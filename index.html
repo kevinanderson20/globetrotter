@@ -74,6 +74,27 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile[disabled]{opacity:.55;cursor:default}
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
+.chall{display:grid;gap:10px}
+.sech{font-size:20px;font-weight:800}
+.secp{margin:2px 0 0;font-size:14px;color:var(--ink-2)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cbtn{border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 12px;text-align:left;display:grid;gap:2px;min-width:0;border-left:6px solid var(--cc)}
+.cbtn:first-child{grid-column:1/-1}
+.missed{display:grid;gap:6px;width:100%}
+.missed .pills{max-height:116px;overflow-y:auto;padding:2px}
+.cbtn b{font-family:var(--f-display);font-weight:800;font-size:16px}
+.cbtn span{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.cbtn[aria-pressed="true"]{border-color:var(--cc);background:color-mix(in srgb,var(--cc) 10%,var(--surface))}
+.cpick{background:var(--surface);border:2px solid var(--cc);border-radius:18px;padding:14px;display:grid;gap:10px}
+.cpick h4{margin:0;font-family:var(--f-display);font-size:19px;font-weight:800}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{border:2px solid var(--line);border-bottom-width:4px;background:var(--surface-2);border-radius:14px;padding:10px;text-align:left;display:grid;gap:3px;min-width:0}
+.mode b{font-weight:800;font-size:15px}
+.mode span{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.timer{font-size:12px;color:var(--ink-3);opacity:.6;font-variant-numeric:tabular-nums;letter-spacing:.02em;min-width:34px;text-align:right}
+.hist{display:grid;gap:4px;width:100%;max-width:320px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.hist div{display:flex;justify-content:space-between;gap:12px}
+.hist .me{color:var(--ink);font-weight:700}
 .cont{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden}
 .cont>button{width:100%;border:0;background:transparent;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:14px 16px;text-align:left}
 .swatch{width:38px;height:38px;border-radius:12px;background:var(--cc);display:grid;place-items:center;color:#fff;font-family:var(--f-display);font-weight:800;font-size:15px}
@@ -167,6 +188,11 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap any country to see its name</span></button>
     <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">Finish a lesson to unlock</span></button>
   </div>
+  <div class="chall">
+    <div><h3 class="sech">Challenges</h3><p class="secp">Every country in a region, once each, against the clock.</p></div>
+    <div class="cgrid" id="cgrid"></div>
+    <div class="cpick" id="cpick" hidden></div>
+  </div>
   <div class="conts" id="conts"></div>
   <div class="sync" id="sync">Progress saves on this device</div>
   <div class="backup" id="backup">
@@ -182,7 +208,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     <button class="x" id="quit" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <div class="steps" id="steps"><i id="stepFill"></i></div>
     <div class="ptitle" id="ptitle" hidden>Explore</div>
-    <span class="xp" id="xpNow">0 XP</span>
+    <span class="timer" id="timer" hidden aria-label="Elapsed time">0:00</span><span class="xp" id="xpNow">0 XP</span>
   </div>
   <div class="stage" id="stage">
     <canvas id="map" aria-label="World map"></canvas>
@@ -263,8 +289,9 @@ const PACK=Object.fromEntries(PACKS.map(p=>[p.id,p]));
 /* ================= progress store ================= */
 const LS="globetrotter.v1";
 const INT=[0,10*60e3,864e5,3*864e5,7*864e5,16*864e5,35*864e5];
-let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America"};
+let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{}};
 try{const s=JSON.parse(localStorage.getItem(LS)||"null"); if(s&&s.packs) S=Object.assign(S,s);}catch(e){}
+if(!S.ch) S.ch={};
 let ready=true, readyCb=null;
 const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(S)); return true;}catch(e){ return false; }};
 function save(){ if(!saveLocal()) setSync("This browser is blocking saving. Progress will reset when you close it."); }
@@ -344,13 +371,14 @@ function renderHome(){
     box.appendChild(el);
   });
   resetUI(false);
+  renderChallenges();
 }
 function resetUI(confirming){
   const w=$('resetWrap');
   if(!confirming){ w.innerHTML=learnedIds().length?`<button class="btn ghost" id="resetBtn">Start over</button>`:""; if($('resetBtn')) $('resetBtn').onclick=()=>resetUI(true); return; }
   w.innerHTML=`<div class="confirm"><span>Erase all lessons, stars and XP?</span><div class="row" style="justify-content:center"><button class="btn ghost" id="rNo">Keep my progress</button><button class="btn ghost" id="rYes" style="color:var(--bad);border-color:var(--bad)">Erase</button></div></div>`;
   $('rNo').onclick=()=>resetUI(false);
-  $('rYes').onclick=()=>{ S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America"}; save(); renderHome(); };
+  $('rYes').onclick=()=>{ S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{}}; save(); renderHome(); };
 }
 function enc(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))); }
 function dec(t){ return JSON.parse(decodeURIComponent(escape(atob(t.replace(/\s+/g,""))))); }
@@ -359,7 +387,7 @@ $('bkCopy').onclick=()=>{ const t=$('bkCode'); const done=()=>{ $('bkCopy').text
   try{ navigator.clipboard.writeText(t.value).then(done,()=>{ t.focus(); t.select(); }); }catch(e){ t.focus(); t.select(); } };
 $('rsBtn').onclick=()=>{ $('bkPane').hidden=true; const p=$('rsPane'); p.hidden=!p.hidden; $('rsMsg').textContent=""; };
 $('rsGo').onclick=()=>{ const m=$('rsMsg'); try{ const raw=$('rsCode').value.trim().replace(/^GLOBE1:/,""); const o=dec(raw); if(!o||!o.packs||!o.cards) throw 0;
-  S=Object.assign({packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America"},o); save(); $('rsCode').value=""; renderHome(); $('rsMsg').style.color="var(--good)"; $('rsPane').hidden=false; $('rsMsg').textContent="Progress restored: "+learnedIds().length+" countries learned."; }
+  S=Object.assign({packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{}},o); save(); $('rsCode').value=""; renderHome(); $('rsMsg').style.color="var(--good)"; $('rsPane').hidden=false; $('rsMsg').textContent="Progress restored: "+learnedIds().length+" countries learned."; }
   catch(e){ m.style.color="var(--bad)"; m.textContent="That code didn't work. Copy the whole code, including GLOBE1: at the start."; } };
 $('exploreBtn').onclick=()=>startExplore();
 $('reviewBtn').onclick=()=>startReview();
@@ -513,11 +541,11 @@ function buzz(ms){ try{ navigator.vibrate&&navigator.vibrate(ms); }catch(e){} }
 
 /* ================= play shell ================= */
 let mode=null, xpRun=0, combo=0;
-function show(screen){ $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; if(screen==="play") resize(); else { renderHome(); } }
+function show(screen){ stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; if(screen==="play") resize(); else { renderHome(); } }
 function setXp(){ $('xpNow').textContent=xpRun+" XP"; }
 function addXp(n){ xpRun+=n; S.xp+=n; setXp(); }
 function setComboUI(){ const c=$('combo'); if(combo>=3){ c.textContent=combo+" in a row!"; c.dataset.on=1; } else c.dataset.on=0; }
-$('quit').onclick=()=>{ mode=null; M={style:()=>null,target:null,labels:[],rings:[],onTap:null}; save(); show("home"); };
+$('quit').onclick=()=>{ stopTimer(); mode=null; M={style:()=>null,target:null,labels:[],rings:[],onTap:null}; save(); show("home"); };
 function setProgress(f){ $('stepFill').style.width=Math.round(f*100)+"%"; }
 function softLabels(exclude){ // names of countries already learned, as gentle context
   return learnedIds().filter(id=>!exclude.has(id)).map(id=>({id,soft:true}));
@@ -684,6 +712,110 @@ function startReview(){
       <p>Every colored country on the map is one you've learned.</p>
       <div class="row" style="width:100%"><button class="btn go wide" id="again">Another round</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
     $('again').onclick=()=>startReview(); $('homeB').onclick=()=>$('quit').click();
+  }
+  step();
+}
+
+/* ================= challenges ================= */
+let cSel=null;
+const fmt=ms=>{ const t=Math.floor(ms/1000), m=Math.floor(t/60), s=t%60; return m+":"+String(s).padStart(2,"0"); };
+const fmtLong=ms=>{ const t=ms/1000; return t<60? t.toFixed(1)+"s" : Math.floor(t/60)+":"+String(Math.floor(t%60)).padStart(2,"0"); };
+const scopeIds=sc=>sc==="World"?IDS:IDS.filter(id=>BY[id].c===sc);
+const better=(a,b)=>!b || a.c>b.c || (a.c===b.c && a.ms<b.ms);
+function bestLine(k){ const r=S.ch[k]; return r&&r.best ? `Best ${r.best.c}/${r.best.n} in ${fmt(r.best.ms)}` : "Not tried yet"; }
+function renderChallenges(){
+  const g=$('cgrid'); g.innerHTML="";
+  ["World",...CONTS.map(c=>c.key)].forEach(sc=>{
+    const b=document.createElement('button'); b.className="cbtn"; b.setAttribute('aria-pressed',cSel===sc);
+    b.style.setProperty('--cc',sc==="World"?"var(--ink)":ccol(sc));
+    const n=scopeIds(sc).length, best=[S.ch[sc+"|name"],S.ch[sc+"|find"]].filter(r=>r&&r.best).map(r=>r.best).sort((a,b)=>b.c/b.n-a.c/a.n)[0];
+    b.innerHTML=`<b>${esc(sc)}</b><span>${n} countries${best?` · best ${Math.round(best.c/best.n*100)}%`:""}</span>`;
+    b.onclick=()=>{ cSel = cSel===sc?null:sc; renderChallenges(); };
+    g.appendChild(b);
+  });
+  const pk=$('cpick');
+  if(!cSel){ pk.hidden=true; return; }
+  const n=scopeIds(cSel).length;
+  pk.hidden=false; pk.style.setProperty('--cc',cSel==="World"?"var(--ink)":ccol(cSel));
+  pk.innerHTML=`<h4>${esc(cSel)} challenge · ${n} countries</h4>
+    <div class="modes"><button class="mode" id="mName"><b>Name them</b><span>Pick from 4 names</span><span>${bestLine(cSel+"|name")}</span></button>
+    <button class="mode" id="mFind"><b>Find them</b><span>Tap each on the map</span><span>${bestLine(cSel+"|find")}</span></button></div>`;
+  $('mName').onclick=()=>startChallenge(cSel,"name");
+  $('mFind').onclick=()=>startChallenge(cSel,"find");
+}
+let tInt=null, tAcc=0, tStart=0, tRun=false;
+function startTimer(){ tAcc=0; tStart=performance.now(); tRun=true; clearInterval(tInt); tInt=setInterval(()=>{ $('timer').textContent=fmt(elapsed()); },250); }
+function elapsed(){ return tAcc+(tRun?performance.now()-tStart:0); }
+function stopTimer(){ if(tRun){ tAcc+=performance.now()-tStart; tRun=false; } clearInterval(tInt); tInt=null; }
+document.addEventListener('visibilitychange',()=>{ if(!tInt) return; if(document.visibilityState==="hidden"){ if(tRun){ tAcc+=performance.now()-tStart; tRun=false; } } else if(!tRun){ tStart=performance.now(); tRun=true; } });
+
+function startChallenge(scope,type){
+  const pool=scopeIds(scope), order=shuffle(pool), n=order.length, key=scope+"|"+type;
+  let qi=0, right=0; const missed=[];
+  xpRun=0; combo=0; setXp(); setComboUI();
+  $('steps').hidden=false; $('ptitle').hidden=true;
+  mode={frame:()=>scope==="World"?worldFrame():frameIds(pool,1.08,20)};
+  show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
+  const after=(ok,id)=>{ if(ok){ right++; combo++; addXp(2); } else { combo=0; missed.push(id); } setComboUI(); };
+  const go=()=>{ qi++; if(qi>=n) fin(); else step(); };
+  function step(){
+    setProgress(qi/n);
+    const id=order[qi], cont=BY[id].c, col=contColor(cont); $('panel').style.setProperty('--cc',ccol(cont));
+    const head=`<span class="eyebrow2">${esc(scope)} · ${qi+1} of ${n} · ${right} right</span>`;
+    if(type==="name"){
+      let others=pool.filter(x=>x!==id&&BY[x].c===cont); if(others.length<3) others=pool.filter(x=>x!==id);
+      const nb=shuffle(others.filter(x=>BY[id].b.includes(x))).slice(0,2); const opts=[...nb]; shuffle(others).forEach(x=>{ if(opts.length<3&&!opts.includes(x)) opts.push(x); });
+      const all=shuffle([id,...opts]);
+      M={style:x=>x!==id&&BY[x].c===cont?[col,.12]:null,target:id,targetColor:col,labels:[],rings:[{id,color:col,r:18,w:3}],onTap:null};
+      const fr=()=>frameIds([id],2.9,28); mode.frame=fr; flyTo(fr());
+      let used=false;
+      $('panel').innerHTML=`${head}<h2>Which country is glowing?</h2><div class="opts">${all.map(o=>`<button class="opt" data-id="${o}">${esc(BY[o].n)}</button>`).join("")}</div><div class="row" id="after" style="min-height:28px"></div>`;
+      document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+        if(used) return; used=true; const ok=b.dataset.id===id; after(ok,id);
+        document.querySelectorAll('.opt').forEach(x=>{ x.disabled=true; x.dataset.s= x.dataset.id===id?"right":(x===b?"wrong":"fade"); });
+        if(ok){ buzz(15); M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); }
+        else { buzz([30,40,30]); M.labels=[{id,color:col}]; draw("hi"); $('after').innerHTML=`<div class="fb" data-k="no">${cross()}<span>That was ${esc(BY[id].n)}.</span></div>`; }
+        setTimeout(go, ok?(reduceMotion?400:650):1500);
+      });
+    } else {
+      const area = scope==="World" ? scopeIds(cont) : pool;
+      let doneQ=false; const wrongIds=new Set();
+      const finish=(ok,tapped)=>{ doneQ=true; after(ok,id);
+        M.target=id; M.targetColor=ok?css.good:col; M.labels=[{id,color:ok?css.good:col}].concat(tapped&&!ok?[{id:tapped,color:css.bad}]:[]); draw("hi");
+        if(ok){ buzz(15); $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${esc(BY[id].n)}</span></div>`; }
+        else { buzz([30,40,30]); $('after').innerHTML=`<div class="fb" data-k="no">${cross()}<span>${tapped?`That's ${esc(BY[tapped].n)}. `:""}${esc(BY[id].n)} is highlighted.</span></div>`; }
+        setTimeout(go, ok?(reduceMotion?400:650):1700); };
+      M={style:x=>wrongIds.has(x)?[css.bad,.55]:(BY[x].c===cont?[col,.14]:null),target:null,labels:[],
+         rings:area.map(x=>({id:x,color:css.ink,a:.35,w:1.5,r:13})),tapPrefer:area,
+         onTap:x=>{ if(doneQ) return; if(x===id) finish(true); else { wrongIds.add(x); finish(false,x); } }};
+      const fr=()=>frameIds(area,1.08,20); mode.frame=fr; flyTo(fr());
+      $('panel').innerHTML=`${head}<h2>Tap <span style="color:${ccol(cont)}">${esc(BY[id].n)}</span></h2><div class="row" id="after" style="min-height:46px"><button class="btn ghost" id="skip">Skip</button></div>`;
+      $('skip').onclick=()=>{ if(!doneQ) finish(false,null); };
+    }
+  }
+  function fin(){
+    stopTimer(); setProgress(1);
+    const ms=Math.round(elapsed()), rec={c:right,n,ms,at:Date.now()};
+    const r=S.ch[key]||{best:null,hist:[]}; const prev=r.best; const isBest=better(rec,prev);
+    if(isBest) r.best=rec; r.hist=[rec,...(r.hist||[])].slice(0,10); S.ch[key]=r;
+    bumpDay(); save();
+    M={style:x=>pool.includes(x)?(missed.includes(x)?[css.bad,.5]:[css.good,.45]):null,target:null,labels:[],rings:[],onTap:null};
+    mode.frame=scope==="World"?worldFrame:()=>frameIds(pool,1.08,20); flyTo(mode.frame(),()=>{ if(right===n||isBest&&prev) confetti(); });
+    const pct=Math.round(right/n*100);
+    let cmp="";
+    if(!prev) cmp="First attempt. This is your score to beat.";
+    else if(isBest) cmp= rec.c>prev.c ? `New best! ${rec.c-prev.c} more right than before.` : `New best! ${fmtLong(prev.ms-ms)} faster with the same score.`;
+    else cmp=`Your best is ${prev.c}/${prev.n} in ${fmt(prev.ms)}.`;
+    $('panel').style.setProperty('--cc','var(--bad)');
+    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px">
+      <span class="eyebrow2">${esc(scope)} · ${type==="name"?"Name them":"Find them"}</span>
+      <h2>${right===n?"Perfect run!":pct+"% correct"}</h2>
+      <div class="nums"><div><b>${right}/${n}</b><span>correct</span></div><div><b>${fmt(ms)}</b><span>time</span></div><div><b>+${xpRun}</b><span>XP</span></div></div>
+      <p>${cmp}</p>
+      ${missed.length?`<div class="missed"><span class="eyebrow2">Missed ${missed.length}</span><div class="pills">${missed.map(id=>`<span>${esc(BY[id].n)}</span>`).join("")}</div></div>`:""}
+      ${r.hist.length>1?`<div class="hist">${r.hist.slice(0,5).map((h,i)=>`<div class="${i===0?"me":""}"><span>${i===0?"This run":new Date(h.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span>${h.c}/${h.n} · ${fmt(h.ms)}</span></div>`).join("")}</div>`:""}
+      <div class="row" style="width:100%"><button class="btn go wide" id="again">Try again</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
+    $('again').onclick=()=>startChallenge(scope,type); $('homeB').onclick=()=>$('quit').click();
   }
   step();
 }
