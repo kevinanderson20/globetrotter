@@ -24,7 +24,7 @@
   --bg:#eaf4fa; --surface:#ffffff; --surface-2:#f3f8fb; --line:#d6e5ee;
   --ink:#10233a; --ink-2:#47596e; --ink-3:#8293a5;
   --sea:#bfe1f2; --sea-deep:#a7d3ea; --grat:#a3cde3; --land:#fffdf7; --land-dim:#edf0f1; --land-off:#e3e8ea; --border:#7b92a2;
-  --sun:#ffb21e; --sun-ink:#4a3000; --good:#1fa25c; --bad:#ec5646; --halo:rgba(255,253,247,.94);
+  --sun:#ffb21e; --sun-ink:#4a3000; --river:#2f86c9; --good:#1fa25c; --bad:#ec5646; --halo:rgba(255,253,247,.94);
   --c-na:#24a167; --c-sa:#8b54d0; --c-eu:#3f67d8; --c-af:#ec7f19; --c-as:#de3f58; --c-oc:#0f9ea0;
   --f-display:"Bricolage Grotesque",ui-rounded,system-ui,sans-serif;
   --f-body:"Figtree",ui-sans-serif,system-ui,sans-serif;
@@ -33,14 +33,14 @@
   --bg:#0a1520; --surface:#12212e; --surface-2:#172938; --line:#22384a;
   --ink:#eaf3fa; --ink-2:#a8bccc; --ink-3:#6f8699;
   --sea:#0f2a3c; --sea-deep:#0b2131; --grat:#173447; --land:#2c3f4d; --land-dim:#1b2a35; --land-off:#1a2731; --border:#5e7a8d;
-  --sun:#ffc23f; --sun-ink:#3a2500; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
+  --sun:#ffc23f; --sun-ink:#3a2500; --river:#5aaee8; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
   --c-na:#3cc485; --c-sa:#a77ae6; --c-eu:#6b8cf0; --c-af:#ff9a3d; --c-as:#ff6680; --c-oc:#2cc4c4;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0a1520; --surface:#12212e; --surface-2:#172938; --line:#22384a;
   --ink:#eaf3fa; --ink-2:#a8bccc; --ink-3:#6f8699;
   --sea:#0f2a3c; --sea-deep:#0b2131; --grat:#173447; --land:#2c3f4d; --land-dim:#1b2a35; --land-off:#1a2731; --border:#5e7a8d;
-  --sun:#ffc23f; --sun-ink:#3a2500; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
+  --sun:#ffc23f; --sun-ink:#3a2500; --river:#5aaee8; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
   --c-na:#3cc485; --c-sa:#a77ae6; --c-eu:#6b8cf0; --c-af:#ff9a3d; --c-as:#ff6680; --c-oc:#2cc4c4;
   color-scheme:dark}
 
@@ -57,7 +57,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .home{overflow-y:auto;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
 .home>*{flex-shrink:0}
 .brand{display:flex;align-items:center;gap:10px}
-.brand h1{font-size:26px;font-weight:800}
+.brand h1{font-size:24px;font-weight:800}
 .brand svg{flex:none}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
@@ -78,7 +78,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .conts{display:grid;gap:12px}
 .trio{grid-template-columns:repeat(3,1fr);gap:8px}
 .tabs{margin-left:auto;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
-.tabs a{padding:7px 13px;border-radius:999px;font-weight:700;font-size:14px;color:var(--ink-2);text-decoration:none;min-height:20px}
+.tabs a{padding:7px 10px;border-radius:999px;font-weight:700;font-size:13px;color:var(--ink-2);text-decoration:none;min-height:20px}
 .tabs a[aria-current="page"]{background:var(--ink);color:var(--surface)}
 .wbtns{display:flex;gap:8px;flex-wrap:wrap}
 .wbtn{flex:1 1 0;min-width:96px;min-height:48px;border:2px solid var(--wc);border-bottom-width:4px;background:color-mix(in srgb,var(--wc) 12%,var(--surface));border-radius:14px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;text-align:left}
@@ -254,7 +254,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="brand">
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="var(--sea)"/><path d="M9 13c3-3 6-2 8 0s1 5-2 6-3 4-1 6M22 8c2 2 5 3 6 6s-1 5-3 5-3 3-1 5" fill="none" stroke="var(--c-na)" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="18" r="16" fill="none" stroke="var(--ink)" stroke-width="2"/><circle cx="28" cy="8" r="4" fill="var(--sun)" stroke="var(--ink)" stroke-width="2"/></svg>
     <h1>Globetrotter</h1>
-    <nav class="tabs" aria-label="Edition"><a href="./" aria-current="page">World</a><a href="usa/">USA</a></nav>
+    <nav class="tabs" aria-label="Edition"><a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a></nav>
   </div>
   <div class="chips" id="chips"></div>
   <button class="next" id="nextBtn"></button>
@@ -332,19 +332,33 @@ const CONTS=[
   {key:"Asia",short:"AS",tok:"c-as",groups:[["East Asia",["Eastern Asia"]],["Southeast Asia",["South-Eastern Asia"]],["South Asia",["Southern Asia"]],["Central Asia",["Central Asia"]],["Middle East & Caucasus",["Western Asia"]]]},
   {key:"Oceania",short:"OC",tok:"c-oc",groups:[["Australia & Melanesia",["Australia and New Zealand","Melanesia"]],["Pacific Islands",["Micronesia","Polynesia"]]]}
 ];
+/* how this edition paints its items: countries fill the land; the Earth edition overrides this */
+const ED={base:()=>null, under:()=>false, otherFill:"land-off"};
 const CONT=Object.fromEntries(CONTS.map(c=>[c.key,c]));
 
 /* ================= map data ================= */
 const hiT=JSON.parse($('hi').textContent), loT=JSON.parse($('lo').textContent);
 const F={hi:{},lo:{}}, OTHER={};
+// a ring wound the wrong way covers the whole globe instead of the country (Kazakhstan, after merging Baikonur), so flip it
+function fixWinding(f){ const g=f.geometry; if(!g||!/Polygon/.test(g.type)) return f;
+  const polys=g.type==="Polygon"?[g.coordinates]:g.coordinates;
+  polys.forEach(p=>p.forEach((ring,i)=>{ if(d3.geoArea({type:"Polygon",coordinates:[ring]})>2*Math.PI) ring.reverse(); }));
+  return f; }
 for(const [k,T] of [["hi",hiT],["lo",loT]]){
-  topojson.feature(T,T.objects.countries).features.forEach(f=>F[k][f.id]=f);
+  topojson.feature(T,T.objects.countries).features.forEach(f=>F[k][f.id]=fixWinding(f));
   OTHER[k]=topojson.feature(T,T.objects.other).features;
 }
 const IDS=Object.keys(F.lo).filter(id=>BY[id]);
-const MAIN={}, AREA={}, CENT={};
+const MAIN={}, AREA={}, CENT={}, KIND={};
 IDS.forEach(id=>{
-  const g=F.lo[id].geometry, polys=g.type==="Polygon"?[g.coordinates]:g.coordinates;
+  const g=F.lo[id].geometry, t=g.type;
+  if(/Point|Line/.test(t)){ // rivers and peaks: no area; label at the vertex nearest the middle
+    KIND[id]=/Point/.test(t)?"point":"line"; MAIN[id]=F.lo[id]; AREA[id]=0;
+    const pts=t==="Point"?[g.coordinates]:t==="MultiPoint"||t==="LineString"?g.coordinates:g.coordinates.flat();
+    const c=d3.geoCentroid(F.lo[id]); let best=pts[0], bd=Infinity; pts.forEach(q=>{ const d=d3.geoDistance(q,c); if(d<bd){bd=d;best=q;} }); CENT[id]=best; return;
+  }
+  KIND[id]="poly";
+  const polys=t==="Polygon"?[g.coordinates]:g.coordinates;
   const areas=polys.map(p=>d3.geoArea({type:"Polygon",coordinates:p}));
   const mx=Math.max(...areas);
   MAIN[id]={type:"Feature",geometry:{type:"MultiPolygon",coordinates:polys.filter((p,i)=>areas[i]>=mx*0.25)}};
@@ -359,7 +373,7 @@ const PACKS=[]; const PACK_OF={};
 CONTS.forEach(c=>{
   c.packs=[];
   c.groups.forEach(([gname,subs],gi)=>{
-    const ids=META.filter(m=>m.c===c.key&&subs.includes(m.s)).map(m=>m.id).sort((a,b)=>AREA[b]-AREA[a]);
+    const ids=META.filter(m=>m.c===c.key&&subs.includes(m.s)).map(m=>m.id).sort((a,b)=>(BY[b].w??AREA[b])-(BY[a].w??AREA[a]));
     const k=Math.max(1,Math.round(ids.length/5)), base=Math.floor(ids.length/k), extra=ids.length%k;
     let i=0;
     for(let p=0;p<k;p++){
@@ -491,7 +505,7 @@ const proj=d3.geoEqualEarth().precision(0.4), path=d3.geoPath(proj,ctx);
 let view={lon:10,lat:10,s:1}, zt=d3.zoomIdentity, worldScale=1, homeView=null;
 let css={};
 function readTokens(){ const s=getComputedStyle(document.documentElement);
-  ["sea","sea-deep","grat","land","land-dim","land-off","border","ink","sun","good","bad","halo","surface","c-na","c-sa","c-eu","c-af","c-as","c-oc"].forEach(k=>css[k]=s.getPropertyValue("--"+k).trim()); }
+  ["sea","sea-deep","grat","land","land-dim","land-off","border","ink","sun","good","bad","halo","surface","river","c-na","c-sa","c-eu","c-af","c-as","c-oc"].forEach(k=>css[k]=s.getPropertyValue("--"+k).trim()); }
 const contColor=cont=>css[CONT[cont].tok];
 /* M = what to paint. style(id) -> [color, alpha] | null ; target ; labels ; rings */
 let M={style:()=>null, target:null, targetColor:null, labels:[], rings:[], onTap:null, ctxLabels:false};
@@ -538,18 +552,36 @@ function draw(q){
   ctx.setTransform(DPR*k,0,0,DPR*k,DPR*zt.x,DPR*zt.y);
   ctx.beginPath(); path(sphere); ctx.fillStyle=css.sea; ctx.fill();
   ctx.beginPath(); path(grat); ctx.strokeStyle=css.grat; ctx.lineWidth=.8/k; ctx.stroke();
-  ctx.lineJoin="round";
-  ctx.beginPath(); OTHER[q].forEach(f=>path(f)); ctx.fillStyle=css["land-off"]; ctx.fill(); ctx.strokeStyle=css.border; ctx.lineWidth=.5/k; ctx.stroke();
-  const groups=new Map();
-  for(const id of IDS){ if(id===M.target||!hit(BOUNDS[id],r)) continue; const st=M.style(id); const key=st?st[0]+"|"+st[1]:"base"; (groups.get(key)||groups.set(key,[]).get(key)).push(id); }
-  for(const [key,ids] of groups){
+  ctx.lineJoin="round"; ctx.lineCap="round";
+  const groups=new Map(), pts=[];
+  for(const id of IDS){ if(id===M.target||!hit(BOUNDS[id],r)) continue; let st=M.style(id); if(!st) st=ED.base(id); if(st==="skip") continue;
+    if(KIND[id]==="point"){ pts.push([id,st]); continue; }
+    const key=(st?st[0]+"|"+st[1]:"base|1")+"|"+KIND[id]+"|"+(ED.under(id)?1:0); (groups.get(key)||groups.set(key,[]).get(key)).push(id); }
+  const paint=(key,ids)=>{
+    const [col,a,kind,under]=key.split("|");
     ctx.beginPath(); ids.forEach(id=>path(set[id]));
-    if(key==="base"){ ctx.fillStyle=css.land; ctx.fill(); }
-    else { const [col,a]=key.split("|"); if(col==="dim"){ ctx.fillStyle=css["land-dim"]; ctx.fill(); } else { ctx.fillStyle=css.land; ctx.fill(); ctx.globalAlpha=+a; ctx.fillStyle=col; ctx.fill(); ctx.globalAlpha=1; } }
+    if(kind==="line"){ ctx.globalAlpha=col==="dim"?.3:+a; ctx.strokeStyle=col==="base"?css.river:col==="dim"?css.border:col; ctx.lineWidth=(col==="base"||col==="dim"?1.4:3.2)/k; ctx.stroke(); ctx.globalAlpha=1; return; }
+    if(col==="base"){ ctx.fillStyle=css.land; ctx.fill(); }
+    else if(col==="dim"){ if(under==="1") return; ctx.fillStyle=css["land-dim"]; ctx.fill(); }
+    else { if(under!=="1"){ ctx.fillStyle=css.land; ctx.fill(); } ctx.globalAlpha=+a; ctx.fillStyle=col; ctx.fill(); ctx.globalAlpha=1; }
     ctx.strokeStyle=css.border; ctx.lineWidth=.7/k; ctx.stroke();
-  }
-  if(M.target){
-    ctx.beginPath(); path(set[M.target]); ctx.fillStyle=M.targetColor; ctx.fill(); ctx.strokeStyle=css.ink; ctx.lineWidth=1.4/k; ctx.stroke();
+  };
+  const tgt=()=>{ const id=M.target, kd=KIND[id]; if(kd==="point") return;
+    ctx.beginPath(); path(set[id]);
+    if(kd==="line"){ ctx.strokeStyle=css.surface; ctx.lineWidth=8/k; ctx.stroke(); ctx.strokeStyle=M.targetColor; ctx.lineWidth=4.5/k; ctx.stroke(); return; }
+    ctx.fillStyle=M.targetColor; ctx.fill(); ctx.strokeStyle=css.ink; ctx.lineWidth=1.4/k; ctx.stroke(); };
+  for(const [key,ids] of groups) if(key.endsWith("|1")) paint(key,ids);   // seas sit under the land
+  if(M.target&&ED.under(M.target)) tgt();
+  ctx.beginPath(); OTHER[q].forEach(f=>path(f)); ctx.fillStyle=css[ED.otherFill]; ctx.fill(); ctx.strokeStyle=css.border; ctx.lineWidth=.5/k; ctx.stroke();
+  for(const [key,ids] of groups) if(key.endsWith("|0")&&!key.includes("|line|")) paint(key,ids);
+  for(const [key,ids] of groups) if(key.includes("|line|")) paint(key,ids);   // rivers on top of land areas
+  if(M.target&&!ED.under(M.target)) tgt();
+  if(pts.length||(M.target&&KIND[M.target]==="point")){ // peaks: triangles that keep their size at any zoom
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    const tri=(id,sz,fill,stroke,lw)=>{ const p=screenOf(id); if(!p) return; ctx.beginPath(); ctx.moveTo(p[0],p[1]-sz); ctx.lineTo(p[0]+sz*.95,p[1]+sz*.6); ctx.lineTo(p[0]-sz*.95,p[1]+sz*.6); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); ctx.lineWidth=lw; ctx.strokeStyle=stroke; ctx.stroke(); };
+    pts.forEach(([id,st])=>{ if(st&&st[0]!=="dim"){ ctx.globalAlpha=Math.max(.5,+st[1]); tri(id,7,st[0],css.ink,1.2); ctx.globalAlpha=1; } else tri(id,5,css.land,css.border,1); });
+    if(M.target&&KIND[M.target]==="point") tri(M.target,11,M.targetColor,css.ink,2);
+    ctx.setTransform(DPR*k,0,0,DPR*k,DPR*zt.x,DPR*zt.y);
   }
   if(M.line){ ctx.beginPath(); path(M.line); ctx.setLineDash([7/k,5/k]); ctx.strokeStyle=css.ink; ctx.lineWidth=2.2/k; ctx.stroke(); ctx.setLineDash([]); }
   // rings around tiny countries so they're visible
@@ -624,19 +656,28 @@ const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,
 $('zin').onclick=()=>zoomBy(2); $('zout').onclick=()=>zoomBy(.5);
 const COARSE=matchMedia('(pointer: coarse)').matches;
 const TOUCH_R=COARSE?30:22, TINY=26; // micro-states get a touch circle this big, and win taps inside it
-const MICRO=new Set(IDS.filter(id=>AREA[id]*6371*6371<3000)); // Vatican, Monaco, Malta, Singapore, small islands...
+const MICRO=new Set(IDS.filter(id=>KIND[id]==="point"||(KIND[id]==="poly"&&AREA[id]*6371*6371<3000))); // Vatican, Monaco, Malta, Singapore, small islands...
 const ringed=id=>pxSize(id)<(MICRO.has(id)?TINY:14);
 // tap -> country
+function segDist(px,py,ax,ay,bx,by){ const dx=bx-ax, dy=by-ay, L=dx*dx+dy*dy; let t=L?((px-ax)*dx+(py-ay)*dy)/L:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(px-ax-t*dx,py-ay-t*dy); }
 function pickAt(cx,cy,prefer){
   const r=canvas.getBoundingClientRect(), x=cx-r.left, y=cy-r.top;
   // 1. tiny countries first: anywhere inside their touch circle counts (so Vatican beats Italy)
   let tb=null, td=TOUCH_R;
   for(const id of MICRO){ if(pxSize(id)>=TINY) continue; const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<td){ td=d; tb=id; } }
   if(tb) return tb;
-  // 2. the country under your finger
+  // 2. rivers: a tap close to the line counts
+  let lb=null, ld=TOUCH_R*.75;
+  for(const id of IDS){ if(KIND[id]!=="line") continue; const b=BOUNDS[id], bx=(x-zt.x)/zt.k, by=(y-zt.y)/zt.k, m=TOUCH_R/zt.k;
+    if(bx<b[0][0]-m||bx>b[1][0]+m||by<b[0][1]-m||by>b[1][1]+m) continue;
+    const g=F.lo[id].geometry, lines=g.type==="LineString"?[g.coordinates]:g.coordinates;
+    for(const L of lines){ let prev=null; for(const c of L){ const q=proj(c); if(!q){ prev=null; continue; } const sx=q[0]*zt.k+zt.x, sy=q[1]*zt.k+zt.y;
+      if(prev){ const d=segDist(x,y,prev[0],prev[1],sx,sy); if(d<ld){ ld=d; lb=id; } } prev=[sx,sy]; } } }
+  if(lb) return lb;
+  // 3. the country under your finger
   const ll=proj.invert([(x-zt.x)/zt.k,(y-zt.y)/zt.k]);
   if(ll){ const bx=(x-zt.x)/zt.k, by=(y-zt.y)/zt.k;
-    for(const id of IDS){ const b=BOUNDS[id]; if(bx<b[0][0]-1||bx>b[1][0]+1||by<b[0][1]-1||by>b[1][1]+1) continue; if(d3.geoContains(F.lo[id],ll)) return id; } }
+    for(const id of IDS){ if(KIND[id]!=="poly") continue; const b=BOUNDS[id]; if(bx<b[0][0]-1||bx>b[1][0]+1||by<b[0][1]-1||by>b[1][1]+1) continue; if(d3.geoContains(F.lo[id],ll)) return id; } }
   // 3. a near miss in the sea: nearest candidate country within reach
   let best=null,bd=TOUCH_R; for(const id of (prefer||[])){ const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<bd){bd=d;best=id;} }
   return best;
@@ -721,7 +762,7 @@ function startLesson(p){
     const nb=m.b.filter(b=>BY[b]);
     const nbText = nb.length ? `Borders <b>${nb.slice(0,5).map(b=>esc(BY[b].n)).join(", ")}</b>${nb.length>5?` and ${nb.length-5} more`:""}.` : `No land borders. It's surrounded by water.`;
     $('panel').innerHTML=`<span class="eyebrow2">New country · ${s.i+1} of ${ids.length}</span><h2 class="bigname">${esc(m.n)}</h2>
-      <p>In <b>${esc(GROUP_OF[id])}</b>. ${nbText}</p>
+      <p>${m.d?esc(m.d):`In <b>${esc(GROUP_OF[id])}</b>. ${nbText}`}</p>
       <div class="row"><button class="btn wide" id="go">${s.i+1<ids.length?"Next country":"Start practice"}</button></div>`;
     $('go').onclick=next; $('go').focus({preventScroll:true});
   }
@@ -967,8 +1008,10 @@ function drawMastery(){
   g.beginPath(); pp(sphere); g.fillStyle=css.sea; g.fill();
   g.beginPath(); OTHER.lo.forEach(f=>pp(f)); g.fillStyle=css["land-off"]; g.fill();
   const cols=MCOL(), groups=[[],[],[],[]]; IDS.forEach(id=>groups[level(id)].push(id));
-  groups.forEach((ids,l)=>{ if(!ids.length) return; g.beginPath(); ids.forEach(id=>pp(F.lo[id])); g.fillStyle=cols[l]; g.fill(); g.strokeStyle=css.border; g.lineWidth=.35; g.stroke(); });
-  IDS.forEach(id=>{ const l=level(id); if(!l) return; const b=pp.bounds(MAIN[id]); if(Math.max(b[1][0]-b[0][0],b[1][1]-b[0][1])>3.5) return; const q=mProj(CENT[id]); if(!q) return; g.beginPath(); g.arc(q[0],q[1],2.2,0,7); g.fillStyle=cols[l]; g.fill(); g.lineWidth=.6; g.strokeStyle=css.ink; g.stroke(); });
+  groups.forEach((ids,l)=>{ const polys=ids.filter(id=>KIND[id]==="poly"&&!(l===0&&ED.base(id)==="skip")), lines=ids.filter(id=>KIND[id]==="line");
+    if(polys.length){ g.beginPath(); polys.forEach(id=>pp(F.lo[id])); g.fillStyle=cols[l]; g.fill(); g.strokeStyle=css.border; g.lineWidth=.35; g.stroke(); }
+    if(lines.length){ g.beginPath(); lines.forEach(id=>pp(F.lo[id])); g.strokeStyle=l?cols[l]:css.river; g.lineWidth=l?2:1; g.stroke(); } });
+  IDS.forEach(id=>{ const l=level(id); if(!l&&KIND[id]!=='point') return; const b=pp.bounds(MAIN[id]); if(Math.max(b[1][0]-b[0][0],b[1][1]-b[0][1])>3.5) return; const q=mProj(CENT[id]); if(!q) return; g.beginPath(); g.arc(q[0],q[1],2.2,0,7); g.fillStyle=cols[l]; g.fill(); g.lineWidth=.6; g.strokeStyle=css.ink; g.stroke(); });
   $('mleg').innerHTML=legendHTML(IDS);
 }
 new ResizeObserver(()=>drawMastery()).observe($('mmap'));
@@ -1179,11 +1222,12 @@ function dayNum(key){ const [y,m,d]=key.split("-").map(Number); return Math.roun
 function rng(seed){ let h=2166136261>>>0; for(const ch of seed){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619)>>>0; }
   return ()=>{ h=(h+0x6D2B79F5)>>>0; let t=h; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
 function pickTen(seed){ const r=rng(seed), pool=IDS.slice().sort(), out=[]; while(out.length<10){ const id=pool[Math.floor(r()*pool.length)]; if(!out.includes(id)) out.push(id); } return out; }
+function eachCoord(g,fn){ const t=g.type,c=g.coordinates; if(t==="Point") fn(c); else if(t==="MultiPoint"||t==="LineString") c.forEach(fn); else if(t==="MultiLineString"||t==="Polygon") c.forEach(r=>r.forEach(fn)); else if(t==="MultiPolygon") c.forEach(p=>p.forEach(r=>r.forEach(fn))); }
 function distMi(id,ll){
-  const f=F.hi[id]; if(d3.geoContains(f,ll)) return {mi:0,near:ll};
-  let best=Infinity, near=null; const g=f.geometry, polys=g.type==="Polygon"?[g.coordinates]:g.coordinates;
-  for(const poly of polys) for(const ring of poly) for(const pt of ring){ const d=d3.geoDistance(ll,pt); if(d<best){best=d;near=pt;} }
-  return {mi:best*MI,near};
+  const f=F.hi[id]; if(KIND[id]==="poly"&&d3.geoContains(f,ll)) return {mi:0,near:ll};
+  let best=Infinity, near=null; eachCoord(f.geometry,pt=>{ const d=d3.geoDistance(ll,pt); if(d<best){best=d;near=pt;} });
+  const mi=best*MI; if(KIND[id]!=="poly"&&mi<25) return {mi:0,near}; // close enough to a river or peak counts as a hit
+  return {mi,near};
 }
 const ptsFor=mi=>mi<=0?1000:Math.max(0,Math.round(1000*Math.exp(-mi/900)));
 const gradeOf=p=>p>=900?3:p>=500?2:1;
@@ -1219,7 +1263,7 @@ function startDaily(practice){
     M={style:()=>null,target:null,labels:[],rings:[],pin:null,line:null,onTap:null,onTapLL:ll=>{ pin=ll; M.pin=ll; draw("hi"); const b=$('lock'); if(b){ b.disabled=false; b.textContent="Lock in"; } }};
     mode.frame=worldFrame; flyTo(worldFrame());
     $('panel').style.setProperty('--cc','var(--ink)');
-    $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">${title} · Round ${ri+1} of 10</span><h2>Where is ${esc(BY[id].n)}?</h2></div><div class="tot">${total.toLocaleString()}<small>points</small></div></div>
+    $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">${title} · Round ${ri+1} of 10</span><h2>Where is ${esc(BY[id].q||BY[id].n)}?</h2></div><div class="tot">${total.toLocaleString()}<small>points</small></div></div>
       ${dotsHTML(ri)}<p>Tap the map to drop a pin. Zoom in for a closer guess, then lock it in.</p>
       <div class="row"><button class="btn go wide" id="lock" disabled>Drop a pin first</button></div>`;
     $('lock').onclick=()=>{ if(!pin) return; lockIn(id,pin); };
@@ -1236,7 +1280,7 @@ function startDaily(practice){
     const last=ri===9;
     $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">${title} · Round ${ri+1} of 10</span><h2>${mi===0?"Bullseye!":esc(BY[id].n)}</h2></div><div class="tot" id="totN">${(total-pts).toLocaleString()}<small>points</small></div></div>
       ${dotsHTML(-1)}
-      <div class="row" style="align-items:baseline;gap:14px"><span class="pts" id="ptsN" style="color:${["","var(--bad)","color-mix(in srgb,var(--sun) 75%,var(--ink))","var(--good)"][g]}">+0</span><span style="color:var(--ink-2);font-size:15px">${mi===0?`Your pin is inside ${esc(BY[id].n)}.`:`${fmtMi(mi)} from ${esc(BY[id].n)}`}</span></div>
+      <div class="row" style="align-items:baseline;gap:14px"><span class="pts" id="ptsN" style="color:${["","var(--bad)","color-mix(in srgb,var(--sun) 75%,var(--ink))","var(--good)"][g]}">+0</span><span style="color:var(--ink-2);font-size:15px">${mi===0?(KIND[id]==='poly'?`Your pin is inside ${esc(BY[id].n)}.`:`Right on ${esc(BY[id].n)}.`):`${fmtMi(mi)} from ${esc(BY[id].n)}`}</span></div>
       <div class="row"><button class="btn wide" id="nextR">${last?"See results":"Next round"}</button></div>`;
     countUp($('ptsN'),pts,"+"); countUp($('totN'),total,"",total-pts,"points");
     $('nextR').onclick=()=>{ ri++; ri<10?round():results(); };

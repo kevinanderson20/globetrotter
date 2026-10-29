@@ -18,6 +18,10 @@ Challenges: quiz a whole continent or the world, timed, with your best scores sa
 
 Works offline: open it once with internet (ideally from your home-screen icon) and the app saves a copy on your device.
 
-## USA edition
+## Editions
 
-`usa/` is the same app for the 50 states (lessons by Census division, challenges, Daily 10, neighbors, mastery map). It is generated from the World edition: after editing `index.html`, run `python3 tools/build_usa.py`. State shapes come from the US Census 1:10m boundaries via us-atlas (`tools/build-us-data.js`).
+- `index.html`: World (197 countries). This is the source of the app code.
+- `usa/`: the 50 states (US Census 1:10m boundaries via us-atlas; `tools/build-us-data.js`).
+- `earth/`: oceans & seas, rivers, mountain ranges and peaks, deserts and regions (Natural Earth 1:50m physical layers; `tools/build-earth-data.mjs`).
+
+`usa/` and `earth/` are generated from the World edition. After editing `index.html`, run `python3 tools/build_editions.py`.
