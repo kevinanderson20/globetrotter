@@ -100,14 +100,18 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .modes.four{grid-template-columns:1fr 1fr}
 .fillcount{font-family:var(--f-display);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums;line-height:1}
 .fillcount small{font-size:16px;color:var(--ink-3)}
-.screen.play.kb{position:fixed;left:0;right:0;margin:0 auto;z-index:20}
-.play.kb .panel{padding-block:10px 10px;gap:8px;max-height:62%}
-.play.kb .panel h2{font-size:19px}
-.play.kb .panel .eyebrow2,.play.kb .sheetgrab{display:none}
-.play.kb .nbnames{max-height:64px;overflow-y:auto}
-.play.kb .nbform .btn{min-height:46px}
-.play.kb .nbform input{padding:10px 12px}
-.play.kb .fillcount{font-size:22px}
+#panel.top{top:var(--pbarh,64px);bottom:auto;border-radius:0 0 22px 22px;border-top:0;border-bottom:1px solid var(--line);padding-block:10px 14px;gap:8px;max-height:52%;overflow-y:auto;box-shadow:0 8px 22px rgba(0,0,0,.10)}
+#panel.top .sheetgrab{display:none}
+#panel.top h2{font-size:20px;line-height:1.15}
+#panel.top .nbform .btn{min-height:46px}
+#panel.top .nbform input{padding:10px 12px}
+#panel.top .fillcount{font-size:24px}
+#panel.top .row{min-height:0!important}
+.route{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:14px;font-weight:600}
+.route span{border-radius:999px;padding:3px 10px;border:1.5px solid var(--good)}
+.route span.a{border-color:var(--c-eu);background:color-mix(in srgb,var(--c-eu) 14%,var(--surface))}
+.route span.b{border-color:var(--sun);background:color-mix(in srgb,var(--sun) 18%,var(--surface))}
+.route i{font-style:normal;color:var(--ink-3)}
 .update{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:30;max-width:calc(100% - 32px);border:0;border-radius:14px;padding:12px 16px;background:var(--sun);color:var(--sun-ink);font:700 15px/1.3 var(--f-body);box-shadow:0 6px 18px rgba(0,0,0,.2)}
 #panel{grid-template-columns:minmax(0,1fr)}
 #panel>*{min-width:0}
@@ -303,7 +307,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
     <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap to see names</span></button>
     <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">After a lesson</span></button>
     <button class="tile" id="nbBtn" hidden><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="6" width="6" height="6" rx="1" fill="currentColor"/><path d="M2 3h3M2 3v3M16 3h-3M16 3v3M2 15h3M2 15v-3M16 15h-3M16 15v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Neighbors</b><span id="nbSub">Name the borders</span></button>
-    <button class="tile" id="chainBtn" hidden><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span><b>Chain</b><span id="chainSub">Neighbor to neighbor</span></button>
+    <button class="tile" id="chainBtn" hidden><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span><b>Chain</b><span id="chainSub">Find the route</span></button>
   </div>
   <div class="chall">
     <div class="sechead"><div><h3 class="sech">Challenges</h3><p class="secp">Every place in a category, once each, against the clock.</p></div><button class="histbtn" id="histBtn"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 13V3M2 13h12M5 10l3-3 2 2 4-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>History</button></div>
@@ -441,7 +445,8 @@ const LS="globetrotter.earth.v1";
 const INT=[0,10*60e3,864e5,3*864e5,7*864e5,16*864e5,35*864e5];
 let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"Oceans & Seas",ch:{},stats:{},daily:{},nb:{}};
 try{const s=JSON.parse(localStorage.getItem(LS)||"null"); if(s&&s.packs) S=Object.assign(S,s);}catch(e){}
-if(!S.ch) S.ch={}; if(!S.chain) S.chain={}; if(S.sound===undefined) S.sound=true; if(S.recall===undefined) S.recall=false; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
+if(!S.ch) S.ch={}; if(!S.chain) S.chain={};
+if(S.chain.hist) S.chain.hist=S.chain.hist.filter(h=>"solved" in h); if(S.chain.best&&!("solved" in S.chain.best)) S.chain.best=null; // runs from the old chain game if(S.sound===undefined) S.sound=true; if(S.recall===undefined) S.recall=false; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
 let ready=true, readyCb=null;
 const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(S)); return true;}catch(e){ return false; }};
 function save(){ if(!saveLocal()) setSync("This browser is blocking saving. Progress will reset when you close it."); }
@@ -503,7 +508,7 @@ function renderHome(){
   const rb=$('reviewBtn'); rb.disabled=L<4;
   $('reviewSub').textContent= L<4 ? "After a lesson" : (due? `${due} ready` : "Mixed practice");
   const nbB=S.nb.best; $('nbSub').textContent= nbB ? `Best ${nbB.c}/${nbB.n}` : "Name the borders";
-  const chB=S.chain&&S.chain.best; $('chainSub').textContent= chB ? `Longest: ${chB.c} links` : "Neighbor to neighbor";
+  const chN=(S.chain&&S.chain.hist||[]).filter(h=>h.solved).length; $('chainSub').textContent= chN ? `${chN} route${chN===1?"":"s"} solved` : "Find the route";
   renderDailyCard(); drawMastery();
   const box=$('conts'); box.innerHTML="";
   CONTS.forEach(c=>{
@@ -563,10 +568,18 @@ const contColor=cont=>css[CONT[cont].tok];
 let M={style:()=>null, target:null, targetColor:null, labels:[], rings:[], onTap:null, ctxLabels:false};
 // the answer panel floats over the bottom of the map; frame and center things in the part you can see
 function occl(){ const pn=$('panel'); if(!pn||$('play').hidden) return 0; return pn.dataset.down==="1"?pn.offsetHeight:Math.max(0,pn.offsetHeight-8); }
-const VH=()=>Math.max(160,H-occl());
-function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); const p=proj([v.lon,v.lat]); let tx=W/2-p[0], ty=VH()/2-p[1];
+function band(){ const pn=$('panel'), st=$('stage');
+  if(!pn||$('play').hidden) return [0,H];
+  if(pn.classList.contains('top')){ // text box at the top: the keyboard takes roughly the bottom 45% of the screen
+    const y0=Math.max(0,pn.offsetTop+pn.offsetHeight-st.offsetTop);
+    const y1=Math.round(window.innerHeight*0.55-st.getBoundingClientRect().top);
+    return [y0,Math.min(H,Math.max(y0+150,y1))]; }
+  return [0,Math.max(160,H-occl())]; }
+const VH=()=>{ const b=band(); return b[1]-b[0]; }, CY=()=>{ const b=band(); return (b[0]+b[1])/2; };
+const CTLW=64, VW=()=>Math.max(160,W-CTLW), CX=()=>VW()/2; // keep things clear of the zoom buttons on the right
+function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); const p=proj([v.lon,v.lat]); let tx=CX()-p[0], ty=CY()-p[1];
   const b=d3.geoPath(proj).bounds(sphere), top=b[0][1]+ty, bot=b[1][1]+ty;
-  if(bot-top>=VH()){ if(top>0) ty-=top; else if(bot<VH()) ty+=VH()-bot; } else ty=VH()/2-(b[0][1]+b[1][1])/2;
+  const [y0,y1]=band(); if(bot-top>=y1-y0){ if(top>y0) ty-=top-y0; else if(bot<y1) ty+=y1-bot; } else ty=CY()-(b[0][1]+b[1][1])/2;
   proj.translate([tx,ty]); }
 function fitWorldScale(){ proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),VH()/(b[1][1]-b[0][1]))*0.98; }
 function frameFeatures(feats,pad,minDeg){
@@ -575,7 +588,7 @@ function frameFeatures(feats,pad,minDeg){
   proj.rotate([-c[0],0]).scale(1).translate([0,0]);
   const b=d3.geoPath(proj).bounds(fc), span=(minDeg||20)*Math.PI/180;
   const sx=Math.max((b[1][0]-b[0][0])*pad,span), sy=Math.max((b[1][1]-b[0][1])*pad,span*0.7);
-  const s=Math.max(Math.min(W/sx,VH()/sy),worldScale);
+  const s=Math.max(Math.min(VW()/sx,VH()/sy),worldScale);
   const ll=proj.invert([(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2])||c;
   return {lon:ll[0],lat:ll[1],s};
 }
@@ -588,7 +601,7 @@ function frameIds(ids,pad,minDeg){
   const b=d3.geoPath(proj).bounds(fc);
   const span=(minDeg||20)*Math.PI/180;
   const sx=Math.max((b[1][0]-b[0][0])*pad,span), sy=Math.max((b[1][1]-b[0][1])*pad,span*0.7);
-  const s=Math.max(Math.min(W/sx,VH()/sy),worldScale);
+  const s=Math.max(Math.min(VW()/sx,VH()/sy),worldScale);
   const ll=proj.invert([(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2])||c;
   return {lon:c[0],lat:ll[1],s};
 }
@@ -707,7 +720,7 @@ function resize(reset){
 }
 new ResizeObserver(()=>resize(false)).observe(stage);
 $('recenter').onclick=()=>{ if(homeView) flyTo(homeView); };
-const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,f,[W/2,VH()/2]);
+const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,f,[W/2,CY()]);
 $('zin').onclick=()=>zoomBy(2); $('zout').onclick=()=>zoomBy(.5);
 const COARSE=matchMedia('(pointer: coarse)').matches;
 const TOUCH_R=COARSE?30:22, TINY=26; // micro-states get a touch circle this big, and win taps inside it
@@ -785,7 +798,7 @@ function buzz(ms){ snd(Array.isArray(ms)?"no":"ok"); try{ navigator.vibrate&&nav
 
 /* ================= play shell ================= */
 let mode=null, xpRun=0, combo=0;
-function show(screen){ $('panel').classList.remove('explore'); stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; $('hist').hidden=screen!=="hist"; if(screen==="play") resize(true); else { renderHome(); } }
+function show(screen){ $('panel').classList.remove('explore','top'); stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; $('hist').hidden=screen!=="hist"; if(screen==="play"){ $('play').style.setProperty('--pbarh',$('play').querySelector('.pbar').offsetHeight+"px"); resize(true); } else { renderHome(); } }
 function setXp(){ $('xpNow').textContent=xpRun+" XP"; }
 function addXp(n){ xpRun+=n; S.xp+=n; setXp(); }
 function setComboUI(){ const c=$('combo'); if(combo>=3){ c.textContent=combo+" in a row!"; c.dataset.on=1; } else c.dataset.on=0; }
@@ -1035,6 +1048,7 @@ function startChallenge(scope,type){
           <div class="row" id="after" style="min-height:48px"><div class="fb" id="tyMsg" style="flex:1"></div><button class="btn ghost" id="tySkip" type="button">Skip</button></div>`;
         setTimeout(()=>$('tyIn').focus({preventScroll:true}),350);
       }
+      if(!$('panel').classList.contains('top')){ $('panel').classList.add('top'); requestAnimationFrame(()=>flyTo(mode.frame())); }
       $('tyHead').textContent=`${scope} · ${qi+1} of ${n} · ${right} right`; $('tyMsg').innerHTML=""; $('tyMsg').dataset.k="";
       const inp=$('tyIn'); inp.value=""; inp.disabled=false;
       let done=false;
@@ -1066,6 +1080,7 @@ function startChallenge(scope,type){
     }
   }
   function fin(){
+    $('panel').classList.remove('top');
     stopTimer(); setProgress(1);
     const ms=Math.round(elapsed()), rec={c:right,n,ms,at:Date.now()};
     const r=S.ch[key]||{best:null,hist:[]}; const prev=r.best; const isBest=better(rec,prev);
@@ -1107,6 +1122,7 @@ function startFill(scope){
   $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">Fill the map · ${esc(scope)}</span><h2>Name every place you can</h2></div><div class="fillcount" id="flCount">0<small>/${pool.length}</small></div></div>
     <form class="nbform" id="flForm" autocomplete="off"><input id="flIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Type a name" aria-label="Type a name"><button class="btn go" type="submit">Enter</button></form>
     <div class="row" id="after" style="min-height:48px"><div class="fb" id="flMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">Any order. Close spelling counts.</span></div><button class="btn ghost" id="flGive" type="button">Give up</button></div>`;
+  $('panel').classList.add('top'); requestAnimationFrame(()=>flyTo(mode.frame()));
   const inp=$('flIn'); setTimeout(()=>inp.focus({preventScroll:true}),350);
   const msg=(t,k)=>{ const m=$('flMsg'); m.dataset.k=k||""; m.innerHTML=(k==="ok"?check():k==="no"?cross():"")+`<span>${t}</span>`; };
   setProgress(0);
@@ -1130,6 +1146,7 @@ function startFill(scope){
     const r=S.ch[key]||{best:null,hist:[]}, prev=r.best, isBest=better(rec,prev);
     if(isBest) r.best=rec; r.hist=[rec,...(r.hist||[])].slice(0,30); S.ch[key]=r; bumpDay(); save();
     if(all||(isBest&&prev)) confetti();
+    $('panel').classList.remove('top');
     const cmp=!prev?"First run. This is your score to beat.":isBest?(rec.c>prev.c?`New best! ${rec.c-prev.c} more than before.`:`New best! ${fmtLong(prev.ms-ms)} faster.`):`Your best is ${prev.c}/${prev.n} in ${fmt(prev.ms)}.`;
     $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">Fill the map · ${esc(scope)}</span>
       <h2>${all?"You filled the whole map!":`${found.length} of ${pool.length} named`}</h2>
@@ -1166,13 +1183,12 @@ function renderHistory(){
   const dt=t=>new Date(t).toLocaleDateString(undefined,{month:"short",day:"numeric"});
   body.innerHTML=cards.map(cd=>{
     const h=cd.hist.slice().reverse(); // oldest first for the charts
-    const raw=cd.kind==="daily"||cd.kind==="chain";
-    const pct=h.map(x=>raw?x.c:Math.round(x.c/x.n*100)), last=h[h.length-1];
-    const top=cd.kind==="daily"?10000:cd.kind==="chain"?Math.max(5,...pct):100;
-    const scoreRow=`<div class="spark"><span>${cd.kind==="daily"?"Points":cd.kind==="chain"?"Links":"Score"}</span>${sparkSVG(pct,{min:0,max:top,color:"var(--good)"})}<b>${cd.kind==="daily"?last.c.toLocaleString():cd.kind==="chain"?last.c:pct[pct.length-1]+"%"}</b></div>`;
+    const pct=h.map(x=>cd.kind==="daily"?x.c:cd.kind==="chain"?(x.solved?Math.round(x.c/x.n*100):0):Math.round(x.c/x.n*100)), last=h[h.length-1];
+    const top=cd.kind==="daily"?10000:100;
+    const scoreRow=`<div class="spark"><span>${cd.kind==="daily"?"Points":cd.kind==="chain"?"Route":"Score"}</span>${sparkSVG(pct,{min:0,max:top,color:"var(--good)"})}<b>${cd.kind==="daily"?last.c.toLocaleString():pct[pct.length-1]+"%"}</b></div>`;
     const timeRow=cd.kind==="daily"?"":`<div class="spark"><span>Time</span>${sparkSVG(h.map(x=>x.ms/1000),{min:0,invert:false,color:"var(--c-eu)"})}<b>${fmt(last.ms)}</b></div>`;
-    const bestTxt=cd.best?(cd.kind==="daily"?`Best ${cd.best.c.toLocaleString()}`:cd.kind==="chain"?`Longest ${cd.best.c} links`:`Best ${cd.best.c}/${cd.best.n} · ${fmt(cd.best.ms)}`):"";
-    const rows=cd.hist.slice(0,5).map(x=>`<div><span>${dt(x.at)}</span><span>${cd.kind==="daily"?x.c.toLocaleString()+" pts":cd.kind==="chain"?`${x.c} links · ${fmt(x.ms)}`:`${x.c}/${x.n} · ${fmt(x.ms)}`}</span></div>`).join("");
+    const bestTxt=cd.best?(cd.kind==="daily"?`Best ${cd.best.c.toLocaleString()}`:cd.kind==="chain"?`${cd.hist.filter(x=>x.solved).length} solved`:`Best ${cd.best.c}/${cd.best.n} · ${fmt(cd.best.ms)}`):"";
+    const rows=cd.hist.slice(0,5).map(x=>`<div><span>${dt(x.at)}</span><span>${cd.kind==="daily"?x.c.toLocaleString()+" pts":cd.kind==="chain"?(x.solved?`${x.n} borders (shortest ${x.c}) · ${fmt(x.ms)}`:`gave up · ${fmt(x.ms)}`):`${x.c}/${x.n} · ${fmt(x.ms)}`}</span></div>`).join("");
     return `<article class="hcard" style="--cc:${cd.cc}"><header><h3>${esc(cd.title)}</h3><span>${cd.hist.length} run${cd.hist.length===1?"":"s"} · ${bestTxt}</span></header>${scoreRow}${timeRow}<div class="hrows">${rows}</div></article>`;
   }).join("");
 }
@@ -1180,18 +1196,9 @@ $('histBtn').onclick=()=>{ renderHistory(); show("hist"); $('hist').scrollTop=0;
 $('histBack').onclick=()=>show("home");
 $('soundBtn').setAttribute('aria-checked',!!S.sound);
 $('soundBtn').onclick=()=>{ S.sound=!S.sound; saveLocal(); $('soundBtn').setAttribute('aria-checked',S.sound); if(S.sound) snd("ok"); };
-// While you type, pin the game screen to the part of the screen above the keyboard:
-// the map keeps the top half, a compact answer panel sits right on top of the keyboard.
-if(window.visualViewport){ const vv=window.visualViewport, play=$('play');
-  const typing=()=>{ const a=document.activeElement; return !!a&&a.tagName==="INPUT"&&play.contains(a); };
-  const full=()=>Math.max(window.innerHeight,document.documentElement.clientHeight,window.screen&&window.screen.height*0.8||0);
-  const fit=()=>{ const kb=typing()&&(vv.height<window.innerHeight-80||vv.height<full()-120); // keyboard is up
-    play.classList.toggle('kb',kb);
-    if(kb){ play.style.top=vv.offsetTop+"px"; play.style.height=vv.height+"px"; } else { play.style.top=""; play.style.height=""; } };
-  window.addEventListener('resize',fit);
-  vv.addEventListener('resize',fit); vv.addEventListener('scroll',fit);
-  document.addEventListener('focusin',()=>{ fit(); setTimeout(fit,120); setTimeout(fit,400); });
-  document.addEventListener('focusout',()=>setTimeout(fit,60)); }
+// Typing screens put the text box at the top, so the keyboard never covers it.
+// If iPhone still nudges the page when the keyboard opens, put it back.
+window.addEventListener('scroll',()=>{ if(window.scrollY&&!$('play').hidden) window.scrollTo(0,0); });
 
 /* ================= mastery ================= */
 const mProj=d3.geoEqualEarth().rotate([-11,0]);
@@ -1306,6 +1313,7 @@ function startNeighbors(){
       <div class="nbnames" id="nbNames"></div>
       <form class="nbform" id="nbForm" autocomplete="off"><input id="nbIn" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Type a neighbor" aria-label="Type a neighboring place"><button class="btn go" id="nbGo" type="submit">Enter</button></form>
       <div class="row" id="after" style="min-height:48px"><div class="fb" id="nbMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">${nb.length} borders to name. Close spelling counts.</span></div><button class="btn ghost" id="stuck" type="button">Show the rest</button></div>`;
+    $('panel').classList.add('top'); requestAnimationFrame(()=>flyTo(mode.frame()));
     const inp=$('nbIn');
     const msg=(t,kind)=>{ const m=$('nbMsg'); m.dataset.k=kind||""; m.innerHTML=(kind==="ok"?check():kind==="no"?cross():"")+`<span>${t}</span>`; };
     const update=()=>{
@@ -1333,6 +1341,7 @@ function startNeighbors(){
     paint(); update(); setTimeout(()=>inp.focus({preventScroll:true}),350);
   }
   function fin(){
+    $('panel').classList.remove('top');
     stopTimer(); setProgress(1); bumpDay();
     const ms=Math.round(elapsed()), rec={c:found,n:total,w:wrong,ms,at:Date.now()}, prev=S.nb.best;
     const isBest=!prev || rec.c/rec.n>prev.c/prev.n || (rec.c/rec.n===prev.c/prev.n && (rec.w<prev.w || (rec.w===prev.w && rec.ms<prev.ms)));
@@ -1417,61 +1426,71 @@ function startWeak(list,ctx){
   step();
 }
 
-/* ================= chain: neighbor to neighbor, as far as you can go ================= */
+/* ================= chain: find a route from one place to another through shared borders ================= */
+function shortestPath(a,b){ const prev={[a]:null}, q=[a];
+  while(q.length){ const x=q.shift(); if(x===b) break; for(const y of nbOf(x)) if(!(y in prev)){ prev[y]=x; q.push(y); } }
+  if(!(b in prev)) return null; const p=[]; for(let x=b;x!=null;x=prev[x]) p.unshift(x); return p; }
+function pickRoute(){ // start and destination on the same continent, 3 to 6 borders apart
+  const starts=shuffle(IDS.filter(id=>nbOf(id).length>=2));
+  for(const a of starts){ const dist={[a]:0}, q=[a];
+    while(q.length){ const x=q.shift(); if(dist[x]>=6) continue; for(const y of nbOf(x)) if(!(y in dist)){ dist[y]=dist[x]+1; q.push(y); } }
+    const cands=Object.keys(dist).filter(b=>dist[b]>=3&&BY[b].c===BY[a].c);
+    if(cands.length){ const b=cands[Math.floor(Math.random()*cands.length)]; return [a,b,shortestPath(a,b)]; } }
+  return null; }
 function startChain(){
-  const elig=IDS.filter(id=>nbOf(id).length>=2);
-  let cur=elig[Math.floor(Math.random()*elig.length)]; const path=[cur], used=new Set([cur]); let lives=3, over=false;
+  const r=pickRoute(); if(!r) return; const [A,B,best]=r, par=best.length-1;
+  const route=[A], bad=new Set(); let wrong=0, over=false;
   xpRun=0; combo=0; setXp(); setComboUI();
   $('steps').hidden=true; $('ptitle').hidden=false; $('ptitle').textContent="Chain";
-  mode={frame:worldFrame}; show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
-  const col=()=>css["c-eu"];
-  const paint=(extra)=>{ const pset=new Set(path);
-    M={style:x=>x===cur?null:pset.has(x)?[css.good,.55]:(extra&&extra.has(x))?[css.sun,.65]:null,target:cur,targetColor:col(),
-       labels:[{id:cur,color:css.ink},...path.slice(0,-1).slice(-8).map(id=>({id,soft:true,force:true})),...(extra?[...extra].map(id=>({id,color:css.sun})):[])],
-       line:path.length>1?{type:"LineString",coordinates:path.map(id=>CENT[id])}:null,rings:[{id:cur,color:col(),w:3}],onTap:null}; draw("hi"); };
-  const frame=()=>frameFeatures([cur,...nbOf(cur)].map(i=>MAIN[i]),1.3,12);
+  const fr=()=>frameIds([...new Set([A,B,...best,...route])],1.35,10);
+  mode={frame:fr}; show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
+  const paint=(reveal)=>{ const rs=new Set(route), rv=new Set(reveal||[]);
+    M={style:x=>x===A?[css["c-eu"],.85]:x===B?[css.sun,.9]:rs.has(x)?[css.good,.6]:rv.has(x)?[css.sun,.45]:bad.has(x)?[css.bad,.3]:null,target:null,
+       labels:[{id:A,color:css["c-eu"]},{id:B,color:css.sun},...route.slice(1).filter(x=>x!==B).map(id=>({id,soft:true,force:true})),...[...rv].filter(x=>x!==A&&x!==B&&!rs.has(x)).map(id=>({id,soft:true,force:true}))],
+       line:route.length>1?{type:"LineString",coordinates:route.map(id=>CENT[id])}:null,rings:[{id:A,color:css["c-eu"],w:3},{id:B,color:css.sun,w:3}],onTap:null}; draw("hi"); };
   $('panel').style.setProperty('--cc','var(--c-eu)');
-  $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2" id="chHead"></span><h2 id="chQ"></h2></div><div class="fillcount" id="chCount">0<small> links</small></div></div>
-    <form class="nbform" id="chForm" autocomplete="off"><input id="chIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Type a neighbor" aria-label="Type a neighboring place"><button class="btn go" type="submit">Enter</button></form>
-    <div class="row" id="after" style="min-height:48px"><div class="fb" id="chMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">Each answer becomes the next start. No repeats. 3 lives.</span></div><button class="btn ghost" id="chEnd" type="button">End chain</button></div>`;
+  $('panel').innerHTML=`<span class="eyebrow2" id="chHead">Chain · shortest route: ${par} borders</span>
+    <h2>Get from <span style="color:var(--c-eu)">${esc(BY[A].n)}</span> to <span style="color:color-mix(in srgb,var(--sun) 80%,var(--ink))">${esc(BY[B].n)}</span></h2>
+    <div class="route" id="chRoute"></div>
+    <form class="nbform" id="chForm" autocomplete="off"><input id="chIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Next place on your route" aria-label="Next place on your route"><button class="btn go" type="submit">Enter</button></form>
+    <div class="row" id="after"><div class="fb" id="chMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">Each one must border the last.</span></div><button class="btn ghost" id="chUndo" type="button">Undo</button><button class="btn ghost" id="chGive" type="button">Show route</button></div>`;
+  $('panel').classList.add('top');
   const inp=$('chIn'); setTimeout(()=>inp.focus({preventScroll:true}),350);
-  const hearts=()=>"♥".repeat(lives)+"♡".repeat(3-lives);
-  const ui=()=>{ $('chHead').textContent=`Chain · ${hearts()}`; $('chQ').innerHTML=`Name a neighbor of <span style="color:var(--c-eu)">${esc(BY[cur].n)}</span>`;
-    $('chCount').innerHTML=`${path.length-1}<small> link${path.length===2?"":"s"}</small>`; };
+  const ui=()=>{ $('chRoute').innerHTML=route.map((id,k)=>`<span class="${k===0?"a":id===B?"b":""}">${esc(BY[id].n)}</span>`).join("<i>→</i>")+(route[route.length-1]!==B?`<i>→ … →</i><span class="b">${esc(BY[B].n)}</span>`:""); };
   const msg=(t,k)=>{ const m=$('chMsg'); m.dataset.k=k||""; m.innerHTML=(k==="ok"?check():k==="no"?cross():"")+`<span>${t}</span>`; };
-  ui(); paint(); mode.frame=frame; flyTo(frame());
+  ui(); paint(); requestAnimationFrame(()=>flyTo(fr()));
   $('chForm').onsubmit=e=>{ e.preventDefault(); if(over) return; const raw=inp.value.trim(); if(!raw) return; inp.value="";
-    const open=nbOf(cur).filter(x=>!used.has(x));
-    const mm=matchCountry(raw,open);
+    const end=route[route.length-1];
+    const mm=matchCountry(raw,nbOf(end).filter(x=>!route.includes(x)));
     if(!mm){ msg(`Not sure what “${esc(raw)}” is.`,"no"); return; }
     if(mm.amb){ msg(`Could be ${mm.amb.map(x=>esc(BY[x].n)).join(" or ")}. Type a bit more.`,""); return; }
     const id=mm.id;
-    if(id===cur){ msg(`You're already in ${esc(BY[cur].n)}.`,""); return; }
-    if(nbOf(cur).includes(id)&&used.has(id)){ msg(`${esc(BY[id].n)} is already in your chain.`,""); return; }
-    if(nbOf(cur).includes(id)){
-      path.push(id); used.add(id); note(id,true); combo++; setComboUI(); addXp(5); buzz(12); const from=cur; cur=id; ui(); paint(); flyTo(frame());
-      if(nbOf(cur).every(x=>used.has(x))){ msg(`${esc(BY[id].n)}. Dead end: every neighbor is already in your chain.`,"ok"); return finish("dead"); }
-      msg(`${esc(BY[from].n)} → ${esc(BY[id].n)}`,"ok");
-    } else {
-      lives--; combo=0; setComboUI(); buzz([30,40,30]); ui();
-      if(lives<=0){ msg(`${esc(BY[id].n)} doesn't border ${esc(BY[cur].n)}. Out of lives.`,"no"); return finish("lives"); }
-      msg(`${esc(BY[id].n)} doesn't border ${esc(BY[cur].n)}. ${lives} ${lives===1?"life":"lives"} left.`,"no");
-    }
-    inp.focus({preventScroll:true}); };
-  $('chEnd').onclick=()=>{ if(!over) finish("stop"); };
-  function finish(why){
+    if(id===end){ msg(`Your route is already at ${esc(BY[end].n)}.`,""); return; }
+    if(route.includes(id)){ msg(`${esc(BY[id].n)} is already on your route.`,""); return; }
+    if(!nbOf(end).includes(id)){ wrong++; bad.add(id); combo=0; setComboUI(); buzz([30,40,30]); paint(); msg(`${esc(BY[id].n)} doesn't border ${esc(BY[end].n)}.`,"no"); return; }
+    route.push(id); note(id,true); combo++; setComboUI(); buzz(12); ui(); paint();
+    if(id===B) return finish(true);
+    msg(`${esc(BY[end].n)} → ${esc(BY[id].n)}`,"ok"); inp.focus({preventScroll:true}); };
+  $('chUndo').onclick=()=>{ if(over||route.length<2) return; const x=route.pop(); ui(); paint(); msg(`Took ${esc(BY[x].n)} off your route.`,""); inp.focus({preventScroll:true}); };
+  $('chGive').onclick=()=>{ if(!over) finish(false); };
+  function finish(solved){
     over=true; stopTimer(); inp.blur(); bumpDay();
-    const links=path.length-1, ms=Math.round(elapsed()), rec={c:links,ms,at:Date.now()}, prev=S.chain.best;
-    const isBest=!prev||links>prev.c||(links===prev.c&&ms<prev.ms);
-    if(isBest) S.chain.best=rec; S.chain.hist=[rec,...(S.chain.hist||[])].slice(0,30); save();
-    const avail=new Set(nbOf(cur).filter(x=>!used.has(x))); avail.forEach(x=>note(x,false));
-    paint(avail); mode.frame=()=>frameFeatures(path.concat([...avail]).map(i=>MAIN[i]),1.2,12); flyTo(mode.frame(),()=>{ if(isBest&&prev&&links>0) confetti(); });
-    const head= why==="dead"?"Dead end!":why==="lives"?"Out of lives":"Chain ended";
-    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">Chain</span><h2>${head}</h2>
-      <div class="nums"><div><b>${links}</b><span>links</span></div><div><b>${fmt(ms)}</b><span>time</span></div><div><b>${prev?Math.max(prev.c,links):links}</b><span>longest</span></div></div>
-      <p>${!prev?"First chain. This is the one to beat.":isBest&&links>prev.c?`New longest chain! ${links-prev.c} more than before.`:`Your longest is ${prev.c} links.`}${avail.size?` You could have gone on to ${[...avail].map(x=>esc(BY[x].n)).join(", ")}, shown in yellow.`:""}</p>
-      <div class="pills" style="--cc:var(--good);max-height:120px;overflow-y:auto">${path.map(id=>`<span>${esc(BY[id].n)}</span>`).join("")}</div>
-      <div class="row" style="width:100%"><button class="btn go wide" id="again">New chain</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
+    const moves=route.length-1, ms=Math.round(elapsed());
+    const rec={c:solved?par:0,n:solved?moves:par,w:wrong,ms,at:Date.now(),a:A,b:B,solved};
+    S.chain.hist=[rec,...(S.chain.hist||[])].slice(0,30);
+    const pct=x=>x.solved?x.c/x.n:0, prev=S.chain.best, isBest=solved&&(!prev||pct(rec)>pct(prev)||(pct(rec)===pct(prev)&&ms<prev.ms));
+    if(isBest) S.chain.best=rec; save();
+    const shortest=shortestPath(A,B); if(!solved) best.forEach(x=>note(x,false));
+    paint(solved?null:shortest);
+    const stars=!solved?0:moves===par?3:moves<=par+2?2:1;
+    $('panel').classList.remove('top');
+    mode.frame=fr; flyTo(fr(),()=>{ if(stars===3) confetti(); });
+    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">Chain · ${esc(BY[A].n)} to ${esc(BY[B].n)}</span>
+      ${solved?`<div class="bigstars">${[1,2,3].map(k=>starSvg(k<=stars,40,"var(--sun)")).join("")}</div>`:""}
+      <h2>${!solved?"Here's a shortest route":moves===par?"Shortest possible route!":`Made it in ${moves} borders`}</h2>
+      <div class="nums"><div><b>${solved?moves:"-"}</b><span>your borders</span></div><div><b>${par}</b><span>shortest</span></div><div><b>${wrong}</b><span>wrong guesses</span></div><div><b>${fmt(ms)}</b><span>time</span></div></div>
+      ${solved&&moves>par?`<p>A shortest route: ${shortest.map(x=>esc(BY[x].n)).join(" → ")}</p>`:!solved?`<p>${shortest.map(x=>esc(BY[x].n)).join(" → ")}</p>`:""}
+      <div class="row" style="width:100%"><button class="btn go wide" id="again">Next route</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
     $('again').onclick=()=>startChain(); $('homeB').onclick=()=>$('quit').click();
   }
 }
@@ -1625,10 +1644,11 @@ new MutationObserver(muts=>{
   if(sheetDown&&panelEl.querySelector('#cont,#nx,#nextR,#again,#homeB')) setSheet(false,true);   // something you need to tap appeared
 }).observe(panelEl,{childList:true,subtree:true});
 window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
-new ResizeObserver(()=>{ $('stage').style.setProperty('--occl',occl()+"px"); }).observe(panelEl);
+const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); $('play').style.setProperty('--pbarh',$('play').querySelector('.pbar').offsetHeight+"px"); };
+new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1358";
+const APP_VERSION="2026.10.29-1438";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
