@@ -773,8 +773,13 @@ let actx=null;
 function snd(kind){ if(!S.sound) return;
   try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume();
     const t=actx.currentTime, o=actx.createOscillator(), g=actx.createGain(); o.connect(g); g.connect(actx.destination);
-    if(kind==="ok"){ o.type="sine"; o.frequency.setValueAtTime(880,t); o.frequency.exponentialRampToValueAtTime(1318,t+.07);
-      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.07,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.17); o.start(t); o.stop(t+.19); }
+    if(kind==="ok"){ // a small bell: a few inharmonic partials struck at once, the higher ones fading first
+      o.disconnect(); g.disconnect(); const out=actx.createGain(); out.gain.value=.55; out.connect(actx.destination);
+      [[1,1,1.1],[2.0,.45,.7],[2.76,.32,.45],[5.4,.14,.25]].forEach(([r,a,d])=>{ const os=actx.createOscillator(), gg=actx.createGain();
+        os.type="sine"; os.frequency.value=1046.5*r; os.connect(gg); gg.connect(out);
+        gg.gain.setValueAtTime(.0001,t); gg.gain.exponentialRampToValueAtTime(.09*a,t+.004); gg.gain.exponentialRampToValueAtTime(.0001,t+d);
+        os.start(t); os.stop(t+d+.05); });
+      return; }
     else { o.type="triangle"; o.frequency.setValueAtTime(196,t); o.frequency.exponentialRampToValueAtTime(130,t+.15);
       g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.11,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.start(t); o.stop(t+.24); }
   }catch(e){} }
@@ -1628,7 +1633,7 @@ window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
 new ResizeObserver(()=>{ $('stage').style.setProperty('--occl',occl()+"px"); }).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1357";
+const APP_VERSION="2026.10.29-1358";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
