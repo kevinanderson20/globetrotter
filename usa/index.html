@@ -77,6 +77,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
 .trio{grid-template-columns:repeat(3,1fr);gap:8px}
+.update{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:30;max-width:calc(100% - 32px);border:0;border-radius:14px;padding:12px 16px;background:var(--sun);color:var(--sun-ink);font:700 15px/1.3 var(--f-body);box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .sheetgrab{display:flex;flex-direction:column;align-items:center;gap:3px;margin:-12px -16px -6px;padding:8px 16px 4px;touch-action:none;cursor:grab;color:var(--ink-3);user-select:none;-webkit-user-select:none}
 .sheetgrab i{display:block;width:46px;height:5px;border-radius:3px;background:var(--line)}
 .sheetgrab svg{transition:transform .25s}
@@ -277,6 +278,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   </div>
   <div class="conts" id="conts"></div>
   <div class="sync" id="sync">Progress saves on this device</div>
+  <div class="sync" id="ver"></div>
   <div class="backup" id="backup">
     <div class="row" style="justify-content:center"><button class="btn ghost" id="bkBtn">Back up progress</button><button class="btn ghost" id="rsBtn">Restore</button></div>
     <div id="bkPane" hidden class="confirm"><span>Copy this code and keep it somewhere safe, like your Notes app.</span><textarea id="bkCode" readonly rows="4"></textarea><button class="btn" id="bkCopy">Copy code</button></div>
@@ -285,6 +287,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="foot" id="resetWrap"><button class="btn ghost" id="resetBtn">Start over</button></div>
 </section>
 
+<button class="update" id="updBtn" hidden>A new version of Globetrotter is ready. Tap to update.</button>
 <section class="screen play" id="play" hidden>
   <div class="pbar">
     <button class="x" id="quit" aria-label="Back to home"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -1360,6 +1363,18 @@ new MutationObserver(muts=>{
   if(sheetDown&&panelEl.querySelector('#cont,#nx,#nextR,#again,#homeB')) setSheet(false,true);   // something you need to tap appeared
 }).observe(panelEl,{childList:true,subtree:true});
 window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
+
+/* ================= updates: notice when a newer version is online ================= */
+const APP_VERSION="2026.10.29-1336";
+$('ver').textContent="Version "+APP_VERSION;
+async function checkUpdate(){
+  if(!navigator.onLine) return;
+  try{ const r=await fetch("../version.json",{cache:"no-store"}); if(!r.ok) return; const v=(await r.json()).v;
+    if(v&&v!==APP_VERSION) $('updBtn').hidden=false; }catch(e){}
+}
+$('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…"; try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update(); }catch(e){} location.reload(); };
+setTimeout(checkUpdate,1500);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==="visible") checkUpdate(); });
 
 /* ================= boot ================= */
 readTokens();

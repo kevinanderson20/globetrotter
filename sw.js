@@ -1,5 +1,6 @@
 // Globetrotter offline support: keeps a copy of all three editions (World, USA, Earth) on the device.
 const CACHE = "globetrotter-v3";
+// Pages always come from the network when online (skipping the browser's 10-minute cache), so updates show up right away.
 const CORE = ["./", "./usa/", "./earth/", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -22,13 +23,14 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+  if (url.pathname.endsWith("/version.json")) return;   // always ask the network which version is live
 
   // Pages: network first, with a short timeout so slow plane Wi-Fi falls back to the saved copy.
   if (req.mode === "navigate") {
     e.respondWith((async () => {
       const cache = await caches.open(CACHE), key = pageKey(req.url);
       try {
-        const res = await Promise.race([fetch(req), timeout(4000)]);
+        const res = await Promise.race([fetch(req, {cache: "no-store"}), timeout(4000)]);
         if (res && res.ok) { cache.put(key, res.clone()); return res; }
         throw new Error("bad response");
       } catch (err) {

@@ -5,9 +5,15 @@ All three editions run the same app code. Each edition swaps in its own data:
   earth/  oceans & seas, rivers, mountains & peaks, deserts & regions (Natural Earth 1:50m).
 Run from the repo root after changing index.html:  python3 tools/build_editions.py
 """
-import re, os
+import re, os, json, datetime
 
-SRC = open('index.html', encoding='utf-8').read()
+# Stamp a new version: the app compares it with version.json and offers to update when they differ.
+VERSION = datetime.datetime.now().strftime('%Y.%m.%d-%H%M')
+_src = open('index.html', encoding='utf-8').read()
+_src = re.sub(r'const APP_VERSION="[^"]*";', f'const APP_VERSION="{VERSION}";', _src)
+open('index.html', 'w', encoding='utf-8').write(_src)
+json.dump({"v": VERSION}, open('version.json', 'w'))
+SRC = _src
 
 
 def sub_json(s, el_id, payload):
@@ -54,6 +60,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     app = rep(app, '"globetrotter-"+key', f'"{seed}"+key', 1)
     app = rep(app, '`Globetrotter ${practice?', f'`{share} ${{practice?', 1)
     app = rep(app, 'navigator.serviceWorker.register("sw.js")', 'navigator.serviceWorker.register("../sw.js")', 1)
+    app = rep(app, 'fetch("version.json",', 'fetch("../version.json",', 1)
     for a, b in extra_app:
         app = b(app) if callable(b) else rep(app, a, b)
     # words
@@ -63,7 +70,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     os.makedirs(folder, exist_ok=True)
     out = head + app
     open(f'{folder}/index.html', 'w', encoding='utf-8').write(out)
-    print(f'{folder}/index.html', len(out))
+    print(f'{folder}/index.html', len(out), VERSION)
 
 
 def tighten_frames(app):  # states are small: shrink the minimum zoom spans used when framing
