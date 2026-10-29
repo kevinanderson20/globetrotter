@@ -77,6 +77,16 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
 .trio{grid-template-columns:repeat(3,1fr);gap:8px}
+.sheetgrab{display:flex;flex-direction:column;align-items:center;gap:3px;margin:-12px -16px -6px;padding:8px 16px 4px;touch-action:none;cursor:grab;color:var(--ink-3);user-select:none;-webkit-user-select:none}
+.sheetgrab i{display:block;width:46px;height:5px;border-radius:3px;background:var(--line)}
+.sheetgrab svg{transition:transform .25s}
+.sheetgrab .peek{display:none;font-family:var(--f-display);font-weight:800;font-size:17px;color:var(--ink);text-align:center}
+.panel[data-down="1"]{min-height:0!important;gap:0;padding-block:6px calc(10px + env(safe-area-inset-bottom,0px))}
+.panel[data-down="1"]>*:not(.sheetgrab){display:none!important}
+.panel[data-down="1"] .sheetgrab{margin:-4px -16px 0;padding-bottom:2px}
+.panel[data-down="1"] .sheetgrab svg{transform:rotate(180deg)}
+.panel[data-down="1"] .sheetgrab i{background:var(--ink-3)}
+.panel[data-down="1"] .sheetgrab .peek:not(:empty){display:block}
 .tabs{margin-left:auto;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
 .tabs a{padding:7px 10px;border-radius:999px;font-weight:700;font-size:13px;color:var(--ink-2);text-decoration:none;min-height:20px}
 .tabs a[aria-current="page"]{background:var(--ink);color:var(--surface)}
@@ -87,15 +97,6 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .wbtn:active{transform:translateY(2px);border-bottom-width:2px;margin-top:2px}
 .moved{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .moved span{border-radius:999px;padding:4px 11px;font-size:14px;font-weight:600;border:1.5px solid var(--mc)}
-.optwrap{position:relative;z-index:4;background:var(--surface);border-radius:18px 18px 0 0;margin:-6px -6px 0;padding:0 6px 6px;will-change:transform}
-.optwrap.anim{transition:transform .32s cubic-bezier(.2,.9,.25,1)}
-.grab{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;width:100%;height:30px;padding-top:6px;border:0;background:transparent;touch-action:none;cursor:grab;color:var(--ink-3)}
-.grab:active{cursor:grabbing}
-.grab i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line)}
-.grab svg{transition:transform .25s}
-.optwrap[data-hidden="1"]{box-shadow:0 -6px 16px rgba(0,0,0,.10)}
-.optwrap[data-hidden="1"] .grab svg{transform:rotate(180deg)}
-.optwrap[data-hidden="1"] .grab i{background:var(--ink-3)}
 
 
 .trio .tile{padding:12px 10px}
@@ -1254,7 +1255,7 @@ function startDaily(practice){
   function round(){
     setProgress(ri/10);
     const id=ids[ri]; let pin=null;
-    M={style:()=>null,target:null,labels:[],rings:[],pin:null,line:null,onTap:null,onTapLL:ll=>{ pin=ll; M.pin=ll; draw("hi"); const b=$('lock'); if(b){ b.disabled=false; b.textContent="Lock in"; } }};
+    M={style:()=>null,target:null,labels:[],rings:[],pin:null,line:null,onTap:null,onTapLL:ll=>{ pin=ll; M.pin=ll; draw("hi"); window.__sheetUp(); const b=$('lock'); if(b){ b.disabled=false; b.textContent="Lock in"; } }};
     mode.frame=worldFrame; flyTo(worldFrame());
     $('panel').style.setProperty('--cc','var(--ink)');
     $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">${title} · Round ${ri+1} of 10</span><h2>Where is ${esc(BY[id].q||BY[id].n)}?</h2></div><div class="tot">${total.toLocaleString()}<small>points</small></div></div>
@@ -1309,35 +1310,56 @@ function countUp(el,to,prefix,from,suffix){
   requestAnimationFrame(tick);
 }
 
-/* ================= hide the choices: drag the sheet down, drag it back up ================= */
-const TAB=26;
-function wrapOpts(){
-  const o=document.querySelector('#panel .opts'); if(!o||o.closest('.optwrap')) return;
-  const w=document.createElement('div'); w.className="optwrap";
-  w.innerHTML=`<button class="grab" aria-label="Hide or show the choices"><i></i><svg width="14" height="8" viewBox="0 0 14 8" aria-hidden="true"><path d="m2 1.5 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
-  o.parentNode.insertBefore(w,o); w.appendChild(o);
-  let y=0, hidden=false;
-  const restTop=()=>w.getBoundingClientRect().top-y;
-  const maxDown=()=>Math.max(0,$('panel').getBoundingClientRect().bottom-restTop()-TAB);
-  const setY=(v,anim)=>{ y=v; w.classList.toggle('anim',!!anim); w.style.transform=v?`translateY(${v}px)`:""; };
-  const setHidden=(h,anim)=>{ hidden=h; if(h&&!w.everHidden){ w.everHidden=true; if(!S.recall){ S.recall=true; saveLocal(); } } w.dataset.hidden=h?1:0; setY(h?maxDown():0,anim); o.querySelectorAll('.opt').forEach(b=>{ b.tabIndex=h?-1:0; }); };
-  w.setHidden=setHidden;
-  // answering without ever hiding the choices turns the auto-hide back off
-  o.addEventListener('click',e=>{ const b=e.target.closest('.opt'); if(b&&!b.disabled&&!w.everHidden&&S.recall){ S.recall=false; saveLocal(); } },true);
-  if(S.recall) requestAnimationFrame(()=>setHidden(true,false));
-  const g=w.querySelector('.grab');
-  let start=null, y0=0, moved=false, lastY=0, lastT=0, vel=0;
-  g.addEventListener('pointerdown',e=>{ if(o.querySelector('.opt:disabled')) return; start=e.clientY; y0=y; moved=false; lastY=e.clientY; lastT=performance.now(); vel=0; w.classList.remove('anim'); g.setPointerCapture(e.pointerId); });
-  g.addEventListener('pointermove',e=>{ if(start===null) return; const d=e.clientY-start; if(Math.abs(d)>4) moved=true;
-    const now=performance.now(); vel=(e.clientY-lastY)/Math.max(1,now-lastT); lastY=e.clientY; lastT=now;
-    setY(Math.min(maxDown(),Math.max(0,y0+d)),false); });
-  const end=()=>{ if(start===null) return; start=null;
-    if(!moved){ setHidden(!hidden,true); return; }
-    const m=maxDown(); const goHide= vel>0.4 ? true : vel<-0.4 ? false : y>m/2; setHidden(goHide,true); };
-  g.addEventListener('pointerup',end); g.addEventListener('pointercancel',end);
+/* ================= slide the whole answer panel down to see the map full screen ================= */
+// Drag the handle (or flick it) down: the panel follows your finger, then collapses to a thin bar and the map
+// grows to fill the screen. Drag or tap the bar to bring it back. Every new question starts with the panel up.
+const panelEl=$('panel'); let sheetDown=false, sheetBusy=false;
+function addGrab(){
+  if(panelEl.firstElementChild&&panelEl.firstElementChild.classList.contains('sheetgrab')) return false;
+  const g=document.createElement('div'); g.className="sheetgrab"; g.setAttribute('role','button'); g.setAttribute('aria-label','Slide the panel down or up'); g.tabIndex=0;
+  g.innerHTML=`<i></i><svg width="16" height="9" viewBox="0 0 16 9" aria-hidden="true"><path d="m2 1.5 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="peek"></span>`;
+  panelEl.insertBefore(g,panelEl.firstChild); wireGrab(g); return true;
 }
-new MutationObserver(wrapOpts).observe($('panel'),{childList:true});
-addEventListener('resize',()=>{ const w=document.querySelector('#panel .optwrap'); if(w&&w.dataset.hidden==="1") w.setHidden(true,false); });
+function peekText(){ const h=panelEl.querySelector('h2'); const t=h?h.textContent.trim():""; return /^(Tap |Where is )/.test(t)?t:""; }
+function setSheet(down,anim){
+  if(down===sheetDown&&!anim){ return; }
+  const finish=()=>{ panelEl.style.transition=""; panelEl.style.transform=""; sheetBusy=false; };
+  if(down){
+    const go=()=>{ sheetDown=true; panelEl.dataset.down=1; const pk=panelEl.querySelector('.peek'); if(pk) pk.textContent=peekText(); finish(); };
+    if(!anim||reduceMotion){ go(); return; }
+    sheetBusy=true; const hgt=panelEl.offsetHeight;
+    panelEl.style.transition="transform .26s cubic-bezier(.3,.7,.3,1)"; panelEl.style.transform=`translateY(${hgt-44}px)`;
+    setTimeout(go,260);
+  } else {
+    sheetDown=false; panelEl.dataset.down=0;
+    if(!anim||reduceMotion){ finish(); return; }
+    sheetBusy=true; const hgt=panelEl.offsetHeight;
+    panelEl.style.transition="none"; panelEl.style.transform=`translateY(${hgt-44}px)`; panelEl.offsetHeight;
+    panelEl.style.transition="transform .3s cubic-bezier(.2,.9,.25,1)"; panelEl.style.transform="translateY(0)";
+    setTimeout(finish,300);
+  }
+}
+function wireGrab(g){
+  let y0=null, dy=0, lastY=0, lastT=0, vel=0, moved=false;
+  g.addEventListener('pointerdown',e=>{ if(sheetBusy) return; y0=e.clientY; dy=0; moved=false; lastY=e.clientY; lastT=performance.now(); vel=0; panelEl.style.transition="none"; g.setPointerCapture(e.pointerId); });
+  g.addEventListener('pointermove',e=>{ if(y0===null) return; dy=e.clientY-y0; if(Math.abs(dy)>5) moved=true;
+    const now=performance.now(); vel=(e.clientY-lastY)/Math.max(1,now-lastT); lastY=e.clientY; lastT=now;
+    if(!sheetDown) panelEl.style.transform=`translateY(${Math.max(0,dy)}px)`; });
+  const end=()=>{ if(y0===null) return; y0=null;
+    if(!moved){ setSheet(!sheetDown,true); return; }
+    if(sheetDown){ if(dy<-20||vel<-0.3) setSheet(false,true); return; }
+    const down= vel>0.4 || dy>panelEl.offsetHeight*0.3;
+    if(down) setSheet(true,true); else { panelEl.style.transition="transform .22s ease"; panelEl.style.transform="translateY(0)"; setTimeout(()=>{ panelEl.style.transition=""; panelEl.style.transform=""; },230); } };
+  g.addEventListener('pointerup',end); g.addEventListener('pointercancel',end);
+  g.addEventListener('keydown',e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); setSheet(!sheetDown,true); } });
+}
+new MutationObserver(muts=>{
+  if($('play').hidden) return;
+  const fresh=muts.some(m=>m.target===panelEl&&m.type==="childList"&&[...m.addedNodes].some(n=>n.nodeType===1&&!n.classList.contains('sheetgrab')));
+  if(fresh&&addGrab()){ setSheet(false,false); return; }          // a new question or screen: panel starts up
+  if(sheetDown&&panelEl.querySelector('#cont,#nx,#nextR,#again,#homeB')) setSheet(false,true);   // something you need to tap appeared
+}).observe(panelEl,{childList:true,subtree:true});
+window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
 
 /* ================= boot ================= */
 readTokens();
