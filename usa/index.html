@@ -400,7 +400,7 @@ function syncText(){ setSync(!saveOk?"This browser is blocking saving. Progress 
 setTimeout(syncText,0);
 if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")){
   {
-    navigator.serviceWorker.register("../sw.js").then(()=>navigator.serviceWorker.ready).then(()=>caches.has("globetrotter-v2")).then(has=>{ offlineReady=has; syncText(); }).catch(()=>{});
+    navigator.serviceWorker.register("../sw.js").then(()=>navigator.serviceWorker.ready).then(()=>caches.has("globetrotter-v3")).then(has=>{ offlineReady=has; syncText(); }).catch(()=>{});
     navigator.serviceWorker.addEventListener("message",e=>{ if(e.data==="cached"){ offlineReady=true; syncText(); } });
   }
 }

@@ -1,6 +1,6 @@
-// Globetrotter offline support: keeps a copy of both editions (World and USA) on the device.
-const CACHE = "globetrotter-v2";
-const CORE = ["./", "./usa/", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+// Globetrotter offline support: keeps a copy of all three editions (World, USA, Earth) on the device.
+const CACHE = "globetrotter-v3";
+const CORE = ["./", "./usa/", "./earth/", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
