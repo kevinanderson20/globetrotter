@@ -77,6 +77,13 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
 .trio{grid-template-columns:repeat(3,1fr);gap:8px}
+.wbtns{display:flex;gap:8px;flex-wrap:wrap}
+.wbtn{flex:1 1 0;min-width:96px;min-height:48px;border:2px solid var(--wc);border-bottom-width:4px;background:color-mix(in srgb,var(--wc) 12%,var(--surface));border-radius:14px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;text-align:left}
+.wbtn i{width:10px;height:10px;border-radius:3px;background:var(--wc);flex:none}
+.wbtn b{margin-left:auto;font-family:var(--f-display);font-size:16px;font-variant-numeric:tabular-nums}
+.wbtn:active{transform:translateY(2px);border-bottom-width:2px;margin-top:2px}
+.moved{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.moved span{border-radius:999px;padding:4px 11px;font-size:14px;font-weight:600;border:1.5px solid var(--mc)}
 .optwrap{position:relative;z-index:4;background:var(--surface);border-radius:18px 18px 0 0;margin:-6px -6px 0;padding:0 6px 6px;will-change:transform}
 .optwrap.anim{transition:transform .32s cubic-bezier(.2,.9,.25,1)}
 .grab{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;width:100%;height:30px;padding-top:6px;border:0;background:transparent;touch-action:none;cursor:grab;color:var(--ink-3)}
@@ -125,6 +132,15 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .found i{width:22px;height:8px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line)}
 .found i[data-k="ok"]{background:var(--good);border-color:var(--good)}
 .found i[data-k="rev"]{background:var(--sun);border-color:var(--sun)}
+.nbnames{display:flex;flex-wrap:wrap;gap:6px;min-height:0}
+.nbnames:empty{display:none}
+.nbnames span{border-radius:999px;padding:3px 10px;font-size:14px;font-weight:600;border:1.5px solid var(--good)}
+.nbnames span.rev{border-color:var(--sun)}
+.nbform{display:flex;gap:8px}
+.nbform input{flex:1;min-width:0;font:600 17px/1.2 var(--f-body);padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);outline:none}
+.nbform input:focus{border-color:var(--cc,var(--ink))}
+.nbform .btn{min-height:50px;padding:0 18px}
+.nbform input:disabled{opacity:.5}
 .chall{display:grid;gap:10px}
 .sech{font-size:20px;font-weight:800}
 .secp{margin:2px 0 0;font-size:14px;color:var(--ink-2)}
@@ -247,7 +263,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="duo trio">
     <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap to see names</span></button>
     <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">After a lesson</span></button>
-    <button class="tile" id="nbBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="6" width="6" height="6" rx="1" fill="currentColor"/><path d="M2 3h3M2 3v3M16 3h-3M16 3v3M2 15h3M2 15v-3M16 15h-3M16 15v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Neighbors</b><span id="nbSub">Find the borders</span></button>
+    <button class="tile" id="nbBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="6" width="6" height="6" rx="1" fill="currentColor"/><path d="M2 3h3M2 3v3M16 3h-3M16 3v3M2 15h3M2 15v-3M16 15h-3M16 15v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Neighbors</b><span id="nbSub">Name the borders</span></button>
   </div>
   <div class="chall">
     <div><h3 class="sech">Challenges</h3><p class="secp">Every country in a region, once each, against the clock.</p></div>
@@ -417,7 +433,7 @@ function renderHome(){
   }
   const rb=$('reviewBtn'); rb.disabled=L<4;
   $('reviewSub').textContent= L<4 ? "After a lesson" : (due? `${due} ready` : "Mixed practice");
-  const nbB=S.nb.best; $('nbSub').textContent= nbB ? `Best ${nbB.c}/${nbB.n}` : "Find the borders";
+  const nbB=S.nb.best; $('nbSub').textContent= nbB ? `Best ${nbB.c}/${nbB.n}` : "Name the borders";
   renderDailyCard(); drawMastery();
   const box=$('conts'); box.innerHTML="";
   CONTS.forEach(c=>{
@@ -535,8 +551,8 @@ function draw(q){
   // rings around tiny countries so they're visible
   ctx.setTransform(DPR,0,0,DPR,0,0);
   for(const rg of M.rings){
-    if(pxSize(rg.id)>=22) continue; const p=screenOf(rg.id); if(!p) continue;
-    ctx.beginPath(); ctx.arc(p[0],p[1],rg.r||16,0,Math.PI*2); ctx.strokeStyle=rg.color; ctx.lineWidth=rg.w||2.5; ctx.globalAlpha=rg.a||1; ctx.stroke(); ctx.globalAlpha=1;
+    if(!ringed(rg.id)) continue; if(rg.soft && view.s*zt.k<worldScale*2.2) continue; const p=screenOf(rg.id); if(!p) continue;
+    ctx.beginPath(); ctx.arc(p[0],p[1],rg.r||TOUCH_R,0,Math.PI*2); ctx.strokeStyle=rg.color; ctx.lineWidth=rg.w||2.5; ctx.globalAlpha=rg.a||1; ctx.stroke(); ctx.globalAlpha=1;
   }
   // labels
   const placed=[];
@@ -603,14 +619,22 @@ $('recenter').onclick=()=>{ if(homeView) flyTo(homeView); };
 const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,f,[W/2,H/2]);
 $('zin').onclick=()=>zoomBy(2); $('zout').onclick=()=>zoomBy(.5);
 const COARSE=matchMedia('(pointer: coarse)').matches;
+const TOUCH_R=COARSE?30:22, TINY=26; // micro-states get a touch circle this big, and win taps inside it
+const MICRO=new Set(IDS.filter(id=>AREA[id]*6371*6371<3000)); // Vatican, Monaco, Malta, Singapore, small islands...
+const ringed=id=>pxSize(id)<(MICRO.has(id)?TINY:14);
 // tap -> country
 function pickAt(cx,cy,prefer){
   const r=canvas.getBoundingClientRect(), x=cx-r.left, y=cy-r.top;
+  // 1. tiny countries first: anywhere inside their touch circle counts (so Vatican beats Italy)
+  let tb=null, td=TOUCH_R;
+  for(const id of MICRO){ if(pxSize(id)>=TINY) continue; const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<td){ td=d; tb=id; } }
+  if(tb) return tb;
+  // 2. the country under your finger
   const ll=proj.invert([(x-zt.x)/zt.k,(y-zt.y)/zt.k]);
   if(ll){ const bx=(x-zt.x)/zt.k, by=(y-zt.y)/zt.k;
     for(const id of IDS){ const b=BOUNDS[id]; if(bx<b[0][0]-1||bx>b[1][0]+1||by<b[0][1]-1||by>b[1][1]+1) continue; if(d3.geoContains(F.lo[id],ll)) return id; } }
-  // tiny countries: nearest centroid within reach
-  let best=null,bd=COARSE?36:26; for(const id of (prefer||IDS)){ if(pxSize(id)>=(COARSE?30:22)&&!(prefer)) continue; const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<bd){bd=d;best=id;} }
+  // 3. a near miss in the sea: nearest candidate country within reach
+  let best=null,bd=TOUCH_R; for(const id of (prefer||[])){ const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<bd){bd=d;best=id;} }
   return best;
 }
 canvas.addEventListener('click',e=>{
@@ -792,7 +816,7 @@ function startReview(){
       });
     } else {
       let tries=0, doneQ=false; const wrongIds=new Set();
-      M={style:x=>wrongIds.has(x)?[css.bad,.55]:(BY[x].c===cont?[col,.14]:null),target:null,labels:softLabels(new Set([id])),rings:[],tapPrefer:grp,
+      M={style:x=>wrongIds.has(x)?[css.bad,.55]:(BY[x].c===cont?[col,.14]:null),target:null,labels:softLabels(new Set([id])),rings:grp.map(x=>({id:x,color:css.ink,a:.35,w:1.5,r:TOUCH_R})),tapPrefer:grp,
         onTap:x=>{ if(doneQ) return;
           if(x===id){ doneQ=true; if(!tries){ right++; combo++; addXp(10);} grade(id,!tries); note(id,!tries); save(); buzz(15); M.target=id; M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); setComboUI();
             $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${tries?"Found it.":PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setTimeout(next,reduceMotion?600:950); }
@@ -891,7 +915,7 @@ function startChallenge(scope,type){
         else { buzz([30,40,30]); $('after').innerHTML=`<div class="fb" data-k="no">${cross()}<span>${tapped?`That's ${esc(BY[tapped].n)}. `:""}${esc(BY[id].n)} is highlighted.</span></div>`; }
         setTimeout(go, ok?(reduceMotion?400:650):1700); };
       M={style:x=>wrongIds.has(x)?[css.bad,.55]:(BY[x].c===cont?[col,.14]:null),target:null,labels:[],
-         rings:area.map(x=>({id:x,color:css.ink,a:.35,w:1.5,r:13})),tapPrefer:area,
+         rings:area.map(x=>({id:x,color:css.ink,a:.35,w:1.5,r:TOUCH_R})),tapPrefer:area,
          onTap:x=>{ if(doneQ) return; if(x===id) finish(true); else { wrongIds.add(x); finish(false,x); } }};
       const fr=()=>frameIds(area,1.08,20); mode.frame=fr; flyTo(fr());
       $('panel').innerHTML=`${head}<h2>Tap <span style="color:${ccol(cont)}">${esc(BY[id].n)}</span></h2><div class="row" id="after" style="min-height:46px"><button class="btn ghost" id="skip">Skip</button></div>`;
@@ -957,14 +981,18 @@ function startExplore(opts){
   mode={frame:worldFrame}; show("play");
   function paint(){
     const tc= sel1 ? (mastery ? (level(sel1)?MCOL()[level(sel1)]:css.land) : contColor(BY[sel1].c)) : null;
-    M={style:st,target:sel1,targetColor:tc,labels:(sel1?[{id:sel1,color:css.ink}]:[]).concat(mastery?[]:softLabels(new Set(sel1?[sel1]:[]))),rings:sel1?[{id:sel1,color:css.ink,r:18,w:3}]:[],onTap:x=>{ sel1=x; paint(); panel(); }};
+    M={style:st,target:sel1,targetColor:tc,labels:(sel1?[{id:sel1,color:css.ink}]:[]).concat(mastery?[]:softLabels(new Set(sel1?[sel1]:[]))),rings:(sel1?[{id:sel1,color:css.ink,r:TOUCH_R,w:3}]:[]).concat([...MICRO].filter(x=>x!==sel1).map(x=>({id:x,color:css.ink,a:.3,w:1.2,r:TOUCH_R,soft:true}))),onTap:x=>{ sel1=x; paint(); panel(); }};
     draw("hi");
   }
   function chips(){ return `<div class="cchips" id="cch">${["World",...CONTS.map(c=>c.key)].map(k=>`<button class="cchip" aria-pressed="${k===focus}" data-k="${esc(k)}" style="--cc:${k==="World"?"var(--ink-3)":ccol(k)}"><i></i>${esc(k)}</button>`).join("")}</div>`; }
   function panel(){
     let body;
     const scope=focus==="World"?IDS:IDS.filter(x=>BY[x].c===focus);
-    if(!sel1) body= mastery ? `<h2>${focus==="World"?"How well you know the world":esc(focus)}</h2><div class="mleg">${legendHTML(scope)}</div><p>Tap a country to see your record. Three right in a row makes it solid.</p>`
+    const red=scope.filter(x=>level(x)===1), yel=scope.filter(x=>level(x)===2);
+    const where=focus==="World"?"":` in ${esc(focus)}`;
+    const pbtns = (red.length||yel.length) ? `<div class="wbtns">${red.length?`<button class="wbtn" data-w="red" style="--wc:var(--bad)"><i></i>Needs work<b>${red.length}</b></button>`:""}${yel.length?`<button class="wbtn" data-w="yel" style="--wc:var(--sun)"><i></i>Getting there<b>${yel.length}</b></button>`:""}${red.length&&yel.length?`<button class="wbtn" data-w="both" style="--wc:var(--ink)"><i></i>Both<b>${red.length+yel.length}</b></button>`:""}</div>`
+                                       : `<p>No weak spots${where} yet. Countries you miss turn red here.</p>`;
+    if(!sel1) body= mastery ? `<h2>${focus==="World"?"Practice your weak spots":esc(focus)}</h2><div class="mleg">${legendHTML(scope)}</div>${pbtns}`
                             : `<h2>Tap any country</h2><p>Brighter colors are countries you've learned. Pick a continent to zoom in.</p>`;
     else { const m=BY[sel1], pk=PACK_OF[sel1], t=S.stats[sel1], l=level(sel1);
       const rec = t&&(t.r+t.w) ? `${t.r} right · ${t.w} missed${t.s>1?` · ${t.s} in a row`:""}` : (learned(sel1)?"Learned in a lesson":"");
@@ -976,8 +1004,34 @@ function startExplore(opts){
     { const cc=$('cch'), on=cc&&cc.querySelector('[aria-pressed="true"]'); if(on) cc.scrollLeft=on.offsetLeft-(cc.clientWidth-on.offsetWidth)/2; }
     document.querySelectorAll('.cchip').forEach(b=>b.onclick=()=>{ focus=b.dataset.k; sel1=null; const fr=focus==="World"?worldFrame:()=>frameIds(IDS.filter(x=>BY[x].c===focus),1.08,20); mode.frame=fr; flyTo(fr()); paint(); panel(); });
     if($('learnIt')) $('learnIt').onclick=()=>startLesson(PACK_OF[sel1]);
+    document.querySelectorAll('.wbtn').forEach(b=>b.onclick=()=>{ const k=b.dataset.w; startWeak(scope.filter(x=>{ const l=level(x); return k==="red"?l===1:k==="yel"?l===2:(l===1||l===2); }),{focus,kind:k}); });
   }
   paint(); panel(); flyTo(worldFrame());
+}
+
+/* ================= typed answers: forgiving name matching ================= */
+const norm=t=>t.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/&/g," and ").replace(/\b(the|republic of|of)\b/g," ").replace(/[^a-z]/g,"");
+const ALIAS={USA:["us","usa","america","unitedstatesamerica","states"],GBR:["uk","britain","greatbritain","england","scotland","wales"],COD:["drc","drcongo","congokinshasa","democraticcongo","democraticrepubliccongo","zaire"],COG:["congo","congobrazzaville","republiccongo"],
+  CIV:["ivorycoast","cotedivoire"],CZE:["czechrepublic","czech"],TUR:["turkey"],SWZ:["swaziland"],MMR:["burma"],TLS:["easttimor"],NLD:["holland"],MKD:["macedonia"],ARE:["uae","emirates","unitedarabemirates"],
+  KOR:["southkorea","korea"],PRK:["northkorea"],CAF:["car"],BIH:["bosnia","bosniaherzegovina"],VAT:["vatican","holysee"],RUS:["russianfederation"],CPV:["capeverde","caboverde"],STP:["saotome"],PSE:["palestinianterritories"],
+  FSM:["micronesia"],TWN:["taiwan"],GMB:["gambia"],BHS:["bahamas"],PHL:["philippines"],LAO:["laos"],VNM:["vietnam"],KGZ:["kyrgyzstan","kirghizia"],BLR:["belarus","byelorussia"],TTO:["trinidad"],ATG:["antigua"],KNA:["stkitts","saintkitts"],VCT:["stvincent","saintvincent"],LCA:["stlucia"],DOM:["dominicanrepublic"],SLV:["elsalvador"]};
+const NAMEKEYS=IDS.map(id=>({id,keys:[norm(BY[id].n),...(ALIAS[id]||[])]}));
+function lev(a,b){ // edit distance where swapping two neighboring letters counts as one typo
+  if(a===b) return 0; const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let pp=null, prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+      if(pp&&i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) cur[j]=Math.min(cur[j],pp[j-2]+1); }
+    pp=prev; prev=cur; } return prev[n]; }
+function matchCountry(raw,prefer){
+  const n=norm(raw); if(!n) return null;
+  const exact=NAMEKEYS.filter(e=>e.keys.includes(n)).map(e=>e.id);
+  if(exact.length) return {id: exact.find(x=>(prefer||[]).includes(x))||exact[0]};
+  const tol= n.length<=4?0 : n.length<=6?1 : n.length<=10?2 : 3;
+  let best=Infinity, ids=[];
+  for(const e of NAMEKEYS){ let d=Infinity; for(const k of e.keys){ d=Math.min(d,lev(n,k)); if(k.startsWith(n)&&n.length>=5) d=Math.min(d,1); } if(d<best){ best=d; ids=[e.id]; } else if(d===best) ids.push(e.id); }
+  if(best>tol) return null;
+  if(ids.length>1){ const pf=ids.filter(x=>(prefer||[]).includes(x)); if(pf.length===1) return {id:pf[0]}; return {amb:ids.slice(0,3)}; }
+  return {id:ids[0]};
 }
 
 /* ================= neighbors drill ================= */
@@ -992,28 +1046,43 @@ function startNeighbors(){
   mode={frame:worldFrame}; show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
   function round(){
     setProgress(ri/R);
-    const X=picks[ri], nb=nbOf(X), got=new Set(), rev=new Set(), bad=new Set(); total+=nb.length; let over=false;
+    const X=picks[ri], nb=nbOf(X), got=[], rev=[], bad=new Set(); total+=nb.length; let over=false;
     const col=contColor(BY[X].c);
-    const paint=()=>{ M={style:x=>got.has(x)?[css.good,.6]:(rev.has(x)?[css.sun,.65]:(bad.has(x)?[css.bad,.45]:null)),target:X,targetColor:col,
-      labels:[{id:X,color:css.ink},...[...got].map(id=>({id,color:css.good})),...[...rev].map(id=>({id,color:css.sun})),...[...bad].map(id=>({id,color:css.bad}))],
-      rings:[{id:X,color:col,r:16,w:3}],onTap:tap}; draw("hi"); };
+    const paint=()=>{ M={style:x=>got.includes(x)?[css.good,.6]:(rev.includes(x)?[css.sun,.65]:(bad.has(x)?[css.bad,.4]:null)),target:X,targetColor:col,
+      labels:[{id:X,color:css.ink},...got.map(id=>({id,color:css.good})),...rev.map(id=>({id,color:css.sun}))],
+      rings:[{id:X,color:col,w:3}],onTap:null}; draw("hi"); };
     const fr=()=>frameFeatures([X,...nb].map(i=>MAIN[i]),1.25,12); mode.frame=fr; flyTo(fr());
-    function ui(msg,kind){
-      $('panel').style.setProperty('--cc',ccol(BY[X].c));
-      $('panel').innerHTML=`<span class="eyebrow2">Neighbors · ${ri+1} of ${R}</span><h2>Tap every country that borders <span style="color:${ccol(BY[X].c)}">${esc(BY[X].n)}</span></h2>
-        <div class="found" aria-label="${got.size} of ${nb.length} found">${nb.map(x=>`<i data-k="${got.has(x)?"ok":rev.has(x)?"rev":""}"></i>`).join("")}</div>
-        <div class="row" id="after" style="min-height:52px">${msg?`<div class="fb" data-k="${kind}" style="flex:1">${kind==="ok"?check():cross()}<span>${msg}</span></div>`:`<span style="flex:1;color:var(--ink-2);font-size:15px">${nb.length} borders to find</span>`}${over?`<button class="btn" id="nx">${ri+1<R?"Next":"See results"}</button>`:`<button class="btn ghost" id="stuck">Show the rest</button>`}</div>`;
-      if(over){ $('nx').onclick=()=>{ ri++; ri<R?round():fin(); }; $('nx').focus({preventScroll:true}); }
-      else $('stuck').onclick=()=>{ nb.forEach(x=>{ if(!got.has(x)){ rev.add(x); note(x,false);} }); over=true; combo=0; setComboUI(); paint(); ui(`${rev.size} border${rev.size===1?"":"s"} to remember, shown in yellow.`,"no"); };
-    }
-    function tap(x){
-      if(over||x===X||got.has(x)) return;
-      if(nb.includes(x)){ got.add(x); found++; combo++; note(x,true); addXp(5); buzz(12); setComboUI(); paint();
-        if(got.size===nb.length){ over=true; if(!bad.size) addXp(10); ui(bad.size?"All found.":"All found, no wrong taps!","ok"); }
-        else ui(`${esc(BY[x].n)}. ${nb.length-got.size} to go.`,"ok"); }
-      else { if(bad.has(x)) return; bad.add(x); wrong++; combo=0; buzz([30,40,30]); setComboUI(); paint(); ui(`${esc(BY[x].n)} doesn't border ${esc(BY[X].n)}.`,"no"); }
-    }
-    paint(); ui();
+    $('panel').style.setProperty('--cc',ccol(BY[X].c));
+    $('panel').innerHTML=`<span class="eyebrow2">Neighbors · ${ri+1} of ${R}</span><h2>Name every country that borders <span style="color:${ccol(BY[X].c)}">${esc(BY[X].n)}</span></h2>
+      <div class="found" id="nbSlots"></div>
+      <div class="nbnames" id="nbNames"></div>
+      <form class="nbform" id="nbForm" autocomplete="off"><input id="nbIn" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Type a neighbor" aria-label="Type a neighboring country"><button class="btn go" id="nbGo" type="submit">Enter</button></form>
+      <div class="row" id="after" style="min-height:48px"><div class="fb" id="nbMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">${nb.length} borders to name. Close spelling counts.</span></div><button class="btn ghost" id="stuck" type="button">Show the rest</button></div>`;
+    const inp=$('nbIn');
+    const msg=(t,kind)=>{ const m=$('nbMsg'); m.dataset.k=kind||""; m.innerHTML=(kind==="ok"?check():kind==="no"?cross():"")+`<span>${t}</span>`; };
+    const update=()=>{
+      $('nbSlots').innerHTML=nb.map((x,k)=>`<i data-k="${k<got.length?"ok":k<got.length+rev.length?"rev":""}"></i>`).join("");
+      $('nbNames').innerHTML=got.map(x=>`<span class="ok">${esc(BY[x].n)}</span>`).join("")+rev.map(x=>`<span class="rev">${esc(BY[x].n)}</span>`).join("");
+    };
+    const finishRound=(text,kind)=>{ over=true; inp.disabled=true; $('nbGo').disabled=true; inp.blur(); msg(text,kind);
+      const st=$('stuck'); st.outerHTML=`<button class="btn" id="nx" type="button">${ri+1<R?"Next":"See results"}</button>`;
+      $('nx').onclick=()=>{ ri++; ri<R?round():fin(); }; };
+    $('nbForm').addEventListener('submit',e=>{ e.preventDefault(); if(over) return;
+      const raw=inp.value.trim(); if(!raw) return; inp.value="";
+      const m=matchCountry(raw, nb.filter(x=>!got.includes(x)));
+      if(!m){ msg(`Not sure which country “${esc(raw)}” is. Try again.`,"no"); return; }
+      if(m.amb){ msg(`“${esc(raw)}” could be ${m.amb.map(x=>esc(BY[x].n)).join(" or ")}. Type a bit more.`,"no"); return; }
+      const x=m.id;
+      if(x===X){ msg(`That's ${esc(BY[X].n)} itself. Name its neighbors.`,"no"); return; }
+      if(got.includes(x)){ msg(`You already have ${esc(BY[x].n)}.`,""); return; }
+      if(nb.includes(x)){ got.push(x); found++; combo++; note(x,true); addXp(5); buzz(12); setComboUI(); paint(); update();
+        if(got.length===nb.length){ if(!bad.size) addXp(10); finishRound(bad.size?"All named.":"All named, no wrong guesses!","ok"); }
+        else msg(`${esc(BY[x].n)}${norm(raw)!==norm(BY[x].n)?` (close enough)`:""}. ${nb.length-got.length} to go.`,"ok"); }
+      else { if(!bad.has(x)){ bad.add(x); wrong++; } combo=0; buzz([30,40,30]); setComboUI(); paint(); msg(`${esc(BY[x].n)} doesn't border ${esc(BY[X].n)}.`,"no"); }
+      inp.focus({preventScroll:true});
+    });
+    $('stuck').onclick=()=>{ if(over) return; nb.forEach(x=>{ if(!got.includes(x)){ rev.push(x); note(x,false);} }); combo=0; setComboUI(); paint(); update(); finishRound(`${rev.length} to remember, shown in yellow.`,"no"); };
+    paint(); update(); setTimeout(()=>inp.focus({preventScroll:true}),350);
   }
   function fin(){
     stopTimer(); setProgress(1); bumpDay();
@@ -1023,14 +1092,81 @@ function startNeighbors(){
     M={style:x=>picks.includes(x)?[css.sun,.5]:null,target:null,labels:[],rings:[],onTap:null}; mode.frame=worldFrame; flyTo(worldFrame(),()=>{ if(isBest&&prev) confetti(); });
     $('panel').style.setProperty('--cc','var(--good)');
     $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">Neighbors drill</span>
-      <h2>${found===total&&!wrong?"Flawless borders!":`${Math.round(found/total*100)}% of borders found`}</h2>
-      <div class="nums"><div><b>${found}/${total}</b><span>found</span></div><div><b>${wrong}</b><span>wrong taps</span></div><div><b>${fmt(ms)}</b><span>time</span></div></div>
-      <p>${!prev?"First run. This is your score to beat.":isBest?"New best!":`Your best is ${prev.c}/${prev.n} with ${prev.w} wrong taps in ${fmt(prev.ms)}.`}</p>
+      <h2>${found===total&&!wrong?"Flawless borders!":`${Math.round(found/total*100)}% of borders named`}</h2>
+      <div class="nums"><div><b>${found}/${total}</b><span>named</span></div><div><b>${wrong}</b><span>wrong guesses</span></div><div><b>${fmt(ms)}</b><span>time</span></div></div>
+      <p>${!prev?"First run. This is your score to beat.":isBest?"New best!":`Your best is ${prev.c}/${prev.n} with ${prev.w} wrong in ${fmt(prev.ms)}.`}</p>
       ${S.nb.hist.length>1?`<div class="hist">${S.nb.hist.slice(0,5).map((h,i)=>`<div class="${i===0?"me":""}"><span>${i===0?"This run":new Date(h.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span>${h.c}/${h.n} · ${h.w} wrong · ${fmt(h.ms)}</span></div>`).join("")}</div>`:""}
       <div class="row" style="width:100%"><button class="btn go wide" id="again">Play again</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
     $('again').onclick=()=>startNeighbors(); $('homeB').onclick=()=>$('quit').click();
   }
   round();
+}
+
+/* ================= weak spots practice (from the mastery map) ================= */
+function startWeak(list,ctx){
+  if(!list.length) return;
+  const before=Object.fromEntries(list.map(id=>[id,level(id)]));
+  const ids=shuffle(list).slice(0,20);
+  const q=ids.map((id,i)=>({t:i%2?"find":"pick",id}));
+  let qi=0, right=0; xpRun=0; combo=0; setXp(); setComboUI();
+  $('steps').hidden=false; $('ptitle').hidden=true;
+  mode={frame:worldFrame}; show("play");
+  const label= ctx.kind==="red"?"Needs work":ctx.kind==="yel"?"Getting there":"Weak spots";
+  const next=()=>{ qi++; qi<q.length?step():fin(); };
+  const requeue=s=>{ if(!s.retry) q.push({...s,t:s.t==="pick"?"find":"pick",retry:true}); };
+  const mark=(id,ok)=>{ note(id,ok); if(S.cards[id]) grade(id,ok); save(); };
+  function step(){
+    setProgress(qi/q.length);
+    const s=q[qi], id=s.id, cont=BY[id].c, col=contColor(cont); $('panel').style.setProperty('--cc',ccol(cont));
+    const head=`<span class="eyebrow2">${esc(label)} · ${qi+1} of ${q.length}</span>`;
+    if(s.t==="pick"){
+      const pool=IDS.filter(x=>x!==id&&BY[x].c===cont);
+      const others=shuffle(pool.filter(x=>BY[id].b.includes(x))).slice(0,2); shuffle(pool).forEach(x=>{ if(others.length<3&&!others.includes(x)) others.push(x); });
+      const opts=shuffle([id,...others]);
+      M={style:x=>x!==id&&BY[x].c===cont?[col,.12]:null,target:id,targetColor:col,labels:[],rings:[{id,color:col,r:18,w:3}],onTap:null};
+      const fr=()=>frameIds([id],2.9,28); mode.frame=fr; flyTo(fr());
+      let used=false;
+      $('panel').innerHTML=`${head}<h2>Which country is glowing?</h2><div class="opts">${opts.map(o=>`<button class="opt" data-id="${o}">${esc(BY[o].n)}</button>`).join("")}</div><div class="row" id="after"></div>`;
+      document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+        if(used) return; used=true; const ok=b.dataset.id===id; mark(id,ok);
+        document.querySelectorAll('.opt').forEach(x=>{ x.disabled=true; x.dataset.s= x.dataset.id===id?"right":(x===b?"wrong":"fade"); });
+        if(ok){ right++; combo++; addXp(10); buzz(15); M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); setComboUI(); $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setTimeout(next,reduceMotion?600:900); }
+        else { combo=0; buzz([30,40,30]); requeue(s); M.labels=[{id,color:col}]; draw("hi"); setComboUI(); $('after').innerHTML=`<div class="fb" data-k="no" style="flex:1">${cross()}<span>This one is ${esc(BY[id].n)}. It'll come back.</span></div><button class="btn" id="cont">Continue</button>`; $('cont').onclick=next; }
+      });
+    } else {
+      const grp=META.filter(m=>GROUP_OF[m.id]===GROUP_OF[id]).map(m=>m.id);
+      let tries=0, doneQ=false; const wrongIds=new Set();
+      M={style:x=>wrongIds.has(x)?[css.bad,.55]:(BY[x].c===cont?[col,.14]:null),target:null,labels:[],rings:grp.map(x=>({id:x,color:css.ink,a:.35,w:1.5,r:TOUCH_R})),tapPrefer:grp,
+        onTap:x=>{ if(doneQ) return;
+          if(x===id){ doneQ=true; mark(id,!tries); if(!tries){ right++; combo++; addXp(10);} buzz(15); M.target=id; M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); setComboUI();
+            $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${tries?"Found it.":PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setTimeout(next,reduceMotion?600:900); }
+          else { tries++; combo=0; buzz([30,40,30]); wrongIds.add(x); setComboUI();
+            if(tries>=2){ doneQ=true; mark(id,false); requeue(s); M.target=id; M.targetColor=col; M.labels=[{id:x,color:css.bad},{id,color:col}]; draw("hi");
+              $('after').innerHTML=`<div class="fb" data-k="no" style="flex:1">${cross()}<span>That's ${esc(BY[x].n)}. Here's ${esc(BY[id].n)}.</span></div><button class="btn" id="cont">Continue</button>`; $('cont').onclick=next; }
+            else { M.labels=[{id:x,color:css.bad}]; draw("hi"); $('after').innerHTML=`<div class="fb" data-k="no" style="flex:1">${cross()}<span>That's ${esc(BY[x].n)}. Try again.</span></div><button class="btn ghost" id="hint">Show me</button>`; $('hint').onclick=()=>pulse(id,css.sun); }
+          } }};
+      const fr=()=>frameIds(grp,1.25,30); mode.frame=fr; flyTo(fr());
+      $('panel').innerHTML=`${head}<h2>Tap <span style="color:${ccol(cont)}">${esc(BY[id].n)}</span></h2><p>It's somewhere in ${esc(GROUP_OF[id])}.</p><div class="row" id="after"><button class="btn ghost" id="hint">Show me</button></div>`;
+      $('hint').onclick=()=>pulse(id,css.sun);
+    }
+  }
+  function fin(){
+    setProgress(1); bumpDay(); save();
+    const up=list.filter(id=>level(id)>before[id]), solid=up.filter(id=>level(id)===3);
+    const still=list.filter(id=>level(id)<3);
+    M={style:x=>list.includes(x)?[MCOL()[level(x)],.75]:null,target:null,labels:[],rings:list.map(id=>({id,color:css.ink,r:10,w:2})),onTap:null};
+    mode.frame=ctx.focus==="World"?worldFrame:()=>frameIds(IDS.filter(x=>BY[x].c===ctx.focus),1.08,20); flyTo(mode.frame(),()=>{ if(solid.length) confetti(); });
+    const mc=l=>["var(--line)","var(--bad)","var(--sun)","var(--good)"][l];
+    $('panel').style.setProperty('--cc','var(--good)');
+    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">${esc(label)}${ctx.focus==="World"?"":" · "+esc(ctx.focus)}</span>
+      <h2>${up.length?`${up.length} countr${up.length===1?"y":"ies"} moved up`:"Practice done"}</h2>
+      <div class="nums"><div><b>${right}</b><span>right first try</span></div><div><b>${solid.length}</b><span>now solid</span></div><div><b>${still.length}</b><span>still to work on</span></div></div>
+      ${up.length?`<div class="moved">${up.map(id=>`<span style="--mc:${mc(level(id))}">${esc(BY[id].n)}</span>`).join("")}</div>`:`<p>Three right in a row turns a country green. Keep going.</p>`}
+      <div class="row" style="width:100%">${still.length?`<button class="btn go wide" id="again">Practice ${still.length} again</button>`:""}<button class="btn ghost ${still.length?"":"wide"}" id="mapB">Mastery map</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
+    if($('again')) $('again').onclick=()=>startWeak(still,ctx);
+    $('mapB').onclick=()=>startExplore({mastery:true}); $('homeB').onclick=()=>$('quit').click();
+  }
+  step();
 }
 
 /* ================= daily 10 ================= */
