@@ -36,7 +36,7 @@ def swap_block(app, start, end_marker, new):
 def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_key, all_key,
           backup, seed, share, unit, units, region_word, extra_head=(), extra_app=()):
     s = SRC
-    for el in ("hi", "lo"):
+    for el in ("lo",):   # editions ship one map; the World edition also has map-hi.json
         s = sub_json(s, el, data_map)
     s = sub_json(s, "meta", data_meta)
     k = s.rindex('<script>'); head, app = s[:k], s[k:]   # never touch the d3 library text
@@ -61,6 +61,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     app = rep(app, '`Globetrotter ${practice?', f'`{share} ${{practice?', 1)
     app = rep(app, 'navigator.serviceWorker.register("sw.js")', 'navigator.serviceWorker.register("../sw.js")', 1)
     app = rep(app, 'fetch("version.json",', 'fetch("../version.json",', 1)
+    app = rep(app, 'const HI_URL="map-hi.json";', 'const HI_URL=null;', 1)
     for a, b in extra_app:
         app = b(app) if callable(b) else rep(app, a, b)
     # words
