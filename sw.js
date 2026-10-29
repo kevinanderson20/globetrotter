@@ -1,6 +1,6 @@
-// Globetrotter offline support: keeps a copy of the app on the device.
-const CACHE = "globetrotter-v1";
-const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+// Globetrotter offline support: keeps a copy of both editions (World and USA) on the device.
+const CACHE = "globetrotter-v2";
+const CORE = ["./", "./usa/", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -14,29 +14,30 @@ self.addEventListener("activate", e => {
   })());
 });
 
-// Network first for the page, with a short timeout so a slow or captive plane Wi-Fi falls back to the saved copy.
 function timeout(ms) { return new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms)); }
+// "/globetrotter/usa/index.html" and "/globetrotter/usa/" are the same page
+function pageKey(u) { const url = new URL(u); url.search = ""; url.hash = ""; url.pathname = url.pathname.replace(/index\.html$/, ""); return url.href; }
 
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
+  // Pages: network first, with a short timeout so slow plane Wi-Fi falls back to the saved copy.
   if (req.mode === "navigate") {
     e.respondWith((async () => {
-      const cache = await caches.open(CACHE);
+      const cache = await caches.open(CACHE), key = pageKey(req.url);
       try {
         const res = await Promise.race([fetch(req), timeout(4000)]);
-        if (res && res.ok) { cache.put("./index.html", res.clone()); return res; }
+        if (res && res.ok) { cache.put(key, res.clone()); return res; }
         throw new Error("bad response");
       } catch (err) {
-        return (await cache.match("./index.html")) || (await cache.match("./")) || Response.error();
+        return (await cache.match(key)) || (await cache.match(new URL("./", self.registration.scope).href)) || Response.error();
       }
     })());
     return;
   }
 
-  // Fonts: keep a copy so the typefaces work offline too.
   if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
     e.respondWith((async () => {
       const cache = await caches.open(CACHE);

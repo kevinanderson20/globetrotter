@@ -77,6 +77,9 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
 .trio{grid-template-columns:repeat(3,1fr);gap:8px}
+.tabs{margin-left:auto;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
+.tabs a{padding:7px 13px;border-radius:999px;font-weight:700;font-size:14px;color:var(--ink-2);text-decoration:none;min-height:20px}
+.tabs a[aria-current="page"]{background:var(--ink);color:var(--surface)}
 .wbtns{display:flex;gap:8px;flex-wrap:wrap}
 .wbtn{flex:1 1 0;min-width:96px;min-height:48px;border:2px solid var(--wc);border-bottom-width:4px;background:color-mix(in srgb,var(--wc) 12%,var(--surface));border-radius:14px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;text-align:left}
 .wbtn i{width:10px;height:10px;border-radius:3px;background:var(--wc);flex:none}
@@ -251,6 +254,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="brand">
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="var(--sea)"/><path d="M9 13c3-3 6-2 8 0s1 5-2 6-3 4-1 6M22 8c2 2 5 3 6 6s-1 5-3 5-3 3-1 5" fill="none" stroke="var(--c-na)" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="18" r="16" fill="none" stroke="var(--ink)" stroke-width="2"/><circle cx="28" cy="8" r="4" fill="var(--sun)" stroke="var(--ink)" stroke-width="2"/></svg>
     <h1>Globetrotter</h1>
+    <nav class="tabs" aria-label="Edition"><a href="./" aria-current="page">World</a><a href="usa/">USA</a></nav>
   </div>
   <div class="chips" id="chips"></div>
   <button class="next" id="nextBtn"></button>
@@ -384,7 +388,7 @@ function syncText(){ setSync(!saveOk?"This browser is blocking saving. Progress 
 setTimeout(syncText,0);
 if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")){
   {
-    navigator.serviceWorker.register("sw.js").then(()=>navigator.serviceWorker.ready).then(()=>caches.has("globetrotter-v1")).then(has=>{ offlineReady=has; syncText(); }).catch(()=>{});
+    navigator.serviceWorker.register("sw.js").then(()=>navigator.serviceWorker.ready).then(()=>caches.has("globetrotter-v2")).then(has=>{ offlineReady=has; syncText(); }).catch(()=>{});
     navigator.serviceWorker.addEventListener("message",e=>{ if(e.data==="cached"){ offlineReady=true; syncText(); } });
   }
 }
@@ -1047,13 +1051,13 @@ function startNeighbors(){
   function round(){
     setProgress(ri/R);
     const X=picks[ri], nb=nbOf(X), got=[], rev=[], bad=new Set(); total+=nb.length; let over=false;
-    const col=contColor(BY[X].c);
+    const col=css["c-eu"]; // one fixed color for the target, so it never looks like a found (green) neighbor
     const paint=()=>{ M={style:x=>got.includes(x)?[css.good,.6]:(rev.includes(x)?[css.sun,.65]:(bad.has(x)?[css.bad,.4]:null)),target:X,targetColor:col,
       labels:[{id:X,color:css.ink},...got.map(id=>({id,color:css.good})),...rev.map(id=>({id,color:css.sun}))],
       rings:[{id:X,color:col,w:3}],onTap:null}; draw("hi"); };
     const fr=()=>frameFeatures([X,...nb].map(i=>MAIN[i]),1.25,12); mode.frame=fr; flyTo(fr());
-    $('panel').style.setProperty('--cc',ccol(BY[X].c));
-    $('panel').innerHTML=`<span class="eyebrow2">Neighbors · ${ri+1} of ${R}</span><h2>Name every country that borders <span style="color:${ccol(BY[X].c)}">${esc(BY[X].n)}</span></h2>
+    $('panel').style.setProperty('--cc','var(--c-eu)');
+    $('panel').innerHTML=`<span class="eyebrow2">Neighbors · ${ri+1} of ${R}</span><h2>Name every country that borders <span style="color:var(--c-eu)">${esc(BY[X].n)}</span></h2>
       <div class="found" id="nbSlots"></div>
       <div class="nbnames" id="nbNames"></div>
       <form class="nbform" id="nbForm" autocomplete="off"><input id="nbIn" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Type a neighbor" aria-label="Type a neighboring country"><button class="btn go" id="nbGo" type="submit">Enter</button></form>

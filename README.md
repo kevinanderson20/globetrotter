@@ -17,3 +17,7 @@ Mastery map: see how well you know each country at a glance.
 Challenges: quiz a whole continent or the world, timed, with your best scores saved.
 
 Works offline: open it once with internet (ideally from your home-screen icon) and the app saves a copy on your device.
+
+## USA edition
+
+`usa/` is the same app for the 50 states (lessons by Census division, challenges, Daily 10, neighbors, mastery map). It is generated from the World edition: after editing `index.html`, run `python3 tools/build_usa.py`. State shapes come from the US Census 1:10m boundaries via us-atlas (`tools/build-us-data.js`).
