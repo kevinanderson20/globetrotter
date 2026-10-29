@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Globetrotter">
@@ -45,7 +45,9 @@
   color-scheme:dark}
 
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.4;overflow:hidden;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.4;overflow:hidden;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+button,canvas,.stage,.pbar{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.home{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
@@ -118,20 +120,23 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .foot{font-size:13px;color:var(--ink-3);text-align:center}
 .sync{font-size:12px;color:var(--ink-3);text-align:center}
 .backup{display:grid;gap:10px}
-.backup textarea{width:100%;box-sizing:border-box;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface);color:var(--ink);resize:vertical;word-break:break-all}
+.backup textarea{width:100%;box-sizing:border-box;font:16px/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface);color:var(--ink);resize:vertical;word-break:break-all}
 .rsmsg{font-size:14px;font-weight:600}
 
 /* ---------- play ---------- */
 .play{display:grid;grid-template-rows:auto 1fr auto;background:var(--sea)}
 .pbar{display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--surface);border-bottom:1px solid var(--line)}
-.x{width:40px;height:40px;border-radius:12px;border:0;background:transparent;display:grid;place-items:center;color:var(--ink-2)}
+.x{width:44px;height:44px;border-radius:12px;border:0;background:transparent;display:grid;place-items:center;color:var(--ink-2)}
 .steps{flex:1;height:12px;border-radius:9px;background:var(--surface-2);overflow:hidden}
 .steps i{display:block;height:100%;width:0;background:var(--good);border-radius:9px;transition:width .35s}
 .xp{font-family:var(--f-display);font-weight:800;color:var(--sun-ink);background:var(--sun);border-radius:999px;padding:4px 10px;font-size:14px;font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
 .ptitle{font-family:var(--f-display);font-weight:800;font-size:18px;flex:1}
 .stage{position:relative;min-height:0;touch-action:none}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.recenter{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:12px;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.mapctl{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:26px;display:grid;gap:8px;z-index:3}
+.mapctl button{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.14);color:var(--ink)}
+.mapctl button:active{transform:scale(.94)}
+.panel.explore{min-height:212px;align-content:start}
 .combo{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--sun);color:var(--sun-ink);font-family:var(--f-display);font-weight:800;padding:6px 14px;border-radius:999px;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.15);transition:opacity .3s, transform .3s}
 .combo[data-on="0"]{opacity:0;transform:translateX(-50%) translateY(-8px)}
 #fx{pointer-events:none;z-index:5}
@@ -214,7 +219,11 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     <canvas id="map" aria-label="World map"></canvas>
     <canvas id="fx" aria-hidden="true"></canvas>
     <div class="combo" id="combo" data-on="0"></div>
-    <button class="recenter" id="recenter" aria-label="Reset map view"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="1.8" fill="currentColor"/><path d="M10 1v3M10 16v3M1 10h3M16 10h3" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    <div class="mapctl">
+      <button id="zin" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      <button id="zout" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+    <button id="recenter" aria-label="Reset map view"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="1.8" fill="currentColor"/><path d="M10 1v3M10 16v3M1 10h3M16 10h3" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
   </div>
   <div class="panel" id="panel"></div>
 </section>
@@ -410,6 +419,7 @@ function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); cons
   proj.translate([tx,ty]); }
 function fitWorldScale(){ proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),H/(b[1][1]-b[0][1]))*0.98; }
 function frameIds(ids,pad,minDeg){
+  if(ids.length>5) ids=ids.filter(i=>i!=="RUS"); // Russia spans 170 degrees; framing it would zoom Europe out to the whole world
   const fc={type:"FeatureCollection",features:ids.map(i=>MAIN[i])};
   let c=d3.geoCentroid(fc);
   if(ids.some(i=>BY[i].c==="Oceania") && ids.every(i=>BY[i].c==="Oceania") && ids.length>2) c=[168,-10];
@@ -491,16 +501,30 @@ function flyTo(v,cb){
     if(t>=1){ anim.stop(); anim=null; fin(); }
   });
 }
-function resize(){
+function resize(reset){
   const r=stage.getBoundingClientRect(); if(!r.width) return;
+  // A size change while playing (the answer panel growing, the phone rotating) keeps your zoom and position.
+  // Only opening a new screen resets the map.
+  let keep=null;
+  if(!reset && W && view && view.s){ const ll=proj.invert([(W/2-zt.x)/zt.k,(H/2-zt.y)/zt.k]); if(ll) keep={ll,k:zt.k}; }
+  if(!reset && r.width===W && r.height===H) return;
   W=r.width; H=r.height; DPR=Math.min(devicePixelRatio||1,2.5);
   for(const c of [canvas,fx]){ c.width=Math.round(W*DPR); c.height=Math.round(H*DPR); }
   worldScale=fitWorldScale();
+  if(keep && !anim){
+    applyView(view); computeBounds();
+    const p=proj(keep.ll);
+    if(p){ sel.call(zoom.transform,d3.zoomIdentity.translate(W/2-p[0]*keep.k,H/2-p[1]*keep.k).scale(keep.k)); draw("hi"); return; }
+  }
+  if(anim){ applyView(view); computeBounds(); draw("lo"); return; }
   if(mode&&mode.frame) view=mode.frame(); else view=worldFrame();
   homeView=view; sel.call(zoom.transform,d3.zoomIdentity); applyView(view); computeBounds(); draw("hi");
 }
-new ResizeObserver(()=>resize()).observe(stage);
+new ResizeObserver(()=>resize(false)).observe(stage);
 $('recenter').onclick=()=>{ if(homeView) flyTo(homeView); };
+const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,f,[W/2,H/2]);
+$('zin').onclick=()=>zoomBy(2); $('zout').onclick=()=>zoomBy(.5);
+const COARSE=matchMedia('(pointer: coarse)').matches;
 // tap -> country
 function pickAt(cx,cy,prefer){
   const r=canvas.getBoundingClientRect(), x=cx-r.left, y=cy-r.top;
@@ -508,7 +532,7 @@ function pickAt(cx,cy,prefer){
   if(ll){ const bx=(x-zt.x)/zt.k, by=(y-zt.y)/zt.k;
     for(const id of IDS){ const b=BOUNDS[id]; if(bx<b[0][0]-1||bx>b[1][0]+1||by<b[0][1]-1||by>b[1][1]+1) continue; if(d3.geoContains(F.lo[id],ll)) return id; } }
   // tiny countries: nearest centroid within reach
-  let best=null,bd=26; for(const id of (prefer||IDS)){ if(pxSize(id)>=22&&!(prefer)) continue; const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<bd){bd=d;best=id;} }
+  let best=null,bd=COARSE?36:26; for(const id of (prefer||IDS)){ if(pxSize(id)>=(COARSE?30:22)&&!(prefer)) continue; const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<bd){bd=d;best=id;} }
   return best;
 }
 canvas.addEventListener('click',e=>{ if(!M.onTap) return; const id=pickAt(e.clientX,e.clientY,M.tapPrefer); if(id) M.onTap(id); });
@@ -541,7 +565,7 @@ function buzz(ms){ try{ navigator.vibrate&&navigator.vibrate(ms); }catch(e){} }
 
 /* ================= play shell ================= */
 let mode=null, xpRun=0, combo=0;
-function show(screen){ stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; if(screen==="play") resize(); else { renderHome(); } }
+function show(screen){ $('panel').classList.remove('explore'); stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; if(screen==="play") resize(true); else { renderHome(); } }
 function setXp(){ $('xpNow').textContent=xpRun+" XP"; }
 function addXp(n){ xpRun+=n; S.xp+=n; setXp(); }
 function setComboUI(){ const c=$('combo'); if(combo>=3){ c.textContent=combo+" in a row!"; c.dataset.on=1; } else c.dataset.on=0; }
@@ -839,7 +863,8 @@ function startExplore(){
       body=`<span class="eyebrow2" style="color:${ccol(m.c)}">${esc(m.c)} · ${esc(GROUP_OF[sel1])}</span><h2 class="bigname" style="--cc:${ccol(m.c)}">${esc(m.n)}</h2>
         <div class="row">${learned(sel1)?`<span class="fb" data-k="ok">${check()}<span>Learned</span></span>`:`<button class="btn go" id="learnIt">Learn it: ${esc(pk.title)}</button>`}</div>`; }
     $('panel').style.setProperty('--cc','var(--ink)');
-    $('panel').innerHTML=chips()+body;
+    $('panel').classList.add('explore'); $('panel').innerHTML=chips()+body;
+    { const cc=$('cch'), on=cc&&cc.querySelector('[aria-pressed="true"]'); if(on) cc.scrollLeft=on.offsetLeft-(cc.clientWidth-on.offsetWidth)/2; }
     document.querySelectorAll('.cchip').forEach(b=>b.onclick=()=>{ focus=b.dataset.k; sel1=null; const fr=focus==="World"?worldFrame:()=>frameIds(IDS.filter(x=>BY[x].c===focus),1.08,20); mode.frame=fr; flyTo(fr()); paint(); panel(); });
     if($('learnIt')) $('learnIt').onclick=()=>startLesson(PACK_OF[sel1]);
   }
