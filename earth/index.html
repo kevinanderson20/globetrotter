@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Globetrotter">
@@ -303,6 +303,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
     <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap to see names</span></button>
     <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">After a lesson</span></button>
     <button class="tile" id="nbBtn" hidden><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="6" width="6" height="6" rx="1" fill="currentColor"/><path d="M2 3h3M2 3v3M16 3h-3M16 3v3M2 15h3M2 15v-3M16 15h-3M16 15v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Neighbors</b><span id="nbSub">Name the borders</span></button>
+    <button class="tile" id="chainBtn" hidden><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span><b>Chain</b><span id="chainSub">Neighbor to neighbor</span></button>
   </div>
   <div class="chall">
     <div class="sechead"><div><h3 class="sech">Challenges</h3><p class="secp">Every place in a category, once each, against the clock.</p></div><button class="histbtn" id="histBtn"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 13V3M2 13h12M5 10l3-3 2 2 4-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>History</button></div>
@@ -440,7 +441,7 @@ const LS="globetrotter.earth.v1";
 const INT=[0,10*60e3,864e5,3*864e5,7*864e5,16*864e5,35*864e5];
 let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"Oceans & Seas",ch:{},stats:{},daily:{},nb:{}};
 try{const s=JSON.parse(localStorage.getItem(LS)||"null"); if(s&&s.packs) S=Object.assign(S,s);}catch(e){}
-if(!S.ch) S.ch={}; if(S.sound===undefined) S.sound=true; if(S.recall===undefined) S.recall=false; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
+if(!S.ch) S.ch={}; if(!S.chain) S.chain={}; if(S.sound===undefined) S.sound=true; if(S.recall===undefined) S.recall=false; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
 let ready=true, readyCb=null;
 const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(S)); return true;}catch(e){ return false; }};
 function save(){ if(!saveLocal()) setSync("This browser is blocking saving. Progress will reset when you close it."); }
@@ -502,6 +503,7 @@ function renderHome(){
   const rb=$('reviewBtn'); rb.disabled=L<4;
   $('reviewSub').textContent= L<4 ? "After a lesson" : (due? `${due} ready` : "Mixed practice");
   const nbB=S.nb.best; $('nbSub').textContent= nbB ? `Best ${nbB.c}/${nbB.n}` : "Name the borders";
+  const chB=S.chain&&S.chain.best; $('chainSub').textContent= chB ? `Longest: ${chB.c} links` : "Neighbor to neighbor";
   renderDailyCard(); drawMastery();
   const box=$('conts'); box.innerHTML="";
   CONTS.forEach(c=>{
@@ -544,7 +546,7 @@ $('rsBtn').onclick=()=>{ $('bkPane').hidden=true; const p=$('rsPane'); p.hidden=
 $('rsGo').onclick=()=>{ const m=$('rsMsg'); try{ const raw=$('rsCode').value.trim().replace(/^GLOBEEARTH1:/,""); const o=dec(raw); if(!o||!o.packs||!o.cards) throw 0;
   S=Object.assign({packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"Oceans & Seas",ch:{},stats:{},daily:{},nb:{}},o); save(); $('rsCode').value=""; renderHome(); $('rsMsg').style.color="var(--good)"; $('rsPane').hidden=false; $('rsMsg').textContent="Progress restored: "+learnedIds().length+" places learned."; }
   catch(e){ m.style.color="var(--bad)"; m.textContent="That code didn't work. Copy the whole code, including GLOBEEARTH1: at the start."; } };
-$('exploreBtn').onclick=()=>startExplore(); $('mBtn').onclick=()=>startExplore({mastery:true}); $('nbBtn').onclick=()=>startNeighbors();
+$('exploreBtn').onclick=()=>startExplore(); $('mBtn').onclick=()=>startExplore({mastery:true}); $('nbBtn').onclick=()=>startNeighbors(); $('chainBtn').onclick=()=>startChain();
 $('reviewBtn').onclick=()=>startReview();
 
 /* ================= map engine ================= */
@@ -1149,20 +1151,23 @@ function renderHistory(){
   const cards=[];
   for(const [k,r] of Object.entries(S.ch)){ if(!r||!(r.hist||[]).length) continue; const [sc,md]=k.split("|");
     cards.push({title:`${sc} · ${MODE_LABEL[md]||md}`,cc:sc==="Everything"?"var(--ink)":(CONT[sc]?ccol(sc):"var(--ink)"),hist:r.hist,best:r.best,kind:"run"}); }
+  if(S.chain&&(S.chain.hist||[]).length) cards.push({title:"Chain",cc:"var(--c-oc)",hist:S.chain.hist,best:S.chain.best,kind:"chain"});
   if(S.nb&&(S.nb.hist||[]).length) cards.push({title:"Neighbors drill",cc:"var(--c-eu)",hist:S.nb.hist,best:S.nb.best,kind:"run"});
   const daily=Object.entries(S.daily||{}).filter(([k,v])=>v.done).sort((a,b)=>a[0]<b[0]?1:-1).map(([k,v])=>({c:v.score,n:10000,at:new Date(k+"T12:00:00").getTime(),day:k}));
   if(daily.length) cards.push({title:"Daily 10",cc:"var(--sun)",hist:daily,best:daily.reduce((m,h)=>!m||h.c>m.c?h:m,null),kind:"daily"});
   cards.sort((a,b)=>(b.hist[0].at||0)-(a.hist[0].at||0));
   const body=$('histBody');
-  if(!cards.length){ body.innerHTML=`<div class="hempty">Nothing here yet. Finish a challenge, a Fill the map run, a Neighbors drill or a Daily 10, and your results show up here with your progress over time.</div>`; return; }
+  if(!cards.length){ body.innerHTML=`<div class="hempty">Nothing here yet. Finish a challenge, a Fill the map run, a Neighbors drill, a Chain or a Daily 10, and your results show up here with your progress over time.</div>`; return; }
   const dt=t=>new Date(t).toLocaleDateString(undefined,{month:"short",day:"numeric"});
   body.innerHTML=cards.map(cd=>{
     const h=cd.hist.slice().reverse(); // oldest first for the charts
-    const pct=h.map(x=>cd.kind==="daily"?x.c:Math.round(x.c/x.n*100)), last=h[h.length-1];
-    const scoreRow=`<div class="spark"><span>${cd.kind==="daily"?"Points":"Score"}</span>${sparkSVG(pct,{min:0,max:cd.kind==="daily"?10000:100,color:"var(--good)"})}<b>${cd.kind==="daily"?last.c.toLocaleString():pct[pct.length-1]+"%"}</b></div>`;
+    const raw=cd.kind==="daily"||cd.kind==="chain";
+    const pct=h.map(x=>raw?x.c:Math.round(x.c/x.n*100)), last=h[h.length-1];
+    const top=cd.kind==="daily"?10000:cd.kind==="chain"?Math.max(5,...pct):100;
+    const scoreRow=`<div class="spark"><span>${cd.kind==="daily"?"Points":cd.kind==="chain"?"Links":"Score"}</span>${sparkSVG(pct,{min:0,max:top,color:"var(--good)"})}<b>${cd.kind==="daily"?last.c.toLocaleString():cd.kind==="chain"?last.c:pct[pct.length-1]+"%"}</b></div>`;
     const timeRow=cd.kind==="daily"?"":`<div class="spark"><span>Time</span>${sparkSVG(h.map(x=>x.ms/1000),{min:0,invert:false,color:"var(--c-eu)"})}<b>${fmt(last.ms)}</b></div>`;
-    const bestTxt=cd.best?(cd.kind==="daily"?`Best ${cd.best.c.toLocaleString()}`:`Best ${cd.best.c}/${cd.best.n} · ${fmt(cd.best.ms)}`):"";
-    const rows=cd.hist.slice(0,5).map(x=>`<div><span>${dt(x.at)}</span><span>${cd.kind==="daily"?x.c.toLocaleString()+" pts":`${x.c}/${x.n} · ${fmt(x.ms)}`}</span></div>`).join("");
+    const bestTxt=cd.best?(cd.kind==="daily"?`Best ${cd.best.c.toLocaleString()}`:cd.kind==="chain"?`Longest ${cd.best.c} links`:`Best ${cd.best.c}/${cd.best.n} · ${fmt(cd.best.ms)}`):"";
+    const rows=cd.hist.slice(0,5).map(x=>`<div><span>${dt(x.at)}</span><span>${cd.kind==="daily"?x.c.toLocaleString()+" pts":cd.kind==="chain"?`${x.c} links · ${fmt(x.ms)}`:`${x.c}/${x.n} · ${fmt(x.ms)}`}</span></div>`).join("");
     return `<article class="hcard" style="--cc:${cd.cc}"><header><h3>${esc(cd.title)}</h3><span>${cd.hist.length} run${cd.hist.length===1?"":"s"} · ${bestTxt}</span></header>${scoreRow}${timeRow}<div class="hrows">${rows}</div></article>`;
   }).join("");
 }
@@ -1174,9 +1179,11 @@ $('soundBtn').onclick=()=>{ S.sound=!S.sound; saveLocal(); $('soundBtn').setAttr
 // the map keeps the top half, a compact answer panel sits right on top of the keyboard.
 if(window.visualViewport){ const vv=window.visualViewport, play=$('play');
   const typing=()=>{ const a=document.activeElement; return !!a&&a.tagName==="INPUT"&&play.contains(a); };
-  const fit=()=>{ const kb=typing()&&vv.height<window.innerHeight-80;
+  const full=()=>Math.max(window.innerHeight,document.documentElement.clientHeight,window.screen&&window.screen.height*0.8||0);
+  const fit=()=>{ const kb=typing()&&(vv.height<window.innerHeight-80||vv.height<full()-120); // keyboard is up
     play.classList.toggle('kb',kb);
     if(kb){ play.style.top=vv.offsetTop+"px"; play.style.height=vv.height+"px"; } else { play.style.top=""; play.style.height=""; } };
+  window.addEventListener('resize',fit);
   vv.addEventListener('resize',fit); vv.addEventListener('scroll',fit);
   document.addEventListener('focusin',()=>{ fit(); setTimeout(fit,120); setTimeout(fit,400); });
   document.addEventListener('focusout',()=>setTimeout(fit,60)); }
@@ -1405,6 +1412,65 @@ function startWeak(list,ctx){
   step();
 }
 
+/* ================= chain: neighbor to neighbor, as far as you can go ================= */
+function startChain(){
+  const elig=IDS.filter(id=>nbOf(id).length>=2);
+  let cur=elig[Math.floor(Math.random()*elig.length)]; const path=[cur], used=new Set([cur]); let lives=3, over=false;
+  xpRun=0; combo=0; setXp(); setComboUI();
+  $('steps').hidden=true; $('ptitle').hidden=false; $('ptitle').textContent="Chain";
+  mode={frame:worldFrame}; show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
+  const col=()=>css["c-eu"];
+  const paint=(extra)=>{ const pset=new Set(path);
+    M={style:x=>x===cur?null:pset.has(x)?[css.good,.55]:(extra&&extra.has(x))?[css.sun,.65]:null,target:cur,targetColor:col(),
+       labels:[{id:cur,color:css.ink},...path.slice(0,-1).slice(-8).map(id=>({id,soft:true,force:true})),...(extra?[...extra].map(id=>({id,color:css.sun})):[])],
+       line:path.length>1?{type:"LineString",coordinates:path.map(id=>CENT[id])}:null,rings:[{id:cur,color:col(),w:3}],onTap:null}; draw("hi"); };
+  const frame=()=>frameFeatures([cur,...nbOf(cur)].map(i=>MAIN[i]),1.3,12);
+  $('panel').style.setProperty('--cc','var(--c-eu)');
+  $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2" id="chHead"></span><h2 id="chQ"></h2></div><div class="fillcount" id="chCount">0<small> links</small></div></div>
+    <form class="nbform" id="chForm" autocomplete="off"><input id="chIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Type a neighbor" aria-label="Type a neighboring place"><button class="btn go" type="submit">Enter</button></form>
+    <div class="row" id="after" style="min-height:48px"><div class="fb" id="chMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">Each answer becomes the next start. No repeats. 3 lives.</span></div><button class="btn ghost" id="chEnd" type="button">End chain</button></div>`;
+  const inp=$('chIn'); setTimeout(()=>inp.focus({preventScroll:true}),350);
+  const hearts=()=>"♥".repeat(lives)+"♡".repeat(3-lives);
+  const ui=()=>{ $('chHead').textContent=`Chain · ${hearts()}`; $('chQ').innerHTML=`Name a neighbor of <span style="color:var(--c-eu)">${esc(BY[cur].n)}</span>`;
+    $('chCount').innerHTML=`${path.length-1}<small> link${path.length===2?"":"s"}</small>`; };
+  const msg=(t,k)=>{ const m=$('chMsg'); m.dataset.k=k||""; m.innerHTML=(k==="ok"?check():k==="no"?cross():"")+`<span>${t}</span>`; };
+  ui(); paint(); mode.frame=frame; flyTo(frame());
+  $('chForm').onsubmit=e=>{ e.preventDefault(); if(over) return; const raw=inp.value.trim(); if(!raw) return; inp.value="";
+    const open=nbOf(cur).filter(x=>!used.has(x));
+    const mm=matchCountry(raw,open);
+    if(!mm){ msg(`Not sure what “${esc(raw)}” is.`,"no"); return; }
+    if(mm.amb){ msg(`Could be ${mm.amb.map(x=>esc(BY[x].n)).join(" or ")}. Type a bit more.`,""); return; }
+    const id=mm.id;
+    if(id===cur){ msg(`You're already in ${esc(BY[cur].n)}.`,""); return; }
+    if(nbOf(cur).includes(id)&&used.has(id)){ msg(`${esc(BY[id].n)} is already in your chain.`,""); return; }
+    if(nbOf(cur).includes(id)){
+      path.push(id); used.add(id); note(id,true); combo++; setComboUI(); addXp(5); buzz(12); const from=cur; cur=id; ui(); paint(); flyTo(frame());
+      if(nbOf(cur).every(x=>used.has(x))){ msg(`${esc(BY[id].n)}. Dead end: every neighbor is already in your chain.`,"ok"); return finish("dead"); }
+      msg(`${esc(BY[from].n)} → ${esc(BY[id].n)}`,"ok");
+    } else {
+      lives--; combo=0; setComboUI(); buzz([30,40,30]); ui();
+      if(lives<=0){ msg(`${esc(BY[id].n)} doesn't border ${esc(BY[cur].n)}. Out of lives.`,"no"); return finish("lives"); }
+      msg(`${esc(BY[id].n)} doesn't border ${esc(BY[cur].n)}. ${lives} ${lives===1?"life":"lives"} left.`,"no");
+    }
+    inp.focus({preventScroll:true}); };
+  $('chEnd').onclick=()=>{ if(!over) finish("stop"); };
+  function finish(why){
+    over=true; stopTimer(); inp.blur(); bumpDay();
+    const links=path.length-1, ms=Math.round(elapsed()), rec={c:links,ms,at:Date.now()}, prev=S.chain.best;
+    const isBest=!prev||links>prev.c||(links===prev.c&&ms<prev.ms);
+    if(isBest) S.chain.best=rec; S.chain.hist=[rec,...(S.chain.hist||[])].slice(0,30); save();
+    const avail=new Set(nbOf(cur).filter(x=>!used.has(x))); avail.forEach(x=>note(x,false));
+    paint(avail); mode.frame=()=>frameFeatures(path.concat([...avail]).map(i=>MAIN[i]),1.2,12); flyTo(mode.frame(),()=>{ if(isBest&&prev&&links>0) confetti(); });
+    const head= why==="dead"?"Dead end!":why==="lives"?"Out of lives":"Chain ended";
+    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">Chain</span><h2>${head}</h2>
+      <div class="nums"><div><b>${links}</b><span>links</span></div><div><b>${fmt(ms)}</b><span>time</span></div><div><b>${prev?Math.max(prev.c,links):links}</b><span>longest</span></div></div>
+      <p>${!prev?"First chain. This is the one to beat.":isBest&&links>prev.c?`New longest chain! ${links-prev.c} more than before.`:`Your longest is ${prev.c} links.`}${avail.size?` You could have gone on to ${[...avail].map(x=>esc(BY[x].n)).join(", ")}, shown in yellow.`:""}</p>
+      <div class="pills" style="--cc:var(--good);max-height:120px;overflow-y:auto">${path.map(id=>`<span>${esc(BY[id].n)}</span>`).join("")}</div>
+      <div class="row" style="width:100%"><button class="btn go wide" id="again">New chain</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
+    $('again').onclick=()=>startChain(); $('homeB').onclick=()=>$('quit').click();
+  }
+}
+
 /* ================= daily 10 ================= */
 const DAY0=Date.UTC(2026,9,28), MI=3958.8;
 function dayNum(key){ const [y,m,d]=key.split("-").map(Number); return Math.round((Date.UTC(y,m-1,d)-DAY0)/864e5)+1; }
@@ -1557,7 +1623,7 @@ window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
 new ResizeObserver(()=>{ $('stage').style.setProperty('--occl',occl()+"px"); }).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1354";
+const APP_VERSION="2026.10.29-1357";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;

@@ -120,7 +120,7 @@ build('earth', 'Globetrotter Earth',
       'place', 'places', 'category',
       extra_head=[('aria-label="World map"', 'aria-label="Map of the Earth"'),
                   ('<button class="tile" id="nbBtn">', '<button class="tile" id="nbBtn" hidden>'),
-                  ('.trio{grid-template-columns:repeat(3,1fr);gap:8px}', '.trio{grid-template-columns:repeat(2,1fr);gap:8px}')],
+                  ('<button class="tile" id="chainBtn">', '<button class="tile" id="chainBtn" hidden>')],
       extra_app=[('const ED={base:()=>null, under:()=>false, otherFill:"land-off"};',
                   'const ED={base:id=>KIND[id]==="line"?["base",.55]:KIND[id]==="point"?null:"skip", under:id=>BY[id].c==="Oceans & Seas", otherFill:"land"};'),
                  ('Which country is glowing?', 'Which place is highlighted?')])
