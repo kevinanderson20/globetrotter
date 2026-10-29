@@ -77,6 +77,17 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
 .trio{grid-template-columns:repeat(3,1fr);gap:8px}
+.optwrap{position:relative;z-index:4;background:var(--surface);border-radius:18px 18px 0 0;margin:-6px -6px 0;padding:0 6px 6px;will-change:transform}
+.optwrap.anim{transition:transform .32s cubic-bezier(.2,.9,.25,1)}
+.grab{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;width:100%;height:30px;padding-top:6px;border:0;background:transparent;touch-action:none;cursor:grab;color:var(--ink-3)}
+.grab:active{cursor:grabbing}
+.grab i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line)}
+.grab svg{transition:transform .25s}
+.optwrap[data-hidden="1"]{box-shadow:0 -6px 16px rgba(0,0,0,.10)}
+.optwrap[data-hidden="1"] .grab svg{transform:rotate(180deg)}
+.optwrap[data-hidden="1"] .grab i{background:var(--ink-3)}
+
+
 .trio .tile{padding:12px 10px}
 .trio .tile b{font-size:16px}
 .trio .tile span{font-size:12px}
@@ -345,7 +356,7 @@ const LS="globetrotter.v1";
 const INT=[0,10*60e3,864e5,3*864e5,7*864e5,16*864e5,35*864e5];
 let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{},stats:{},daily:{},nb:{}};
 try{const s=JSON.parse(localStorage.getItem(LS)||"null"); if(s&&s.packs) S=Object.assign(S,s);}catch(e){}
-if(!S.ch) S.ch={}; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
+if(!S.ch) S.ch={}; if(S.recall===undefined) S.recall=false; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
 let ready=true, readyCb=null;
 const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(S)); return true;}catch(e){ return false; }};
 function save(){ if(!saveLocal()) setSync("This browser is blocking saving. Progress will reset when you close it."); }
@@ -1119,6 +1130,36 @@ function countUp(el,to,prefix,from,suffix){
   const tick=()=>{ const t=Math.min(1,(performance.now()-t0)/dur), v=Math.round(f+(to-f)*d3.easeCubicOut(t)); el.innerHTML=prefix+v.toLocaleString()+sm; if(t<1) requestAnimationFrame(tick); };
   requestAnimationFrame(tick);
 }
+
+/* ================= hide the choices: drag the sheet down, drag it back up ================= */
+const TAB=26;
+function wrapOpts(){
+  const o=document.querySelector('#panel .opts'); if(!o||o.closest('.optwrap')) return;
+  const w=document.createElement('div'); w.className="optwrap";
+  w.innerHTML=`<button class="grab" aria-label="Hide or show the choices"><i></i><svg width="14" height="8" viewBox="0 0 14 8" aria-hidden="true"><path d="m2 1.5 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
+  o.parentNode.insertBefore(w,o); w.appendChild(o);
+  let y=0, hidden=false;
+  const restTop=()=>w.getBoundingClientRect().top-y;
+  const maxDown=()=>Math.max(0,$('panel').getBoundingClientRect().bottom-restTop()-TAB);
+  const setY=(v,anim)=>{ y=v; w.classList.toggle('anim',!!anim); w.style.transform=v?`translateY(${v}px)`:""; };
+  const setHidden=(h,anim)=>{ hidden=h; if(h&&!w.everHidden){ w.everHidden=true; if(!S.recall){ S.recall=true; saveLocal(); } } w.dataset.hidden=h?1:0; setY(h?maxDown():0,anim); o.querySelectorAll('.opt').forEach(b=>{ b.tabIndex=h?-1:0; }); };
+  w.setHidden=setHidden;
+  // answering without ever hiding the choices turns the auto-hide back off
+  o.addEventListener('click',e=>{ const b=e.target.closest('.opt'); if(b&&!b.disabled&&!w.everHidden&&S.recall){ S.recall=false; saveLocal(); } },true);
+  if(S.recall) requestAnimationFrame(()=>setHidden(true,false));
+  const g=w.querySelector('.grab');
+  let start=null, y0=0, moved=false, lastY=0, lastT=0, vel=0;
+  g.addEventListener('pointerdown',e=>{ if(o.querySelector('.opt:disabled')) return; start=e.clientY; y0=y; moved=false; lastY=e.clientY; lastT=performance.now(); vel=0; w.classList.remove('anim'); g.setPointerCapture(e.pointerId); });
+  g.addEventListener('pointermove',e=>{ if(start===null) return; const d=e.clientY-start; if(Math.abs(d)>4) moved=true;
+    const now=performance.now(); vel=(e.clientY-lastY)/Math.max(1,now-lastT); lastY=e.clientY; lastT=now;
+    setY(Math.min(maxDown(),Math.max(0,y0+d)),false); });
+  const end=()=>{ if(start===null) return; start=null;
+    if(!moved){ setHidden(!hidden,true); return; }
+    const m=maxDown(); const goHide= vel>0.4 ? true : vel<-0.4 ? false : y>m/2; setHidden(goHide,true); };
+  g.addEventListener('pointerup',end); g.addEventListener('pointercancel',end);
+}
+new MutationObserver(wrapOpts).observe($('panel'),{childList:true});
+addEventListener('resize',()=>{ const w=document.querySelector('#panel .optwrap'); if(w&&w.dataset.hidden==="1") w.setHidden(true,false); });
 
 /* ================= boot ================= */
 readTokens();
