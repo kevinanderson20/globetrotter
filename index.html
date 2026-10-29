@@ -194,7 +194,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .rsmsg{font-size:14px;font-weight:600}
 
 /* ---------- play ---------- */
-.play{display:grid;grid-template-rows:auto 1fr auto;background:var(--sea)}
+.play{display:grid;grid-template-rows:auto 1fr;background:var(--sea);position:relative;overflow:hidden}
 .pbar{display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--surface);border-bottom:1px solid var(--line)}
 .x{width:44px;height:44px;border-radius:12px;border:0;background:transparent;display:grid;place-items:center;color:var(--ink-2)}
 .steps{flex:1;height:12px;border-radius:9px;background:var(--surface-2);overflow:hidden}
@@ -203,14 +203,14 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .ptitle{font-family:var(--f-display);font-weight:800;font-size:18px;flex:1}
 .stage{position:relative;min-height:0;touch-action:none}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.mapctl{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:26px;display:grid;gap:8px;z-index:3}
+.mapctl{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(var(--occl,0px) + 14px);transition:bottom .25s;display:grid;gap:8px;z-index:3}
 .mapctl button{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.14);color:var(--ink)}
 .mapctl button:active{transform:scale(.94)}
 .panel.explore{min-height:212px;align-content:start}
 .combo{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--sun);color:var(--sun-ink);font-family:var(--f-display);font-weight:800;padding:6px 14px;border-radius:999px;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.15);transition:opacity .3s, transform .3s}
 .combo[data-on="0"]{opacity:0;transform:translateX(-50%) translateY(-8px)}
 #fx{pointer-events:none;z-index:5}
-.panel{background:var(--surface);border-top:1px solid var(--line);padding-block:16px calc(16px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:12px;border-radius:22px 22px 0 0;margin-top:-14px;position:relative;z-index:2;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+.panel{background:var(--surface);border-top:1px solid var(--line);padding-block:16px calc(16px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:12px;border-radius:22px 22px 0 0;position:absolute;left:0;right:0;bottom:0;max-height:88%;z-index:2;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
 .eyebrow2{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 .panel h2{font-size:26px;font-weight:800;line-height:1.1}
 .bigname{font-size:34px!important;color:var(--cc)}
@@ -513,18 +513,21 @@ function readTokens(){ const s=getComputedStyle(document.documentElement);
 const contColor=cont=>css[CONT[cont].tok];
 /* M = what to paint. style(id) -> [color, alpha] | null ; target ; labels ; rings */
 let M={style:()=>null, target:null, targetColor:null, labels:[], rings:[], onTap:null, ctxLabels:false};
-function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); const p=proj([v.lon,v.lat]); let tx=W/2-p[0], ty=H/2-p[1];
+// the answer panel floats over the bottom of the map; frame and center things in the part you can see
+function occl(){ const pn=$('panel'); if(!pn||$('play').hidden) return 0; return pn.dataset.down==="1"?pn.offsetHeight:Math.max(0,pn.offsetHeight-8); }
+const VH=()=>Math.max(160,H-occl());
+function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); const p=proj([v.lon,v.lat]); let tx=W/2-p[0], ty=VH()/2-p[1];
   const b=d3.geoPath(proj).bounds(sphere), top=b[0][1]+ty, bot=b[1][1]+ty;
-  if(bot-top>=H){ if(top>0) ty-=top; else if(bot<H) ty+=H-bot; } else ty=H/2-(b[0][1]+b[1][1])/2;
+  if(bot-top>=VH()){ if(top>0) ty-=top; else if(bot<VH()) ty+=VH()-bot; } else ty=VH()/2-(b[0][1]+b[1][1])/2;
   proj.translate([tx,ty]); }
-function fitWorldScale(){ proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),H/(b[1][1]-b[0][1]))*0.98; }
+function fitWorldScale(){ proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),VH()/(b[1][1]-b[0][1]))*0.98; }
 function frameFeatures(feats,pad,minDeg){
   const fc={type:"FeatureCollection",features:feats};
   const c=d3.geoCentroid(fc);
   proj.rotate([-c[0],0]).scale(1).translate([0,0]);
   const b=d3.geoPath(proj).bounds(fc), span=(minDeg||20)*Math.PI/180;
   const sx=Math.max((b[1][0]-b[0][0])*pad,span), sy=Math.max((b[1][1]-b[0][1])*pad,span*0.7);
-  const s=Math.max(Math.min(W/sx,H/sy),worldScale);
+  const s=Math.max(Math.min(W/sx,VH()/sy),worldScale);
   const ll=proj.invert([(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2])||c;
   return {lon:ll[0],lat:ll[1],s};
 }
@@ -537,7 +540,7 @@ function frameIds(ids,pad,minDeg){
   const b=d3.geoPath(proj).bounds(fc);
   const span=(minDeg||20)*Math.PI/180;
   const sx=Math.max((b[1][0]-b[0][0])*pad,span), sy=Math.max((b[1][1]-b[0][1])*pad,span*0.7);
-  const s=Math.max(Math.min(W/sx,H/sy),worldScale);
+  const s=Math.max(Math.min(W/sx,VH()/sy),worldScale);
   const ll=proj.invert([(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2])||c;
   return {lon:c[0],lat:ll[1],s};
 }
@@ -656,7 +659,7 @@ function resize(reset){
 }
 new ResizeObserver(()=>resize(false)).observe(stage);
 $('recenter').onclick=()=>{ if(homeView) flyTo(homeView); };
-const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,f,[W/2,H/2]);
+const zoomBy=f=>sel.transition().duration(reduceMotion?0:220).call(zoom.scaleBy,f,[W/2,VH()/2]);
 $('zin').onclick=()=>zoomBy(2); $('zout').onclick=()=>zoomBy(.5);
 const COARSE=matchMedia('(pointer: coarse)').matches;
 const TOUCH_R=COARSE?30:22, TINY=26; // micro-states get a touch circle this big, and win taps inside it
@@ -1369,9 +1372,10 @@ new MutationObserver(muts=>{
   if(sheetDown&&panelEl.querySelector('#cont,#nx,#nextR,#again,#homeB')) setSheet(false,true);   // something you need to tap appeared
 }).observe(panelEl,{childList:true,subtree:true});
 window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
+new ResizeObserver(()=>{ $('stage').style.setProperty('--occl',occl()+"px"); }).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1336";
+const APP_VERSION="2026.10.29-1241";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
