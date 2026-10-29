@@ -100,7 +100,14 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .modes.four{grid-template-columns:1fr 1fr}
 .fillcount{font-family:var(--f-display);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums;line-height:1}
 .fillcount small{font-size:16px;color:var(--ink-3)}
-.screen.play.kb{height:var(--vvh,100%)}
+.screen.play.kb{position:fixed;left:0;right:0;margin:0 auto;z-index:20}
+.play.kb .panel{padding-block:10px 10px;gap:8px;max-height:62%}
+.play.kb .panel h2{font-size:19px}
+.play.kb .panel .eyebrow2,.play.kb .sheetgrab{display:none}
+.play.kb .nbnames{max-height:64px;overflow-y:auto}
+.play.kb .nbform .btn{min-height:46px}
+.play.kb .nbform input{padding:10px 12px}
+.play.kb .fillcount{font-size:22px}
 .update{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:30;max-width:calc(100% - 32px);border:0;border-radius:14px;padding:12px 16px;background:var(--sun);color:var(--sun-ink);font:700 15px/1.3 var(--f-body);box-shadow:0 6px 18px rgba(0,0,0,.2)}
 #panel{grid-template-columns:minmax(0,1fr)}
 #panel>*{min-width:0}
@@ -1163,10 +1170,16 @@ $('histBtn').onclick=()=>{ renderHistory(); show("hist"); $('hist').scrollTop=0;
 $('histBack').onclick=()=>show("home");
 $('soundBtn').setAttribute('aria-checked',!!S.sound);
 $('soundBtn').onclick=()=>{ S.sound=!S.sound; saveLocal(); $('soundBtn').setAttribute('aria-checked',S.sound); if(S.sound) snd("ok"); };
-// keep the answer panel above the on-screen keyboard while typing
+// While you type, pin the game screen to the part of the screen above the keyboard:
+// the map keeps the top half, a compact answer panel sits right on top of the keyboard.
 if(window.visualViewport){ const vv=window.visualViewport, play=$('play');
-  const fit=()=>{ const kb=vv.height<window.innerHeight*0.82; play.classList.toggle('kb',kb); if(kb){ document.documentElement.style.setProperty('--vvh',(vv.height-(parseFloat(getComputedStyle(document.documentElement).paddingTop)||0))+"px"); window.scrollTo(0,0); } };
-  vv.addEventListener('resize',fit); vv.addEventListener('scroll',()=>{ if(play.classList.contains('kb')) window.scrollTo(0,0); }); }
+  const typing=()=>{ const a=document.activeElement; return !!a&&a.tagName==="INPUT"&&play.contains(a); };
+  const fit=()=>{ const kb=typing()&&vv.height<window.innerHeight-80;
+    play.classList.toggle('kb',kb);
+    if(kb){ play.style.top=vv.offsetTop+"px"; play.style.height=vv.height+"px"; } else { play.style.top=""; play.style.height=""; } };
+  vv.addEventListener('resize',fit); vv.addEventListener('scroll',fit);
+  document.addEventListener('focusin',()=>{ fit(); setTimeout(fit,120); setTimeout(fit,400); });
+  document.addEventListener('focusout',()=>setTimeout(fit,60)); }
 
 /* ================= mastery ================= */
 const mProj=d3.geoAlbersUsa();
@@ -1178,7 +1191,8 @@ let mKey="";
 function drawMastery(){
   const c=$('mmap'); if(!c||$('home').hidden) return; const w=c.clientWidth; if(!w) return; const h=Math.round(w/1.6);
   const dpr=Math.min(devicePixelRatio||1,2.5);
-  const key=w+"|"+dpr+"|"+css.sea+"|"+IDS.map(level).join(""); if(key===mKey) return; mKey=key; // nothing changed: skip the redraw c.width=Math.round(w*dpr); c.height=Math.round(h*dpr);
+  const key=w+"|"+dpr+"|"+css.sea+"|"+IDS.map(level).join(""); if(key===mKey) return; mKey=key; // nothing changed: skip the redraw
+  c.width=Math.round(w*dpr); c.height=Math.round(h*dpr);
   const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   mProj.fitExtent([[6,6],[w-6,h-6]],{type:"FeatureCollection",features:IDS.map(id=>F.lo[id])}); const pp=d3.geoPath(mProj,g);
   g.fillStyle=css.sea; g.fillRect(0,0,w,h);
@@ -1542,7 +1556,7 @@ window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
 new ResizeObserver(()=>{ $('stage').style.setProperty('--occl',occl()+"px"); }).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1321";
+const APP_VERSION="2026.10.29-1354";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
