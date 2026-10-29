@@ -8,6 +8,12 @@ Progress saves in your browser on your device. Use "Back up progress" to move it
 
 Map data: Natural Earth 1:10m, via world-atlas.
 
+Daily 10: the same 10 countries for everyone each day. Drop a pin; points depend on how close you get.
+
+Neighbors drill: tap every country that borders the highlighted one.
+
+Mastery map: see how well you know each country at a glance.
+
 Challenges: quiz a whole continent or the world, timed, with your best scores saved.
 
 Works offline: open it once with internet (ideally from your home-screen icon) and the app saves a copy on your device.

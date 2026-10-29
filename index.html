@@ -76,6 +76,44 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tile[disabled]{opacity:.55;cursor:default}
 .tile .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);margin-bottom:4px}
 .conts{display:grid;gap:12px}
+.trio{grid-template-columns:repeat(3,1fr);gap:8px}
+.trio .tile{padding:12px 10px}
+.trio .tile b{font-size:16px}
+.trio .tile span{font-size:12px}
+.daily{position:relative;overflow:hidden;border:0;border-radius:22px;padding:16px 18px;text-align:left;background:var(--ink);color:var(--surface);display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:center;box-shadow:0 6px 0 color-mix(in srgb,var(--ink) 60%,#000 40%)}
+.daily:active{transform:translateY(3px);box-shadow:0 3px 0 color-mix(in srgb,var(--ink) 60%,#000 40%)}
+.daily .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.daily h2{font-size:24px;font-weight:800;line-height:1.1}
+.daily p{margin:0;font-size:14px;opacity:.8;grid-column:1/-1}
+.daily .dgo{grid-row:1/3;grid-column:2;background:var(--sun);color:var(--sun-ink);font-family:var(--f-display);font-weight:800;border-radius:14px;padding:10px 16px;font-size:16px;white-space:nowrap}
+.daily .ddots{display:flex;gap:4px;grid-column:1/-1;margin-top:6px}
+.daily .ddots i{width:14px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--surface) 25%,transparent)}
+.mcard{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:14px;display:grid;gap:10px;text-align:left}
+.mhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.mhead b{font-family:var(--f-display);font-size:19px;font-weight:800}
+.mhead span{font-size:13px;color:var(--ink-3)}
+#mmap{width:100%;aspect-ratio:2.05/1;display:block;border-radius:12px;background:var(--sea)}
+.mleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.mleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.mleg b{color:var(--ink)}
+.rdots{display:flex;gap:5px}
+.rdots i{flex:1;height:7px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line)}
+.rdots i[data-g="3"]{background:var(--good);border-color:var(--good)}
+.rdots i[data-g="2"]{background:var(--sun);border-color:var(--sun)}
+.rdots i[data-g="1"]{background:var(--bad);border-color:var(--bad)}
+.rdots i[data-g="now"]{border-color:var(--ink);border-width:2px}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.dhead .tot{font-family:var(--f-display);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;text-align:right;line-height:1}
+.dhead .tot small{display:block;font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.pts{font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.rlist{display:grid;gap:4px;width:100%;text-align:left;max-height:30vh;overflow-y:auto}
+.rlist div{display:grid;grid-template-columns:1fr auto auto;gap:10px;font-size:14px;align-items:center;font-variant-numeric:tabular-nums}
+.rlist em{font-style:normal;color:var(--ink-3);font-size:13px}
+.rlist b{min-width:44px;text-align:right}
+.found{display:flex;gap:6px;flex-wrap:wrap}
+.found i{width:22px;height:8px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line)}
+.found i[data-k="ok"]{background:var(--good);border-color:var(--good)}
+.found i[data-k="rev"]{background:var(--sun);border-color:var(--sun)}
 .chall{display:grid;gap:10px}
 .sech{font-size:20px;font-weight:800}
 .secp{margin:2px 0 0;font-size:14px;color:var(--ink-2)}
@@ -132,7 +170,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .xp{font-family:var(--f-display);font-weight:800;color:var(--sun-ink);background:var(--sun);border-radius:999px;padding:4px 10px;font-size:14px;font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
 .ptitle{font-family:var(--f-display);font-weight:800;font-size:18px;flex:1}
 .stage{position:relative;min-height:0;touch-action:none}
-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .mapctl{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:26px;display:grid;gap:8px;z-index:3}
 .mapctl button{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.14);color:var(--ink)}
 .mapctl button:active{transform:scale(.94)}
@@ -189,9 +227,16 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   </div>
   <div class="chips" id="chips"></div>
   <button class="next" id="nextBtn"></button>
-  <div class="duo">
-    <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap any country to see its name</span></button>
-    <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">Finish a lesson to unlock</span></button>
+  <button class="daily" id="dailyBtn"></button>
+  <button class="mcard" id="mBtn" aria-label="Open your mastery map">
+    <span class="mhead"><b>Your mastery map</b><span>Tap to zoom in</span></span>
+    <canvas id="mmap" aria-hidden="true"></canvas>
+    <span class="mleg" id="mleg"></span>
+  </button>
+  <div class="duo trio">
+    <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap to see names</span></button>
+    <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">After a lesson</span></button>
+    <button class="tile" id="nbBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="6" width="6" height="6" rx="1" fill="currentColor"/><path d="M2 3h3M2 3v3M16 3h-3M16 3v3M2 15h3M2 15v-3M16 15h-3M16 15v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Neighbors</b><span id="nbSub">Find the borders</span></button>
   </div>
   <div class="chall">
     <div><h3 class="sech">Challenges</h3><p class="secp">Every country in a region, once each, against the clock.</p></div>
@@ -298,9 +343,9 @@ const PACK=Object.fromEntries(PACKS.map(p=>[p.id,p]));
 /* ================= progress store ================= */
 const LS="globetrotter.v1";
 const INT=[0,10*60e3,864e5,3*864e5,7*864e5,16*864e5,35*864e5];
-let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{}};
+let S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{},stats:{},daily:{},nb:{}};
 try{const s=JSON.parse(localStorage.getItem(LS)||"null"); if(s&&s.packs) S=Object.assign(S,s);}catch(e){}
-if(!S.ch) S.ch={};
+if(!S.ch) S.ch={}; if(!S.stats) S.stats={}; if(!S.daily) S.daily={}; if(!S.nb) S.nb={};
 let ready=true, readyCb=null;
 const saveLocal=()=>{try{localStorage.setItem(LS,JSON.stringify(S)); return true;}catch(e){ return false; }};
 function save(){ if(!saveLocal()) setSync("This browser is blocking saving. Progress will reset when you close it."); }
@@ -331,6 +376,10 @@ function grade(id,ok){
   c.t=n;
 }
 const ccol=cont=>"var(--"+CONT[cont].tok+")";
+/* per-country record from every mode: right, wrong, current streak */
+function note(id,ok){ const t=S.stats[id]||(S.stats[id]={r:0,w:0,s:0}); if(ok){t.r++;t.s++;} else {t.w++;t.s=0;} t.t=Date.now(); }
+function level(id){ const t=S.stats[id]; if(t&&(t.r+t.w)) return t.s>=3?3:(t.s>=1?2:1); const c=S.cards[id]; if(c) return c.b>=3?3:(c.b>=1?2:1); return 0; }
+const LV=["Not seen yet","Needs work","Getting there","Solid"];
 
 /* ================= home ================= */
 function nextPack(){
@@ -356,7 +405,9 @@ function renderHome(){
     nb.onclick=()=>startReview();
   }
   const rb=$('reviewBtn'); rb.disabled=L<4;
-  $('reviewSub').textContent= L<4 ? "Unlocks after your first lesson" : (due? `${due} countr${due===1?"y":"ies"} ready to refresh` : "Mix of everything you know");
+  $('reviewSub').textContent= L<4 ? "After a lesson" : (due? `${due} ready` : "Mixed practice");
+  const nbB=S.nb.best; $('nbSub').textContent= nbB ? `Best ${nbB.c}/${nbB.n}` : "Find the borders";
+  renderDailyCard(); drawMastery();
   const box=$('conts'); box.innerHTML="";
   CONTS.forEach(c=>{
     const n=c.packs.reduce((a,p)=>a+p.ids.length,0), l=c.packs.reduce((a,p)=>a+p.ids.filter(learned).length,0);
@@ -387,7 +438,7 @@ function resetUI(confirming){
   if(!confirming){ w.innerHTML=learnedIds().length?`<button class="btn ghost" id="resetBtn">Start over</button>`:""; if($('resetBtn')) $('resetBtn').onclick=()=>resetUI(true); return; }
   w.innerHTML=`<div class="confirm"><span>Erase all lessons, stars and XP?</span><div class="row" style="justify-content:center"><button class="btn ghost" id="rNo">Keep my progress</button><button class="btn ghost" id="rYes" style="color:var(--bad);border-color:var(--bad)">Erase</button></div></div>`;
   $('rNo').onclick=()=>resetUI(false);
-  $('rYes').onclick=()=>{ S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{}}; save(); renderHome(); };
+  $('rYes').onclick=()=>{ S={packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{},stats:{},daily:{},nb:{}}; save(); renderHome(); };
 }
 function enc(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))); }
 function dec(t){ return JSON.parse(decodeURIComponent(escape(atob(t.replace(/\s+/g,""))))); }
@@ -396,9 +447,9 @@ $('bkCopy').onclick=()=>{ const t=$('bkCode'); const done=()=>{ $('bkCopy').text
   try{ navigator.clipboard.writeText(t.value).then(done,()=>{ t.focus(); t.select(); }); }catch(e){ t.focus(); t.select(); } };
 $('rsBtn').onclick=()=>{ $('bkPane').hidden=true; const p=$('rsPane'); p.hidden=!p.hidden; $('rsMsg').textContent=""; };
 $('rsGo').onclick=()=>{ const m=$('rsMsg'); try{ const raw=$('rsCode').value.trim().replace(/^GLOBE1:/,""); const o=dec(raw); if(!o||!o.packs||!o.cards) throw 0;
-  S=Object.assign({packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{}},o); save(); $('rsCode').value=""; renderHome(); $('rsMsg').style.color="var(--good)"; $('rsPane').hidden=false; $('rsMsg').textContent="Progress restored: "+learnedIds().length+" countries learned."; }
+  S=Object.assign({packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"North America",ch:{},stats:{},daily:{},nb:{}},o); save(); $('rsCode').value=""; renderHome(); $('rsMsg').style.color="var(--good)"; $('rsPane').hidden=false; $('rsMsg').textContent="Progress restored: "+learnedIds().length+" countries learned."; }
   catch(e){ m.style.color="var(--bad)"; m.textContent="That code didn't work. Copy the whole code, including GLOBE1: at the start."; } };
-$('exploreBtn').onclick=()=>startExplore();
+$('exploreBtn').onclick=()=>startExplore(); $('mBtn').onclick=()=>startExplore({mastery:true}); $('nbBtn').onclick=()=>startNeighbors();
 $('reviewBtn').onclick=()=>startReview();
 
 /* ================= map engine ================= */
@@ -418,6 +469,16 @@ function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); cons
   if(bot-top>=H){ if(top>0) ty-=top; else if(bot<H) ty+=H-bot; } else ty=H/2-(b[0][1]+b[1][1])/2;
   proj.translate([tx,ty]); }
 function fitWorldScale(){ proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),H/(b[1][1]-b[0][1]))*0.98; }
+function frameFeatures(feats,pad,minDeg){
+  const fc={type:"FeatureCollection",features:feats};
+  const c=d3.geoCentroid(fc);
+  proj.rotate([-c[0],0]).scale(1).translate([0,0]);
+  const b=d3.geoPath(proj).bounds(fc), span=(minDeg||20)*Math.PI/180;
+  const sx=Math.max((b[1][0]-b[0][0])*pad,span), sy=Math.max((b[1][1]-b[0][1])*pad,span*0.7);
+  const s=Math.max(Math.min(W/sx,H/sy),worldScale);
+  const ll=proj.invert([(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2])||c;
+  return {lon:ll[0],lat:ll[1],s};
+}
 function frameIds(ids,pad,minDeg){
   if(ids.length>5) ids=ids.filter(i=>i!=="RUS"); // Russia spans 170 degrees; framing it would zoom Europe out to the whole world
   const fc={type:"FeatureCollection",features:ids.map(i=>MAIN[i])};
@@ -459,6 +520,7 @@ function draw(q){
   if(M.target){
     ctx.beginPath(); path(set[M.target]); ctx.fillStyle=M.targetColor; ctx.fill(); ctx.strokeStyle=css.ink; ctx.lineWidth=1.4/k; ctx.stroke();
   }
+  if(M.line){ ctx.beginPath(); path(M.line); ctx.setLineDash([7/k,5/k]); ctx.strokeStyle=css.ink; ctx.lineWidth=2.2/k; ctx.stroke(); ctx.setLineDash([]); }
   // rings around tiny countries so they're visible
   ctx.setTransform(DPR,0,0,DPR,0,0);
   for(const rg of M.rings){
@@ -481,6 +543,11 @@ function draw(q){
     if(L.soft){ ctx.lineWidth=3; ctx.strokeStyle=css.halo; ctx.strokeText(t,x,y); ctx.fillStyle=css.ink; ctx.globalAlpha=.75; ctx.fillText(t,x,y); ctx.globalAlpha=1; }
     else { roundRect(box[0],box[1],w,h,9); ctx.fillStyle=css.surface; ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle=L.color||css.ink; ctx.stroke(); ctx.fillStyle=css.ink; ctx.fillText(t,x,y+.5); }
   }
+  if(M.pin){ const q=proj(M.pin); if(q){ const x=q[0]*zt.k+zt.x, y=q[1]*zt.k+zt.y;
+    ctx.beginPath(); ctx.ellipse(x,y,6,2.5,0,0,Math.PI*2); ctx.fillStyle="rgba(0,0,0,.25)"; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.bezierCurveTo(x-3,y-10,x-11,y-14,x-11,y-23); ctx.arc(x,y-23,11,Math.PI,0); ctx.bezierCurveTo(x+11,y-14,x+3,y-10,x,y); ctx.closePath();
+    ctx.fillStyle=css.bad; ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle=css.ink; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y-23,4,0,Math.PI*2); ctx.fillStyle=css.surface; ctx.fill(); } }
 }
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 let raf=0, hiT2=null;
@@ -535,7 +602,10 @@ function pickAt(cx,cy,prefer){
   let best=null,bd=COARSE?36:26; for(const id of (prefer||IDS)){ if(pxSize(id)>=(COARSE?30:22)&&!(prefer)) continue; const p=screenOf(id); if(!p) continue; const d=Math.hypot(p[0]-x,p[1]-y); if(d<bd){bd=d;best=id;} }
   return best;
 }
-canvas.addEventListener('click',e=>{ if(!M.onTap) return; const id=pickAt(e.clientX,e.clientY,M.tapPrefer); if(id) M.onTap(id); });
+canvas.addEventListener('click',e=>{
+  if(M.onTapLL){ const r=canvas.getBoundingClientRect(), x=(e.clientX-r.left-zt.x)/zt.k, y=(e.clientY-r.top-zt.y)/zt.k, ll=proj.invert([x,y]);
+    if(ll&&isFinite(ll[0])&&isFinite(ll[1])&&Math.abs(ll[1])<=90){ const back=proj(ll); if(back&&Math.hypot(back[0]-x,back[1]-y)<1) M.onTapLL([((ll[0]+540)%360)-180,ll[1]]); } return; }
+  if(!M.onTap) return; const id=pickAt(e.clientX,e.clientY,M.tapPrefer); if(id) M.onTap(id); });
 
 /* pulse ring (hint) */
 function pulse(id,color){
@@ -627,7 +697,7 @@ function startLesson(p){
       <div class="row" id="after"><button class="btn ghost" id="hint">Hint: remove one</button></div>`;
     $('hint').onclick=()=>{ if(hinted) return; hinted=true; const wrong=[...document.querySelectorAll('.opt')].find(b=>b.dataset.id!==id); wrong.dataset.s="gone"; wrong.disabled=true; $('hint').disabled=true; $('hint').style.opacity=.4; };
     document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
-      if(used) return; used=true; const ok=b.dataset.id===id;
+      if(used) return; used=true; const ok=b.dataset.id===id; note(id,ok);
       document.querySelectorAll('.opt').forEach(x=>{ x.disabled=true; x.dataset.s= x.dataset.id===id?"right":(x===b?"wrong":"fade"); });
       if(ok){ combo++; addXp(hinted?5:10); buzz(15); M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi");
         $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setComboUI(); setTimeout(next,reduceMotion?600:950); }
@@ -640,10 +710,10 @@ function startLesson(p){
     M={style:x=>wrongIds.has(x)?[css.bad,.55]:(set.has(x)?[color(),.4]:null),target:null,labels:softLabels(set),rings:ids.map(x=>({id:x,color:color(),a:.8})),tapPrefer:ids,
        onTap:x=>{
         if(doneQ) return;
-        if(x===id){ doneQ=true; if(!tries){ combo++; addXp(10);} else addXp(5); buzz(15); M.target=id; M.targetColor=css.good; M.labels=[{id,color:css.good},...M.labels.filter(l=>l.soft)]; draw("hi");
+        if(x===id){ doneQ=true; note(id,!tries); if(!tries){ combo++; addXp(10);} else addXp(5); buzz(15); M.target=id; M.targetColor=css.good; M.labels=[{id,color:css.good},...M.labels.filter(l=>l.soft)]; draw("hi");
           $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${tries?"Found it.":PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setComboUI(); setTimeout(next,reduceMotion?600:950); }
         else { tries++; combo=0; mistakes++; missed.add(id); buzz([30,40,30]); wrongIds.add(x); M.labels=[{id:x,color:css.bad},...M.labels.filter(l=>l.soft)]; setComboUI();
-          if(tries>=2){ doneQ=true; requeue(s); M.target=id; M.targetColor=color(); M.labels.push({id,color:color()}); draw("hi");
+          if(tries>=2){ doneQ=true; note(id,false); requeue(s); M.target=id; M.targetColor=color(); M.labels.push({id,color:color()}); draw("hi");
             $('after').innerHTML=`<div class="fb" data-k="no">${cross()}<span>That's ${esc(BY[x].n)}. ${esc(BY[id].n)} is highlighted.</span></div><button class="btn wide" id="cont">Continue</button>`; $('cont').onclick=next; $('cont').focus({preventScroll:true}); }
           else { draw("hi"); $('after').innerHTML=`<div class="fb" data-k="no">${cross()}<span>That's ${esc(BY[x].n)}. Try again.</span></div><button class="btn ghost" id="hint">Show me where</button>`; $('hint').onclick=()=>pulse(id,css.sun); }
         }
@@ -704,7 +774,7 @@ function startReview(){
       let used=false;
       $('panel').innerHTML=`<span class="eyebrow2">Review · ${qi+1} of ${q.length-1}</span><h2>Which country is glowing?</h2><div class="opts" id="opts">${opts.map((o,i)=>`<button class="opt" data-id="${o}">${esc(BY[o].n)}</button>`).join("")}</div><div class="row" id="after"></div>`;
       document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
-        if(used) return; used=true; const ok=b.dataset.id===id; grade(id,ok); save();
+        if(used) return; used=true; const ok=b.dataset.id===id; grade(id,ok); note(id,ok); save();
         document.querySelectorAll('.opt').forEach(x=>{ x.disabled=true; x.dataset.s= x.dataset.id===id?"right":(x===b?"wrong":"fade"); });
         if(ok){ right++; combo++; addXp(10); buzz(15); M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setComboUI(); setTimeout(next,reduceMotion?600:950); }
         else { combo=0; buzz([30,40,30]); M.labels=[{id,color:col}]; draw("hi"); setComboUI(); $('after').innerHTML=`<div class="fb" data-k="no" style="flex:1">${cross()}<span>This one is ${esc(BY[id].n)}.</span></div><button class="btn" id="cont">Continue</button>`; $('cont').onclick=next; $('cont').focus({preventScroll:true}); }
@@ -713,10 +783,10 @@ function startReview(){
       let tries=0, doneQ=false; const wrongIds=new Set();
       M={style:x=>wrongIds.has(x)?[css.bad,.55]:(BY[x].c===cont?[col,.14]:null),target:null,labels:softLabels(new Set([id])),rings:[],tapPrefer:grp,
         onTap:x=>{ if(doneQ) return;
-          if(x===id){ doneQ=true; if(!tries){ right++; combo++; addXp(10);} grade(id,!tries); save(); buzz(15); M.target=id; M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); setComboUI();
+          if(x===id){ doneQ=true; if(!tries){ right++; combo++; addXp(10);} grade(id,!tries); note(id,!tries); save(); buzz(15); M.target=id; M.targetColor=css.good; M.labels=[{id,color:css.good}]; draw("hi"); setComboUI();
             $('after').innerHTML=`<div class="fb" data-k="ok">${check()}<span>${tries?"Found it.":PRAISE[Math.floor(Math.random()*PRAISE.length)]}</span></div>`; setTimeout(next,reduceMotion?600:950); }
           else { tries++; combo=0; buzz([30,40,30]); wrongIds.add(x); setComboUI();
-            if(tries>=2){ doneQ=true; grade(id,false); save(); M.target=id; M.targetColor=col; M.labels=[{id:x,color:css.bad},{id,color:col}]; draw("hi");
+            if(tries>=2){ doneQ=true; grade(id,false); note(id,false); save(); M.target=id; M.targetColor=col; M.labels=[{id:x,color:css.bad},{id,color:col}]; draw("hi");
               $('after').innerHTML=`<div class="fb" data-k="no" style="flex:1">${cross()}<span>That's ${esc(BY[x].n)}. Here's ${esc(BY[id].n)}.</span></div><button class="btn" id="cont">Continue</button>`; $('cont').onclick=next; $('cont').focus({preventScroll:true}); }
             else { M.labels=[{id:x,color:css.bad}]; draw("hi"); $('after').innerHTML=`<div class="fb" data-k="no" style="flex:1">${cross()}<span>That's ${esc(BY[x].n)}. Try again.</span></div><button class="btn ghost" id="hint">Show me</button>`; $('hint').onclick=()=>pulse(id,css.sun); }
           } }};
@@ -780,7 +850,7 @@ function startChallenge(scope,type){
   $('steps').hidden=false; $('ptitle').hidden=true;
   mode={frame:()=>scope==="World"?worldFrame():frameIds(pool,1.08,20)};
   show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
-  const after=(ok,id)=>{ if(ok){ right++; combo++; addXp(2); } else { combo=0; missed.push(id); } setComboUI(); };
+  const after=(ok,id)=>{ note(id,ok); if(ok){ right++; combo++; addXp(2); } else { combo=0; missed.push(id); } setComboUI(); };
   const go=()=>{ qi++; if(qi>=n) fin(); else step(); };
   function step(){
     setProgress(qi/n);
@@ -844,24 +914,52 @@ function startChallenge(scope,type){
   step();
 }
 
+/* ================= mastery ================= */
+const mProj=d3.geoEqualEarth().rotate([-11,0]);
+const MCOL=()=>[css.land,css.bad,css.sun,css.good];
+function masteryCounts(ids){ const n=[0,0,0,0]; ids.forEach(id=>n[level(id)]++); return n; }
+function legendHTML(ids){ const n=masteryCounts(ids), c=["var(--land)","var(--bad)","var(--sun)","var(--good)"];
+  return [3,2,1,0].map(l=>`<span><i style="background:${c[l]};${l?"":"border:1px solid var(--line)"}"></i>${LV[l]} <b>${n[l]}</b></span>`).join(""); }
+function drawMastery(){
+  const c=$('mmap'); if(!c||$('home').hidden) return; const w=c.clientWidth; if(!w) return; const h=Math.round(w/2.05);
+  const dpr=Math.min(devicePixelRatio||1,2.5); c.width=Math.round(w*dpr); c.height=Math.round(h*dpr);
+  const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  mProj.fitExtent([[3,3],[w-3,h-3]],sphere); const pp=d3.geoPath(mProj,g);
+  g.beginPath(); pp(sphere); g.fillStyle=css.sea; g.fill();
+  g.beginPath(); OTHER.lo.forEach(f=>pp(f)); g.fillStyle=css["land-off"]; g.fill();
+  const cols=MCOL(), groups=[[],[],[],[]]; IDS.forEach(id=>groups[level(id)].push(id));
+  groups.forEach((ids,l)=>{ if(!ids.length) return; g.beginPath(); ids.forEach(id=>pp(F.lo[id])); g.fillStyle=cols[l]; g.fill(); g.strokeStyle=css.border; g.lineWidth=.35; g.stroke(); });
+  IDS.forEach(id=>{ const l=level(id); if(!l) return; const b=pp.bounds(MAIN[id]); if(Math.max(b[1][0]-b[0][0],b[1][1]-b[0][1])>3.5) return; const q=mProj(CENT[id]); if(!q) return; g.beginPath(); g.arc(q[0],q[1],2.2,0,7); g.fillStyle=cols[l]; g.fill(); g.lineWidth=.6; g.strokeStyle=css.ink; g.stroke(); });
+  $('mleg').innerHTML=legendHTML(IDS);
+}
+new ResizeObserver(()=>drawMastery()).observe($('mmap'));
+
 /* ================= explore ================= */
-function startExplore(){
+function startExplore(opts){
+  const mastery=!!(opts&&opts.mastery);
   xpRun=0; combo=0; setComboUI();
-  $('steps').hidden=true; $('ptitle').hidden=false; $('xpNow').textContent=S.xp+" XP";
+  $('steps').hidden=true; $('ptitle').hidden=false; $('ptitle').textContent=mastery?"Mastery map":"Explore"; $('xpNow').textContent=S.xp+" XP";
   let focus="World", sel1=null;
-  const st=x=>{ const c=BY[x].c, on=focus==="World"||c===focus; if(!on) return ["dim",1]; return [contColor(c), learned(x)?.62:.24]; };
+  const st=x=>{ const c=BY[x].c, on=focus==="World"||c===focus; if(!on) return ["dim",1];
+    if(mastery){ const l=level(x); return l?[MCOL()[l],.75]:null; }
+    return [contColor(c), learned(x)?.62:.24]; };
   mode={frame:worldFrame}; show("play");
   function paint(){
-    M={style:st,target:sel1,targetColor:sel1?contColor(BY[sel1].c):null,labels:(sel1?[{id:sel1,color:css.ink}]:[]).concat(softLabels(new Set(sel1?[sel1]:[]))),rings:sel1?[{id:sel1,color:css.ink,r:18,w:3}]:[],onTap:x=>{ sel1=x; paint(); panel(); }};
+    const tc= sel1 ? (mastery ? (level(sel1)?MCOL()[level(sel1)]:css.land) : contColor(BY[sel1].c)) : null;
+    M={style:st,target:sel1,targetColor:tc,labels:(sel1?[{id:sel1,color:css.ink}]:[]).concat(mastery?[]:softLabels(new Set(sel1?[sel1]:[]))),rings:sel1?[{id:sel1,color:css.ink,r:18,w:3}]:[],onTap:x=>{ sel1=x; paint(); panel(); }};
     draw("hi");
   }
   function chips(){ return `<div class="cchips" id="cch">${["World",...CONTS.map(c=>c.key)].map(k=>`<button class="cchip" aria-pressed="${k===focus}" data-k="${esc(k)}" style="--cc:${k==="World"?"var(--ink-3)":ccol(k)}"><i></i>${esc(k)}</button>`).join("")}</div>`; }
   function panel(){
     let body;
-    if(!sel1) body=`<h2>Tap any country</h2><p>Brighter colors are countries you've learned. Pick a continent to zoom in.</p>`;
-    else { const m=BY[sel1], pk=PACK_OF[sel1];
-      body=`<span class="eyebrow2" style="color:${ccol(m.c)}">${esc(m.c)} · ${esc(GROUP_OF[sel1])}</span><h2 class="bigname" style="--cc:${ccol(m.c)}">${esc(m.n)}</h2>
-        <div class="row">${learned(sel1)?`<span class="fb" data-k="ok">${check()}<span>Learned</span></span>`:`<button class="btn go" id="learnIt">Learn it: ${esc(pk.title)}</button>`}</div>`; }
+    const scope=focus==="World"?IDS:IDS.filter(x=>BY[x].c===focus);
+    if(!sel1) body= mastery ? `<h2>${focus==="World"?"How well you know the world":esc(focus)}</h2><div class="mleg">${legendHTML(scope)}</div><p>Tap a country to see your record. Three right in a row makes it solid.</p>`
+                            : `<h2>Tap any country</h2><p>Brighter colors are countries you've learned. Pick a continent to zoom in.</p>`;
+    else { const m=BY[sel1], pk=PACK_OF[sel1], t=S.stats[sel1], l=level(sel1);
+      const rec = t&&(t.r+t.w) ? `${t.r} right · ${t.w} missed${t.s>1?` · ${t.s} in a row`:""}` : (learned(sel1)?"Learned in a lesson":"");
+      const lvlLine = mastery ? `<p><b style="color:${["var(--ink-3)","var(--bad)","color-mix(in srgb,var(--sun) 70%,var(--ink))","var(--good)"][l]}">${LV[l]}</b>${rec?` · ${rec}`:""}</p>` : "";
+      body=`<span class="eyebrow2" style="color:${ccol(m.c)}">${esc(m.c)} · ${esc(GROUP_OF[sel1])}</span><h2 class="bigname" style="--cc:${ccol(m.c)}">${esc(m.n)}</h2>${lvlLine}
+        <div class="row">${learned(sel1)?(mastery?"":`<span class="fb" data-k="ok">${check()}<span>Learned</span></span>`):`<button class="btn go" id="learnIt">Learn it: ${esc(pk.title)}</button>`}</div>`; }
     $('panel').style.setProperty('--cc','var(--ink)');
     $('panel').classList.add('explore'); $('panel').innerHTML=chips()+body;
     { const cc=$('cch'), on=cc&&cc.querySelector('[aria-pressed="true"]'); if(on) cc.scrollLeft=on.offsetLeft-(cc.clientWidth-on.offsetWidth)/2; }
@@ -871,10 +969,161 @@ function startExplore(){
   paint(); panel(); flyTo(worldFrame());
 }
 
+/* ================= neighbors drill ================= */
+const nbOf=id=>BY[id].b.filter(x=>BY[x]);
+function startNeighbors(){
+  const elig=IDS.filter(id=>nbOf(id).length>=2);
+  const picks=shuffle(elig.filter(learned)).slice(0,8);
+  shuffle(elig.filter(x=>!picks.includes(x))).forEach(x=>{ if(picks.length<8) picks.push(x); });
+  const R=picks.length; let ri=0, found=0, total=0, wrong=0;
+  xpRun=0; combo=0; setXp(); setComboUI();
+  $('steps').hidden=false; $('ptitle').hidden=true;
+  mode={frame:worldFrame}; show("play"); $('timer').textContent="0:00"; $('timer').hidden=false; startTimer();
+  function round(){
+    setProgress(ri/R);
+    const X=picks[ri], nb=nbOf(X), got=new Set(), rev=new Set(), bad=new Set(); total+=nb.length; let over=false;
+    const col=contColor(BY[X].c);
+    const paint=()=>{ M={style:x=>got.has(x)?[css.good,.6]:(rev.has(x)?[css.sun,.65]:(bad.has(x)?[css.bad,.45]:null)),target:X,targetColor:col,
+      labels:[{id:X,color:css.ink},...[...got].map(id=>({id,color:css.good})),...[...rev].map(id=>({id,color:css.sun})),...[...bad].map(id=>({id,color:css.bad}))],
+      rings:[{id:X,color:col,r:16,w:3}],onTap:tap}; draw("hi"); };
+    const fr=()=>frameFeatures([X,...nb].map(i=>MAIN[i]),1.25,12); mode.frame=fr; flyTo(fr());
+    function ui(msg,kind){
+      $('panel').style.setProperty('--cc',ccol(BY[X].c));
+      $('panel').innerHTML=`<span class="eyebrow2">Neighbors · ${ri+1} of ${R}</span><h2>Tap every country that borders <span style="color:${ccol(BY[X].c)}">${esc(BY[X].n)}</span></h2>
+        <div class="found" aria-label="${got.size} of ${nb.length} found">${nb.map(x=>`<i data-k="${got.has(x)?"ok":rev.has(x)?"rev":""}"></i>`).join("")}</div>
+        <div class="row" id="after" style="min-height:52px">${msg?`<div class="fb" data-k="${kind}" style="flex:1">${kind==="ok"?check():cross()}<span>${msg}</span></div>`:`<span style="flex:1;color:var(--ink-2);font-size:15px">${nb.length} borders to find</span>`}${over?`<button class="btn" id="nx">${ri+1<R?"Next":"See results"}</button>`:`<button class="btn ghost" id="stuck">Show the rest</button>`}</div>`;
+      if(over){ $('nx').onclick=()=>{ ri++; ri<R?round():fin(); }; $('nx').focus({preventScroll:true}); }
+      else $('stuck').onclick=()=>{ nb.forEach(x=>{ if(!got.has(x)){ rev.add(x); note(x,false);} }); over=true; combo=0; setComboUI(); paint(); ui(`${rev.size} border${rev.size===1?"":"s"} to remember, shown in yellow.`,"no"); };
+    }
+    function tap(x){
+      if(over||x===X||got.has(x)) return;
+      if(nb.includes(x)){ got.add(x); found++; combo++; note(x,true); addXp(5); buzz(12); setComboUI(); paint();
+        if(got.size===nb.length){ over=true; if(!bad.size) addXp(10); ui(bad.size?"All found.":"All found, no wrong taps!","ok"); }
+        else ui(`${esc(BY[x].n)}. ${nb.length-got.size} to go.`,"ok"); }
+      else { if(bad.has(x)) return; bad.add(x); wrong++; combo=0; buzz([30,40,30]); setComboUI(); paint(); ui(`${esc(BY[x].n)} doesn't border ${esc(BY[X].n)}.`,"no"); }
+    }
+    paint(); ui();
+  }
+  function fin(){
+    stopTimer(); setProgress(1); bumpDay();
+    const ms=Math.round(elapsed()), rec={c:found,n:total,w:wrong,ms,at:Date.now()}, prev=S.nb.best;
+    const isBest=!prev || rec.c/rec.n>prev.c/prev.n || (rec.c/rec.n===prev.c/prev.n && (rec.w<prev.w || (rec.w===prev.w && rec.ms<prev.ms)));
+    if(isBest) S.nb.best=rec; S.nb.hist=[rec,...(S.nb.hist||[])].slice(0,10); save();
+    M={style:x=>picks.includes(x)?[css.sun,.5]:null,target:null,labels:[],rings:[],onTap:null}; mode.frame=worldFrame; flyTo(worldFrame(),()=>{ if(isBest&&prev) confetti(); });
+    $('panel').style.setProperty('--cc','var(--good)');
+    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">Neighbors drill</span>
+      <h2>${found===total&&!wrong?"Flawless borders!":`${Math.round(found/total*100)}% of borders found`}</h2>
+      <div class="nums"><div><b>${found}/${total}</b><span>found</span></div><div><b>${wrong}</b><span>wrong taps</span></div><div><b>${fmt(ms)}</b><span>time</span></div></div>
+      <p>${!prev?"First run. This is your score to beat.":isBest?"New best!":`Your best is ${prev.c}/${prev.n} with ${prev.w} wrong taps in ${fmt(prev.ms)}.`}</p>
+      ${S.nb.hist.length>1?`<div class="hist">${S.nb.hist.slice(0,5).map((h,i)=>`<div class="${i===0?"me":""}"><span>${i===0?"This run":new Date(h.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span>${h.c}/${h.n} · ${h.w} wrong · ${fmt(h.ms)}</span></div>`).join("")}</div>`:""}
+      <div class="row" style="width:100%"><button class="btn go wide" id="again">Play again</button><button class="btn ghost" id="homeB">Home</button></div></div>`;
+    $('again').onclick=()=>startNeighbors(); $('homeB').onclick=()=>$('quit').click();
+  }
+  round();
+}
+
+/* ================= daily 10 ================= */
+const DAY0=Date.UTC(2026,9,28), MI=3958.8;
+function dayNum(key){ const [y,m,d]=key.split("-").map(Number); return Math.round((Date.UTC(y,m-1,d)-DAY0)/864e5)+1; }
+function rng(seed){ let h=2166136261>>>0; for(const ch of seed){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619)>>>0; }
+  return ()=>{ h=(h+0x6D2B79F5)>>>0; let t=h; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
+function pickTen(seed){ const r=rng(seed), pool=IDS.slice().sort(), out=[]; while(out.length<10){ const id=pool[Math.floor(r()*pool.length)]; if(!out.includes(id)) out.push(id); } return out; }
+function distMi(id,ll){
+  const f=F.hi[id]; if(d3.geoContains(f,ll)) return {mi:0,near:ll};
+  let best=Infinity, near=null; const g=f.geometry, polys=g.type==="Polygon"?[g.coordinates]:g.coordinates;
+  for(const poly of polys) for(const ring of poly) for(const pt of ring){ const d=d3.geoDistance(ll,pt); if(d<best){best=d;near=pt;} }
+  return {mi:best*MI,near};
+}
+const ptsFor=mi=>mi<=0?1000:Math.max(0,Math.round(1000*Math.exp(-mi/900)));
+const gradeOf=p=>p>=900?3:p>=500?2:1;
+const fmtMi=mi=>(mi<10?mi.toFixed(1):Math.round(mi).toLocaleString())+" mi";
+const rating=t=>t>=9000?"World-class navigator":t>=7500?"Seasoned traveler":t>=5500?"Frequent flyer":t>=3500?"Getting your bearings":"Tourist";
+function dailyStats(){ const done=Object.entries(S.daily).filter(([k,v])=>v.done).sort((a,b)=>a[0]<b[0]?1:-1);
+  let streak=0; for(let i=0;;i++){ const d=new Date(); d.setDate(d.getDate()-i); const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    if(S.daily[k]&&S.daily[k].done) streak++; else if(i>0) break; }
+  return {played:done.length,best:done.reduce((m,[k,v])=>Math.max(m,v.score),0),streak}; }
+function renderDailyCard(){
+  const key=today(), d=S.daily[key], n=dayNum(key), b=$('dailyBtn');
+  const dots=d?`<span class="ddots">${Array.from({length:10},(_,i)=>{ const r=d.rounds[i]; return `<i style="${r?`background:${["","var(--bad)","var(--sun)","var(--good)"][gradeOf(r.p)]}`:""}"></i>`; }).join("")}</span>`:"";
+  if(d&&d.done) b.innerHTML=`<span class="eyebrow">Daily 10 · #${n} · done</span><h2>${d.score.toLocaleString()} points</h2><span class="dgo">Results</span><p>New countries tomorrow. Practice rounds are open anytime.</p>${dots}`;
+  else if(d&&d.rounds.length) b.innerHTML=`<span class="eyebrow">Daily 10 · #${n}</span><h2>Round ${d.rounds.length+1} of 10</h2><span class="dgo">Resume</span><p>${d.rounds.reduce((a,r)=>a+r.p,0).toLocaleString()} points so far.</p>${dots}`;
+  else b.innerHTML=`<span class="eyebrow">Daily 10 · #${n}</span><h2>Today's 10 countries</h2><span class="dgo">Play</span><p>Drop a pin as close as you can. Same 10 for everyone today.</p>`;
+  b.onclick=()=>startDaily(false);
+}
+function startDaily(practice){
+  const key=today(), n=dayNum(key);
+  if(!practice){ const keys=Object.keys(S.daily).sort(); while(keys.length>90) delete S.daily[keys.shift()]; }
+  const ids= practice ? pickTen("practice-"+Date.now()+Math.random()) : pickTen("globetrotter-"+key);
+  const rec= practice ? {rounds:[],done:false} : (S.daily[key]||(S.daily[key]={rounds:[],done:false}));
+  let ri=rec.rounds.length, total=rec.rounds.reduce((a,r)=>a+r.p,0);
+  xpRun=0; combo=0; setXp(); setComboUI();
+  $('steps').hidden=false; $('ptitle').hidden=true;
+  mode={frame:worldFrame}; show("play");
+  const title= practice ? "Practice round" : `Daily 10 · #${n}`;
+  const dotsHTML=cur=>`<div class="rdots">${Array.from({length:10},(_,i)=>{ const r=rec.rounds[i]; return `<i data-g="${r?gradeOf(r.p):(i===cur?"now":"")}"></i>`; }).join("")}</div>`;
+  if(rec.done) return results();
+  function round(){
+    setProgress(ri/10);
+    const id=ids[ri]; let pin=null;
+    M={style:()=>null,target:null,labels:[],rings:[],pin:null,line:null,onTap:null,onTapLL:ll=>{ pin=ll; M.pin=ll; draw("hi"); const b=$('lock'); if(b){ b.disabled=false; b.textContent="Lock in"; } }};
+    mode.frame=worldFrame; flyTo(worldFrame());
+    $('panel').style.setProperty('--cc','var(--ink)');
+    $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">${title} · Round ${ri+1} of 10</span><h2>Where is ${esc(BY[id].n)}?</h2></div><div class="tot">${total.toLocaleString()}<small>points</small></div></div>
+      ${dotsHTML(ri)}<p>Tap the map to drop a pin. Zoom in for a closer guess, then lock it in.</p>
+      <div class="row"><button class="btn go wide" id="lock" disabled>Drop a pin first</button></div>`;
+    $('lock').onclick=()=>{ if(!pin) return; lockIn(id,pin); };
+  }
+  function lockIn(id,pin){
+    M.onTapLL=null;
+    const {mi,near}=distMi(id,pin), pts=ptsFor(mi), g=gradeOf(pts);
+    total+=pts; rec.rounds.push({id,mi:Math.round(mi*10)/10,p:pts});
+    if(!practice){ if(rec.rounds.length===10){ rec.done=true; rec.score=total; } bumpDay(); }
+    note(id,pts>=850); addXp(Math.round(pts/100)); save();
+    M.target=id; M.targetColor=[null,css.bad,css.sun,css.good][g]; M.labels=[{id,color:css.ink}]; M.line= mi>0?{type:"LineString",coordinates:[pin,near]}:null; M.rings=[{id,color:css.ink,r:16,w:3}];
+    const fr=()=>frameFeatures([MAIN[id],{type:"Feature",geometry:{type:"Point",coordinates:pin}},{type:"Feature",geometry:{type:"Point",coordinates:near}}],1.6,10);
+    mode.frame=fr; flyTo(fr(),()=>{ if(mi===0) confetti(); });
+    const last=ri===9;
+    $('panel').innerHTML=`<div class="dhead"><div style="min-width:0"><span class="eyebrow2">${title} · Round ${ri+1} of 10</span><h2>${mi===0?"Bullseye!":esc(BY[id].n)}</h2></div><div class="tot" id="totN">${(total-pts).toLocaleString()}<small>points</small></div></div>
+      ${dotsHTML(-1)}
+      <div class="row" style="align-items:baseline;gap:14px"><span class="pts" id="ptsN" style="color:${["","var(--bad)","color-mix(in srgb,var(--sun) 75%,var(--ink))","var(--good)"][g]}">+0</span><span style="color:var(--ink-2);font-size:15px">${mi===0?`Your pin is inside ${esc(BY[id].n)}.`:`${fmtMi(mi)} from ${esc(BY[id].n)}`}</span></div>
+      <div class="row"><button class="btn wide" id="nextR">${last?"See results":"Next round"}</button></div>`;
+    countUp($('ptsN'),pts,"+"); countUp($('totN'),total,"",total-pts,"points");
+    $('nextR').onclick=()=>{ ri++; ri<10?round():results(); };
+    buzz(g===3?20:[20,30,20]);
+  }
+  function results(){
+    setProgress(1);
+    const tot=rec.rounds.reduce((a,r)=>a+r.p,0), ds=dailyStats();
+    M={style:x=>{ const r=rec.rounds.find(r=>r.id===x); return r?[[null,css.bad,css.sun,css.good][gradeOf(r.p)],.75]:null; },target:null,labels:[],rings:rec.rounds.map(r=>({id:r.id,color:[null,css.bad,css.sun,css.good][gradeOf(r.p)],r:10,w:3})),line:null,pin:null,onTap:null};
+    mode.frame=worldFrame; flyTo(worldFrame(),()=>{ if(tot>=7500) confetti(); });
+    const squares=rec.rounds.map(r=>["","🟥","🟨","🟩"][gradeOf(r.p)]).join("");
+    const share=`Globetrotter ${practice?"practice":"Daily 10 #"+n}: ${tot.toLocaleString()}/10,000\n${squares}\n${location.origin}${location.pathname}`;
+    $('panel').style.setProperty('--cc','var(--ink)');
+    $('panel').innerHTML=`<div class="result" style="display:grid;gap:12px"><span class="eyebrow2">${title}</span>
+      <div class="pts">${tot.toLocaleString()}<span style="font-size:18px;color:var(--ink-3)"> / 10,000</span></div>
+      <h2 style="font-size:20px">${rating(tot)}</h2>
+      <div class="rlist">${rec.rounds.map(r=>`<div><span>${esc(BY[r.id].n)}</span><em>${r.mi===0?"inside":fmtMi(r.mi)}</em><b style="color:${["","var(--bad)","color-mix(in srgb,var(--sun) 75%,var(--ink))","var(--good)"][gradeOf(r.p)]}">${r.p}</b></div>`).join("")}</div>
+      ${practice?"":`<div class="nums"><div><b>${ds.best.toLocaleString()}</b><span>best daily</span></div><div><b>${ds.played}</b><span>days played</span></div><div><b>${ds.streak}</b><span>daily streak</span></div></div>`}
+      ${practice?"":`<button class="btn go" id="shareB" style="width:100%">Copy result to share</button>`}<div class="row" style="width:100%"><button class="btn ghost wide" id="pracB">${practice?"Another practice round":"Practice round"}</button><button class="btn ghost" id="homeB">Home</button></div>
+      <textarea id="shareT" readonly rows="3" hidden style="width:100%;box-sizing:border-box;font:16px/1.4 var(--f-body);border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface);color:var(--ink)">${esc(share)}</textarea></div>`;
+    if($('shareB')) $('shareB').onclick=()=>{ const t=$('shareT'); const ok=()=>{ $('shareB').textContent="Copied. Paste it in a text."; };
+      try{ navigator.clipboard.writeText(share).then(ok,()=>{ t.hidden=false; t.focus(); t.select(); }); }catch(e){ t.hidden=false; t.focus(); t.select(); } };
+    $('pracB').onclick=()=>startDaily(true); $('homeB').onclick=()=>$('quit').click();
+  }
+  round();
+}
+function countUp(el,to,prefix,from,suffix){
+  if(!el) return; const f=from||0, small=el.querySelector('small'); const sm=small?small.outerHTML:"";
+  if(reduceMotion){ el.innerHTML=prefix+to.toLocaleString()+sm; return; }
+  const t0=performance.now(), dur=700;
+  const tick=()=>{ const t=Math.min(1,(performance.now()-t0)/dur), v=Math.round(f+(to-f)*d3.easeCubicOut(t)); el.innerHTML=prefix+v.toLocaleString()+sm; if(t<1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
 /* ================= boot ================= */
 readTokens();
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ readTokens(); if(!$('play').hidden) draw("hi"); });
-new MutationObserver(()=>{ readTokens(); if(!$('play').hidden) draw("hi"); }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ readTokens(); if(!$('play').hidden) draw("hi"); else drawMastery(); });
+new MutationObserver(()=>{ readTokens(); if(!$('play').hidden) draw("hi"); else drawMastery(); }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 renderHome();
 readyCb=()=>{ if(!$('home').hidden) renderHome(); };
 if(ready) readyCb();
