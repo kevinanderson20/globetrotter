@@ -107,6 +107,20 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 #panel.top .nbform input{padding:10px 12px}
 #panel.top .fillcount{font-size:24px}
 #panel.top .row{min-height:0!important}
+#panel.top.slim{padding-block:8px 10px;gap:8px}
+.cbar{display:flex;align-items:center;gap:6px;min-width:0;font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.2}
+.cbar .a{color:var(--c-eu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.cbar .b{color:color-mix(in srgb,var(--sun) 80%,var(--ink));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.cbar i{font-style:normal;color:var(--ink-3);flex:none}
+.cbar small{font-family:var(--f-body);font-weight:600;font-size:12px;color:var(--ink-3);flex:none;white-space:nowrap}
+.cbar .ib{margin-left:auto}
+.ib{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);display:grid;place-items:center;color:var(--ink-2)}
+.ib+.ib{margin-left:0}
+.nbform.slim input{padding:8px 12px;font-size:17px}
+.nbform.slim .btn{min-height:42px;padding:0 16px;font-size:16px}
+.maptoast{position:absolute;left:12px;right:76px;top:calc(var(--bandtop,0px) + 10px);z-index:4;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-weight:700;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.15);transition:opacity .25s}
+.maptoast[data-k="ok"]{color:var(--good)}.maptoast[data-k="no"]{color:var(--bad)}
+.maptoast svg{flex:none}
 .route{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:14px;font-weight:600}
 .route span{border-radius:999px;padding:3px 10px;border:1.5px solid var(--good)}
 .route span.a{border-color:var(--c-eu);background:color-mix(in srgb,var(--c-eu) 14%,var(--surface))}
@@ -342,6 +356,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
     <canvas id="map" aria-label="Map of the Earth"></canvas>
     <canvas id="fx" aria-hidden="true"></canvas>
     <div class="combo" id="combo" data-on="0"></div>
+    <div class="maptoast" id="mapToast" hidden></div>
     <div class="mapctl">
       <button id="zin" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <button id="zout" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -798,7 +813,7 @@ function buzz(ms){ snd(Array.isArray(ms)?"no":"ok"); try{ navigator.vibrate&&nav
 
 /* ================= play shell ================= */
 let mode=null, xpRun=0, combo=0;
-function show(screen){ $('panel').classList.remove('explore','top'); stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; $('hist').hidden=screen!=="hist"; if(screen==="play"){ $('play').style.setProperty('--pbarh',$('play').querySelector('.pbar').offsetHeight+"px"); resize(true); } else { renderHome(); } }
+function show(screen){ $('panel').classList.remove('explore','top','slim'); $('mapToast').hidden=true; stopTimer(); $('timer').hidden=true; $('home').hidden=screen!=="home"; $('play').hidden=screen!=="play"; $('hist').hidden=screen!=="hist"; if(screen==="play"){ $('play').style.setProperty('--pbarh',$('play').querySelector('.pbar').offsetHeight+"px"); resize(true); } else { renderHome(); } }
 function setXp(){ $('xpNow').textContent=xpRun+" XP"; }
 function addXp(n){ xpRun+=n; S.xp+=n; setXp(); }
 function setComboUI(){ const c=$('combo'); if(combo>=3){ c.textContent=combo+" in a row!"; c.dataset.on=1; } else c.dataset.on=0; }
@@ -1449,15 +1464,15 @@ function startChain(){
        labels:[{id:A,color:css["c-eu"]},{id:B,color:css.sun},...route.slice(1).filter(x=>x!==B).map(id=>({id,soft:true,force:true})),...[...rv].filter(x=>x!==A&&x!==B&&!rs.has(x)).map(id=>({id,soft:true,force:true}))],
        line:route.length>1?{type:"LineString",coordinates:route.map(id=>CENT[id])}:null,rings:[{id:A,color:css["c-eu"],w:3},{id:B,color:css.sun,w:3}],onTap:null}; draw("hi"); };
   $('panel').style.setProperty('--cc','var(--c-eu)');
-  $('panel').innerHTML=`<span class="eyebrow2" id="chHead">Chain · shortest route: ${par} borders</span>
-    <h2>Get from <span style="color:var(--c-eu)">${esc(BY[A].n)}</span> to <span style="color:color-mix(in srgb,var(--sun) 80%,var(--ink))">${esc(BY[B].n)}</span></h2>
-    <div class="route" id="chRoute"></div>
-    <form class="nbform" id="chForm" autocomplete="off"><input id="chIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Next place on your route" aria-label="Next place on your route"><button class="btn go" type="submit">Enter</button></form>
-    <div class="row" id="after"><div class="fb" id="chMsg" style="flex:1"><span style="color:var(--ink-2);font-weight:500">Each one must border the last.</span></div><button class="btn ghost" id="chUndo" type="button">Undo</button><button class="btn ghost" id="chGive" type="button">Show route</button></div>`;
-  $('panel').classList.add('top');
+  $('panel').innerHTML=`<div class="cbar"><span class="a">${esc(BY[A].n)}</span><i>→</i><span class="b">${esc(BY[B].n)}</span><small id="chCount"></small>
+      <button class="ib" id="chUndo" type="button" aria-label="Undo last step"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4 3 8l4 4M3.5 8H11a4 4 0 0 1 0 8H8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="ib" id="chGive" type="button" aria-label="Show a shortest route"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 16V2.5M4 3h9l-2 3 2 3H4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    <form class="nbform slim" id="chForm" autocomplete="off"><input id="chIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" placeholder="Next place on your route" aria-label="Next place on your route"><button class="btn go" type="submit">Enter</button></form>`;
+  $('panel').classList.add('top','slim');
   const inp=$('chIn'); setTimeout(()=>inp.focus({preventScroll:true}),350);
-  const ui=()=>{ $('chRoute').innerHTML=route.map((id,k)=>`<span class="${k===0?"a":id===B?"b":""}">${esc(BY[id].n)}</span>`).join("<i>→</i>")+(route[route.length-1]!==B?`<i>→ … →</i><span class="b">${esc(BY[B].n)}</span>`:""); };
-  const msg=(t,k)=>{ const m=$('chMsg'); m.dataset.k=k||""; m.innerHTML=(k==="ok"?check():k==="no"?cross():"")+`<span>${t}</span>`; };
+  const ui=()=>{ $('chCount').textContent=`best ${par}`; };
+  let tT=null; const msg=(t,k)=>{ const m=$('mapToast'); m.dataset.k=k||""; m.innerHTML=(k==="ok"?check():k==="no"?cross():"")+`<span>${t}</span>`; m.hidden=false; m.style.opacity=1;
+    clearTimeout(tT); tT=setTimeout(()=>{ m.style.opacity=0; setTimeout(()=>{ m.hidden=true; },260); },2600); };
   ui(); paint(); requestAnimationFrame(()=>flyTo(fr()));
   $('chForm').onsubmit=e=>{ e.preventDefault(); if(over) return; const raw=inp.value.trim(); if(!raw) return; inp.value="";
     const end=route[route.length-1];
@@ -1470,11 +1485,11 @@ function startChain(){
     if(!nbOf(end).includes(id)){ wrong++; bad.add(id); combo=0; setComboUI(); buzz([30,40,30]); paint(); msg(`${esc(BY[id].n)} doesn't border ${esc(BY[end].n)}.`,"no"); return; }
     route.push(id); note(id,true); combo++; setComboUI(); buzz(12); ui(); paint();
     if(id===B) return finish(true);
-    msg(`${esc(BY[end].n)} → ${esc(BY[id].n)}`,"ok"); inp.focus({preventScroll:true}); };
+    msg(`${esc(BY[end].n)} → ${esc(BY[id].n)} · ${route.length-1} so far`,"ok"); inp.focus({preventScroll:true}); };
   $('chUndo').onclick=()=>{ if(over||route.length<2) return; const x=route.pop(); ui(); paint(); msg(`Took ${esc(BY[x].n)} off your route.`,""); inp.focus({preventScroll:true}); };
   $('chGive').onclick=()=>{ if(!over) finish(false); };
   function finish(solved){
-    over=true; stopTimer(); inp.blur(); bumpDay();
+    over=true; stopTimer(); inp.blur(); bumpDay(); $('mapToast').hidden=true; $('panel').classList.remove('slim');
     const moves=route.length-1, ms=Math.round(elapsed());
     const rec={c:solved?par:0,n:solved?moves:par,w:wrong,ms,at:Date.now(),a:A,b:B,solved};
     S.chain.hist=[rec,...(S.chain.hist||[])].slice(0,30);
@@ -1644,11 +1659,11 @@ new MutationObserver(muts=>{
   if(sheetDown&&panelEl.querySelector('#cont,#nx,#nextR,#again,#homeB')) setSheet(false,true);   // something you need to tap appeared
 }).observe(panelEl,{childList:true,subtree:true});
 window.__sheetUp=()=>{ if(sheetDown) setSheet(false,true); };
-const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); $('play').style.setProperty('--pbarh',$('play').querySelector('.pbar').offsetHeight+"px"); };
+const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); $('stage').style.setProperty('--bandtop',band()[0]+"px"); $('play').style.setProperty('--pbarh',$('play').querySelector('.pbar').offsetHeight+"px"); };
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1438";
+const APP_VERSION="2026.10.29-1934";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
