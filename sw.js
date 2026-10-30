@@ -2,7 +2,7 @@
 // Pages open instantly from the saved copy, and a fresh copy is fetched in the background for next time.
 // The app checks version.json and offers "tap to update" when a newer version is online.
 const CACHE = "globetrotter-v4";
-const CORE = ["./", "./usa/", "./earth/", "./earth/blue-marble.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+const CORE = ["./", "./usa/", "./earth/", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

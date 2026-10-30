@@ -24,7 +24,7 @@
   --bg:#eaf4fa; --surface:#ffffff; --surface-2:#f3f8fb; --line:#d6e5ee;
   --ink:#10233a; --ink-2:#47596e; --ink-3:#8293a5;
   --sea:#bfe1f2; --sea-deep:#a7d3ea; --grat:#a3cde3; --land:#fffdf7; --land-dim:#edf0f1; --land-off:#e3e8ea; --border:#7b92a2;
-  --sun:#ffb21e; --sun-ink:#4a3000; --river:#2f86c9; --t-sea:#2a7fd4; --t-river:#0e97a3; --t-mtn:#8a5a3b; --t-desert:#cf9330; --globe-land:#e6e3cc; --good:#1fa25c; --bad:#ec5646; --halo:rgba(255,253,247,.94);
+  --sun:#ffb21e; --sun-ink:#4a3000; --river:#2f86c9; --t-sea:#2a7fd4; --t-river:#0e97a3; --t-mtn:#8a5a3b; --t-desert:#cf9330; --globe-land:#e6e3cc; --sky1:#bfe3f2; --sky2:#f1f1e4; --good:#1fa25c; --bad:#ec5646; --halo:rgba(255,253,247,.94);
   --c-na:#24a167; --c-sa:#8b54d0; --c-eu:#3f67d8; --c-af:#ec7f19; --c-as:#de3f58; --c-oc:#0f9ea0;
   --f-display:"Bricolage Grotesque",ui-rounded,system-ui,sans-serif;
   --f-body:"Figtree",ui-sans-serif,system-ui,sans-serif;
@@ -33,14 +33,14 @@
   --bg:#0a1520; --surface:#12212e; --surface-2:#172938; --line:#22384a;
   --ink:#eaf3fa; --ink-2:#a8bccc; --ink-3:#6f8699;
   --sea:#0f2a3c; --sea-deep:#0b2131; --grat:#173447; --land:#2c3f4d; --land-dim:#1b2a35; --land-off:#1a2731; --border:#5e7a8d;
-  --sun:#ffc23f; --sun-ink:#3a2500; --river:#5aaee8; --t-sea:#4f9cf0; --t-river:#33c1cc; --t-mtn:#c4906a; --t-desert:#e3b25a; --globe-land:#3a4637; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
+  --sun:#ffc23f; --sun-ink:#3a2500; --river:#5aaee8; --t-sea:#4f9cf0; --t-river:#33c1cc; --t-mtn:#c4906a; --t-desert:#e3b25a; --globe-land:#3a4637; --sky1:#0d2236; --sky2:#132b3d; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
   --c-na:#3cc485; --c-sa:#a77ae6; --c-eu:#6b8cf0; --c-af:#ff9a3d; --c-as:#ff6680; --c-oc:#2cc4c4;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0a1520; --surface:#12212e; --surface-2:#172938; --line:#22384a;
   --ink:#eaf3fa; --ink-2:#a8bccc; --ink-3:#6f8699;
   --sea:#0f2a3c; --sea-deep:#0b2131; --grat:#173447; --land:#2c3f4d; --land-dim:#1b2a35; --land-off:#1a2731; --border:#5e7a8d;
-  --sun:#ffc23f; --sun-ink:#3a2500; --river:#5aaee8; --t-sea:#4f9cf0; --t-river:#33c1cc; --t-mtn:#c4906a; --t-desert:#e3b25a; --globe-land:#3a4637; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
+  --sun:#ffc23f; --sun-ink:#3a2500; --river:#5aaee8; --t-sea:#4f9cf0; --t-river:#33c1cc; --t-mtn:#c4906a; --t-desert:#e3b25a; --globe-land:#3a4637; --sky1:#0d2236; --sky2:#132b3d; --good:#3cc77b; --bad:#ff7363; --halo:rgba(16,34,48,.92);
   --c-na:#3cc485; --c-sa:#a77ae6; --c-eu:#6b8cf0; --c-af:#ff9a3d; --c-as:#ff6680; --c-oc:#2cc4c4;
   color-scheme:dark}
 
@@ -353,6 +353,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
     <span class="timer" id="timer" hidden aria-label="Elapsed time">0:00</span><span class="xp" id="xpNow">0 XP</span>
   </div>
   <div class="stage" id="stage">
+    <canvas id="gl" aria-hidden="true"></canvas>
     <canvas id="map" aria-label="Map of the United States"></canvas>
     <canvas id="fx" aria-hidden="true"></canvas>
     <div class="combo" id="combo" data-on="0"></div>
@@ -392,7 +393,7 @@ const CONTS=[
   {key:"Northeast",short:"NE",tok:"c-eu",groups:[["Mid-Atlantic",["Mid-Atlantic"]],["New England",["New England"]]]}
 ];
 /* how this edition paints its items: states fill the land; the Earth edition overrides this */
-const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false, proj:null, image:null, grid:true, borderColor:null, dimFill:null, alphaScale:1, targetAlpha:1, targetStroke:null};
+const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false, proj:null, image:null, globe:false, texture:null, grid:true, borderColor:null, dimFill:null, alphaScale:1, targetAlpha:1, targetStroke:null};
 const CONT=Object.fromEntries(CONTS.map(c=>[c.key,c]));
 
 /* ================= map data ================= */
@@ -576,7 +577,7 @@ const sphere={type:"Sphere"}, grat=d3.geoGraticule10();
 const proj=(ED.proj?ED.proj():d3.geoEqualEarth()).precision(0.4), path=d3.geoPath(proj,ctx);
 // satellite imagery (Earth edition): an equirectangular picture of the whole planet, drawn under everything else
 const SAT=ED.image?new Image():null;
-if(SAT){ SAT.onload=()=>{ mKey=""; if(!$('play').hidden) draw("hi"); else drawMastery(); }; SAT.src=ED.image; }
+if(SAT){ let tries=0; SAT.onload=()=>{ mKey=""; if(!$('play').hidden) draw("hi"); else drawMastery(); }; SAT.onerror=()=>{ if(++tries<4) setTimeout(()=>{ SAT.src=ED.image+"?r="+tries; },2500*tries); }; SAT.src=ED.image; }
 function drawSat(c,pr){ if(!SAT||!SAT.complete||!SAT.naturalWidth) return false;
   const s=pr.scale(), t=pr.translate(), r=pr.rotate()[0], w=s*2*Math.PI, h=s*Math.PI, x0=t[0]+s*(-180+r)*Math.PI/180, y0=t[1]-h/2;
   c.save(); c.beginPath(); c.rect(t[0]-s*Math.PI,y0,w,h); c.clip();
@@ -585,7 +586,7 @@ function drawSat(c,pr){ if(!SAT||!SAT.complete||!SAT.naturalWidth) return false;
 let view={lon:10,lat:10,s:1}, zt=d3.zoomIdentity, worldScale=1, homeView=null;
 let css={};
 function readTokens(){ const s=getComputedStyle(document.documentElement);
-  ["sea","sea-deep","grat","land","land-dim","land-off","border","ink","sun","good","bad","halo","surface","river","t-sea","t-river","t-mtn","t-desert","globe-land","c-na","c-sa","c-eu","c-af","c-as","c-oc"].forEach(k=>css[k]=s.getPropertyValue("--"+k).trim()); }
+  ["sea","sea-deep","grat","land","land-dim","land-off","border","ink","sun","good","bad","halo","surface","river","t-sea","t-river","t-mtn","t-desert","globe-land","sky1","sky2","c-na","c-sa","c-eu","c-af","c-as","c-oc"].forEach(k=>css[k]=s.getPropertyValue("--"+k).trim()); }
 const contColor=cont=>css[CONT[cont].tok];
 /* M = what to paint. style(id) -> [color, alpha] | null ; target ; labels ; rings */
 let M={style:()=>null, target:null, targetColor:null, labels:[], rings:[], onTap:null, ctxLabels:false};
@@ -600,12 +601,18 @@ function band(){ const pn=$('panel'), st=$('stage');
   return [0,Math.max(160,H-occl())]; }
 const VH=()=>{ const b=band(); return b[1]-b[0]; }, CY=()=>{ const b=band(); return (b[0]+b[1])/2; };
 const CTLW=64, VW=()=>Math.max(160,W-CTLW), CX=()=>VW()/2; // keep things clear of the zoom buttons on the right
-function applyView(v){ proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); const p=proj([v.lon,v.lat]); let tx=CX()-p[0], ty=CY()-p[1];
+function applyView(v){ if(ED.globe){ proj.rotate([-v.lon,-v.lat]).scale(v.s*gk).translate([CX(),CY()]); return; }
+  proj.rotate([-v.lon,0]).scale(v.s).translate([0,0]); const p=proj([v.lon,v.lat]); let tx=CX()-p[0], ty=CY()-p[1];
   const b=d3.geoPath(proj).bounds(sphere), top=b[0][1]+ty, bot=b[1][1]+ty;
   const [y0,y1]=band(); if(bot-top>=y1-y0){ if(top>y0) ty-=top-y0; else if(bot<y1) ty+=y1-bot; } else ty=CY()-(b[0][1]+b[1][1])/2;
   proj.translate([tx,ty]); }
-function fitWorldScale(){ proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),VH()/(b[1][1]-b[0][1]))*0.98; }
-function frameFeatures(feats,pad,minDeg){
+function fitWorldScale(){ if(ED.globe) return Math.min(VW(),VH())/2*0.9; proj.rotate([0,0]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(sphere); return Math.min(W/(b[1][0]-b[0][0]),VH()/(b[1][1]-b[0][1]))*0.98; }
+function frameGlobe(feats,pad,minDeg){ // turn the globe to face the places, then zoom to fit them
+  const fc={type:"FeatureCollection",features:feats}, c=d3.geoCentroid(fc);
+  proj.rotate([-c[0],-c[1]]).scale(1).translate([0,0]); const b=d3.geoPath(proj).bounds(fc), span=(minDeg||20)*Math.PI/180;
+  const sx=Math.max((b[1][0]-b[0][0])*pad,span), sy=Math.max((b[1][1]-b[0][1])*pad,span*0.7);
+  return {lon:c[0],lat:Math.max(-70,Math.min(70,c[1])),s:Math.max(Math.min(VW()/sx,VH()/sy),worldScale)}; }
+function frameFeatures(feats,pad,minDeg){ if(ED.globe) return frameGlobe(feats,pad,minDeg);
   const fc={type:"FeatureCollection",features:feats};
   const c=d3.geoCentroid(fc);
   proj.rotate([-c[0],0]).scale(1).translate([0,0]);
@@ -615,7 +622,7 @@ function frameFeatures(feats,pad,minDeg){
   const ll=proj.invert([(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2])||c;
   return {lon:ll[0],lat:ll[1],s};
 }
-function frameIds(ids,pad,minDeg){
+function frameIds(ids,pad,minDeg){ if(ED.globe) return frameGlobe(ids.map(i=>MAIN[i]),pad,minDeg);
   if(ids.length>5) ids=ids.filter(i=>i!=="RUS"); // Russia spans 170 degrees; framing it would zoom Europe out to the whole world
   const fc={type:"FeatureCollection",features:ids.map(i=>MAIN[i])};
   let c=d3.geoCentroid(fc);
@@ -634,16 +641,18 @@ function computeBounds(){ const pp=d3.geoPath(proj); IDS.forEach(id=>BOUNDS[id]=
 const visRect=()=>[(-zt.x)/zt.k-40,(-zt.y)/zt.k-40,(W-zt.x)/zt.k+40,(H-zt.y)/zt.k+40];
 const hit=(b,r)=>!(b[1][0]<r[0]||b[0][0]>r[2]||b[1][1]<r[1]||b[0][1]>r[3]);
 const pxSize=id=>{const b=BOUNDS[id];return Math.max(b[1][0]-b[0][0],b[1][1]-b[0][1])*zt.k;};
-function screenOf(id){ const p=proj(CENT[id]); return p?[p[0]*zt.k+zt.x,p[1]*zt.k+zt.y]:null; }
+function screenOf(id){ if(ED.globe&&d3.geoDistance(CENT[id],[view.lon,view.lat])>Math.PI/2-.03) return null; // far side of the globe
+  const p=proj(CENT[id]); return p?[p[0]*zt.k+zt.x,p[1]*zt.k+zt.y]:null; }
 
 function draw(q){
   if(!W) return;
   const set=F[q], k=zt.k, r=visRect();
-  ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle=css["sea-deep"]; ctx.fillRect(0,0,W,H);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(ED.globe){ ctx.clearRect(0,0,W,H); drawGL(); }
+  else { ctx.fillStyle=css["sea-deep"]; ctx.fillRect(0,0,W,H); }
   ctx.setTransform(DPR*k,0,0,DPR*k,DPR*zt.x,DPR*zt.y);
-  ctx.beginPath(); path(sphere); ctx.fillStyle=css.sea; ctx.fill();
-  drawSat(ctx,proj);
-  if(ED.grid){ ctx.beginPath(); path(grat); ctx.strokeStyle=css.grat; ctx.lineWidth=.8/k; ctx.stroke(); }
+  if(!ED.globe){ ctx.beginPath(); path(sphere); ctx.fillStyle=css.sea; ctx.fill(); drawSat(ctx,proj); }
+  if(ED.grid&&!ED.globe){ ctx.beginPath(); path(grat); ctx.strokeStyle=css.grat; ctx.lineWidth=.8/k; ctx.stroke(); }
   ctx.lineJoin="round"; ctx.lineCap="round";
   const groups=new Map(), pts=[];
   for(const id of IDS){ if(id===M.target||!hit(BOUNDS[id],r)) continue; let st=M.style(id); if(!st) st=ED.base(id); if(st==="skip") continue;
@@ -707,12 +716,20 @@ function draw(q){
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 let raf=0, hiT2=null;
 function redraw(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(()=>draw("lo")); clearTimeout(hiT2); hiT2=setTimeout(()=>draw("hi"),140); }
-const zoom=d3.zoom().scaleExtent([.2,80]).clickDistance(8).on("zoom",e=>{ zt=e.transform; redraw(); });
+let gk=1, gx=0, gy=0, zReset=false;
+const zoom=d3.zoom().scaleExtent([.2,80]).clickDistance(8).on("zoom",e=>{ if(ED.globe) return globeZoom(e.transform); zt=e.transform; redraw(); });
+function globeZoom(t){
+  if(zReset){ gk=t.k; gx=t.x; gy=t.y; return; }
+  if(anim){ anim.stop(); anim=null; }
+  if(t.k===gk){ const s=view.s*gk; view={...view, lon:view.lon-(t.x-gx)/s*180/Math.PI, lat:Math.max(-85,Math.min(85,view.lat+(t.y-gy)/s*180/Math.PI))}; }
+  gk=t.k; gx=t.x; gy=t.y; applyView(view); computeBounds(); redraw(); }
+function zoomReset(){ zReset=true; sel.call(zoom.transform,d3.zoomIdentity); zReset=false; gk=1; gx=0; gy=0; }
 const sel=d3.select(canvas).call(zoom).on("dblclick.zoom",null);
 let anim=null;
 function flyTo(v,cb){
   if(anim){anim.stop();anim=null;}
-  const from={...view}; sel.call(zoom.transform,d3.zoomIdentity); homeView=v;
+  if(ED.globe&&gk!==1) view={...view,s:view.s*gk};
+  const from={...view}; zoomReset(); homeView=v;
   const fin=()=>{ view=v; applyView(view); computeBounds(); draw("hi"); cb&&cb(); };
   if(reduceMotion||!W){ fin(); return; }
   const dl=((v.lon-from.lon+540)%360)-180, dur=700;
@@ -732,7 +749,9 @@ function resize(reset){
   if(!reset && r.width===W && r.height===H) return;
   W=r.width; H=r.height; DPR=Math.min(devicePixelRatio||1,2.5);
   for(const c of [canvas,fx]){ c.width=Math.round(W*DPR); c.height=Math.round(H*DPR); }
+  if(ED.globe){ const g=$('gl'), gd=Math.min(DPR,2); g.width=Math.round(W*gd); g.height=Math.round(H*gd); g.dataset.dpr=gd; } // the globe shader doesn't need more than 2x
   worldScale=fitWorldScale();
+  if(ED.globe&&!reset&&view&&view.s){ applyView(view); computeBounds(); draw("hi"); return; }
   if(keep && !anim){
     applyView(view); computeBounds();
     const p=proj(keep.ll);
@@ -740,7 +759,7 @@ function resize(reset){
   }
   if(anim){ applyView(view); computeBounds(); draw("lo"); return; }
   if(mode&&mode.frame) view=mode.frame(); else view=worldFrame();
-  homeView=view; sel.call(zoom.transform,d3.zoomIdentity); applyView(view); computeBounds(); draw("hi");
+  homeView=view; zoomReset(); applyView(view); computeBounds(); draw("hi");
 }
 new ResizeObserver(()=>resize(false)).observe(stage);
 $('recenter').onclick=()=>{ if(homeView) flyTo(homeView); };
@@ -819,6 +838,56 @@ function snd(kind){ if(!S.sound) return;
       g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.11,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.start(t); o.stop(t+.24); }
   }catch(e){} }
 function buzz(ms){ snd(Array.isArray(ms)?"no":"ok"); try{ navigator.vibrate&&navigator.vibrate(ms); }catch(e){} }
+
+/* ================= the 3D globe (Earth edition): a textured sphere drawn by WebGL ================= */
+const glc=$('gl'); let gl=null, glReady=false, glU={};
+function initGL(){
+  if(!ED.globe) return;
+  gl=glc.getContext('webgl',{antialias:true,premultipliedAlpha:false}); if(!gl) return;
+  const vs=`attribute vec2 a; void main(){ gl_Position=vec4(a,0.,1.); }`;
+  const fs=`precision highp float;
+uniform vec2 uC; uniform float uR; uniform vec2 uRot; uniform sampler2D uTex; uniform float uReady; uniform vec3 uBg1; uniform vec3 uBg2; uniform vec2 uSize;
+void main(){
+  vec2 p=(gl_FragCoord.xy-uC)/uR; float r=length(p);
+  vec3 bg=mix(uBg2,uBg1,gl_FragCoord.y/uSize.y);
+  if(r>1.0){ float glow=smoothstep(1.06,1.0,r)*0.45; gl_FragColor=vec4(mix(bg,vec3(0.78,0.9,1.0),glow),1.0); return; }
+  float c=asin(min(r,1.0)), sc=sin(c), cc=cos(c), phi0=uRot.y, lam0=uRot.x;
+  float phi = r<1e-6 ? phi0 : asin(clamp(cc*sin(phi0)+p.y*sc*cos(phi0)/r,-1.0,1.0));
+  float lam = lam0 + atan(p.x*sc, r*cc*cos(phi0)-p.y*sc*sin(phi0));
+  vec2 uv=vec2(fract((lam+3.14159265)/6.28318531), clamp((1.57079633-phi)/3.14159265,0.0,1.0));
+  vec3 col = uReady>0.5 ? texture2D(uTex,uv).rgb : vec3(0.18,0.40,0.66);
+  float z=sqrt(max(0.0,1.0-r*r));
+  col*=0.74+0.26*z;                                    // soft daylight shading toward the edge
+  col=mix(col,vec3(0.86,0.94,1.0),pow(1.0-z,3.0)*0.38); // thin bright atmosphere at the rim
+  gl_FragColor=vec4(mix(bg,col,smoothstep(1.0,0.994,r)),1.0);
+}`;
+  const sh=(t,src)=>{ const o=gl.createShader(t); gl.shaderSource(o,src); gl.compileShader(o); return o; };
+  const pg=gl.createProgram(); gl.attachShader(pg,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(pg,sh(gl.FRAGMENT_SHADER,fs)); gl.linkProgram(pg);
+  if(!gl.getProgramParameter(pg,gl.LINK_STATUS)){ gl=null; return; }
+  gl.useProgram(pg);
+  const b=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const a=gl.getAttribLocation(pg,'a'); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+  ["uC","uR","uRot","uTex","uReady","uBg1","uBg2","uSize"].forEach(n=>glU[n]=gl.getUniformLocation(pg,n));
+  const tex=gl.createTexture(), img=new Image(); let tries=0;
+  img.onload=()=>{ gl.bindTexture(gl.TEXTURE_2D,tex); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,img);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    glReady=true; if(!$('play').hidden) draw("hi"); };
+  img.onerror=()=>{ if(++tries<4) setTimeout(()=>{ img.src=ED.texture+"?r="+tries; },2500*tries); };
+  img.src=ED.texture;
+}
+const hex=h=>{ const m=(h||"#000").replace("#",""), n=parseInt(m.length===3?m.split("").map(x=>x+x).join(""):m,16); return [(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]; };
+function drawGL(){
+  if(!gl) return;
+  gl.viewport(0,0,glc.width,glc.height);
+  const gd=+glc.dataset.dpr||1; gl.uniform2f(glU.uC,CX()*gd,(H-CY())*gd); gl.uniform1f(glU.uR,proj.scale()*gd);
+  const rt=proj.rotate(); gl.uniform2f(glU.uRot,-rt[0]*Math.PI/180,-rt[1]*Math.PI/180);
+  gl.uniform1i(glU.uTex,0); gl.uniform1f(glU.uReady,glReady?1:0);
+  gl.uniform3fv(glU.uBg1,hex(css.sky1)); gl.uniform3fv(glU.uBg2,hex(css.sky2)); gl.uniform2f(glU.uSize,glc.width,glc.height);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+}
+initGL();
 
 /* ================= play shell ================= */
 let mode=null, xpRun=0, combo=0;
@@ -1671,7 +1740,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1949";
+const APP_VERSION="2026.10.29-2009";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
