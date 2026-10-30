@@ -110,10 +110,10 @@ build('earth', 'Globetrotter Earth',
       '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a>',
       open('tools/earth-map.json').read(), open('tools/earth-meta.json').read(),
       '''const CONTS=[
-  {key:"Oceans & Seas",short:"OS",tok:"c-eu",groups:[["Oceans",["Oceans"]],["Seas around Europe",["Around Europe"]],["Seas around the Americas",["Around the Americas"]],["Seas around Asia",["Around Asia"]],["Seas of Africa, Arabia & Oceania",["Africa, Arabia & Oceania"]]]},
-  {key:"Rivers",short:"RV",tok:"c-oc",groups:[["Rivers of Africa",["Africa"]],["Rivers of the Americas",["The Americas"]],["Rivers of Asia",["Asia"]],["Rivers of Europe & Oceania",["Europe & Oceania"]]]},
-  {key:"Mountains",short:"MT",tok:"c-sa",groups:[["Ranges of Asia",["Ranges of Asia"]],["Ranges of Europe",["Ranges of Europe"]],["Ranges of the Americas",["Ranges of the Americas"]],["Ranges of Africa, Oceania & Antarctica",["Ranges of Africa, Oceania & Antarctica"]],["Famous peaks",["Famous peaks"]]]},
-  {key:"Deserts & Regions",short:"DR",tok:"c-af",groups:[["Deserts",["Deserts"]],["Plains, plateaus & basins",["Plains, plateaus & basins"]],["Peninsulas & regions",["Peninsulas & regions"]]]}
+  {key:"Oceans & Seas",short:"OS",tok:"t-sea",groups:[["Oceans",["Oceans"]],["Seas of Europe & Africa",["Seas of Europe & Africa"]],["Seas of the Americas",["Seas of the Americas"]],["Seas of Asia",["Seas of Asia"]]]},
+  {key:"Rivers",short:"RV",tok:"t-river",groups:[["Rivers of Africa",["Africa"]],["Rivers of the Americas",["The Americas"]],["Rivers of Asia",["Asia"]],["Rivers of Europe & Oceania",["Europe & Oceania"]]]},
+  {key:"Mountains",short:"MT",tok:"t-mtn",groups:[["Mountain ranges",["Mountain ranges"]],["Famous peaks",["Famous peaks"]]]},
+  {key:"Deserts & Regions",short:"DR",tok:"t-desert",groups:[["Deserts",["Deserts"]],["Plains & regions",["Plains & regions"]]]}
 ];
 ''', 'const ALIAS={};\n',
       'globetrotter.earth.v1', 'Oceans & Seas', 'Everything', 'GLOBEEARTH1', 'globetrotter-earth-', 'Globetrotter Earth',
@@ -121,6 +121,7 @@ build('earth', 'Globetrotter Earth',
       extra_head=[('aria-label="World map"', 'aria-label="Map of the Earth"'),
                   ('<button class="tile" id="nbBtn">', '<button class="tile" id="nbBtn" hidden>'),
                   ('<button class="tile" id="chainBtn">', '<button class="tile" id="chainBtn" hidden>')],
-      extra_app=[('const ED={base:()=>null, under:()=>false, otherFill:"land-off"};',
-                  'const ED={base:id=>KIND[id]==="line"?["base",.55]:KIND[id]==="point"?null:"skip", under:id=>BY[id].c==="Oceans & Seas", otherFill:"land"};'),
+      extra_app=[('const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false};',
+                  # globe look: natural land, very faint borders; every place shown faintly in its type's color
+                  'const ED={base:id=>{ const c=css[CONT[BY[id].c].tok]; return KIND[id]==="line"?[c,.5]:KIND[id]==="point"?[c,.55]:[c,.13]; }, under:id=>BY[id].c==="Oceans & Seas", otherFill:"globe-land", itemFill:"globe-land", otherAlpha:.28, hideUnseen:true};'),
                  ('Which country is glowing?', 'Which place is highlighted?')])
