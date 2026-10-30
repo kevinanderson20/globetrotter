@@ -394,7 +394,7 @@ const CONTS=[
   {key:"Oceania",short:"OC",tok:"c-oc",groups:[["Australia & Melanesia",["Australia and New Zealand","Melanesia"]],["Pacific Islands",["Micronesia","Polynesia"]]]}
 ];
 /* how this edition paints its items: countries fill the land; the Earth edition overrides this */
-const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false};
+const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false, proj:null, image:null, grid:true, borderColor:null, dimFill:null, alphaScale:1, targetAlpha:1, targetStroke:null};
 const CONT=Object.fromEntries(CONTS.map(c=>[c.key,c]));
 
 /* ================= map data ================= */
@@ -575,7 +575,15 @@ $('reviewBtn').onclick=()=>startReview();
 const canvas=$('map'), ctx=canvas.getContext('2d'), stage=$('stage'), fx=$('fx'), fctx=fx.getContext('2d');
 let W=0,H=0,DPR=1;
 const sphere={type:"Sphere"}, grat=d3.geoGraticule10();
-const proj=d3.geoEqualEarth().precision(0.4), path=d3.geoPath(proj,ctx);
+const proj=(ED.proj?ED.proj():d3.geoEqualEarth()).precision(0.4), path=d3.geoPath(proj,ctx);
+// satellite imagery (Earth edition): an equirectangular picture of the whole planet, drawn under everything else
+const SAT=ED.image?new Image():null;
+if(SAT){ SAT.onload=()=>{ mKey=""; if(!$('play').hidden) draw("hi"); else drawMastery(); }; SAT.src=ED.image; }
+function drawSat(c,pr){ if(!SAT||!SAT.complete||!SAT.naturalWidth) return false;
+  const s=pr.scale(), t=pr.translate(), r=pr.rotate()[0], w=s*2*Math.PI, h=s*Math.PI, x0=t[0]+s*(-180+r)*Math.PI/180, y0=t[1]-h/2;
+  c.save(); c.beginPath(); c.rect(t[0]-s*Math.PI,y0,w,h); c.clip();
+  for(const dx of [-w,0,w]) c.drawImage(SAT,x0+dx,y0,w,h);
+  c.restore(); return true; }
 let view={lon:10,lat:10,s:1}, zt=d3.zoomIdentity, worldScale=1, homeView=null;
 let css={};
 function readTokens(){ const s=getComputedStyle(document.documentElement);
@@ -636,7 +644,8 @@ function draw(q){
   ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle=css["sea-deep"]; ctx.fillRect(0,0,W,H);
   ctx.setTransform(DPR*k,0,0,DPR*k,DPR*zt.x,DPR*zt.y);
   ctx.beginPath(); path(sphere); ctx.fillStyle=css.sea; ctx.fill();
-  ctx.beginPath(); path(grat); ctx.strokeStyle=css.grat; ctx.lineWidth=.8/k; ctx.stroke();
+  drawSat(ctx,proj);
+  if(ED.grid){ ctx.beginPath(); path(grat); ctx.strokeStyle=css.grat; ctx.lineWidth=.8/k; ctx.stroke(); }
   ctx.lineJoin="round"; ctx.lineCap="round";
   const groups=new Map(), pts=[];
   for(const id of IDS){ if(id===M.target||!hit(BOUNDS[id],r)) continue; let st=M.style(id); if(!st) st=ED.base(id); if(st==="skip") continue;
@@ -647,17 +656,17 @@ function draw(q){
     ctx.beginPath(); ids.forEach(id=>path(set[id]));
     if(kind==="line"){ ctx.globalAlpha=col==="dim"?.3:+a; ctx.strokeStyle=col==="base"?css.river:col==="dim"?css.border:col; ctx.lineWidth=(col==="base"||col==="dim"||+a<.6?1.5:3.2)/k; ctx.stroke(); ctx.globalAlpha=1; return; }
     if(col==="base"){ ctx.fillStyle=css[ED.itemFill]; ctx.fill(); }
-    else if(col==="dim"){ if(under==="1") return; ctx.fillStyle=css["land-dim"]; ctx.fill(); }
-    else { if(under!=="1"){ ctx.fillStyle=css[ED.itemFill]; ctx.fill(); } ctx.globalAlpha=+a; ctx.fillStyle=col; ctx.fill(); ctx.globalAlpha=1; }
+    else if(col==="dim"){ if(under==="1") return; ctx.fillStyle=ED.dimFill||css["land-dim"]; ctx.fill(); }
+    else { if(under!=="1"&&ED.itemFill){ ctx.fillStyle=css[ED.itemFill]; ctx.fill(); } ctx.globalAlpha=Math.min(1,+a*ED.alphaScale); ctx.fillStyle=col; ctx.fill(); ctx.globalAlpha=1; }
     ctx.strokeStyle=css.border; ctx.lineWidth=.7/k; ctx.stroke();
   };
   const tgt=()=>{ const id=M.target, kd=KIND[id]; if(kd==="point") return;
     ctx.beginPath(); path(set[id]);
     if(kd==="line"){ ctx.strokeStyle=css.surface; ctx.lineWidth=8/k; ctx.stroke(); ctx.strokeStyle=M.targetColor; ctx.lineWidth=4.5/k; ctx.stroke(); return; }
-    ctx.fillStyle=M.targetColor; ctx.fill(); ctx.strokeStyle=css.ink; ctx.lineWidth=1.4/k; ctx.stroke(); };
+    ctx.globalAlpha=ED.targetAlpha; ctx.fillStyle=M.targetColor; ctx.fill(); ctx.globalAlpha=1; ctx.strokeStyle=ED.targetStroke||css.ink; ctx.lineWidth=(ED.targetStroke?2.2:1.4)/k; ctx.stroke(); };
   for(const [key,ids] of groups) if(key.endsWith("|1")) paint(key,ids);   // seas sit under the land
   if(M.target&&ED.under(M.target)) tgt();
-  ctx.beginPath(); OTHER[q].forEach(f=>path(f)); ctx.fillStyle=css[ED.otherFill]; ctx.fill(); ctx.globalAlpha=ED.otherAlpha; ctx.strokeStyle=css.border; ctx.lineWidth=.5/k; ctx.stroke(); ctx.globalAlpha=1;
+  ctx.beginPath(); OTHER[q].forEach(f=>path(f)); if(ED.otherFill){ ctx.fillStyle=css[ED.otherFill]; ctx.fill(); } ctx.globalAlpha=ED.otherAlpha; ctx.strokeStyle=ED.borderColor||css.border; ctx.lineWidth=.5/k; ctx.stroke(); ctx.globalAlpha=1;
   for(const [key,ids] of groups) if(key.endsWith("|0")&&!key.includes("|line|")) paint(key,ids);
   for(const [key,ids] of groups) if(key.includes("|line|")) paint(key,ids);   // rivers on top of land areas
   if(M.target&&!ED.under(M.target)) tgt();
@@ -1232,7 +1241,7 @@ function drawMastery(){
   const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
   mProj.fitExtent([[3,3],[w-3,h-3]],sphere); const pp=d3.geoPath(mProj,g);
   g.beginPath(); pp(sphere); g.fillStyle=css.sea; g.fill();
-  g.beginPath(); OTHER.lo.forEach(f=>pp(f)); g.fillStyle=css["land-off"]; g.fill();
+  if(!drawSat(g,mProj)){ g.beginPath(); OTHER.lo.forEach(f=>pp(f)); g.fillStyle=css["land-off"]; g.fill(); }
   const cols=MCOL(), groups=[[],[],[],[]]; IDS.forEach(id=>groups[level(id)].push(id));
   groups.forEach((ids,l)=>{ const polys=ids.filter(id=>KIND[id]==="poly"&&!(l===0&&ED.hideUnseen)), lines=ids.filter(id=>KIND[id]==="line");
     if(polys.length){ g.beginPath(); polys.forEach(id=>pp(F.lo[id])); g.fillStyle=cols[l]; g.fill(); g.strokeStyle=css.border; g.lineWidth=.35; g.stroke(); }
@@ -1668,7 +1677,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-1944";
+const APP_VERSION="2026.10.29-1949";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;

@@ -102,7 +102,7 @@ build('usa', 'Globetrotter USA',
                  ('const mProj=d3.geoEqualEarth().rotate([-11,0]);', 'const mProj=d3.geoAlbersUsa();'),
                  ('const h=Math.round(w/2.05);', 'const h=Math.round(w/1.6);'),
                  ('mProj.fitExtent([[3,3],[w-3,h-3]],sphere); const pp=d3.geoPath(mProj,g);', 'mProj.fitExtent([[6,6],[w-6,h-6]],{type:"FeatureCollection",features:IDS.map(id=>F.lo[id])}); const pp=d3.geoPath(mProj,g);'),
-                 ('g.beginPath(); pp(sphere); g.fillStyle=css.sea; g.fill();\n  g.beginPath(); OTHER.lo.forEach(f=>pp(f)); g.fillStyle=css["land-off"]; g.fill();', 'g.fillStyle=css.sea; g.fillRect(0,0,w,h);'),
+                 ('g.beginPath(); pp(sphere); g.fillStyle=css.sea; g.fill();\n  if(!drawSat(g,mProj)){ g.beginPath(); OTHER.lo.forEach(f=>pp(f)); g.fillStyle=css["land-off"]; g.fill(); }', 'g.fillStyle=css.sea; g.fillRect(0,0,w,h);'),
                  (None, tighten_frames)])
 
 # ---------------- Earth ----------------
@@ -120,8 +120,11 @@ build('earth', 'Globetrotter Earth',
       'place', 'places', 'category',
       extra_head=[('aria-label="World map"', 'aria-label="Map of the Earth"'),
                   ('<button class="tile" id="nbBtn">', '<button class="tile" id="nbBtn" hidden>'),
-                  ('<button class="tile" id="chainBtn">', '<button class="tile" id="chainBtn" hidden>')],
-      extra_app=[('const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false};',
-                  # globe look: natural land, very faint borders; every place shown faintly in its type's color
-                  'const ED={base:id=>{ const c=css[CONT[BY[id].c].tok]; return KIND[id]==="line"?[c,.5]:KIND[id]==="point"?[c,.55]:[c,.13]; }, under:id=>BY[id].c==="Oceans & Seas", otherFill:"globe-land", itemFill:"globe-land", otherAlpha:.28, hideUnseen:true};'),
+                  ('<button class="tile" id="chainBtn">', '<button class="tile" id="chainBtn" hidden>'),
+                  ('#mmap{width:100%;aspect-ratio:2.05/1;', '#mmap{width:100%;aspect-ratio:2/1;')],
+      extra_app=[('const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false, proj:null, image:null, grid:true, borderColor:null, dimFill:null, alphaScale:1, targetAlpha:1, targetStroke:null};',
+                  # satellite look: NASA Blue Marble imagery (public domain) under faint borders; each place in its type's color
+                  'const ED={base:id=>{ if(BY[id].c==="Oceans & Seas") return "skip"; const c=css[CONT[BY[id].c].tok]; return KIND[id]==="line"?[c,.6]:KIND[id]==="point"?[c,.55]:[c,.16]; }, under:id=>BY[id].c==="Oceans & Seas", otherFill:null, itemFill:null, otherAlpha:.35, hideUnseen:true, proj:()=>d3.geoEquirectangular(), image:"blue-marble.jpg", grid:false, borderColor:"rgba(255,255,255,.6)", dimFill:"rgba(0,0,0,.45)", alphaScale:.75, targetAlpha:.6, targetStroke:"#ffffff"};'),
+                 ('const mProj=d3.geoEqualEarth().rotate([-11,0]);', 'const mProj=d3.geoEquirectangular();'),
+                 ('const h=Math.round(w/2.05);', 'const h=Math.round(w/2);'),
                  ('Which country is glowing?', 'Which place is highlighted?')])
