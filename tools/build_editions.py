@@ -1,4 +1,4 @@
-"""Builds the USA and Earth editions from the World edition's index.html.
+"""Builds the USA and Earth editions, and the 640 Test 2 study guide, from the World edition's index.html.
 
 All three editions run the same app code. Each edition swaps in its own data:
   usa/    the 50 states. Census regions stand in for continents, Census divisions for regions.
@@ -44,7 +44,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     head = rep(head, '<title>Globetrotter</title>', f'<title>{title}</title>', 1)
     for icon in ('icon-180.png', 'icon-192.png', 'manifest.webmanifest'):
         head = rep(head, f'href="{icon}"', f'href="../{icon}"', 1)
-    head = rep(head, '<a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a>', tabs, 1)
+    head = rep(head, '<a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a><a href="test2/">640 Test 2</a>', tabs, 1)
     head = rep(head, 'Every country in a region', f'Every {unit} in a {region_word}', 1)
     for a, b in extra_head:
         head = rep(head, a, b)
@@ -81,7 +81,7 @@ def tighten_frames(app):  # states are small: shrink the minimum zoom spans used
 
 # ---------------- USA ----------------
 build('usa', 'Globetrotter USA',
-      '<a href="../">World</a><a href="./" aria-current="page">USA</a><a href="../earth/">Earth</a>',
+      '<a href="../">World</a><a href="./" aria-current="page">USA</a><a href="../earth/">Earth</a><a href="../test2/">640 Test 2</a>',
       open('tools/us-map.json').read(), open('tools/us-meta.json').read(),
       '''const CONTS=[
   {key:"West",short:"W",tok:"c-sa",groups:[["Pacific",["Pacific"]],["Mountain West",["Mountain West"]]]},
@@ -107,7 +107,7 @@ build('usa', 'Globetrotter USA',
 
 # ---------------- Earth ----------------
 build('earth', 'Globetrotter Earth',
-      '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a>',
+      '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a><a href="../test2/">640 Test 2</a>',
       open('tools/earth-map.json').read(), open('tools/earth-meta.json').read(),
       '''const CONTS=[
   {key:"Oceans & Seas",short:"OS",tok:"t-sea",groups:[["Oceans",["Oceans"]],["Seas of Europe & Africa",["Seas of Europe & Africa"]],["Seas of the Americas",["Seas of the Americas"]],["Seas of Asia",["Seas of Asia"]]]},
@@ -128,3 +128,16 @@ build('earth', 'Globetrotter Earth',
                  ('const mProj=d3.geoEqualEarth().rotate([-11,0]);', 'const mProj=d3.geoEquirectangular();'),
                  ('const h=Math.round(w/2.05);', 'const h=Math.round(w/2);'),
                  ('Which country is glowing?', 'Which place is highlighted?')])
+
+# ---------------- 640 Test 2 (a study guide, not a map edition) ----------------
+# Assembled from tools/test2/: page.html is the shell and styles; content.js holds every card and question.
+T2 = 'tools/test2/'
+page = open(T2 + 'page.html', encoding='utf-8').read()
+for mark, fname in (('/*CONTENT*/', 'content.js'), ('/*PROBLEMS*/', 'problems.js'), ('/*APP*/', 'app.js')):
+    code = open(T2 + fname, encoding='utf-8').read()
+    if fname == 'app.js':
+        code = rep(code, 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
+    page = rep(page, mark, code, 1)
+os.makedirs('test2', exist_ok=True)
+open('test2/index.html', 'w', encoding='utf-8').write(page)
+print('test2/index.html', len(page), VERSION)

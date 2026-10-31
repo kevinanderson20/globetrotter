@@ -142,6 +142,9 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tabs{margin-left:auto;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;flex:none}
 .tabs a{padding:7px 10px;border-radius:999px;font-weight:700;font-size:13px;color:var(--ink-2);text-decoration:none;min-height:20px}
 .tabs a[aria-current="page"]{background:var(--ink);color:var(--surface)}
+.brand{flex-wrap:wrap;row-gap:12px}
+.tabs{order:3;flex:1 1 100%;margin-left:0;display:grid;grid-template-columns:1fr 1fr 1fr 1.35fr}
+.tabs a{text-align:center;white-space:nowrap;padding:7px 6px}
 .wbtns{display:flex;gap:8px;flex-wrap:wrap}
 .wbtn{flex:1 1 0;min-width:96px;min-height:48px;border:2px solid var(--wc);border-bottom-width:4px;background:color-mix(in srgb,var(--wc) 12%,var(--surface));border-radius:14px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;text-align:left}
 .wbtn i{width:10px;height:10px;border-radius:3px;background:var(--wc);flex:none}
@@ -307,7 +310,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="brand">
     <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="var(--sea)"/><path d="M9 13c3-3 6-2 8 0s1 5-2 6-3 4-1 6M22 8c2 2 5 3 6 6s-1 5-3 5-3 3-1 5" fill="none" stroke="var(--c-na)" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="18" r="16" fill="none" stroke="var(--ink)" stroke-width="2"/><circle cx="28" cy="8" r="4" fill="var(--sun)" stroke="var(--ink)" stroke-width="2"/></svg>
     <h1>Globetrotter</h1>
-    <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a></nav>
+    <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a><a href="../test2/">640 Test 2</a></nav>
   </div>
   <div class="chips" id="chips"></div>
   <button class="next" id="nextBtn"></button>
@@ -474,7 +477,7 @@ function syncText(){ setSync(!saveOk?"This browser is blocking saving. Progress 
 setTimeout(syncText,0);
 if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")){
   {
-    navigator.serviceWorker.register("../sw.js").then(()=>navigator.serviceWorker.ready).then(()=>caches.has("globetrotter-v4")).then(has=>{ offlineReady=has; syncText(); }).catch(()=>{});
+    navigator.serviceWorker.register("../sw.js").then(()=>navigator.serviceWorker.ready).then(()=>caches.has("globetrotter-v5")).then(has=>{ offlineReady=has; syncText(); }).catch(()=>{});
     navigator.serviceWorker.addEventListener("message",e=>{ if(e.data==="cached"){ offlineReady=true; syncText(); } });
   }
 }
@@ -1741,7 +1744,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.10.29-2009";
+const APP_VERSION="2026.10.31-1431";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
@@ -1751,7 +1754,7 @@ async function checkUpdate(){
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v4"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v5"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==="visible") checkUpdate(); });
