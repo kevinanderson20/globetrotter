@@ -133,7 +133,7 @@ build('earth', 'Globetrotter Earth',
 # Assembled from tools/test2/: page.html is the shell and styles; content.js holds every card and question.
 T2 = 'tools/test2/'
 page = open(T2 + 'page.html', encoding='utf-8').read()
-for mark, fname in (('/*CONTENT*/', 'content.js'), ('/*PROBLEMS*/', 'problems.js'), ('/*APP*/', 'app.js')):
+for mark, fname in (('/*CONTENT*/', 'content.js'), ('/*PROBLEMS*/', 'problems.js'), ('/*VIZ*/', 'viz.js'), ('/*APP*/', 'app.js')):
     code = open(T2 + fname, encoding='utf-8').read()
     if fname == 'app.js':
         code = rep(code, 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)

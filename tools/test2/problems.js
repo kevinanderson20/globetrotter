@@ -94,6 +94,7 @@ function genT1(){
   else { const a=vals[rnd(k-2)], b=a+2; ev={sym:`P(${a} < X ≤ ${b})`, w:`more than ${a} but at most ${b}`, v:vals.filter(x=>x>a&&x<=b), wrong:[vals.filter(x=>x>=a&&x<=b), vals.filter(x=>x>a&&x<b), vals.filter(x=>x>=a&&x<b)]}; }
   if(ctx.evNum) ev.w=ev.w.replace("fewer than","lower than").replace("more than","higher than");
   const pv=ev.v.reduce((s,x)=>s+P[vals.indexOf(x)],0);
+  const BARS=`${vals.join(",")};${P.map(x=>+x.toFixed(4)).join(",")}`;
   const tbl=`<table class="dt"><tr><th>${ctx.head[0]}</th><th>${ctx.head[1]}</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${cnt[i]}</td></tr>`).join("")}</table>`;
   const sumE=vals.map((x,i)=>`${x}×${fnum(P[i])}`).join(" + ");
   const opts=uniqOpts(list(ev.v), ev.wrong.filter(w=>w.length).map(list));
@@ -104,19 +105,19 @@ function genT1(){
     model:`X assumes a finite number of values (specifically, ${k}), and therefore it is discrete.`},
    {label:"b", q:"Use the information in the table to find the probability distribution for X.",
     steps:[{k:"multi", q:`Divide each count by ${N}. Enter P(x):`, fields:vals.map((x,i)=>({l:`P(${x})`, ans:P[i]})), tol:.0006, o:["P2","D2"]}],
-    model:`We have a total of ${N} observations, so divide each count by ${N}:<table class="dt"><tr><th>x</th>${vals.map(x=>`<td>${x}</td>`).join("")}</tr><tr><th>P(x)</th>${P.map(p=>`<td>${fnum(p)}</td>`).join("")}</tr></table>Check: each is between 0 and 1, and they sum to 1.`},
+    model:`We have a total of ${N} observations, so divide each count by ${N}:<table class="dt"><tr><th>x</th>${vals.map(x=>`<td>${x}</td>`).join("")}</tr><tr><th>P(x)</th>${P.map(p=>`<td>${fnum(p)}</td>`).join("")}</tr></table>Check: each is between 0 and 1, and they sum to 1.[[bars:${BARS}|cap=The distribution of X as bars]]`},
    {label:"c", q:`Find the probability that ${ctx.ev(ev.w)}, that is, ${ev.sym}.`,
     steps:[mcShuffle({k:"mc", q:`Which values of X make ${ev.sym} true?`, c:opts, a:0, e:"Watch strict versus non-strict inequalities: \"fewer than\" and \"more than\" exclude the boundary, \"at least\" and \"at most\" include it.", o:["D1","P3"]}),
            {k:"num", q:`${ev.sym} = ?`, ans:pv, tol:.0006, o:["P3"]}],
-    model:`${ev.sym} = ${ev.v.map(x=>`P(X = ${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}<br>We may add because different values of X are mutually exclusive events.`},
+    model:`${ev.sym} = ${ev.v.map(x=>`P(X = ${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}<br>We may add because different values of X are mutually exclusive events.[[bars:${BARS}|hl=${ev.v.join(",")}|cap=${ev.sym}: the highlighted bars]]`},
    {label:"d", q:"Find the expected value of X and practically interpret the result.",
     steps:[{k:"num", q:"E[X] = Σ x·P(x) = ?", ans:E, tol:.006, o:["D3"]},
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:interpOpts, a:0, ce:["Full credit: an average, what it's averaged over, context and units.","Partial: it says average, but not of what. That's where the meaning of E[X] lives.","No credit: E[X] is not a prediction of one result.","No credit: E[X] is not the most likely value; it may not even be a possible value."], e:"E[X] is an average over the set (or over many repetitions), never a prediction.", o:["D3"]})],
-    model:`E[X] = Σ x·P(x) = ${sumE} = ${fnum(E)}<br>Interpretation: ${ctx.interp(Er,N)}`},
+    model:`E[X] = Σ x·P(x) = ${sumE} = ${fnum(E)}<br>Interpretation: ${ctx.interp(Er,N)}[[bars:${BARS}|E=${fnum(E)}|cap=The mean is the balance point of the bars]]`},
    {label:"e", q:"Find the standard deviation of X.",
     steps:[{k:"num", q:"Var(X) = Σ (x − E[X])²·P(x) = ?", ans:V, tol:.006, o:["D3"]},
            {k:"num", q:"SD(X) = √Var(X) = ?", ans:SD, tol:.006, o:["D3"]}],
-    model:`<table class="dt sm"><tr><th>x</th><th>P(x)</th><th>x − E[X]</th><th>(x − E[X])²</th><th>P(x)(x − E[X])²</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${fnum(P[i])}</td><td>${fnum(dev[i])}</td><td>${f4(sq[i])}</td><td>${f4(prod[i])}</td></tr>`).join("")}</table>Var(X) = ${prod.map(f4).join(" + ")} = ${f4(V)}<br>SD(X) = √${f4(V)} = ${f4(SD)} ${ctx.unit}`}
+    model:`<table class="dt sm"><tr><th>x</th><th>P(x)</th><th>x − E[X]</th><th>(x − E[X])²</th><th>P(x)(x − E[X])²</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${fnum(P[i])}</td><td>${fnum(dev[i])}</td><td>${f4(sq[i])}</td><td>${f4(prod[i])}</td></tr>`).join("")}</table>Var(X) = ${prod.map(f4).join(" + ")} = ${f4(V)}<br>SD(X) = √${f4(V)} = ${f4(SD)} ${ctx.unit}[[bars:${BARS}|E=${fnum(E)}|sd=${f4(SD)}|cap=Shaded band: one SD either side of the mean]]`}
   ];
   return {tpl:1, title:ctx.name, setup:ctx.setup(N)+tbl, parts};
 }
@@ -183,26 +184,26 @@ function genT2(){
         e:"Define X in words, name the structure, then X ~ B(n, p).", o:["D1","D4"]}),
       mcShuffle({k:"mc", q:`Which values of X?`, c:uniqOpts(list([allNone]), [list([allNone===n?0:n]), list(allNone===n?range(1,n):range(0,1)), allNone===n?`X ≥ 1`:`X ≤ 1`]), a:0, e:allNone===n?"All of them succeed: X = n.":"None succeed: X = 0.", o:["D5"]}),
       {k:"num", q:`P(X = ${allNone}) = ?`, ans:ta.v, tol:.0015, o:["D5","P5"]}],
-    model:`${Xdef} Since this random variable can be represented as a number of successes in ${n} identical independent trials, X ~ B(${n}, ${ps}).<br>P(X = ${allNone}) = ${allNone===n?`${ps}${sup(n)}`:`${qs}${sup(n)}`} = ${f4(ta.v)}`},
+    model:`${Xdef} Since this random variable can be represented as a number of successes in ${n} identical independent trials, X ~ B(${n}, ${ps}).<br>P(X = ${allNone}) = ${allNone===n?`${ps}${sup(n)}`:`${qs}${sup(n)}`} = ${f4(ta.v)}[[binom:${n},${ps}|hl=${allNone}]]`},
    {label:"b", q:bQ,
     steps:[mcShuffle({k:"mc", q:"Which value of X?", c:uniqOpts(list([xb]), [list([kf]), `X ≤ ${kf}`, `X ≥ ${xb}`, list([Math.max(0,xb-1)])]), a:0, e:`X counts ${ctx.xs}. ${kf} failure${kf>1?"s":""} out of ${n} leaves ${xb} successes.`, o:["D5"]}),
            {k:"num", q:`P(X = ${xb}) = ?`, ans:tb.v, tol:.0015, o:["D5","P5"]}],
-    model:`${kf} ${kf===1?ctx.who[0]:ctx.who[1]} that ${kf===1?ctx.no[0]:ctx.no[1]} out of ${n} means X = ${xb}.<br>${tb.line}`},
+    model:`${kf} ${kf===1?ctx.who[0]:ctx.who[1]} that ${kf===1?ctx.no[0]:ctx.no[1]} out of ${n} means X = ${xb}.<br>${tb.line}[[binom:${n},${ps}|hl=${xb}]]`},
    {label:"c", q:cQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(cv,cWrong), a:0, e:"\"At least\" and \"at most\" include the boundary.", o:["D5","P3"]}),
            ...(cK==="ge1"?[mcShuffle({k:"mc", q:"Quickest route?", c:["1 − P(X = 0)",`P(X = 1)`,`${n} × ${ps}`,`P(X = 0)`], a:0, e:"The complement of \"at least one\" is \"none\".", o:["P3"]})]:[]),
            {k:"num", q:`${cSym} = ?`, ans:cAns, tol:.002, o:["D5","P3","P4"]}],
-    model:cModel},
+    model:cModel+(cK==="ge1"?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=0|cap=${cSym}: 1 minus the red bar]]`:cK==="le"&&hiP?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=${n}|cap=${cSym}: 1 minus the red bar]]`:`[[binom:${n},${ps}|hl=${cv.join(",")}|cap=${cSym}: the highlighted bars]]`)},
    {label:"d", q:dQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(dv,[range(a,b), range(a,b-1), range(a+1,b)]), a:0, e:"Both inequalities are strict for a discrete X.", o:["D5","P3"]}),
            mcShuffle({k:"mc", q:"Why may you add these probabilities?", c:["The values of X are mutually exclusive events","The trials are independent","X is binomial","Each probability is less than 1"], a:0, e:"Mutual exclusivity justifies adding across values; independence justifies multiplying inside each term.", o:["P4"]}),
            {k:"num", q:`${dSym} = ?`, ans:dAns, tol:.002, o:["D5","P3"]}],
-    model:`${dSym} = ${dv.map(x=>`P(X = ${x})`).join(" + ")}<br>${td.map(t=>t.line).join("<br>")}<br>${dSym} = ${td.map(t=>f4(t.v)).join(" + ")} = ${f4(dAns)}`},
+    model:`${dSym} = ${dv.map(x=>`P(X = ${x})`).join(" + ")}<br>${td.map(t=>t.line).join("<br>")}<br>${dSym} = ${td.map(t=>f4(t.v)).join(" + ")} = ${f4(dAns)}[[binom:${n},${ps}|hl=${dv.join(",")}|cap=${dSym}: the highlighted bars]]`},
    {label:"e", q:`Find the expected number of ${ctx.xs} and practically interpret it.`,
     steps:[{k:"num", q:"E[X] = np = ?", ans:E, tol:.006, o:["D3"]},
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:[interp, `On average, ${fnum(E)} ${ctx.succ}.`, `${fnum(E)} of the ${n} ${ctx.who[1]} will ${ctx.yes[1]}.`, `${fnum(E)} is the most likely number of ${ctx.succ}.`], a:0,
              ce:["Full credit: average, over many repetitions, in context.","Partial: an average of what? Say it's over many repetitions of the experiment.","No credit: a prediction of one result. A count can't even be a decimal.","No credit: E[X] is not the most likely value."], e:"An average over many repetitions of the same experiment.", o:["D3"]})],
-    model:`E[X] = np = ${n} × ${ps} = ${fnum(E)}<br>Interpretation: ${interp}`}
+    model:`E[X] = np = ${n} × ${ps} = ${fnum(E)}<br>Interpretation: ${interp}[[binom:${n},${ps}|E=${fnum(E)}|cap=E = np sits at the balance point of the bars]]`}
   ];
   return {tpl:2, title:ctx.name, setup:ctx.intro(n,p)+" Find the following probabilities:", parts};
 }
@@ -262,6 +263,8 @@ function genT3(){
   const tol=Math.max(.011*ctx.sd+.02, ctx.int?.6:0);
   const lookup=cut.P<.5?`${cut.name}: ${cut.why}. The table only has positive z, so look up ${r2(1-cut.P)}: the closest table probability is ${f4(zf.t)} at z = ${fz(-zf.z)}${zf.alt!=null?` (or ${fz(-zf.alt)})`:""}. By symmetry the ${cut.name} has z = ${fz(zf.z)}.`
     :`We need the ${cut.name} (${cut.why}). The closest table probability to ${cut.P} is ${f4(zf.t)}, for z = ${fz(zf.z)}${zf.alt!=null?` (${fz(zf.alt)} is equally close; either is fine if you say which)`:""}.`;
+  const svc=cut.why.startsWith("P(demand");
+  const cutViz=`[[normal:${ctx.mu},${ctx.sd}|${svc?`cutl=${fnum(xc)},${pctS(cut.P)}%`:cut.P>=.5?`cutr=${fnum(xc)},top ${pctS(r4(1-cut.P))}%`:`cutl=${fnum(xc)},bottom ${pctS(cut.P)}%`}]]`;
   const pctOpts=uniqOpts(`The ${cut.name}`, [`The ${pctName(1-cut.P)}`, `P(X > ${Math.round(cut.P*100)})`, `μ + ${Math.round(cut.P*100)}%`]);
   // (b) above or below
   const bk=pick(["aboveHi","belowLo","belowHi","aboveLo"]);
@@ -275,7 +278,7 @@ function genT3(){
   else { bAns=t; bq=ctx.above(bx); bModel=`By symmetry, P(X > ${bx}) = P(Z > ${fz(bz)}) = P(Z < ${az}) = ${f4(t)}`; bSent=ctx.sAbove(bx,pctS(bAns)); }
   // (c) between: either both above the mean, or straddling it
   let c1,c2;
-  if(Math.random()<.5){ c1=nx(ctx,.3,1.1,1); c2=nx(ctx,1.2,2.3,1); }
+  if(Math.random()<.5){ c1=nx(ctx,.3,1.1,1); c2=nx(ctx,Math.max(1.2,Math.abs(c1.z)+.5),2.4,1); }
   else { c1=nx(ctx,.4,1.6,-1); c2=nx(ctx,.4,1.8,1); }
   const p1=phi(c1.z), p2=phi(c2.z), cAns=r4(p2-p1);
   const p1txt=c1.z<0?`P(X < ${c1.x}) = P(Z < ${fz(c1.z)}) = 1 − P(Z < ${fz(-c1.z)}) = 1 − ${f4(phi(-c1.z))} = ${f4(p1)}`:`P(X < ${c1.x}) = P(Z < ${fz(c1.z)}) = ${f4(p1)}`;
@@ -284,16 +287,16 @@ function genT3(){
     steps:[mcShuffle({k:"mc", q:"What are you looking for?", c:pctOpts, a:0, e:`${cut.why}.`, o:["C5"]}),
            {k:"num", q:"z from the table = ?", ans:zf.z, alt:zf.alt, tol:.0051, o:["C4","C5"]},
            {k:"num", q:`x = μ + zσ = ? (${ctx.unit})`, ans:xc, alt:xAlt, tol, o:["C5","C6"]}],
-    model:`${lookup}<br>x = μ + zσ = ${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)} ${ctx.unit}${xAlt!=null?` (with z = ${fz(zf.alt)}: ${fnum(xAlt)})`:""}<br>${cut.c(xc)}`},
+    model:`${lookup}<br>x = μ + zσ = ${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)} ${ctx.unit}${xAlt!=null?` (with z = ${fz(zf.alt)}: ${fnum(xAlt)})`:""}<br>${cut.c(xc)}${cutViz}`},
    {label:"b", q:bq,
     steps:[{k:"num", q:"z = (x − μ)/σ = ?", ans:bz, tol:.0051, o:["C5"]},
            {k:"num", q:"Probability (as a decimal) = ?", ans:bAns, tol:.0015, pct:true, o:["C4","P3"]}],
-    model:`${zLine(bx,ctx,bz)}<br>The table gives P(Z < ${az}) = ${f4(t)}.<br>${bModel}<br>${bSent}`},
+    model:`${zLine(bx,ctx,bz)}<br>The table gives P(Z < ${az}) = ${f4(t)}.<br>${bModel}<br>${bSent}[[normal:${ctx.mu},${ctx.sd}|${bk.startsWith("above")?"gt":"lt"}=${bx}]]`},
    {label:"c", q:ctx.between(c1.x,c2.x),
     steps:[{k:"num", q:`z for ${c1.x} = ?`, ans:c1.z, tol:.0051, o:["C5"]},
            {k:"num", q:`z for ${c2.x} = ?`, ans:c2.z, tol:.0051, o:["C5"]},
            {k:"num", q:"Probability (as a decimal) = ?", ans:cAns, tol:.0015, pct:true, o:["C4","P3"]}],
-    model:`P(${c1.x} < X < ${c2.x}) = P(X < ${c2.x}) − P(X < ${c1.x})<br>${zLine(c2.x,ctx,c2.z)} → P(X < ${c2.x}) = ${f4(p2)}<br>${zLine(c1.x,ctx,c1.z)} → ${p1txt}<br>P(${c1.x} < X < ${c2.x}) = ${f4(p2)} − ${f4(p1)} = ${f4(cAns)}<br>${ctx.sBetween(c1.x,c2.x,pctS(cAns))}`}
+    model:`P(${c1.x} < X < ${c2.x}) = P(X < ${c2.x}) − P(X < ${c1.x})<br>${zLine(c2.x,ctx,c2.z)} → P(X < ${c2.x}) = ${f4(p2)}<br>${zLine(c1.x,ctx,c1.z)} → ${p1txt}<br>P(${c1.x} < X < ${c2.x}) = ${f4(p2)} − ${f4(p1)} = ${f4(cAns)}<br>${ctx.sBetween(c1.x,c2.x,pctS(cAns))}[[normal:${ctx.mu},${ctx.sd}|btw=${c1.x},${c2.x}]]`}
   ];
   return {tpl:3, title:ctx.name, setup:ctx.setup, parts};
 }
@@ -320,27 +323,28 @@ const DRILLS={
    else if(kind==="one"){ return {q:`${what}. Fastest way to get P(at least one)?`, c:["1 − P(X = 0)","P(X = 1)",`P(X = 1) + ... + P(X = ${n}), term by term`,`1 − P(X = ${n})`], a:0, e:"The opposite of \"at least one\" is \"none\".", o:["P3","D5"]}; }
    else { const k=pick([5,10,15,20,25]); const top=kind==="top"; const name=top?pctName((100-k)/100):pctName(k/100);
      return {q:top?`Normal X. \"The lowest value that still makes the top ${k}%\" is the...`:`Normal X. \"The highest value that is still in the bottom ${k}%\" is the...`,
-       c:[name, top?pctName(k/100):pctName((100-k)/100), `P(X > ${k})`, `μ ${top?"+":"−"} ${k}%`], a:0, e:top?`${k}% lie above it, so ${100-k}% lie below it.`:`${k}% lie below it.`, o:["C5"]}; }
-   return {q:`${what}. \"${q}\" means:`, c:uniqOpts(list(v), wrong.filter(w=>w.length).map(list)), a:0, e, o}; }},
+       c:[name, top?pctName(k/100):pctName((100-k)/100), `P(X > ${k})`, `μ ${top?"+":"−"} ${k}%`], a:0, e:top?`${k}% lie above it, so ${100-k}% lie below it.`:`${k}% lie below it.`, o:["C5"], v:`[[normal:0,1|${top?`cutr=${zFor(1-k/100).z},top ${k}%`:`cutl=${(-zFor(1-k/100).z)},bottom ${k}%`}]]`}; }
+   return {q:`${what}. \"${q}\" means:`, c:uniqOpts(list(v), wrong.filter(w=>w.length).map(list)), a:0, e, o, v:`[[binom:${n},${ctx.p[0]}|hl=${v.join(",")}|cap=${q}: the highlighted bars]]`}; }},
  ztable:{title:"Table reading", sub:"z → area, area → z, with symmetry", gen(){
    const kind=pick(["below","above","negbelow","negabove","inverse","inverse"]);
    const r=3+rnd(23), c=rnd(10), z=(r*10+c)/100, t=ZT[r][c], zs=z.toFixed(2);
    const f=x=>x.toFixed(4);
    if(kind==="inverse"){ const P=pick([.8,.85,.9,.95,.975,.99,.75,.7,.6]); const zf=zFor(P);
      const c4=numOpts(zf.z,[zf.z+.01*(1+rnd(3)),-zf.z,r2(P),zf.z-.1],x=>x.toFixed(2));
-     return {q:`Which z has about ${Math.round(P*1000)/10}% of the area to its LEFT?`, c:c4.map(x=>x.toFixed(2).replace("-","−")), a:0, e:`Find the probability closest to ${P} inside the table: ${f(zf.t)} at z = ${zf.z.toFixed(2)}${zf.alt!=null?` (or ${zf.alt.toFixed(2)})`:""}.`, o:["C4","C5"]}; }
+     return {q:`Which z has about ${Math.round(P*1000)/10}% of the area to its LEFT?`, c:c4.map(x=>x.toFixed(2).replace("-","−")), a:0, e:`Find the probability closest to ${P} inside the table: ${f(zf.t)} at z = ${zf.z.toFixed(2)}${zf.alt!=null?` (or ${zf.alt.toFixed(2)})`:""}.`, o:["C4","C5"], v:`[[normal:0,1|lt=${zf.z}]][[zt:${zf.z}]]`}; }
    let q,ans,e;
    if(kind==="below"){ q=`P(Z < ${zs}) = ?`; ans=t; e=`Read row ${zs.slice(0,3)}, column 0.0${zs[3]}: the table gives area to the left.`; }
    else if(kind==="above"){ q=`P(Z > ${zs}) = ?`; ans=r4(1-t); e=`Complement: 1 − ${f(t)} = ${f(1-t)}.`; }
    else if(kind==="negbelow"){ q=`P(Z < −${zs}) = ?`; ans=r4(1-t); e=`Symmetry: P(Z < −${zs}) = 1 − P(Z < ${zs}) = 1 − ${f(t)} = ${f(1-t)}.`; }
    else { q=`P(Z > −${zs}) = ?`; ans=t; e=`Symmetry: the area right of −${zs} equals the area left of ${zs}: ${f(t)}.`; }
    const c4=numOpts(ans,[r4(1-ans), ZT[Math.min(30,r+1)][c], r4(t-.5), ZT[r][(c+1)%10]],f);
-   return {q, c:c4.map(f), a:0, e, o:["C4"]}; }},
+   const zz=kind.startsWith("neg")?-z:z, side=kind.endsWith("above")?"gt":"lt";
+  return {q, c:c4.map(f), a:0, e, o:["C4"], v:`[[normal:0,1|${side}=${zz}]][[zt:${z}]]`}; }},
  coef:{title:"Binomial pieces", sub:"C(n, x), powers and the setup", gen(){
    const kind=pick(["c","c","c","setup"]);
    if(kind==="c"){ const n=4+rnd(3), x=1+rnd(n-1), v=C(n,x);
      const c4=numOpts(v,[n*x, fact(n)/fact(x), x===1?n+1:C(n,x-1)+ (C(n,x-1)===v?1:0), v+n],x=>String(x));
-     return {q:`C(${n}, ${x}) = ?`, c:c4.map(String), a:0, e:`${n}!/(${x}!·${n-x}!) = ${fact(n)}/(${fact(x)}·${fact(n-x)}) = ${v}. Not ${n} × ${x}.`, o:["D5"]}; }
+     return {q:`C(${n}, ${x}) = ?`, c:c4.map(String), a:0, e:`${n}!/(${x}!·${n-x}!) = ${fact(n)}/(${fact(x)}·${fact(n-x)}) = ${v}. Not ${n} × ${x}.`, o:["D5"], v:`[[seq:${n},${x}]]`}; }
    const n=4+rnd(3), x=1+rnd(n-1), p=pick([.1,.2,.3,.7,.8,.9,.85,.75]), q=r2(1-p);
    const ok=`${C(n,x)} × ${p}${sup(x)} × ${q}${sup(n-x)}`;
    return {q:`X ~ B(${n}, ${p}). Which expression is P(X = ${x})?`, c:uniqOpts(ok,[`${n*x} × ${p}${sup(x)} × ${q}${sup(n-x)}`, `${C(n,x)} × ${p}${sup(n-x)} × ${q}${sup(x)}`, `${p}${sup(x)} × ${q}${sup(n-x)}`]), a:0, e:`C(${n}, ${x}) = ${C(n,x)}, then p to the number of successes (${x}) and 1 − p to the number of failures (${n-x}).`, o:["D5","P5"]}; }}

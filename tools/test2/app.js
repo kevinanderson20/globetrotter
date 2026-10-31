@@ -123,7 +123,7 @@ function renderCards(){
   show(`${bar(CV.title,{back:CV.back, prog:CV.i/CV.list.length})}
   <div class="pn"><button data-act="cprev" ${CV.i?"":"disabled"}>‹ Prev</button><span>${CV.i+1} of ${CV.list.length} · ${esc(c.dt)}</span><button data-act="cnext">Skip ›</button></div>
   <div class="flip" id="flip" data-act="flip" data-side="${CV.side}" data-k="${S.cards[c.key]??""}" role="button" aria-label="Flip card">${cardFace(c)}</div>
-  ${CV.simp&&c.s?`<section class="simple" id="simple"><div class="eyebrow">In plain English</div><div class="cb">${c.s}</div></section>`:""}
+  ${CV.simp&&c.s?`<section class="simple" id="simple"><div class="eyebrow">In plain English</div><div class="cb">${rich(c.s)}</div></section>`:""}
   <div class="cnav"><button class="btn learn" data-act="mark" data-v="0">Still learning</button><button class="btn got" data-act="mark" data-v="1">Got it</button></div>`);
   const el=$('flip'); let sx=null, sy=0;
   el.addEventListener("touchstart",e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
@@ -133,7 +133,7 @@ function renderCards(){
 const BULB='<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5v.5h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 17.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
 function simpBtn(c){ return c.s?`<button class="simp" data-act="simp" aria-label="Explain it simply" aria-pressed="${CV.simp}">${BULB}<span>${CV.simp?"Hide":"Simpler"}</span></button>`:""; }
 function cardFace(c){ return simpBtn(c)+(CV.side==="f"?`<div class="eyebrow">${esc(c.dt)}</div><div class="ft">${esc(c.f)}</div><div class="hint">Tap to flip</div>`
-  :`<div class="ft">${esc(c.f)}</div><div class="cb">${c.b}</div><div class="hint">Tap to flip back</div>`); }
+  :`<div class="ft">${esc(c.f)}</div><div class="cb">${rich(c.b)}</div><div class="hint">Tap to flip back</div>`); }
 function flip(){ const el=$('flip'); if(!el) return; el.classList.add("turn");
   setTimeout(()=>{ CV.side=CV.side==="f"?"b":"f"; el.dataset.side=CV.side; el.innerHTML=cardFace(CV.list[CV.i]); el.classList.remove("turn"); },160); }
 function cardStep(d){ const n=CV.i+d; if(n<0) return; if(n>=CV.list.length) return cardsDone(); CV.i=n; CV.side="f"; CV.simp=false; renderCards(); }
@@ -200,7 +200,7 @@ function qPick(k){
   if(q.idx!=null) srs(q.idx,ok); save(); buzz(ok);
   btns.forEach((b,j)=>{ b.disabled=true; b.dataset.s=j===q.a?"right":j===k?"wrong":"fade"; });
   if(QR.mode==="drill"&&ok){ setTimeout(()=>{ if(QR&&QR.done&&QR.items[QR.i]===q) qNext(); },550); return; }
-  $('qfb').innerHTML=`<div class="fb" data-k="${ok?"ok":"no"}"><b>${ok?praise():"Not quite."}</b>${esc(q.e)}<div>${(q.o||[]).map(o=>`<span class="tag">${o} ${esc(OBJ[o])}</span>`).join("")}</div></div>
+  $('qfb').innerHTML=`<div class="fb" data-k="${ok?"ok":"no"}"><b>${ok?praise():"Not quite."}</b>${esc(q.e)}${q.v?rich(q.v):""}<div>${(q.o||[]).map(o=>`<span class="tag">${o} ${esc(OBJ[o])}</span>`).join("")}</div></div>
   <div style="height:10px"></div><button class="btn wide" data-act="qnext">${QR.i+1<QR.items.length?"Continue":"See results"}</button>`;
   $('qfb').scrollIntoView({behavior:"smooth",block:"nearest"});
 }
@@ -220,7 +220,7 @@ function qResults(){
   show(`${bar(QR.title,{back:qBack()})}
   <section class="card center"><div class="big">${QR.right}/${n}</div><p class="muted">${QR.mode!=="prac"?`in ${fmtT(secs)} · `:""}${Math.round(pct*100)}% right</p>${pct===1?`<p class="cheer">${pick(["Perfect round!","Flawless.","Every single one. Great work!"])}</p>`:pct>=.8?`<p class="cheer">Strong round. Keep it up!</p>`:""}${note?`<p class="muted">${esc(note)}</p>`:""}</section>
   ${QR.mode==="test"?`<section class="card"><h3>By topic</h3><div class="weak">${Object.entries(by).sort((a,b)=>a[1].r/a[1].n-b[1].r/b[1].n).map(([o,b])=>wrow(o,b.r/b.n)).join("")}</div></section>`:""}
-  ${missed.length?`<section class="card"><h3>Review what you missed</h3>${missed.map(a=>`<div class="fb" data-k="no"><b>${esc(a.q.q)}</b>You chose: ${esc(a.q.c[a.k])}<br><b style="display:inline;font-size:15px">Answer:</b> ${esc(a.q.c[a.q.a])}<br><span class="muted">${esc(a.q.e)}</span></div>`).join("")}</section>`:""}
+  ${missed.length?`<section class="card"><h3>Review what you missed</h3>${missed.map(a=>`<div class="fb" data-k="no"><b>${esc(a.q.q)}</b>You chose: ${esc(a.q.c[a.k])}<br><b style="display:inline;font-size:15px">Answer:</b> ${esc(a.q.c[a.q.a])}<br><span class="muted">${esc(a.q.e)}</span>${a.q.v?rich(a.q.v):""}</div>`).join("")}</section>`:""}
   <button class="btn go wide" ${again}</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
   if(pct===1) confetti();
@@ -234,6 +234,7 @@ function cram(){
   <p class="muted">The night-before page: what's not on the formula sheet, the lookups worth memorizing, and what the grader wants.</p>
   <section class="card"><h3>Memorize (not on the sheet)</h3><div class="cb">${deck("formulas").slice(1).map(c=>`<p style="margin:0 0 8px"><b>${esc(c.f.replace("Memorize: ",""))}:</b> ${c.b}</p>`).join("")}</div></section>
   <section class="card"><h3>Table lookups</h3><div class="cb">${lookups.b}</div></section>
+  <section class="card"><h3>Pictures to remember</h3><div class="cb">${rich("[[normal:50,15|gt=70|cap=Above: 1 − table]][[normal:50,15|btw=60,70|cap=Between: subtract two table values]][[normal:0,1|lt=-1.33|cap=Negative z: 1 − table value of +z]][[normal:50,15|cutr=69.2,top 10%|cap=Cutoff: top 10% = 90th percentile, x = μ + zσ]][[binom:5,0.88|hl=3,4|cap=Binomial: add the bars you need]]")}</div></section>
   <section class="card"><h3>Word → X</h3><div class="cb">"at least k" → X ≥ k (k included)<br>"at most k" → X ≤ k (k included)<br>"more than k" → X > k (k left out)<br>"fewer than k" → X &lt; k (k left out)<br>"exactly one failure out of n" → X = n − 1<br>"at least one" → 1 − P(X = 0)<br>"top k%" → (100 − k)th percentile</div></section>
   <section class="card"><h3>Interpret E[X] (full credit)</h3><div class="cb">Average + what it's averaged over + context and units.<ex>"An average rating of a car in this set is 3.93 stars."<br>"If this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5."</ex></div></section>
   <section class="card"><h3>Binomial justification (full credit)</h3><div class="cb"><ex>"Let X = number of correct matches out of 5. Since this random variable can be represented as a number of successes in n identical independent trials, X ~ B(5, 0.88)."</ex></div></section>
@@ -287,11 +288,11 @@ function renderProb(){
   const p=PR.p, part=p.parts[PR.pi];
   const nSteps=p.parts.reduce((a,x)=>a+x.steps.length,0), doneSteps=Object.keys(PR.res).length;
   let h=`${bar("",{back:"practice", close:true, prog:doneSteps/nSteps, z:p.tpl===3})}${setupHTML(PR.pi===0)}`;
-  p.parts.slice(0,PR.pi).forEach(pt=>{ h+=`<details class="part"><summary><b>(${pt.label})</b> ${esc(pt.q)}</summary><div class="model"><b>What to write</b>${pt.model}</div></details>`; });
+  p.parts.slice(0,PR.pi).forEach(pt=>{ h+=`<details class="part"><summary><b>(${pt.label})</b> ${esc(pt.q)}</summary><div class="model"><b>What to write</b>${rich(pt.model)}</div></details>`; });
   h+=`<section class="part"><h3><span class="pl">${part.label}</span>${esc(part.q)}</h3>`;
   for(let si=0;si<=Math.min(PR.si,part.steps.length-1);si++) h+=stepHTML(part.steps[si],PR.pi,si,"prac");
   if(PR.si>=part.steps.length){
-    h+=`<div class="model"><b>What to write on the test</b>${part.model}</div>`;
+    h+=`<div class="model"><b>What to write on the test</b>${rich(part.model)}</div>`;
     h+=PR.pi+1<p.parts.length?`<button class="btn go wide" data-act="pnext">Next: part (${p.parts[PR.pi+1].label})</button>`:`<button class="btn go wide" data-act="pdone">Finish</button>`;
   }
   h+=`</section>`;
@@ -346,7 +347,7 @@ function examSubmit(){
       const yours=s.k==="mc"?(v!=null?s.c[v]:"no answer"):s.k==="num"?(v?v:"no answer"):(v?v.join(", "):"no answer");
       const right=s.k==="mc"?s.c[s.a]:s.k==="num"?fmtAns(s):s.fields.map(f=>+f.ans.toFixed(4)).join(", ");
       return `<div class="rline"><span class="${r.ok?"ok":"no"}">${r.ok?"✓":"✗"}</span><div>${esc(s.q)}<br><small>${r.ok?`You: ${esc(yours)}`:`You: ${esc(yours)} · Answer: ${esc(right)}`}</small></div></div>`; }).join("")}</div>
-      <details><summary class="link" style="text-decoration:none">Show model answer</summary><div class="model"><b>What to write</b>${pt.model}</div></details></section>`; });
+      <details><summary class="link" style="text-decoration:none">Show model answer</summary><div class="model"><b>What to write</b>${rich(pt.model)}</div></details></section>`; });
   h+=checklist(p.tpl)+`<button class="btn go wide" data-act="exam" data-t="${PR.t||0}">Another exam problem</button><button class="btn ghost wide" data-act="home">Home</button>`;
   show(h);
 }

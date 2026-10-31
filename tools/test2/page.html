@@ -227,6 +227,34 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 .dgrid .tile b{grid-column:1}.dgrid .tile span{grid-column:1}
 .dgrid .tile .best{grid-column:2;grid-row:1/3;font-weight:800;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .duo{grid-template-columns:1fr 1fr}
+/* charts */
+.vz{margin:10px 0 4px;display:grid;gap:4px}
+.vz svg{width:100%;height:auto;max-width:420px;display:block;margin:0 auto;overflow:visible}
+.vz figcaption{font-size:13px;color:var(--ink-2);text-align:center;line-height:1.35}
+.vz text{font:11px var(--f-body);fill:var(--ink-2);font-variant-numeric:tabular-nums}
+.vz text.tiny{font-size:9.5px}
+.vz text.lab{font-weight:800;fill:var(--ink)}
+.vz text.evt{fill:color-mix(in srgb,var(--sun) 55%,var(--ink))}
+.vz text.arealab{font-size:12px;paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+.vz .ax,.vz .tick{stroke:var(--ink-3);stroke-width:1.2}
+.vz .bar{fill:color-mix(in srgb,var(--ink-3) 70%,var(--surface))}
+.vz .bar.dim{fill:color-mix(in srgb,var(--ink-3) 45%,var(--surface))}
+.vz .hl{fill:var(--m-learn)}
+.vz .cmp{fill:var(--bad)}
+.vz .ev{stroke:var(--sun);stroke-width:2;stroke-dasharray:4 3}
+.vz .band{fill:var(--sun);opacity:.2}
+.vz .curve{fill:none;stroke:var(--ink);stroke-width:2}
+.vz .area{fill:var(--m-learn);opacity:.5}
+.vz .area.bad{fill:var(--bad)}
+.vz .mk{stroke:var(--ink-2);stroke-width:1.2;stroke-dasharray:3 2}
+.dt.zs{margin:0 auto;font-size:13px}
+.dt.zs td.on{background:var(--sun);color:var(--sun-ink);font-weight:800}
+.dt.zs td.hl,.dt.zs th.hc{background:color-mix(in srgb,var(--sun) 20%,var(--surface))}
+.seqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:4px 10px;justify-items:center}
+.seqs div{display:flex;gap:3px}
+.seqs span{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
+.seqs .s{background:var(--good)}.seqs .f{background:var(--bad)}
+.fb .vz figcaption{color:var(--ink-2)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -246,6 +274,9 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 </script>
 <script>
 /*PROBLEMS*/
+</script>
+<script>
+/*VIZ*/
 </script>
 <script>
 /*APP*/

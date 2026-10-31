@@ -227,6 +227,34 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 .dgrid .tile b{grid-column:1}.dgrid .tile span{grid-column:1}
 .dgrid .tile .best{grid-column:2;grid-row:1/3;font-weight:800;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .duo{grid-template-columns:1fr 1fr}
+/* charts */
+.vz{margin:10px 0 4px;display:grid;gap:4px}
+.vz svg{width:100%;height:auto;max-width:420px;display:block;margin:0 auto;overflow:visible}
+.vz figcaption{font-size:13px;color:var(--ink-2);text-align:center;line-height:1.35}
+.vz text{font:11px var(--f-body);fill:var(--ink-2);font-variant-numeric:tabular-nums}
+.vz text.tiny{font-size:9.5px}
+.vz text.lab{font-weight:800;fill:var(--ink)}
+.vz text.evt{fill:color-mix(in srgb,var(--sun) 55%,var(--ink))}
+.vz text.arealab{font-size:12px;paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+.vz .ax,.vz .tick{stroke:var(--ink-3);stroke-width:1.2}
+.vz .bar{fill:color-mix(in srgb,var(--ink-3) 70%,var(--surface))}
+.vz .bar.dim{fill:color-mix(in srgb,var(--ink-3) 45%,var(--surface))}
+.vz .hl{fill:var(--m-learn)}
+.vz .cmp{fill:var(--bad)}
+.vz .ev{stroke:var(--sun);stroke-width:2;stroke-dasharray:4 3}
+.vz .band{fill:var(--sun);opacity:.2}
+.vz .curve{fill:none;stroke:var(--ink);stroke-width:2}
+.vz .area{fill:var(--m-learn);opacity:.5}
+.vz .area.bad{fill:var(--bad)}
+.vz .mk{stroke:var(--ink-2);stroke-width:1.2;stroke-dasharray:3 2}
+.dt.zs{margin:0 auto;font-size:13px}
+.dt.zs td.on{background:var(--sun);color:var(--sun-ink);font-weight:800}
+.dt.zs td.hl,.dt.zs th.hc{background:color-mix(in srgb,var(--sun) 20%,var(--surface))}
+.seqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:4px 10px;justify-items:center}
+.seqs div{display:flex;gap:3px}
+.seqs span{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
+.seqs .s{background:var(--good)}.seqs .f{background:var(--bad)}
+.fb .vz figcaption{color:var(--ink-2)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -265,58 +293,58 @@ const DECKS=[
  {f:"Realization", b:"The particular value the random variable takes once the experiment has run. The random variable is the rule; the realization is the number it produced this time.<ex>X = stars of a randomly selected car. The car we pick has 4 stars, so 4 is a realization of X.</ex>"},
  {f:"How do events and random variables connect?", b:"Any statement about the value of X defines an event: {X = 5}, {X ≥ 4}, {60 < X < 70}. So P(X ≥ 4) is just the probability of an event, and all the probability rules apply unchanged.<ex>{X = 4} and {X = 5} are mutually exclusive (X can't take two values at once), so their probabilities can be added.</ex>"},
  {f:"X versus x", b:"Capital <b>X</b> is the random variable (the rule). Lowercase <b>x</b> is one particular number X might take. P(X = x) reads \"the probability that X takes the value x\". In p(x) = ..., x is a placeholder you replace with a number, as in P(X = 4).<ex>Capitals near the start (A, B) usually name events; capitals near the end (X, Y, Z) name random variables; n and p are given constants; μ and σ are the mean and SD.</ex>"},
- {f:"Discrete vs continuous", b:"<b>Discrete:</b> the values can be listed (counts, ratings on a fixed scale).<br><b>Continuous:</b> any value in an interval (weight, time, a score modeled as continuous).<br>Decide by the <b>set of values X can take</b>, and give a one-sentence reason.<ex>Model answer: \"X assumes a finite number of values (specifically, 5), and therefore it is discrete.\"</ex>"},
- {f:"Why is P(X = 70) = 0 for a continuous X?", b:"For a continuous variable, probability is <b>area under the density curve over an interval</b>, and a single point has no width. P(69.5 < X < 70.5) is positive; P(X = 70) is 0.<ex>So for a normal X, P(X > 70) = P(X ≥ 70). For a binomial X, {X > 3} and {X ≥ 3} are different events with different probabilities.</ex>"}
+ {f:"Discrete vs continuous", b:"<b>Discrete:</b> the values can be listed (counts, ratings on a fixed scale).<br><b>Continuous:</b> any value in an interval (weight, time, a score modeled as continuous).<br>Decide by the <b>set of values X can take</b>, and give a one-sentence reason.<ex>Model answer: \"X assumes a finite number of values (specifically, 5), and therefore it is discrete.\"</ex>[[bars:0,1,2,3;0.1,0.3,0.4,0.2|cap=Discrete: separate bars, one for each value]][[normal:50,15|cap=Continuous: a smooth curve over an interval]]"},
+ {f:"Why is P(X = 70) = 0 for a continuous X?", b:"For a continuous variable, probability is <b>area under the density curve over an interval</b>, and a single point has no width. P(69.5 < X < 70.5) is positive; P(X = 70) is 0.<ex>So for a normal X, P(X > 70) = P(X ≥ 70). For a binomial X, {X > 3} and {X ≥ 3} are different events with different probabilities.</ex>[[normal:50,15|btw=67,73|lab=area > 0|cap=An interval around 70 has area. The single line at 70 has none.]]"}
 ]},
 {id:"table", title:"Distribution from a table", sub:"Template 1: build it, check it, use it", cards:[
- {f:"Build a distribution from a table of counts", b:"Divide each count by the total. Show how each probability was obtained.<ex>100 cars: 0, 4, 18, 59, 19 cars with 1 to 5 stars → P(x) = 0, 0.04, 0.18, 0.59, 0.19.</ex>"},
+ {f:"Build a distribution from a table of counts", b:"Divide each count by the total. Show how each probability was obtained.<ex>100 cars: 0, 4, 18, 59, 19 cars with 1 to 5 stars → P(x) = 0, 0.04, 0.18, 0.59, 0.19.</ex>[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|cap=The star-rating distribution: one bar per value, heights add to 1]]"},
  {f:"When is a distribution valid?", b:"Check <b>both</b> conditions:<br>1. Every probability is between 0 and 1.<br>2. The probabilities sum to 1.<ex>0.2, 0.3, 0.4, 0.2 sums to 1.1, so it is not valid, even though each value is between 0 and 1.</ex>"},
- {f:"Translate the event before computing", b:"Turn the words into values of X first. For a discrete X the boundary matters:<br>\"more than 2\" excludes 2 · \"at least 2\" includes 2<br>\"fewer than 5\" excludes 5 · \"at most 5\" includes 5<ex>P(X < 4) = P(X = 1) + P(X = 2) + P(X = 3) = 0 + 0.04 + 0.18 = 0.22</ex>"},
- {f:"Why may you add P(X = 3) and P(X = 4)?", b:"Because the events {X = 3} and {X = 4} are <b>mutually exclusive</b>: X cannot take two values at once. Not \"because the trials are independent\"; that is a common error."},
- {f:"Expected value: formula", b:"E[X] = Σ x · p(x) (not on the formula sheet, so memorize it).<ex>E[X] = 1(0) + 2(0.04) + 3(0.18) + 4(0.59) + 5(0.19) = 3.93</ex>"},
+ {f:"Translate the event before computing", b:"Turn the words into values of X first. For a discrete X the boundary matters:<br>\"more than 2\" excludes 2 · \"at least 2\" includes 2<br>\"fewer than 5\" excludes 5 · \"at most 5\" includes 5<ex>P(X < 4) = P(X = 1) + P(X = 2) + P(X = 3) = 0 + 0.04 + 0.18 = 0.22</ex>[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|hl=1,2,3|cap=P(X < 4): the highlighted bars. 4 is not included.]]"},
+ {f:"Why may you add P(X = 3) and P(X = 4)?", b:"Because the events {X = 3} and {X = 4} are <b>mutually exclusive</b>: X cannot take two values at once. Not \"because the trials are independent\"; that is a common error.[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|hl=3,4|cap=Separate bars never overlap, so their heights add]]"},
+ {f:"Expected value: formula", b:"E[X] = Σ x · p(x) (not on the formula sheet, so memorize it).<ex>E[X] = 1(0) + 2(0.04) + 3(0.18) + 4(0.59) + 5(0.19) = 3.93</ex>[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|E=3.93|cap=E(X) is the balance point of the bars]]"},
  {f:"What is the expected value?", b:"The <b>probability-weighted average</b> of the values of X: the center of the distribution. It does not have to be a value X can take.<ex>3.93 stars is not a possible rating. Like 1.9 children per family: no family has 1.9 children.</ex>"},
  {f:"Interpret E[X] (full credit)", b:"Do three things: say it is an <b>average</b>; say <b>what it is averaged over</b>; use the <b>context and units</b>.<br>• Fixed set, one drawn at random: \"An average rating of a car in this set is 3.93 stars.\"<br>• Repeated experiment: \"If this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5.\"<ex>Never: \"X will be 3.93\", \"3.93 is the most likely value\", \"we expect 3.93\" in the everyday sense.</ex>"},
  {f:"Interpretation: what loses points?", b:"<b>Partial:</b> \"on average, 4.4 matches\" with no hint of what the average is over.<br><b>No credit:</b> \"the expert will identify 4.4 matches\", \"is expected to get 4.4 right\", \"4.4 is the most likely number\". Each treats E[X] as a prediction of one result, and a count can't even be 4.4."},
- {f:"Variance: say it from memory", b:"Var(X) = E[(X − E[X])²]: the <b>expected value of the squared difference</b> between X and its expected value. Roughly, <b>the average squared deviation from the average</b>.<br>Compute: Var(X) = Σ (x − E[X])² · p(x)."},
+ {f:"Variance: say it from memory", b:"Var(X) = E[(X − E[X])²]: the <b>expected value of the squared difference</b> between X and its expected value. Roughly, <b>the average squared deviation from the average</b>.<br>Compute: Var(X) = Σ (x − E[X])² · p(x).[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|E=3.93|cap=Variance: how far the bars sit from the dashed mean, squared and averaged]]"},
  {f:"Why square the deviations?", b:"Plain deviations always average to <b>zero</b>: values above and below E[X] cancel. Squaring makes every deviation count and weighs big ones more. Price: variance is in <b>squared units</b>."},
- {f:"Standard deviation", b:"SD(X) = √Var(X). It brings the spread back to the <b>units of X</b> and describes a typical distance between X and E[X]. Show the work (a table of deviations is fine) and state the units.<ex>Var = 0.5251 → SD = √0.5251 = 0.7246 stars</ex>"},
- {f:"Variance table layout", b:"Columns: x · P(x) · x − E[X] · (x − E[X])² · P(x)(x − E[X])². Add the last column for Var(X), then take the square root.<ex>Stars: 0 + 0.1490 + 0.1557 + 0.0029 + 0.2175 = 0.5251</ex>"}
+ {f:"Standard deviation", b:"SD(X) = √Var(X). It brings the spread back to the <b>units of X</b> and describes a typical distance between X and E[X]. Show the work (a table of deviations is fine) and state the units.<ex>Var = 0.5251 → SD = √0.5251 = 0.7246 stars</ex>[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|E=3.93|sd=0.7246|cap=The shaded band is one SD on each side of the mean]]"},
+ {f:"Variance table layout", b:"Columns: x · P(x) · x − E[X] · (x − E[X])² · P(x)(x − E[X])². Add the last column for Var(X), then take the square root.<table class=\"dt sm\"><tr><th>x</th><th>P(x)</th><th>x − E</th><th>(x − E)²</th><th>P(x)(x − E)²</th></tr><tr><td>1</td><td>0</td><td>−2.93</td><td>8.5849</td><td>0</td></tr><tr><td>2</td><td>0.04</td><td>−1.93</td><td>3.7249</td><td>0.1490</td></tr><tr><td>3</td><td>0.18</td><td>−0.93</td><td>0.8649</td><td>0.1557</td></tr><tr><td>4</td><td>0.59</td><td>0.07</td><td>0.0049</td><td>0.0029</td></tr><tr><td>5</td><td>0.19</td><td>1.07</td><td>1.1449</td><td>0.2175</td></tr><tr><th colspan=\"4\">Var(X) = sum of last column</th><th>0.5251</th></tr></table><ex>SD = √0.5251 = 0.7246 stars</ex>"}
 ]},
 {id:"binom", title:"Binomial", sub:"Template 2: recognize it, justify it, compute", cards:[
  {f:"The four binomial assumptions", b:"1. A <b>fixed number n</b> of identical trials<br>2. <b>Two outcomes</b> per trial (success / failure)<br>3. The <b>same probability p</b> of success in every trial<br>4. <b>Independent</b> trials<br>Find where the problem states each one."},
  {f:"Full-credit binomial justification", b:"Define X in words, name the structure, give the parameters:<ex>\"Let X = number of correct matches out of 5. Since this random variable can be represented as a number of successes in n identical independent trials, X ~ B(5, 0.88).\"</ex>"},
  {f:"Justification: what loses points?", b:"<b>Partial:</b> X ~ B(5, 0.88) with no reason, or the formula used with no distribution named.<br><b>No credit:</b> \"binomial because there are two outcomes\" alone, or \"because it's a probability problem\". Independence and constant p are the assumptions that usually fail in practice."},
- {f:"The binomial formula", b:"p(x) = C(n, x) · p<sup>x</sup> · (1 − p)<sup>n − x</sup>, where C(n, x) = n! / (x!(n − x)!). On the formula sheet, with E[X] = np and Var(X) = np(1 − p).<ex>P(X = 4) = 5!/(4!·1!) · 0.88⁴ · 0.12 = 5 · 0.5997 · 0.12 ≈ 0.3598</ex>"},
- {f:"Where does the formula come from?", b:"Each sequence of successes and failures is an elementary event; its probability is a product by the <b>multiplication rule</b> (the trials are independent). The <b>binomial coefficient</b> counts how many sequences give the same value of X."},
- {f:"Binomial coefficients you'll need", b:"C(5,3) = 5!/(3!·2!) = 10 (not 5 × 3).<ex>C(4,1)=4 · C(4,2)=6 · C(5,1)=5 · C(5,2)=10 · C(5,3)=10 · C(5,4)=5 · C(6,1)=6 · C(6,2)=15 · C(6,3)=20 · C(n,0)=C(n,n)=1</ex>"},
- {f:"Independent trials vs mutually exclusive values", b:"Both appear in every binomial problem, and they are not the same.<br><b>Independence</b> justifies <b>multiplying</b> across trials inside each term.<br><b>Mutual exclusivity</b> justifies <b>adding</b> P(X = 3) + P(X = 4) across values.<ex>Two mutually exclusive events with positive probability are never independent: learning one happened tells you the other didn't.</ex>"},
- {f:"\"Exactly one mistake out of 5\"", b:"If X counts <b>correct</b> identifications, one mistake means 4 correct: <b>X = 4</b>, not X = 1. Always convert failures into the count X tracks."},
- {f:"\"More than 2 but less than 5\"", b:"Both inequalities are strict: X = 3 or 4.<ex>P(2 < X < 5) = P(X = 3) + P(X = 4) = 0.0981 + 0.3598 = 0.4579</ex>"},
- {f:"\"At least 1\": the shortcut", b:"The complement of \"at least one\" is \"none\": P(X ≥ 1) = 1 − P(X = 0)."},
- {f:"Binomial expected value", b:"E[X] = np, interpreted as the average number of successes over many repetitions of the same experiment.<ex>E[X] = 5 × 0.88 = 4.4: \"if this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5.\"</ex>"},
- {f:"Service level and stockout risk", b:"With s units (or seats) on hand and demand X:<br><b>Service level</b> = P(X ≤ s)<br><b>Stockout risk</b> = P(X > s)<ex>6 tickets sold for 5 seats, each passenger shows with p = 0.9: overbooked means X = 6, P = 0.9⁶.</ex>"},
+ {f:"The binomial formula", b:"p(x) = C(n, x) · p<sup>x</sup> · (1 − p)<sup>n − x</sup>, where C(n, x) = n! / (x!(n − x)!). On the formula sheet, with E[X] = np and Var(X) = np(1 − p).<ex>P(X = 4) = 5!/(4!·1!) · 0.88⁴ · 0.12 = 5 · 0.5997 · 0.12 ≈ 0.3598</ex>[[binom:5,0.88|hl=4|cap=P(X = 4) = 0.3598 is one bar of B(5, 0.88)]]"},
+ {f:"Where does the formula come from?", b:"Each sequence of successes and failures is an elementary event; its probability is a product by the <b>multiplication rule</b> (the trials are independent). The <b>binomial coefficient</b> counts how many sequences give the same value of X.[[seq:5,4]]"},
+ {f:"Binomial coefficients you'll need", b:"C(5,3) = 5!/(3!·2!) = 10 (not 5 × 3).<table class=\"dt sm\"><tr><th>C(n, x)</th><th>x=0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr><tr><th>n=4</th><td>1</td><td>4</td><td>6</td><td>4</td><td>1</td><td></td><td></td></tr><tr><th>n=5</th><td>1</td><td>5</td><td>10</td><td>10</td><td>5</td><td>1</td><td></td></tr><tr><th>n=6</th><td>1</td><td>6</td><td>15</td><td>20</td><td>15</td><td>6</td><td>1</td></tr></table><ex>C(4,1)=4 · C(4,2)=6 · C(5,1)=5 · C(5,2)=10 · C(5,3)=10 · C(5,4)=5 · C(6,1)=6 · C(6,2)=15 · C(6,3)=20 · C(n,0)=C(n,n)=1</ex>[[seq:5,3]]"},
+ {f:"Independent trials vs mutually exclusive values", b:"Both appear in every binomial problem, and they are not the same.<br><b>Independence</b> justifies <b>multiplying</b> across trials inside each term.<br><b>Mutual exclusivity</b> justifies <b>adding</b> P(X = 3) + P(X = 4) across values.<ex>Two mutually exclusive events with positive probability are never independent: learning one happened tells you the other didn't.</ex>[[binom:5,0.88|hl=3,4|cap=Add across bars (mutually exclusive). Multiply inside each bar (independent trials).]]"},
+ {f:"\"Exactly one mistake out of 5\"", b:"If X counts <b>correct</b> identifications, one mistake means 4 correct: <b>X = 4</b>, not X = 1. Always convert failures into the count X tracks.[[binom:5,0.88|hl=4|cap=One mistake out of 5 = the X = 4 bar]]"},
+ {f:"\"More than 2 but less than 5\"", b:"Both inequalities are strict: X = 3 or 4.<ex>P(2 < X < 5) = P(X = 3) + P(X = 4) = 0.0981 + 0.3598 = 0.4579</ex>[[binom:5,0.88|hl=3,4|cap=2 < X < 5: only the 3 and 4 bars]]"},
+ {f:"\"At least 1\": the shortcut", b:"The complement of \"at least one\" is \"none\": P(X ≥ 1) = 1 − P(X = 0).[[binom:6,0.1|hl=1,2,3,4,5,6|cmp=0|cap=At least one = every bar except X = 0. Quicker: 1 minus the red bar.]]"},
+ {f:"Binomial expected value", b:"E[X] = np, interpreted as the average number of successes over many repetitions of the same experiment.<ex>E[X] = 5 × 0.88 = 4.4: \"if this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5.\"</ex>[[binom:5,0.88|E=4.4|cap=E = np = 4.4 falls between bars: an average, not a possible count]]"},
+ {f:"Service level and stockout risk", b:"With s units (or seats) on hand and demand X:<br><b>Service level</b> = P(X ≤ s)<br><b>Stockout risk</b> = P(X > s)<ex>6 tickets sold for 5 seats, each passenger shows with p = 0.9: overbooked means X = 6, P = 0.9⁶.</ex>[[binom:6,0.9|cmp=6|cap=6 tickets, 5 seats: overbooked only when X = 6 (red bar)]]"},
  {f:"Looks binomial but isn't", b:"• Sampling <b>without replacement</b> from a small group (trials not independent)<br>• <b>p changes</b> from trial to trial (big vs small clients)<br>• <b>No fixed n</b> (customers arriving in an hour, umbrellas sold in a day)<br>• Linked trials: employees of one store, members of one household"}
 ]},
 {id:"normal", title:"Normal", sub:"Template 3: z-scores, table, percentiles", cards:[
- {f:"z-score", b:"z = (x − μ) / σ: how many standard deviations x lies above (+) or below (−) the mean. Round to two decimals for the table. Not on the formula sheet.<ex>(70 − 50)/15 = 1.33: a rating of 70 is 1.33 SDs above the mean.</ex>"},
- {f:"What the table gives", b:"The area to the <b>LEFT</b> of z, for z from 0.00 to 3.09. Not the area between 0 and z, and not the area to the right.<ex>Row 1.3, column 0.03 → P(Z < 1.33) = 0.9082</ex>"},
- {f:"Area ABOVE a value", b:"Use the complement: P(Z > z) = 1 − P(Z < z).<ex>P(X > 70) = 1 − P(Z < 1.33) = 1 − 0.9082 = 0.0918 → about 9.18% of employees rate above 70.</ex>"},
- {f:"Area BETWEEN two values", b:"Subtract the two left areas: P(a < X < b) = P(X < b) − P(X < a).<ex>P(60 < X < 70) = 0.9082 − 0.7486 = 0.1596</ex>"},
- {f:"Negative z with a positive-only table", b:"Use symmetry: P(Z < −z) = 1 − P(Z < z).<ex>P(Z < −1.33) = 1 − 0.9082 = 0.0918. And P(Z > −1.33) = P(Z < 1.33) = 0.9082.</ex>"},
- {f:"Cutoff / percentile questions", b:"1. Say which percentile: \"lowest rating in the top 10%\" = <b>90th percentile</b>.<br>2. Find the closest table probability and its z.<br>3. x = μ + zσ, with numbers.<br>4. Round in context if it must be whole.<ex>Closest to 0.9 is 0.8997 at z = 1.28 → x = 50 + 1.28 × 15 = 69.2 → 69</ex>"},
- {f:"Bottom k% cutoff", b:"The highest value in the bottom 10% is the <b>10th percentile</b>, below the mean, so z is negative. Find the z for 0.90 (1.28) and flip the sign: z = −1.28, then x = μ − 1.28σ."},
- {f:"Reorder point for a service level", b:"A 95% service level means stock covers lead-time demand 95% of the time, so the reorder point is the <b>95th percentile</b> of lead-time demand: P(demand ≤ ROP) = 0.95."},
- {f:"Not in the table? Don't interpolate", b:"Use the closest table probability and its z, and say which one you used. If two are equally close, either is fine.<ex>0.95 lies between 0.9495 (1.64) and 0.9505 (1.65): use either and say which.</ex>"},
+ {f:"z-score", b:"z = (x − μ) / σ: how many standard deviations x lies above (+) or below (−) the mean. Round to two decimals for the table. Not on the formula sheet.<ex>(70 − 50)/15 = 1.33: a rating of 70 is 1.33 SDs above the mean.</ex>[[normal:50,15|mark=70|cap=A rating of 70 sits 1.33 standard deviations above the mean]]"},
+ {f:"What the table gives", b:"The area to the <b>LEFT</b> of z, for z from 0.00 to 3.09. Not the area between 0 and z, and not the area to the right.<ex>Row 1.3, column 0.03 → P(Z < 1.33) = 0.9082</ex>[[normal:0,1|lt=1.33|cap=The table gives the shaded area: everything to the LEFT of z]][[zt:1.33]]"},
+ {f:"Area ABOVE a value", b:"Use the complement: P(Z > z) = 1 − P(Z < z).<ex>P(X > 70) = 1 − P(Z < 1.33) = 1 − 0.9082 = 0.0918 → about 9.18% of employees rate above 70.</ex>[[normal:50,15|gt=70|cap=P(X > 70) = 1 − 0.9082 = 0.0918]]"},
+ {f:"Area BETWEEN two values", b:"Subtract the two left areas: P(a < X < b) = P(X < b) − P(X < a).<ex>P(60 < X < 70) = 0.9082 − 0.7486 = 0.1596</ex>[[normal:50,15|btw=60,70|cap=Left of 70 minus left of 60]]"},
+ {f:"Negative z with a positive-only table", b:"Use symmetry: P(Z < −z) = 1 − P(Z < z).<ex>P(Z < −1.33) = 1 − 0.9082 = 0.0918. And P(Z > −1.33) = P(Z < 1.33) = 0.9082.</ex>[[normal:0,1|lt=-1.33|cap=Area left of −1.33...]][[normal:0,1|gt=1.33|cap=...is the same as the area right of +1.33]]"},
+ {f:"Cutoff / percentile questions", b:"1. Say which percentile: \"lowest rating in the top 10%\" = <b>90th percentile</b>.<br>2. Find the closest table probability and its z.<br>3. x = μ + zσ, with numbers.<br>4. Round in context if it must be whole.<ex>Closest to 0.9 is 0.8997 at z = 1.28 → x = 50 + 1.28 × 15 = 69.2 → 69</ex>[[normal:50,15|cutr=69.2,top 10%|cap=The cutoff 69.2 leaves 10% above and 90% below]]"},
+ {f:"Bottom k% cutoff", b:"The highest value in the bottom 10% is the <b>10th percentile</b>, below the mean, so z is negative. Find the z for 0.90 (1.28) and flip the sign: z = −1.28, then x = μ − 1.28σ.[[normal:50,15|cutl=30.8,bottom 10%|cap=Bottom 10%: the cutoff is below the mean, z = −1.28]]"},
+ {f:"Reorder point for a service level", b:"A 95% service level means stock covers lead-time demand 95% of the time, so the reorder point is the <b>95th percentile</b> of lead-time demand: P(demand ≤ ROP) = 0.95.[[normal:400,50|cutl=482,95%|cap=Reorder point 482: lead-time demand falls below it 95% of the time]]"},
+ {f:"Not in the table? Don't interpolate", b:"Use the closest table probability and its z, and say which one you used. If two are equally close, either is fine.<ex>0.95 lies between 0.9495 (1.64) and 0.9505 (1.65): use either and say which.</ex>[[zt:1.64]]"},
  {f:"Common table lookups", b:"0.90 → z = 1.28 (0.8997)<br>0.95 → 1.64 or 1.65<br>0.975 → 1.96 (0.9750)<br>0.99 → 2.33 (0.9901)<br>0.80 → 0.84 (0.7995)<br>0.75 → 0.67 (0.7486)"},
  {f:"\"Above 70\" vs \"70 or above\"", b:"For a <b>normal</b> X they are the same, because P(X = 70) = 0. For a <b>binomial</b> X they are different events."},
- {f:"When does the normal model fit?", b:"\"Approximately normal\" works when nearly all the probability falls inside the possible range. Ratings 1 to 100 with μ = 50, σ = 15: the range is more than 3σ from the mean on both sides.<ex>Bad fits: waiting times, incomes, claim sizes (skewed, bounded at zero). Hold time with μ = 2, σ = 3 min gives P(X < 0) = 0.2514.</ex>"},
+ {f:"When does the normal model fit?", b:"\"Approximately normal\" works when nearly all the probability falls inside the possible range. Ratings 1 to 100 with μ = 50, σ = 15: the range is more than 3σ from the mean on both sides.<ex>Bad fits: waiting times, incomes, claim sizes (skewed, bounded at zero). Hold time with μ = 2, σ = 3 min gives P(X < 0) = 0.2514.</ex>[[normal:2,3|lt=0|bad|cap=Hold times as N(2, 3): a quarter of the curve sits below 0 minutes. Impossible.]]"},
  {f:"Finish in context", b:"End with a sentence about the problem, not just a number.<ex>\"Approximately 9.18% of employees have a rating above 70.\"</ex>"}
 ]},
 {id:"spot", title:"Spot the template", sub:"Recognize the structure under a new story", cards:[
  {f:"The test in one sentence", b:"<b>One written problem</b>, very similar in structure to one of the three practice problems, in a new context. Closed book, calculator only. Formula sheet and normal table provided. Graded on reasoning, justification and interpretation, not only the number."},
- {f:"Signature: Template 1 (table)", b:"A table of counts or percentages for a numerical variable with a few values; one unit drawn at random, or one period treated as random. <b>No named distribution:</b> the table is the distribution. Asks for the distribution, a range probability, E[X], SD."},
- {f:"Signature: Template 2 (binomial)", b:"A fixed number n of repeated trials, two outcomes each, the same probability every time, independent. X counts successes.<ex>Signal phrases: \"each ... independently\", \"out of n\", \"assume the same probability for every ...\"</ex>"},
- {f:"Signature: Template 3 (normal)", b:"A measurement that can take any value in an interval, stated to be (approximately) normal with a given mean and SD. Asks for proportions above, below, between, or a value cutting off a proportion."},
+ {f:"Signature: Template 1 (table)", b:"A table of counts or percentages for a numerical variable with a few values; one unit drawn at random, or one period treated as random. <b>No named distribution:</b> the table is the distribution. Asks for the distribution, a range probability, E[X], SD.[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|cap=Looks like: a table of values and counts]]"},
+ {f:"Signature: Template 2 (binomial)", b:"A fixed number n of repeated trials, two outcomes each, the same probability every time, independent. X counts successes.<ex>Signal phrases: \"each ... independently\", \"out of n\", \"assume the same probability for every ...\"</ex>[[binom:5,0.88|cap=Looks like: n trials, count the successes]]"},
+ {f:"Signature: Template 3 (normal)", b:"A measurement that can take any value in an interval, stated to be (approximately) normal with a given mean and SD. Asks for proportions above, below, between, or a value cutting off a proportion.[[normal:50,15|gt=70|cap=Looks like: a bell curve with a mean and SD]]"},
  {f:"Typical Template 1 stories", b:"Items per online order · cars sold per day · satisfaction ratings 1 to 5 · service calls per day · walk-in rooms per night · returns per week · credit cards per applicant"},
  {f:"Typical Template 2 stories", b:"Defectives in a sample from a large run · coupon redemptions · on-time deliveries · loan defaults · first-contact resolutions · flight no-shows (overbooking) · survey responses · offers accepted"},
  {f:"Typical Template 3 stories", b:"Package fill weights · part lengths or diameters · lead-time demand and reorder points · delivery times on a fixed route · daily line output · aptitude test scores"}
@@ -358,18 +386,18 @@ const DECKS=[
 ]},
 {id:"examples", title:"Posted practice test", sub:"The three problems with model answers", cards:[
  {f:"Stars Q1(a): 100 cars, X = stars (1 to 5). Discrete or continuous?", b:"X assumes a finite number of values (specifically, 5), and therefore it is discrete."},
- {f:"Stars Q1(b): counts 0, 4, 18, 59, 19. Distribution?", b:"We have 100 observations, so divide each count by 100:<br>x: 1, 2, 3, 4, 5<br>P(x): 0, 0.04, 0.18, 0.59, 0.19"},
- {f:"Stars Q1(c): P(X < 4)?", b:"P(X < 4) = P(X = 1) + P(X = 2) + P(X = 3) = 0 + 0.04 + 0.18 = 0.22"},
- {f:"Stars Q1(d): E[X] and interpretation", b:"E[X] = Σ x P(x) = 1×0 + 2×0.04 + 3×0.18 + 4×0.59 + 5×0.19 = 3.93<br>An average rating of a car in this set is 3.93 stars."},
- {f:"Stars Q1(e): SD of X", b:"Deviations −2.93, −1.93, −0.93, 0.07, 1.07; squared × P(x): 0, 0.1490, 0.1557, 0.0029, 0.2175.<br>Var(X) = 0.5251; SD = √0.5251 = 0.7246 stars"},
- {f:"Fingerprints Q2(a): 88% correct, 5 pairs. P(all five correct)?", b:"Let X = number of correct matches out of 5. Since X is a number of successes in n identical independent trials, X ~ B(5, 0.88).<br>P(X = 5) = 0.88⁵ = 0.5277"},
- {f:"Fingerprints Q2(b): exactly one mistake?", b:"One mistake = 4 correct.<br>P(X = 4) = 5!/(4!·1!) · 0.88⁴ · 0.12 = 5 · 0.88⁴ · 0.12 = 0.3598"},
- {f:"Fingerprints Q2(c): at least 4 correct?", b:"\"At least 4\" includes 4.<br>P(X ≥ 4) = P(X = 4) + P(X = 5) = 0.3598 + 0.5277 = 0.8875"},
- {f:"Fingerprints Q2(d): more than 2 but less than 5?", b:"P(2 < X < 5) = P(X = 3) + P(X = 4)<br>P(X = 3) = 5!/(3!·2!) · 0.88³ · 0.12² = 10 · 0.88³ · 0.12² = 0.0981<br>= 0.0981 + 0.3598 = 0.4579"},
- {f:"Fingerprints Q2(e): E[X] and interpretation", b:"E[X] = np = 5 × 0.88 = 4.4<br>If this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5."},
- {f:"Ratings Q3(a): N(50, 15). Lowest \"exemplary\" (top 10%) rating?", b:"Top 10% → 90th percentile. Closest table probability to 0.9 is 0.8997 at z = 1.28.<br>x = μ + zσ = 50 + 1.28 × 15 = 69.2, about 69 if whole numbers."},
- {f:"Ratings Q3(b): % above 70?", b:"z = (70 − 50)/15 = 1.33; table: 0.9082.<br>P(X > 70) = 1 − P(Z < 1.33) = 1 − 0.9082 = 0.0918<br>About 9.18% of employees rate above 70."},
- {f:"Ratings Q3(c): % between 60 and 70?", b:"P(X < 70) = 0.9082; z = (60 − 50)/15 = 0.67 → 0.7486.<br>P(60 < X < 70) = 0.9082 − 0.7486 = 0.1596, about 16% of employees."}
+ {f:"Stars Q1(b): counts 0, 4, 18, 59, 19. Distribution?", b:"We have 100 observations, so divide each count by 100:<br>x: 1, 2, 3, 4, 5<br>P(x): 0, 0.04, 0.18, 0.59, 0.19[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19]]"},
+ {f:"Stars Q1(c): P(X < 4)?", b:"P(X < 4) = P(X = 1) + P(X = 2) + P(X = 3) = 0 + 0.04 + 0.18 = 0.22[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|hl=1,2,3]]"},
+ {f:"Stars Q1(d): E[X] and interpretation", b:"E[X] = Σ x P(x) = 1×0 + 2×0.04 + 3×0.18 + 4×0.59 + 5×0.19 = 3.93<br>An average rating of a car in this set is 3.93 stars.[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|E=3.93]]"},
+ {f:"Stars Q1(e): SD of X", b:"Deviations −2.93, −1.93, −0.93, 0.07, 1.07; squared × P(x): 0, 0.1490, 0.1557, 0.0029, 0.2175.<br>Var(X) = 0.5251; SD = √0.5251 = 0.7246 stars[[bars:1,2,3,4,5;0,0.04,0.18,0.59,0.19|E=3.93|sd=0.7246]]"},
+ {f:"Fingerprints Q2(a): 88% correct, 5 pairs. P(all five correct)?", b:"Let X = number of correct matches out of 5. Since X is a number of successes in n identical independent trials, X ~ B(5, 0.88).<br>P(X = 5) = 0.88⁵ = 0.5277[[binom:5,0.88|hl=5]]"},
+ {f:"Fingerprints Q2(b): exactly one mistake?", b:"One mistake = 4 correct.<br>P(X = 4) = 5!/(4!·1!) · 0.88⁴ · 0.12 = 5 · 0.88⁴ · 0.12 = 0.3598[[binom:5,0.88|hl=4]]"},
+ {f:"Fingerprints Q2(c): at least 4 correct?", b:"\"At least 4\" includes 4.<br>P(X ≥ 4) = P(X = 4) + P(X = 5) = 0.3598 + 0.5277 = 0.8875[[binom:5,0.88|hl=4,5]]"},
+ {f:"Fingerprints Q2(d): more than 2 but less than 5?", b:"P(2 < X < 5) = P(X = 3) + P(X = 4)<br>P(X = 3) = 5!/(3!·2!) · 0.88³ · 0.12² = 10 · 0.88³ · 0.12² = 0.0981<br>= 0.0981 + 0.3598 = 0.4579[[binom:5,0.88|hl=3,4]]"},
+ {f:"Fingerprints Q2(e): E[X] and interpretation", b:"E[X] = np = 5 × 0.88 = 4.4<br>If this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5.[[binom:5,0.88|E=4.4]]"},
+ {f:"Ratings Q3(a): N(50, 15). Lowest \"exemplary\" (top 10%) rating?", b:"Top 10% → 90th percentile. Closest table probability to 0.9 is 0.8997 at z = 1.28.<br>x = μ + zσ = 50 + 1.28 × 15 = 69.2, about 69 if whole numbers.[[normal:50,15|cutr=69.2,top 10%]]"},
+ {f:"Ratings Q3(b): % above 70?", b:"z = (70 − 50)/15 = 1.33; table: 0.9082.<br>P(X > 70) = 1 − P(Z < 1.33) = 1 − 0.9082 = 0.0918<br>About 9.18% of employees rate above 70.[[normal:50,15|gt=70]]"},
+ {f:"Ratings Q3(c): % between 60 and 70?", b:"P(X < 70) = 0.9082; z = (60 − 50)/15 = 0.67 → 0.7486.<br>P(60 < X < 70) = 0.9082 − 0.7486 = 0.1596, about 16% of employees.[[normal:50,15|btw=60,70]]"}
 ]}
 ];
 
@@ -382,42 +410,42 @@ const QC=[
  {q:"Which of these is a random event?", c:["X","{X ≥ 4}","E[X]","x"], a:1, e:"Any statement about the value of X defines an event.", o:["P1","D1"]},
  {q:"X = customers who enter a store in an hour; Y = time between two arrivals. These are:", c:["Both discrete","X discrete, Y continuous","X continuous, Y discrete","Both continuous"], a:1, e:"Counts can be listed; a time can take any value in an interval.", o:["D1"]},
  {q:"x = 0, 1, 2, 3 with probabilities 0.2, 0.3, 0.4, 0.2. Valid distribution?", c:["Yes, every probability is between 0 and 1","No, the probabilities sum to 1.1","No, one probability is negative","Yes, there are four values"], a:1, e:"Both conditions must hold, and the sum fails.", o:["D2","P2"]},
- {q:"X = defective units in a sample of 6. \"At most 2 defective\" is:", c:["X < 2","X ≤ 2","X ≥ 2","X = 2"], a:1, e:"\"At most\" includes the boundary.", o:["D5"]},
- {q:"Same X. \"More than 2 but fewer than 5\" is:", c:["X = 2, 3, 4, 5","X = 3, 4","X = 2, 3, 4","X = 3, 4, 5"], a:1, e:"Both inequalities are strict for a discrete X.", o:["D5"]},
- {q:"X = correct identifications out of 5. \"Exactly one mistake\" is:", c:["X = 1","X = 4","X ≤ 1","X ≥ 4"], a:1, e:"One mistake out of five leaves four correct.", o:["D5"]},
- {q:"Why may P(X = 3) and P(X = 4) be added?", c:["Because the trials are independent","Because {X = 3} and {X = 4} are mutually exclusive","Because X is binomial","Because both use n = 5"], a:1, e:"X can't take two values at once. Independence justifies multiplying across trials inside each term; mutual exclusivity justifies adding across values.", o:["P3","P4"]},
+ {v:"[[binom:6,0.2|hl=0,1,2|cap=At most 2: the 0, 1 and 2 bars]]", q:"X = defective units in a sample of 6. \"At most 2 defective\" is:", c:["X < 2","X ≤ 2","X ≥ 2","X = 2"], a:1, e:"\"At most\" includes the boundary.", o:["D5"]},
+ {v:"[[binom:6,0.4|hl=3,4|cap=More than 2, fewer than 5: the 3 and 4 bars]]", q:"Same X. \"More than 2 but fewer than 5\" is:", c:["X = 2, 3, 4, 5","X = 3, 4","X = 2, 3, 4","X = 3, 4, 5"], a:1, e:"Both inequalities are strict for a discrete X.", o:["D5"]},
+ {v:"[[binom:5,0.88|hl=4]]", q:"X = correct identifications out of 5. \"Exactly one mistake\" is:", c:["X = 1","X = 4","X ≤ 1","X ≥ 4"], a:1, e:"One mistake out of five leaves four correct.", o:["D5"]},
+ {v:"[[binom:5,0.88|hl=3,4|cap=Two separate bars: they can't both happen, so add]]", q:"Why may P(X = 3) and P(X = 4) be added?", c:["Because the trials are independent","Because {X = 3} and {X = 4} are mutually exclusive","Because X is binomial","Because both use n = 5"], a:1, e:"X can't take two values at once. Independence justifies multiplying across trials inside each term; mutual exclusivity justifies adding across values.", o:["P3","P4"]},
  {q:"Why is P(all five correct) = 0.88⁵?", c:["The addition rule","The multiplication rule for independent trials","The complement rule","The trials are mutually exclusive"], a:1, e:"Independent trials: the probability of the whole sequence is the product.", o:["P5"]},
  {q:"Which situation is NOT binomial?", c:["6 calls, each independently resolved on first contact with p = 0.7; X = number resolved","4 cards dealt from one deck; X = number of hearts","10 independent loan applicants, each defaulting with p = 0.05; X = defaults","5 independent shipments, each on time with p = 0.9; X = number on time"], a:1, e:"Dealing without replacement changes the probability of a heart from card to card, so the trials are neither independent nor identical.", o:["D4"]},
  {q:"X = number of umbrellas a store sells in one day. Is X binomial?", c:["Yes, because it is a count","No, because there is no fixed number of trials","Yes, with n = number of customers","No, because X is continuous"], a:1, e:"A binomial count needs a fixed n set in advance.", o:["D4"]},
  {q:"A rep calls 5 clients: two large (buy with p = 0.6) and three small (p = 0.2). Is the number of sales binomial?", c:["Yes, n = 5","No, the probability of success is not the same in every trial","Yes, with p = 0.4","No, because there are two outcomes"], a:1, e:"Constant p is one of the four assumptions, and it fails here.", o:["D4"]},
- {q:"E[X] = 4.4 correct matches out of 5. Which is the correct interpretation?", c:["The expert will identify 4.4 matches","4.4 is the most likely number of matches","Over many repetitions of the five-pair test, the expert would correctly identify 4.4 matches on average","There is a 4.4% chance of a correct match"], a:2, e:"An expected value is an average over repetitions, not a prediction of one result.", o:["D3"]},
+ {v:"[[binom:5,0.88|E=4.4|cap=4.4 isn't even a bar: it's an average]]", q:"E[X] = 4.4 correct matches out of 5. Which is the correct interpretation?", c:["The expert will identify 4.4 matches","4.4 is the most likely number of matches","Over many repetitions of the five-pair test, the expert would correctly identify 4.4 matches on average","There is a 4.4% chance of a correct match"], a:2, e:"An expected value is an average over repetitions, not a prediction of one result.", o:["D3"]},
  {q:"The variance of X is:", c:["The average deviation of X from its expected value","The expected value of the squared deviation of X from its expected value","The square of the expected value","The largest value minus the smallest"], a:1, e:"Roughly, the average squared deviation from the average. The first option is always zero, because deviations cancel.", o:["D3"]},
  {q:"X is measured in dollars. The variance of X is measured in:", c:["Dollars","Dollars squared","No units","Percent"], a:1, e:"That's why the SD, in dollars, is usually reported.", o:["D3"]},
- {q:"X is continuous. P(X = 70) is:", c:["The height of the density curve at 70","0","Small but positive","Undefined"], a:1, e:"Probability for a continuous variable is area over an interval, and a single point has no width.", o:["C1"]},
+ {v:"[[normal:50,15|mark=70|cap=A single line has no area]]", q:"X is continuous. P(X = 70) is:", c:["The height of the density curve at 70","0","Small but positive","Undefined"], a:1, e:"Probability for a continuous variable is area over an interval, and a single point has no width.", o:["C1"]},
  {q:"X is normal. How do P(X > 70) and P(X ≥ 70) compare?", c:["They differ by P(X = 70), which is positive","They are equal","Equal only if μ = 70","P(X ≥ 70) is always larger by 0.5"], a:1, e:"P(X = 70) = 0. For a binomial X, P(X > 3) and P(X ≥ 3) differ.", o:["C1"]},
  {q:"A rating of 70 has z = 1.33. This means:", c:["The rating is 1.33 points above the mean","The rating is 1.33 standard deviations above the mean","The rating is 133% of the mean","The probability of a rating of 70 is 1.33"], a:1, e:"A z-score counts standard deviations from the mean.", o:["C5"]},
- {q:"The table gives 0.9082 for z = 1.33. What is P(Z > 1.33)?", c:["0.9082","0.0918","0.4082","1.33"], a:1, e:"The table gives the area to the left, so the area to the right is its complement.", o:["C4","P3"]},
- {q:"The table lists only positive z. What is P(Z < −1.33)?", c:["−0.9082","0.0918","0.9082","Can't be found from this table"], a:1, e:"By symmetry, the area left of −1.33 equals the area right of 1.33.", o:["C4"]},
- {q:"\"The lowest rating that still puts an employee in the top 10%\" asks for:", c:["P(X > 10)","The 90th percentile of X","The 10th percentile of X","μ + 10%"], a:1, e:"Ten percent lie above it, so ninety percent lie below it.", o:["C5"]},
- {q:"Lead-time demand is normal. A manager wants a 95% service level. The reorder point is:", c:["The 95th percentile of lead-time demand","The 5th percentile","μ + 0.95","μ × 0.95"], a:0, e:"Then P(demand ≤ reorder point) = 0.95.", o:["C5","C6"]},
+ {v:"[[normal:0,1|gt=1.33]]", q:"The table gives 0.9082 for z = 1.33. What is P(Z > 1.33)?", c:["0.9082","0.0918","0.4082","1.33"], a:1, e:"The table gives the area to the left, so the area to the right is its complement.", o:["C4","P3"]},
+ {v:"[[normal:0,1|lt=-1.33]][[normal:0,1|gt=1.33|cap=Mirror images: same area]]", q:"The table lists only positive z. What is P(Z < −1.33)?", c:["−0.9082","0.0918","0.9082","Can't be found from this table"], a:1, e:"By symmetry, the area left of −1.33 equals the area right of 1.33.", o:["C4"]},
+ {v:"[[normal:50,15|cutr=69.2,top 10%]]", q:"\"The lowest rating that still puts an employee in the top 10%\" asks for:", c:["P(X > 10)","The 90th percentile of X","The 10th percentile of X","μ + 10%"], a:1, e:"Ten percent lie above it, so ninety percent lie below it.", o:["C5"]},
+ {v:"[[normal:400,50|cutl=482,95%]]", q:"Lead-time demand is normal. A manager wants a 95% service level. The reorder point is:", c:["The 95th percentile of lead-time demand","The 5th percentile","μ + 0.95","μ × 0.95"], a:0, e:"Then P(demand ≤ reorder point) = 0.95.", o:["C5","C6"]},
  {q:"A store holds s units and demand is X. The stockout risk is:", c:["P(X ≤ s)","P(X > s)","P(X = s)","E[X] − s"], a:1, e:"A stockout happens when demand exceeds what's on hand; the service level is P(X ≤ s).", o:["D5","C6"]},
- {q:"X ~ B(6, 0.1). The quickest way to find P(X ≥ 1) is:", c:["Add P(X = 1) through P(X = 6)","1 − P(X = 0)","P(X = 1)","6 × 0.1"], a:1, e:"The complement of \"at least one\" is \"none\".", o:["P3","D5"]},
- {q:"An airline sells 6 tickets for 5 seats; each passenger independently shows up with p = 0.9. Which template fits \"more passengers show up than there are seats\"?", c:["Distribution from a table","Binomial, P(X = 6)","Normal","None of the three"], a:1, e:"Six identical, independent trials with constant p; more than 5 out of 6 means all 6.", o:["D4","D5"]},
- {q:"A bakery recorded wedding cakes sold per week: 0 in 6 weeks, 1 in 18, 2 in 20, 3 in 8. Which template fits?", c:["Distribution from a table","Binomial","Normal","None of the three"], a:0, e:"The frequency table is the distribution; there is no fixed number of trials.", o:["D1","D2"]},
- {q:"Cereal fill weights are approximately normal, mean 500 g, SD 4 g. Which template fits \"what proportion weigh less than 492 g\"?", c:["Distribution from a table","Binomial","Normal","None of the three"], a:2, e:"A continuous measurement stated to be normal.", o:["C6"]},
- {q:"A manager models hold times as normal with mean 2 min and SD 3 min. What's wrong?", c:["Nothing","It puts substantial probability on negative waiting times, so it doesn't fit","Waiting times are discrete","The SD must be smaller than 1"], a:1, e:"Under that model P(X < 0) = P(Z < −0.67) = 0.2514. Matching the model to the situation is part of applying it.", o:["C6"]},
+ {v:"[[binom:6,0.1|hl=1,2,3,4,5,6|cmp=0|cap=1 minus the red bar]]", q:"X ~ B(6, 0.1). The quickest way to find P(X ≥ 1) is:", c:["Add P(X = 1) through P(X = 6)","1 − P(X = 0)","P(X = 1)","6 × 0.1"], a:1, e:"The complement of \"at least one\" is \"none\".", o:["P3","D5"]},
+ {v:"[[binom:6,0.9|cmp=6]]", q:"An airline sells 6 tickets for 5 seats; each passenger independently shows up with p = 0.9. Which template fits \"more passengers show up than there are seats\"?", c:["Distribution from a table","Binomial, P(X = 6)","Normal","None of the three"], a:1, e:"Six identical, independent trials with constant p; more than 5 out of 6 means all 6.", o:["D4","D5"]},
+ {v:"[[bars:0,1,2,3;0.1154,0.3462,0.3846,0.1538|cap=The table is the distribution: 6, 18, 20, 8 out of 52 weeks]]", q:"A bakery recorded wedding cakes sold per week: 0 in 6 weeks, 1 in 18, 2 in 20, 3 in 8. Which template fits?", c:["Distribution from a table","Binomial","Normal","None of the three"], a:0, e:"The frequency table is the distribution; there is no fixed number of trials.", o:["D1","D2"]},
+ {v:"[[normal:500,4|lt=492]]", q:"Cereal fill weights are approximately normal, mean 500 g, SD 4 g. Which template fits \"what proportion weigh less than 492 g\"?", c:["Distribution from a table","Binomial","Normal","None of the three"], a:2, e:"A continuous measurement stated to be normal.", o:["C6"]},
+ {v:"[[normal:2,3|lt=0|bad]]", q:"A manager models hold times as normal with mean 2 min and SD 3 min. What's wrong?", c:["Nothing","It puts substantial probability on negative waiting times, so it doesn't fit","Waiting times are discrete","The SD must be smaller than 1"], a:1, e:"Under that model P(X < 0) = P(Z < −0.67) = 0.2514. Matching the model to the situation is part of applying it.", o:["C6"]},
  /* drill scenarios */
  {q:"An inspector draws 4 parts, without replacement, from a batch of 10 that contains 3 defectives. X = defectives drawn. Binomial?", c:["Yes, X ~ B(4, 0.3)","No: drawing without replacement from a small batch makes the trials dependent","Yes, because each part is defective or not","No, because X is continuous"], a:1, e:"After each draw the chance of a defective changes. A near miss: it looks binomial but independence and constant p fail.", o:["D4"]},
  {q:"A hotel logs walk-in rooms booked on each of the last 100 nights (0 rooms on 12 nights, 1 on 30, ...). X = walk-in rooms booked on a night. Which template?", c:["Distribution from a table","Binomial","Normal","None of the three"], a:0, e:"Historical frequencies used as probabilities: the table is the distribution.", o:["D1","D2"]},
  {q:"Each of 5 independent job candidates accepts an offer with probability 0.7. X = acceptances. What is the model?", c:["X ~ B(5, 0.7)","X ~ B(0.7, 5)","Normal with μ = 3.5","Distribution from a table"], a:0, e:"Successes in n = 5 identical independent trials with p = 0.7: write X ~ B(n, p) = B(5, 0.7).", o:["D4"]},
  {q:"X = number of customers who arrive at a bank in one hour. Which assumption makes this NOT binomial?", c:["Two outcomes per trial","There is no fixed number of trials","p is too small","X is continuous"], a:1, e:"Arrivals in an hour have no n set in advance.", o:["D4"]},
- {q:"Invoice amounts at a firm are strongly right-skewed with mean $400 and SD $500. A colleague proposes a normal model. Your verdict?", c:["Fine, any variable with a mean and SD is normal","Poor fit: amounts can't be negative and are skewed, but the normal would put lots of probability below $0","Fine if you round to whole dollars","Use binomial instead"], a:1, e:"P(X < 0) = P(Z < −0.8) = 0.2119 under that model. The normal fits roughly symmetric quantities.", o:["C6"]},
+ {v:"[[normal:400,500|lt=0|bad]]", q:"Invoice amounts at a firm are strongly right-skewed with mean $400 and SD $500. A colleague proposes a normal model. Your verdict?", c:["Fine, any variable with a mean and SD is normal","Poor fit: amounts can't be negative and are skewed, but the normal would put lots of probability below $0","Fine if you round to whole dollars","Use binomial instead"], a:1, e:"P(X < 0) = P(Z < −0.8) = 0.2119 under that model. The normal fits roughly symmetric quantities.", o:["C6"]},
  {q:"Delivery time on a fixed route is approximately normal. Is X = delivery time discrete or continuous?", c:["Discrete, because we record whole minutes","Continuous, because a time can take any value in an interval","Discrete, because there are finitely many deliveries","Neither"], a:1, e:"Decide by the set of values X can take; time is continuous.", o:["D1"]},
  {q:"Survey: 8 employees of the same store are asked whether they're satisfied, each with probability 0.6. Why might X = satisfied employees not be binomial?", c:["n is too small","Employees of one store tend to answer alike, so the trials may not be independent","Satisfied is not an outcome","p must be 0.5"], a:1, e:"Linked trials (same store, same household) break independence.", o:["D4"]},
- {q:"X ~ B(5, 0.8). Which expression is P(X = 3)?", c:["5 × 3 × 0.8³ × 0.2²","10 × 0.8³ × 0.2²","0.8³ × 0.2²","10 × 0.8² × 0.2³"], a:1, e:"C(5,3) = 5!/(3!·2!) = 10, times p³ for 3 successes and (1 − p)² for 2 failures.", o:["D5"]},
+ {v:"[[seq:5,3]]", q:"X ~ B(5, 0.8). Which expression is P(X = 3)?", c:["5 × 3 × 0.8³ × 0.2²","10 × 0.8³ × 0.2²","0.8³ × 0.2²","10 × 0.8² × 0.2³"], a:1, e:"C(5,3) = 5!/(3!·2!) = 10, times p³ for 3 successes and (1 − p)² for 2 failures.", o:["D5"]},
  {q:"Which full answer earns full credit for the binomial model?", c:["\"It's binomial because each pair is right or wrong.\"","\"X ~ B(5, 0.88).\"","\"Let X = correct matches out of 5. X is the number of successes in 5 identical independent trials, so X ~ B(5, 0.88).\"","\"It's a probability problem, so binomial.\""], a:2, e:"Define X, name the structure, give the parameters. Two outcomes alone is only one assumption.", o:["D4"]},
- {q:"\"The highest score that is still in the bottom 20%\" asks for:", c:["The 80th percentile","The 20th percentile","P(X < 20)","μ − 20"], a:1, e:"Twenty percent lie below it. Its z is negative: −0.84.", o:["C5"]},
- {q:"P(Z < z) = 0.9082 at z = 1.33. What is P(Z > −1.33)?", c:["0.0918","0.9082","0.4082","1.8164"], a:1, e:"By symmetry, the area right of −1.33 equals the area left of 1.33.", o:["C4"]},
+ {v:"[[normal:500,100|cutl=416,bottom 20%]]", q:"\"The highest score that is still in the bottom 20%\" asks for:", c:["The 80th percentile","The 20th percentile","P(X < 20)","μ − 20"], a:1, e:"Twenty percent lie below it. Its z is negative: −0.84.", o:["C5"]},
+ {v:"[[normal:0,1|gt=-1.33]]", q:"P(Z < z) = 0.9082 at z = 1.33. What is P(Z > −1.33)?", c:["0.0918","0.9082","0.4082","1.8164"], a:1, e:"By symmetry, the area right of −1.33 equals the area left of 1.33.", o:["C4"]},
  {q:"E[X] = 2.35 items per order for one order drawn at random from 200. Which interpretation is complete?", c:["\"On average, 2.35 items.\"","\"The order will have 2.35 items.\"","\"An average number of items in an order in this set of 200 orders is 2.35.\"","\"2.35 is the most likely number of items.\""], a:2, e:"Average, what it's over (the 200 orders), context and units. The first option is partial: an average of what?", o:["D3"]}
 ];
 
@@ -458,7 +486,7 @@ table:[
  "Two checks: no probability below 0 or above 1, and they all add up to exactly 1 (something has to happen).<ex>Weather: 0.5 sun, 0.3 cloud, 0.3 rain adds to 1.1. Impossible, so it's not valid.</ex>",
  "Before doing math, write which numbers count. \"Fewer than 4\" means 1, 2, 3 (not 4). \"At least 4\" means 4, 5 (4 counts).<ex>\"At least 18 to vote\": 18 counts. \"Over 18\": 18 doesn't.</ex>",
  "X can't be 3 and 4 at the same time, so \"3 or 4\" has no overlap, and you just add the chances.<ex>A die can't land on 2 and 5 at once, so P(2 or 5) = 1/6 + 1/6.</ex>",
- "Multiply each value by its probability, then add them all up. It's a weighted average.<ex>A game pays $10 with chance 0.2 and $0 with chance 0.8: E = 10(0.2) + 0(0.8) = $2.</ex>",
+ "Multiply each value by its probability, then add them all up. It's a weighted average.<ex>A game pays $10 with chance 0.2 and $0 with chance 0.8: E = 10(0.2) + 0(0.8) = $2.</ex>[[bars:0,10;0.8,0.2|E=2|cap=The mean $2 sits between the two possible payouts]]",
  "It's the long-run average, not a value you'll actually see.<ex>The average family has 1.9 kids. No family has 1.9 kids, but the average still makes sense.</ex>",
  "Say three things: (1) it's an average, (2) average over what (this set of cars, or many repeats), (3) the units.<ex>\"An average rating of a car in this set is 3.93 stars.\" Average ✓, over this set ✓, stars ✓.</ex>",
  "Saying \"on average 4.4\" without saying over what loses some points. Saying it \"will be\" 4.4 or \"most likely\" 4.4 loses all of them.<ex>You can't get 4.4 fingerprints right. That's the giveaway that E[X] isn't a prediction.</ex>",
@@ -471,7 +499,7 @@ binom:[
  "Binomial = repeat the same yes/no thing a set number of times, same odds each time, and no attempt affects another.<ex>Shoot 5 free throws, 70% each, misses don't affect the next shot: binomial.</ex>",
  "Say what X counts, say why it's binomial (n identical, independent trials, same chance), then write B(n, p).<ex>\"X = free throws made out of 5. Number of successes in 5 identical independent trials, so X ~ B(5, 0.7).\"</ex>",
  "\"It's binomial\" with no reason only gets partial credit. \"Two outcomes\" alone isn't enough, because independence and same-chance are what usually break.",
- "The formula: (how many arrangements) × (chance of a success)^(successes) × (chance of failure)^(failures).<ex>2 heads in 3 flips: 3 arrangements (HHT, HTH, THH) × 0.5² × 0.5¹ = 0.375.</ex>",
+ "The formula: (how many arrangements) × (chance of a success)^(successes) × (chance of failure)^(failures).<ex>2 heads in 3 flips: 3 arrangements (HHT, HTH, THH) × 0.5² × 0.5¹ = 0.375.</ex>[[seq:3,2]]",
  "One specific order (like HHT) has probability p × p × (1 − p). The coefficient counts how many orders give the same total.<ex>Getting exactly 1 six in 3 rolls can happen 3 ways: first, second or third roll.</ex>",
  "C(n, x) = how many ways to choose which x trials are the successes. Use n!/(x!(n − x)!).<ex>C(5,2): 5!/(2!·3!) = 120/(2·6) = 10. Not 5 × 2.</ex>",
  "Independent: one trial doesn't affect another (so multiply). Mutually exclusive: two things can't both happen (so add).<ex>Two coin flips are independent. \"X = 3\" and \"X = 4\" are mutually exclusive. Different ideas, both used here.</ex>",
@@ -483,10 +511,10 @@ binom:[
  "If the odds change between tries, or there's no fixed number of tries, it's not binomial.<ex>Drawing 3 cards from a deck without putting them back: the odds shift each draw. Not binomial.</ex>"
 ],
 normal:[
- "z tells you how many standard deviations away from average something is. Positive = above, negative = below.<ex>Average height 66 in, SD 3. Someone 72 in tall: z = (72 − 66)/3 = 2, two SDs above average.</ex>",
+ "z tells you how many standard deviations away from average something is. Positive = above, negative = below.<ex>Average height 66 in, SD 3. Someone 72 in tall: z = (72 − 66)/3 = 2, two SDs above average.</ex>[[normal:66,3|mark=72|cap=Heights: 72 inches is 2 SDs above the mean of 66]]",
  "Every number in the table is the share of the bell curve to the LEFT of your z (below it).<ex>z = 0 → 0.5000: half the curve is below the average.</ex>",
- "Table gives \"below\". For \"above\", do 1 minus the table number.<ex>If 90.82% are below, then 100% − 90.82% = 9.18% are above.</ex>",
- "Between two values = (share below the bigger one) − (share below the smaller one).<ex>Below 70: 90.82%. Below 60: 74.86%. Between: 15.96%.</ex>",
+ "Table gives \"below\". For \"above\", do 1 minus the table number.<ex>If 90.82% are below, then 100% − 90.82% = 9.18% are above.</ex>[[normal:50,15|gt=70]]",
+ "Between two values = (share below the bigger one) − (share below the smaller one).<ex>Below 70: 90.82%. Below 60: 74.86%. Between: 15.96%.</ex>[[normal:50,15|btw=60,70]]",
  "The bell curve is a mirror. The share below −1.33 is the same as the share above +1.33.<ex>P(Z < −1.33) = 1 − 0.9082 = 0.0918.</ex>",
  "Here you're given a percentage and asked for a value. Go backwards: find the % inside the table, read off z, then x = average + z × SD.<ex>Top 10% means 90% are below → find 0.90 in the table → z = 1.28 → x = 50 + 1.28 × 15 = 69.2.</ex>",
  "For a bottom cutoff, your answer is below average, so z is negative.<ex>Bottom 10%: z = −1.28. x = 50 − 1.28 × 15 = 30.8.</ex>",
@@ -656,6 +684,7 @@ function genT1(){
   else { const a=vals[rnd(k-2)], b=a+2; ev={sym:`P(${a} < X ≤ ${b})`, w:`more than ${a} but at most ${b}`, v:vals.filter(x=>x>a&&x<=b), wrong:[vals.filter(x=>x>=a&&x<=b), vals.filter(x=>x>a&&x<b), vals.filter(x=>x>=a&&x<b)]}; }
   if(ctx.evNum) ev.w=ev.w.replace("fewer than","lower than").replace("more than","higher than");
   const pv=ev.v.reduce((s,x)=>s+P[vals.indexOf(x)],0);
+  const BARS=`${vals.join(",")};${P.map(x=>+x.toFixed(4)).join(",")}`;
   const tbl=`<table class="dt"><tr><th>${ctx.head[0]}</th><th>${ctx.head[1]}</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${cnt[i]}</td></tr>`).join("")}</table>`;
   const sumE=vals.map((x,i)=>`${x}×${fnum(P[i])}`).join(" + ");
   const opts=uniqOpts(list(ev.v), ev.wrong.filter(w=>w.length).map(list));
@@ -666,19 +695,19 @@ function genT1(){
     model:`X assumes a finite number of values (specifically, ${k}), and therefore it is discrete.`},
    {label:"b", q:"Use the information in the table to find the probability distribution for X.",
     steps:[{k:"multi", q:`Divide each count by ${N}. Enter P(x):`, fields:vals.map((x,i)=>({l:`P(${x})`, ans:P[i]})), tol:.0006, o:["P2","D2"]}],
-    model:`We have a total of ${N} observations, so divide each count by ${N}:<table class="dt"><tr><th>x</th>${vals.map(x=>`<td>${x}</td>`).join("")}</tr><tr><th>P(x)</th>${P.map(p=>`<td>${fnum(p)}</td>`).join("")}</tr></table>Check: each is between 0 and 1, and they sum to 1.`},
+    model:`We have a total of ${N} observations, so divide each count by ${N}:<table class="dt"><tr><th>x</th>${vals.map(x=>`<td>${x}</td>`).join("")}</tr><tr><th>P(x)</th>${P.map(p=>`<td>${fnum(p)}</td>`).join("")}</tr></table>Check: each is between 0 and 1, and they sum to 1.[[bars:${BARS}|cap=The distribution of X as bars]]`},
    {label:"c", q:`Find the probability that ${ctx.ev(ev.w)}, that is, ${ev.sym}.`,
     steps:[mcShuffle({k:"mc", q:`Which values of X make ${ev.sym} true?`, c:opts, a:0, e:"Watch strict versus non-strict inequalities: \"fewer than\" and \"more than\" exclude the boundary, \"at least\" and \"at most\" include it.", o:["D1","P3"]}),
            {k:"num", q:`${ev.sym} = ?`, ans:pv, tol:.0006, o:["P3"]}],
-    model:`${ev.sym} = ${ev.v.map(x=>`P(X = ${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}<br>We may add because different values of X are mutually exclusive events.`},
+    model:`${ev.sym} = ${ev.v.map(x=>`P(X = ${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}<br>We may add because different values of X are mutually exclusive events.[[bars:${BARS}|hl=${ev.v.join(",")}|cap=${ev.sym}: the highlighted bars]]`},
    {label:"d", q:"Find the expected value of X and practically interpret the result.",
     steps:[{k:"num", q:"E[X] = Σ x·P(x) = ?", ans:E, tol:.006, o:["D3"]},
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:interpOpts, a:0, ce:["Full credit: an average, what it's averaged over, context and units.","Partial: it says average, but not of what. That's where the meaning of E[X] lives.","No credit: E[X] is not a prediction of one result.","No credit: E[X] is not the most likely value; it may not even be a possible value."], e:"E[X] is an average over the set (or over many repetitions), never a prediction.", o:["D3"]})],
-    model:`E[X] = Σ x·P(x) = ${sumE} = ${fnum(E)}<br>Interpretation: ${ctx.interp(Er,N)}`},
+    model:`E[X] = Σ x·P(x) = ${sumE} = ${fnum(E)}<br>Interpretation: ${ctx.interp(Er,N)}[[bars:${BARS}|E=${fnum(E)}|cap=The mean is the balance point of the bars]]`},
    {label:"e", q:"Find the standard deviation of X.",
     steps:[{k:"num", q:"Var(X) = Σ (x − E[X])²·P(x) = ?", ans:V, tol:.006, o:["D3"]},
            {k:"num", q:"SD(X) = √Var(X) = ?", ans:SD, tol:.006, o:["D3"]}],
-    model:`<table class="dt sm"><tr><th>x</th><th>P(x)</th><th>x − E[X]</th><th>(x − E[X])²</th><th>P(x)(x − E[X])²</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${fnum(P[i])}</td><td>${fnum(dev[i])}</td><td>${f4(sq[i])}</td><td>${f4(prod[i])}</td></tr>`).join("")}</table>Var(X) = ${prod.map(f4).join(" + ")} = ${f4(V)}<br>SD(X) = √${f4(V)} = ${f4(SD)} ${ctx.unit}`}
+    model:`<table class="dt sm"><tr><th>x</th><th>P(x)</th><th>x − E[X]</th><th>(x − E[X])²</th><th>P(x)(x − E[X])²</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${fnum(P[i])}</td><td>${fnum(dev[i])}</td><td>${f4(sq[i])}</td><td>${f4(prod[i])}</td></tr>`).join("")}</table>Var(X) = ${prod.map(f4).join(" + ")} = ${f4(V)}<br>SD(X) = √${f4(V)} = ${f4(SD)} ${ctx.unit}[[bars:${BARS}|E=${fnum(E)}|sd=${f4(SD)}|cap=Shaded band: one SD either side of the mean]]`}
   ];
   return {tpl:1, title:ctx.name, setup:ctx.setup(N)+tbl, parts};
 }
@@ -745,26 +774,26 @@ function genT2(){
         e:"Define X in words, name the structure, then X ~ B(n, p).", o:["D1","D4"]}),
       mcShuffle({k:"mc", q:`Which values of X?`, c:uniqOpts(list([allNone]), [list([allNone===n?0:n]), list(allNone===n?range(1,n):range(0,1)), allNone===n?`X ≥ 1`:`X ≤ 1`]), a:0, e:allNone===n?"All of them succeed: X = n.":"None succeed: X = 0.", o:["D5"]}),
       {k:"num", q:`P(X = ${allNone}) = ?`, ans:ta.v, tol:.0015, o:["D5","P5"]}],
-    model:`${Xdef} Since this random variable can be represented as a number of successes in ${n} identical independent trials, X ~ B(${n}, ${ps}).<br>P(X = ${allNone}) = ${allNone===n?`${ps}${sup(n)}`:`${qs}${sup(n)}`} = ${f4(ta.v)}`},
+    model:`${Xdef} Since this random variable can be represented as a number of successes in ${n} identical independent trials, X ~ B(${n}, ${ps}).<br>P(X = ${allNone}) = ${allNone===n?`${ps}${sup(n)}`:`${qs}${sup(n)}`} = ${f4(ta.v)}[[binom:${n},${ps}|hl=${allNone}]]`},
    {label:"b", q:bQ,
     steps:[mcShuffle({k:"mc", q:"Which value of X?", c:uniqOpts(list([xb]), [list([kf]), `X ≤ ${kf}`, `X ≥ ${xb}`, list([Math.max(0,xb-1)])]), a:0, e:`X counts ${ctx.xs}. ${kf} failure${kf>1?"s":""} out of ${n} leaves ${xb} successes.`, o:["D5"]}),
            {k:"num", q:`P(X = ${xb}) = ?`, ans:tb.v, tol:.0015, o:["D5","P5"]}],
-    model:`${kf} ${kf===1?ctx.who[0]:ctx.who[1]} that ${kf===1?ctx.no[0]:ctx.no[1]} out of ${n} means X = ${xb}.<br>${tb.line}`},
+    model:`${kf} ${kf===1?ctx.who[0]:ctx.who[1]} that ${kf===1?ctx.no[0]:ctx.no[1]} out of ${n} means X = ${xb}.<br>${tb.line}[[binom:${n},${ps}|hl=${xb}]]`},
    {label:"c", q:cQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(cv,cWrong), a:0, e:"\"At least\" and \"at most\" include the boundary.", o:["D5","P3"]}),
            ...(cK==="ge1"?[mcShuffle({k:"mc", q:"Quickest route?", c:["1 − P(X = 0)",`P(X = 1)`,`${n} × ${ps}`,`P(X = 0)`], a:0, e:"The complement of \"at least one\" is \"none\".", o:["P3"]})]:[]),
            {k:"num", q:`${cSym} = ?`, ans:cAns, tol:.002, o:["D5","P3","P4"]}],
-    model:cModel},
+    model:cModel+(cK==="ge1"?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=0|cap=${cSym}: 1 minus the red bar]]`:cK==="le"&&hiP?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=${n}|cap=${cSym}: 1 minus the red bar]]`:`[[binom:${n},${ps}|hl=${cv.join(",")}|cap=${cSym}: the highlighted bars]]`)},
    {label:"d", q:dQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(dv,[range(a,b), range(a,b-1), range(a+1,b)]), a:0, e:"Both inequalities are strict for a discrete X.", o:["D5","P3"]}),
            mcShuffle({k:"mc", q:"Why may you add these probabilities?", c:["The values of X are mutually exclusive events","The trials are independent","X is binomial","Each probability is less than 1"], a:0, e:"Mutual exclusivity justifies adding across values; independence justifies multiplying inside each term.", o:["P4"]}),
            {k:"num", q:`${dSym} = ?`, ans:dAns, tol:.002, o:["D5","P3"]}],
-    model:`${dSym} = ${dv.map(x=>`P(X = ${x})`).join(" + ")}<br>${td.map(t=>t.line).join("<br>")}<br>${dSym} = ${td.map(t=>f4(t.v)).join(" + ")} = ${f4(dAns)}`},
+    model:`${dSym} = ${dv.map(x=>`P(X = ${x})`).join(" + ")}<br>${td.map(t=>t.line).join("<br>")}<br>${dSym} = ${td.map(t=>f4(t.v)).join(" + ")} = ${f4(dAns)}[[binom:${n},${ps}|hl=${dv.join(",")}|cap=${dSym}: the highlighted bars]]`},
    {label:"e", q:`Find the expected number of ${ctx.xs} and practically interpret it.`,
     steps:[{k:"num", q:"E[X] = np = ?", ans:E, tol:.006, o:["D3"]},
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:[interp, `On average, ${fnum(E)} ${ctx.succ}.`, `${fnum(E)} of the ${n} ${ctx.who[1]} will ${ctx.yes[1]}.`, `${fnum(E)} is the most likely number of ${ctx.succ}.`], a:0,
              ce:["Full credit: average, over many repetitions, in context.","Partial: an average of what? Say it's over many repetitions of the experiment.","No credit: a prediction of one result. A count can't even be a decimal.","No credit: E[X] is not the most likely value."], e:"An average over many repetitions of the same experiment.", o:["D3"]})],
-    model:`E[X] = np = ${n} × ${ps} = ${fnum(E)}<br>Interpretation: ${interp}`}
+    model:`E[X] = np = ${n} × ${ps} = ${fnum(E)}<br>Interpretation: ${interp}[[binom:${n},${ps}|E=${fnum(E)}|cap=E = np sits at the balance point of the bars]]`}
   ];
   return {tpl:2, title:ctx.name, setup:ctx.intro(n,p)+" Find the following probabilities:", parts};
 }
@@ -824,6 +853,8 @@ function genT3(){
   const tol=Math.max(.011*ctx.sd+.02, ctx.int?.6:0);
   const lookup=cut.P<.5?`${cut.name}: ${cut.why}. The table only has positive z, so look up ${r2(1-cut.P)}: the closest table probability is ${f4(zf.t)} at z = ${fz(-zf.z)}${zf.alt!=null?` (or ${fz(-zf.alt)})`:""}. By symmetry the ${cut.name} has z = ${fz(zf.z)}.`
     :`We need the ${cut.name} (${cut.why}). The closest table probability to ${cut.P} is ${f4(zf.t)}, for z = ${fz(zf.z)}${zf.alt!=null?` (${fz(zf.alt)} is equally close; either is fine if you say which)`:""}.`;
+  const svc=cut.why.startsWith("P(demand");
+  const cutViz=`[[normal:${ctx.mu},${ctx.sd}|${svc?`cutl=${fnum(xc)},${pctS(cut.P)}%`:cut.P>=.5?`cutr=${fnum(xc)},top ${pctS(r4(1-cut.P))}%`:`cutl=${fnum(xc)},bottom ${pctS(cut.P)}%`}]]`;
   const pctOpts=uniqOpts(`The ${cut.name}`, [`The ${pctName(1-cut.P)}`, `P(X > ${Math.round(cut.P*100)})`, `μ + ${Math.round(cut.P*100)}%`]);
   // (b) above or below
   const bk=pick(["aboveHi","belowLo","belowHi","aboveLo"]);
@@ -837,7 +868,7 @@ function genT3(){
   else { bAns=t; bq=ctx.above(bx); bModel=`By symmetry, P(X > ${bx}) = P(Z > ${fz(bz)}) = P(Z < ${az}) = ${f4(t)}`; bSent=ctx.sAbove(bx,pctS(bAns)); }
   // (c) between: either both above the mean, or straddling it
   let c1,c2;
-  if(Math.random()<.5){ c1=nx(ctx,.3,1.1,1); c2=nx(ctx,1.2,2.3,1); }
+  if(Math.random()<.5){ c1=nx(ctx,.3,1.1,1); c2=nx(ctx,Math.max(1.2,Math.abs(c1.z)+.5),2.4,1); }
   else { c1=nx(ctx,.4,1.6,-1); c2=nx(ctx,.4,1.8,1); }
   const p1=phi(c1.z), p2=phi(c2.z), cAns=r4(p2-p1);
   const p1txt=c1.z<0?`P(X < ${c1.x}) = P(Z < ${fz(c1.z)}) = 1 − P(Z < ${fz(-c1.z)}) = 1 − ${f4(phi(-c1.z))} = ${f4(p1)}`:`P(X < ${c1.x}) = P(Z < ${fz(c1.z)}) = ${f4(p1)}`;
@@ -846,16 +877,16 @@ function genT3(){
     steps:[mcShuffle({k:"mc", q:"What are you looking for?", c:pctOpts, a:0, e:`${cut.why}.`, o:["C5"]}),
            {k:"num", q:"z from the table = ?", ans:zf.z, alt:zf.alt, tol:.0051, o:["C4","C5"]},
            {k:"num", q:`x = μ + zσ = ? (${ctx.unit})`, ans:xc, alt:xAlt, tol, o:["C5","C6"]}],
-    model:`${lookup}<br>x = μ + zσ = ${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)} ${ctx.unit}${xAlt!=null?` (with z = ${fz(zf.alt)}: ${fnum(xAlt)})`:""}<br>${cut.c(xc)}`},
+    model:`${lookup}<br>x = μ + zσ = ${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)} ${ctx.unit}${xAlt!=null?` (with z = ${fz(zf.alt)}: ${fnum(xAlt)})`:""}<br>${cut.c(xc)}${cutViz}`},
    {label:"b", q:bq,
     steps:[{k:"num", q:"z = (x − μ)/σ = ?", ans:bz, tol:.0051, o:["C5"]},
            {k:"num", q:"Probability (as a decimal) = ?", ans:bAns, tol:.0015, pct:true, o:["C4","P3"]}],
-    model:`${zLine(bx,ctx,bz)}<br>The table gives P(Z < ${az}) = ${f4(t)}.<br>${bModel}<br>${bSent}`},
+    model:`${zLine(bx,ctx,bz)}<br>The table gives P(Z < ${az}) = ${f4(t)}.<br>${bModel}<br>${bSent}[[normal:${ctx.mu},${ctx.sd}|${bk.startsWith("above")?"gt":"lt"}=${bx}]]`},
    {label:"c", q:ctx.between(c1.x,c2.x),
     steps:[{k:"num", q:`z for ${c1.x} = ?`, ans:c1.z, tol:.0051, o:["C5"]},
            {k:"num", q:`z for ${c2.x} = ?`, ans:c2.z, tol:.0051, o:["C5"]},
            {k:"num", q:"Probability (as a decimal) = ?", ans:cAns, tol:.0015, pct:true, o:["C4","P3"]}],
-    model:`P(${c1.x} < X < ${c2.x}) = P(X < ${c2.x}) − P(X < ${c1.x})<br>${zLine(c2.x,ctx,c2.z)} → P(X < ${c2.x}) = ${f4(p2)}<br>${zLine(c1.x,ctx,c1.z)} → ${p1txt}<br>P(${c1.x} < X < ${c2.x}) = ${f4(p2)} − ${f4(p1)} = ${f4(cAns)}<br>${ctx.sBetween(c1.x,c2.x,pctS(cAns))}`}
+    model:`P(${c1.x} < X < ${c2.x}) = P(X < ${c2.x}) − P(X < ${c1.x})<br>${zLine(c2.x,ctx,c2.z)} → P(X < ${c2.x}) = ${f4(p2)}<br>${zLine(c1.x,ctx,c1.z)} → ${p1txt}<br>P(${c1.x} < X < ${c2.x}) = ${f4(p2)} − ${f4(p1)} = ${f4(cAns)}<br>${ctx.sBetween(c1.x,c2.x,pctS(cAns))}[[normal:${ctx.mu},${ctx.sd}|btw=${c1.x},${c2.x}]]`}
   ];
   return {tpl:3, title:ctx.name, setup:ctx.setup, parts};
 }
@@ -882,27 +913,28 @@ const DRILLS={
    else if(kind==="one"){ return {q:`${what}. Fastest way to get P(at least one)?`, c:["1 − P(X = 0)","P(X = 1)",`P(X = 1) + ... + P(X = ${n}), term by term`,`1 − P(X = ${n})`], a:0, e:"The opposite of \"at least one\" is \"none\".", o:["P3","D5"]}; }
    else { const k=pick([5,10,15,20,25]); const top=kind==="top"; const name=top?pctName((100-k)/100):pctName(k/100);
      return {q:top?`Normal X. \"The lowest value that still makes the top ${k}%\" is the...`:`Normal X. \"The highest value that is still in the bottom ${k}%\" is the...`,
-       c:[name, top?pctName(k/100):pctName((100-k)/100), `P(X > ${k})`, `μ ${top?"+":"−"} ${k}%`], a:0, e:top?`${k}% lie above it, so ${100-k}% lie below it.`:`${k}% lie below it.`, o:["C5"]}; }
-   return {q:`${what}. \"${q}\" means:`, c:uniqOpts(list(v), wrong.filter(w=>w.length).map(list)), a:0, e, o}; }},
+       c:[name, top?pctName(k/100):pctName((100-k)/100), `P(X > ${k})`, `μ ${top?"+":"−"} ${k}%`], a:0, e:top?`${k}% lie above it, so ${100-k}% lie below it.`:`${k}% lie below it.`, o:["C5"], v:`[[normal:0,1|${top?`cutr=${zFor(1-k/100).z},top ${k}%`:`cutl=${(-zFor(1-k/100).z)},bottom ${k}%`}]]`}; }
+   return {q:`${what}. \"${q}\" means:`, c:uniqOpts(list(v), wrong.filter(w=>w.length).map(list)), a:0, e, o, v:`[[binom:${n},${ctx.p[0]}|hl=${v.join(",")}|cap=${q}: the highlighted bars]]`}; }},
  ztable:{title:"Table reading", sub:"z → area, area → z, with symmetry", gen(){
    const kind=pick(["below","above","negbelow","negabove","inverse","inverse"]);
    const r=3+rnd(23), c=rnd(10), z=(r*10+c)/100, t=ZT[r][c], zs=z.toFixed(2);
    const f=x=>x.toFixed(4);
    if(kind==="inverse"){ const P=pick([.8,.85,.9,.95,.975,.99,.75,.7,.6]); const zf=zFor(P);
      const c4=numOpts(zf.z,[zf.z+.01*(1+rnd(3)),-zf.z,r2(P),zf.z-.1],x=>x.toFixed(2));
-     return {q:`Which z has about ${Math.round(P*1000)/10}% of the area to its LEFT?`, c:c4.map(x=>x.toFixed(2).replace("-","−")), a:0, e:`Find the probability closest to ${P} inside the table: ${f(zf.t)} at z = ${zf.z.toFixed(2)}${zf.alt!=null?` (or ${zf.alt.toFixed(2)})`:""}.`, o:["C4","C5"]}; }
+     return {q:`Which z has about ${Math.round(P*1000)/10}% of the area to its LEFT?`, c:c4.map(x=>x.toFixed(2).replace("-","−")), a:0, e:`Find the probability closest to ${P} inside the table: ${f(zf.t)} at z = ${zf.z.toFixed(2)}${zf.alt!=null?` (or ${zf.alt.toFixed(2)})`:""}.`, o:["C4","C5"], v:`[[normal:0,1|lt=${zf.z}]][[zt:${zf.z}]]`}; }
    let q,ans,e;
    if(kind==="below"){ q=`P(Z < ${zs}) = ?`; ans=t; e=`Read row ${zs.slice(0,3)}, column 0.0${zs[3]}: the table gives area to the left.`; }
    else if(kind==="above"){ q=`P(Z > ${zs}) = ?`; ans=r4(1-t); e=`Complement: 1 − ${f(t)} = ${f(1-t)}.`; }
    else if(kind==="negbelow"){ q=`P(Z < −${zs}) = ?`; ans=r4(1-t); e=`Symmetry: P(Z < −${zs}) = 1 − P(Z < ${zs}) = 1 − ${f(t)} = ${f(1-t)}.`; }
    else { q=`P(Z > −${zs}) = ?`; ans=t; e=`Symmetry: the area right of −${zs} equals the area left of ${zs}: ${f(t)}.`; }
    const c4=numOpts(ans,[r4(1-ans), ZT[Math.min(30,r+1)][c], r4(t-.5), ZT[r][(c+1)%10]],f);
-   return {q, c:c4.map(f), a:0, e, o:["C4"]}; }},
+   const zz=kind.startsWith("neg")?-z:z, side=kind.endsWith("above")?"gt":"lt";
+  return {q, c:c4.map(f), a:0, e, o:["C4"], v:`[[normal:0,1|${side}=${zz}]][[zt:${z}]]`}; }},
  coef:{title:"Binomial pieces", sub:"C(n, x), powers and the setup", gen(){
    const kind=pick(["c","c","c","setup"]);
    if(kind==="c"){ const n=4+rnd(3), x=1+rnd(n-1), v=C(n,x);
      const c4=numOpts(v,[n*x, fact(n)/fact(x), x===1?n+1:C(n,x-1)+ (C(n,x-1)===v?1:0), v+n],x=>String(x));
-     return {q:`C(${n}, ${x}) = ?`, c:c4.map(String), a:0, e:`${n}!/(${x}!·${n-x}!) = ${fact(n)}/(${fact(x)}·${fact(n-x)}) = ${v}. Not ${n} × ${x}.`, o:["D5"]}; }
+     return {q:`C(${n}, ${x}) = ?`, c:c4.map(String), a:0, e:`${n}!/(${x}!·${n-x}!) = ${fact(n)}/(${fact(x)}·${fact(n-x)}) = ${v}. Not ${n} × ${x}.`, o:["D5"], v:`[[seq:${n},${x}]]`}; }
    const n=4+rnd(3), x=1+rnd(n-1), p=pick([.1,.2,.3,.7,.8,.9,.85,.75]), q=r2(1-p);
    const ok=`${C(n,x)} × ${p}${sup(x)} × ${q}${sup(n-x)}`;
    return {q:`X ~ B(${n}, ${p}). Which expression is P(X = ${x})?`, c:uniqOpts(ok,[`${n*x} × ${p}${sup(x)} × ${q}${sup(n-x)}`, `${C(n,x)} × ${p}${sup(n-x)} × ${q}${sup(x)}`, `${p}${sup(x)} × ${q}${sup(n-x)}`]), a:0, e:`C(${n}, ${x}) = ${C(n,x)}, then p to the number of successes (${x}) and 1 − p to the number of failures (${n-x}).`, o:["D5","P5"]}; }}
@@ -910,8 +942,99 @@ const DRILLS={
 
 </script>
 <script>
+/* ================= CHARTS =================
+   Any card, explanation or model answer can include a chart token; rich() turns it into inline SVG.
+   [[bars:1,2,3;0.2,0.5,0.3|hl=1,2|cmp=0|E=2.1|sd=0.7|cap=...]]  (no square brackets inside a token)  a discrete distribution (bar chart)
+   [[binom:5,0.88|hl=4,5|cmp=0|E=4.4|cap=...]]                   the B(n, p) distribution as bars
+   [[normal:50,15|gt=70 | lt=x | btw=a,b | cutr=x,10% | cutl=x,10% |bad|cap=...]]  a shaded bell curve
+   [[zt:1.33]]                                                     the slice of the z table you'd read
+   [[seq:5,4]]                                                     every success/failure order with x successes
+*/
+function rich(html){ return String(html).replace(/\[\[([^\]]+)\]\]/g,(m,t)=>{ try{ return viz(t); }catch(e){ return ""; } }); }
+function vzArgs(t){ const [head,...rest]=t.split("|"); const i=head.indexOf(":"); const o={type:head.slice(0,i).trim(), a:head.slice(i+1).trim()};
+  rest.forEach(r=>{ const j=r.indexOf("="); if(j<0) o[r.trim()]=true; else o[r.slice(0,j).trim()]=r.slice(j+1).trim(); }); return o; }
+const vnum=s=>String(s).split(",").map(x=>+x);
+const pf=p=>{ const s=(Math.round(p*1e4)/1e4).toFixed(4).replace(/0+$/,"").replace(/\.$/,""); return s==="0"?"0":s.replace(/^0\./,"."); };
+const vesc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function fig(svg,cap){ return `<figure class="vz">${svg}${cap?`<figcaption>${vesc(cap)}</figcaption>`:""}</figure>`; }
+
+function viz(t){
+  const o=vzArgs(t);
+  if(o.type==="bars") { const [xs,ps]=o.a.split(";"); return bars(vnum(xs), vnum(ps), o); }
+  if(o.type==="binom"){ const [n,p]=vnum(o.a); const xs=[], ps=[]; for(let x=0;x<=n;x++){ xs.push(x); ps.push(C(n,x)*Math.pow(p,x)*Math.pow(1-p,n-x)); }
+    if(!o.cap&&o.cap!=="") o.cap=`X ~ B(${n}, ${p}): P(X = x) for each x`; return bars(xs,ps,o); }
+  if(o.type==="normal") return bell(vnum(o.a),o);
+  if(o.type==="zt") return zslice(+o.a);
+  if(o.type==="seq") return seqs(...vnum(o.a));
+  return "";
+}
+/* bar chart of a discrete distribution */
+function bars(xs,ps,o){
+  const W=320,H=158,L=8,R=8,T=26,B=26, k=xs.length, slot=(W-L-R)/k, bw=Math.min(40,slot*.62), maxP=Math.max(...ps)||1;
+  const hl=o.hl!=null?new Set(vnum(o.hl)):null, cmp=o.cmp!=null?new Set(vnum(o.cmp)):null;
+  const cx=i=>L+slot*(i+.5), base=H-B, ph=H-T-B;
+  let g=`<line class="ax" x1="${L}" x2="${W-R}" y1="${base}" y2="${base}"/>`;
+  if(o.sd&&o.E){ const E=+o.E, sd=+o.sd, x0=cx(0)+(E-sd-xs[0])*slot, x1=cx(0)+(E+sd-xs[0])*slot;
+    g+=`<rect class="band" x="${x0}" y="${T-8}" width="${x1-x0}" height="${base-T+8}"/>`; }
+  xs.forEach((x,i)=>{ const h=Math.max(ps[i]>0?2:0, ps[i]/maxP*ph); const cls=cmp&&cmp.has(x)?"cmp":hl&&hl.has(x)?"hl":hl||cmp?"bar dim":"bar";
+    g+=`<rect class="${cls}" x="${cx(i)-bw/2}" y="${base-h}" width="${bw}" height="${h}" rx="3"/>`;
+    g+=`<text x="${cx(i)}" y="${base-h-5}" text-anchor="middle" class="tiny${hl&&hl.has(x)||cmp&&cmp.has(x)?" lab":""}">${pf(ps[i])}</text>`;
+    g+=`<text x="${cx(i)}" y="${base+15}" text-anchor="middle" class="${hl&&hl.has(x)?"lab":""}">${x}</text>`; });
+  if(o.E){ const E=+o.E, ex=cx(0)+(E-xs[0])*slot;
+    g+=`<line class="ev" x1="${ex}" x2="${ex}" y1="${T-12}" y2="${base}"/><text class="lab evt" x="${Math.min(W-R-2,Math.max(L+2,ex))}" y="${T-15}" text-anchor="${ex>W*.75?"end":ex<W*.25?"start":"middle"}">E[X] = ${o.E}</text>`; }
+  return fig(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bar chart of the distribution">${g}</svg>`, o.cap||"");
+}
+/* bell curve with a shaded region */
+function bell([mu,sd],o){
+  const W=320,H=150,L=10,R=10,T=22,B=34, base=H-B;
+  let lo=mu-3.6*sd, hi=mu+3.6*sd; const marks=[];
+  let a=null,b=null,label=null,bad=!!o.bad;
+  const zOf=x=>Math.round((x-mu)/sd*100)/100;
+  const area=z=>phi(z);
+  if(o.gt!=null){ const x=+o.gt; a=x; b=hi; marks.push(x); label=pf4(1-area(zOf(x))); }
+  if(o.lt!=null){ const x=+o.lt; a=lo; b=x; marks.push(x); label=pf4(area(zOf(x))); }
+  if(o.btw!=null){ const [x1,x2]=vnum(o.btw); a=x1; b=x2; marks.push(x1,x2); label=pf4(area(zOf(x2))-area(zOf(x1))); }
+  if(o.cutr!=null){ const [x,l]=o.cutr.split(","); a=+x; b=hi; marks.push(+x); label=l||null; }
+  if(o.cutl!=null){ const [x,l]=o.cutl.split(","); a=lo; b=+x; marks.push(+x); label=l||null; }
+  if(o.mark!=null) marks.push(...vnum(o.mark));
+  if(o.lab) label=o.lab;
+  const sx=x=>L+(x-lo)/(hi-lo)*(W-L-R), y=x=>{ const z=(x-mu)/sd; return base-Math.exp(-z*z/2)*(base-T); };
+  let path="", N=120; for(let i=0;i<=N;i++){ const x=lo+(hi-lo)*i/N; path+=(i?"L":"M")+sx(x).toFixed(1)+" "+y(x).toFixed(1); }
+  let g=`<line class="ax" x1="${L}" x2="${W-R}" y1="${base}" y2="${base}"/>`;
+  if(a!=null){ const aa=Math.max(lo,a), bb=Math.min(hi,b); let poly=`M${sx(aa).toFixed(1)} ${base}`; const M=60;
+    for(let i=0;i<=M;i++){ const x=aa+(bb-aa)*i/M; poly+=`L${sx(x).toFixed(1)} ${y(x).toFixed(1)}`; } poly+=`L${sx(bb).toFixed(1)} ${base}Z`;
+    g+=`<path class="area${bad?" bad":""}" d="${poly}"/>`; }
+  g+=`<path class="curve" d="${path}"/>`;
+  const std=mu===0&&sd===1;
+  const crowd=marks.some(x=>Math.abs(sx(x)-sx(mu))<(std?16:30));   // a marked value next to the mean takes the label spot
+  g+=`<line class="tick" x1="${sx(mu)}" x2="${sx(mu)}" y1="${base}" y2="${base+4}"/>${crowd?"":`<text x="${sx(mu)}" y="${base+15}" text-anchor="middle">${std?"0":"μ = "+mu}</text>`}`;
+  marks.forEach(x=>{ const z=zOf(x);
+    g+=`<line class="mk" x1="${sx(x)}" x2="${sx(x)}" y1="${y(x)}" y2="${base+4}"/><text class="lab" x="${sx(x)}" y="${base+15}" text-anchor="middle">${std?fz2(z):x}</text>${std?"":`<text class="tiny" x="${sx(x)}" y="${base+27}" text-anchor="middle">z = ${fz2(z)}</text>`}`; });
+  if(label&&a!=null){ const aa=Math.max(lo,a), bb=Math.min(hi,b); let cxp=(aa+bb)/2;
+    if(bb-aa>4*sd) cxp=b===hi?Math.max(aa+sd*.9, mu+sd*.2):Math.min(bb-sd*.9, mu-sd*.2);
+    const tail=(b===hi&&aa>mu+sd*.8)||(a===lo&&bb<mu-sd*.8); const lx=tail?(b===hi?Math.min(W-R-4,sx(aa)+26):Math.max(L+4,sx(bb)-26)):sx(cxp);
+    const ly=tail?Math.min(y(aa===lo?bb:aa)-10,base-30):Math.max(T+14,(y(cxp)+base)/2);
+    g+=`<text class="lab arealab" x="${lx}" y="${ly}" text-anchor="middle">${vesc(label)}</text>`; }
+  return fig(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Normal curve with the shaded area">${g}</svg>`, (crowd&&!std?`μ = ${mu}. `:"")+(o.cap||""));
+}
+const pf4=v=>(Math.round(v*1e4)/1e4).toFixed(4);
+const fz2=z=>(z<0?"−":"")+Math.abs(z).toFixed(2);
+/* a 3×3 slice of the z table around the cell you'd read */
+function zslice(z){
+  const a=Math.abs(z), r=Math.floor(Math.round(a*100)/10), c=Math.round(a*100)%10;
+  const rows=[r-1,r,r+1].filter(x=>x>=0&&x<=30), cols=[c-1,c,c+1].filter(x=>x>=0&&x<=9);
+  return `<figure class="vz"><table class="dt zs"><tr><th>z</th>${cols.map(k=>`<th${k===c?' class="hc"':""}>.0${k}</th>`).join("")}</tr>${rows.map(rr=>`<tr><th${rr===r?' class="hc"':""}>${(rr/10).toFixed(1)}</th>${cols.map(k=>`<td${rr===r&&k===c?' class="on"':rr===r||k===c?' class="hl"':""}>${ZT[rr][k].toFixed(4)}</td>`).join("")}</tr>`).join("")}</table><figcaption>Row ${(r/10).toFixed(1)}, column .0${c}: P(Z &lt; ${a.toFixed(2)}) = ${ZT[r][c].toFixed(4)}</figcaption></figure>`;
+}
+/* every order of successes (✓) and failures (✗) that gives x successes out of n */
+function seqs(n,x){
+  const out=[]; (function go(pre,s){ if(pre.length===n){ if(s===x) out.push(pre); return; } go(pre+"1",s+1); go(pre+"0",s); })("",0);
+  return `<figure class="vz"><div class="seqs">${out.map(q=>`<div>${[...q].map(ch=>`<span class="${ch==="1"?"s":"f"}">${ch==="1"?"✓":"✗"}</span>`).join("")}</div>`).join("")}</div><figcaption>${out.length} orders give ${x} success${x===1?"":"es"} out of ${n}: that's C(${n}, ${x}) = ${C(n,x)}. Each order has probability p${x>1?sup(x):x===1?"":"⁰"} × (1 − p)${n-x>1?sup(n-x):n-x===1?"":"⁰"}.</figcaption></figure>`;
+}
+
+</script>
+<script>
 /* ================= 640 TEST 2 APP ================= */
-const APP_VERSION="2026.10.31-1431";
+const APP_VERSION="2026.10.31-1751";
 const LS="globetrotter.test2.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -1035,7 +1158,7 @@ function renderCards(){
   show(`${bar(CV.title,{back:CV.back, prog:CV.i/CV.list.length})}
   <div class="pn"><button data-act="cprev" ${CV.i?"":"disabled"}>‹ Prev</button><span>${CV.i+1} of ${CV.list.length} · ${esc(c.dt)}</span><button data-act="cnext">Skip ›</button></div>
   <div class="flip" id="flip" data-act="flip" data-side="${CV.side}" data-k="${S.cards[c.key]??""}" role="button" aria-label="Flip card">${cardFace(c)}</div>
-  ${CV.simp&&c.s?`<section class="simple" id="simple"><div class="eyebrow">In plain English</div><div class="cb">${c.s}</div></section>`:""}
+  ${CV.simp&&c.s?`<section class="simple" id="simple"><div class="eyebrow">In plain English</div><div class="cb">${rich(c.s)}</div></section>`:""}
   <div class="cnav"><button class="btn learn" data-act="mark" data-v="0">Still learning</button><button class="btn got" data-act="mark" data-v="1">Got it</button></div>`);
   const el=$('flip'); let sx=null, sy=0;
   el.addEventListener("touchstart",e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
@@ -1045,7 +1168,7 @@ function renderCards(){
 const BULB='<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5a5.5 5.5 0 0 0-3.2 10c.5.4.7.9.7 1.5v.5h5v-.5c0-.6.2-1.1.7-1.5A5.5 5.5 0 0 0 10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 17.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
 function simpBtn(c){ return c.s?`<button class="simp" data-act="simp" aria-label="Explain it simply" aria-pressed="${CV.simp}">${BULB}<span>${CV.simp?"Hide":"Simpler"}</span></button>`:""; }
 function cardFace(c){ return simpBtn(c)+(CV.side==="f"?`<div class="eyebrow">${esc(c.dt)}</div><div class="ft">${esc(c.f)}</div><div class="hint">Tap to flip</div>`
-  :`<div class="ft">${esc(c.f)}</div><div class="cb">${c.b}</div><div class="hint">Tap to flip back</div>`); }
+  :`<div class="ft">${esc(c.f)}</div><div class="cb">${rich(c.b)}</div><div class="hint">Tap to flip back</div>`); }
 function flip(){ const el=$('flip'); if(!el) return; el.classList.add("turn");
   setTimeout(()=>{ CV.side=CV.side==="f"?"b":"f"; el.dataset.side=CV.side; el.innerHTML=cardFace(CV.list[CV.i]); el.classList.remove("turn"); },160); }
 function cardStep(d){ const n=CV.i+d; if(n<0) return; if(n>=CV.list.length) return cardsDone(); CV.i=n; CV.side="f"; CV.simp=false; renderCards(); }
@@ -1112,7 +1235,7 @@ function qPick(k){
   if(q.idx!=null) srs(q.idx,ok); save(); buzz(ok);
   btns.forEach((b,j)=>{ b.disabled=true; b.dataset.s=j===q.a?"right":j===k?"wrong":"fade"; });
   if(QR.mode==="drill"&&ok){ setTimeout(()=>{ if(QR&&QR.done&&QR.items[QR.i]===q) qNext(); },550); return; }
-  $('qfb').innerHTML=`<div class="fb" data-k="${ok?"ok":"no"}"><b>${ok?praise():"Not quite."}</b>${esc(q.e)}<div>${(q.o||[]).map(o=>`<span class="tag">${o} ${esc(OBJ[o])}</span>`).join("")}</div></div>
+  $('qfb').innerHTML=`<div class="fb" data-k="${ok?"ok":"no"}"><b>${ok?praise():"Not quite."}</b>${esc(q.e)}${q.v?rich(q.v):""}<div>${(q.o||[]).map(o=>`<span class="tag">${o} ${esc(OBJ[o])}</span>`).join("")}</div></div>
   <div style="height:10px"></div><button class="btn wide" data-act="qnext">${QR.i+1<QR.items.length?"Continue":"See results"}</button>`;
   $('qfb').scrollIntoView({behavior:"smooth",block:"nearest"});
 }
@@ -1132,7 +1255,7 @@ function qResults(){
   show(`${bar(QR.title,{back:qBack()})}
   <section class="card center"><div class="big">${QR.right}/${n}</div><p class="muted">${QR.mode!=="prac"?`in ${fmtT(secs)} · `:""}${Math.round(pct*100)}% right</p>${pct===1?`<p class="cheer">${pick(["Perfect round!","Flawless.","Every single one. Great work!"])}</p>`:pct>=.8?`<p class="cheer">Strong round. Keep it up!</p>`:""}${note?`<p class="muted">${esc(note)}</p>`:""}</section>
   ${QR.mode==="test"?`<section class="card"><h3>By topic</h3><div class="weak">${Object.entries(by).sort((a,b)=>a[1].r/a[1].n-b[1].r/b[1].n).map(([o,b])=>wrow(o,b.r/b.n)).join("")}</div></section>`:""}
-  ${missed.length?`<section class="card"><h3>Review what you missed</h3>${missed.map(a=>`<div class="fb" data-k="no"><b>${esc(a.q.q)}</b>You chose: ${esc(a.q.c[a.k])}<br><b style="display:inline;font-size:15px">Answer:</b> ${esc(a.q.c[a.q.a])}<br><span class="muted">${esc(a.q.e)}</span></div>`).join("")}</section>`:""}
+  ${missed.length?`<section class="card"><h3>Review what you missed</h3>${missed.map(a=>`<div class="fb" data-k="no"><b>${esc(a.q.q)}</b>You chose: ${esc(a.q.c[a.k])}<br><b style="display:inline;font-size:15px">Answer:</b> ${esc(a.q.c[a.q.a])}<br><span class="muted">${esc(a.q.e)}</span>${a.q.v?rich(a.q.v):""}</div>`).join("")}</section>`:""}
   <button class="btn go wide" ${again}</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
   if(pct===1) confetti();
@@ -1146,6 +1269,7 @@ function cram(){
   <p class="muted">The night-before page: what's not on the formula sheet, the lookups worth memorizing, and what the grader wants.</p>
   <section class="card"><h3>Memorize (not on the sheet)</h3><div class="cb">${deck("formulas").slice(1).map(c=>`<p style="margin:0 0 8px"><b>${esc(c.f.replace("Memorize: ",""))}:</b> ${c.b}</p>`).join("")}</div></section>
   <section class="card"><h3>Table lookups</h3><div class="cb">${lookups.b}</div></section>
+  <section class="card"><h3>Pictures to remember</h3><div class="cb">${rich("[[normal:50,15|gt=70|cap=Above: 1 − table]][[normal:50,15|btw=60,70|cap=Between: subtract two table values]][[normal:0,1|lt=-1.33|cap=Negative z: 1 − table value of +z]][[normal:50,15|cutr=69.2,top 10%|cap=Cutoff: top 10% = 90th percentile, x = μ + zσ]][[binom:5,0.88|hl=3,4|cap=Binomial: add the bars you need]]")}</div></section>
   <section class="card"><h3>Word → X</h3><div class="cb">"at least k" → X ≥ k (k included)<br>"at most k" → X ≤ k (k included)<br>"more than k" → X > k (k left out)<br>"fewer than k" → X &lt; k (k left out)<br>"exactly one failure out of n" → X = n − 1<br>"at least one" → 1 − P(X = 0)<br>"top k%" → (100 − k)th percentile</div></section>
   <section class="card"><h3>Interpret E[X] (full credit)</h3><div class="cb">Average + what it's averaged over + context and units.<ex>"An average rating of a car in this set is 3.93 stars."<br>"If this experiment were repeated infinitely many times, on average the expert would correctly identify 4.4 matches out of 5."</ex></div></section>
   <section class="card"><h3>Binomial justification (full credit)</h3><div class="cb"><ex>"Let X = number of correct matches out of 5. Since this random variable can be represented as a number of successes in n identical independent trials, X ~ B(5, 0.88)."</ex></div></section>
@@ -1199,11 +1323,11 @@ function renderProb(){
   const p=PR.p, part=p.parts[PR.pi];
   const nSteps=p.parts.reduce((a,x)=>a+x.steps.length,0), doneSteps=Object.keys(PR.res).length;
   let h=`${bar("",{back:"practice", close:true, prog:doneSteps/nSteps, z:p.tpl===3})}${setupHTML(PR.pi===0)}`;
-  p.parts.slice(0,PR.pi).forEach(pt=>{ h+=`<details class="part"><summary><b>(${pt.label})</b> ${esc(pt.q)}</summary><div class="model"><b>What to write</b>${pt.model}</div></details>`; });
+  p.parts.slice(0,PR.pi).forEach(pt=>{ h+=`<details class="part"><summary><b>(${pt.label})</b> ${esc(pt.q)}</summary><div class="model"><b>What to write</b>${rich(pt.model)}</div></details>`; });
   h+=`<section class="part"><h3><span class="pl">${part.label}</span>${esc(part.q)}</h3>`;
   for(let si=0;si<=Math.min(PR.si,part.steps.length-1);si++) h+=stepHTML(part.steps[si],PR.pi,si,"prac");
   if(PR.si>=part.steps.length){
-    h+=`<div class="model"><b>What to write on the test</b>${part.model}</div>`;
+    h+=`<div class="model"><b>What to write on the test</b>${rich(part.model)}</div>`;
     h+=PR.pi+1<p.parts.length?`<button class="btn go wide" data-act="pnext">Next: part (${p.parts[PR.pi+1].label})</button>`:`<button class="btn go wide" data-act="pdone">Finish</button>`;
   }
   h+=`</section>`;
@@ -1258,7 +1382,7 @@ function examSubmit(){
       const yours=s.k==="mc"?(v!=null?s.c[v]:"no answer"):s.k==="num"?(v?v:"no answer"):(v?v.join(", "):"no answer");
       const right=s.k==="mc"?s.c[s.a]:s.k==="num"?fmtAns(s):s.fields.map(f=>+f.ans.toFixed(4)).join(", ");
       return `<div class="rline"><span class="${r.ok?"ok":"no"}">${r.ok?"✓":"✗"}</span><div>${esc(s.q)}<br><small>${r.ok?`You: ${esc(yours)}`:`You: ${esc(yours)} · Answer: ${esc(right)}`}</small></div></div>`; }).join("")}</div>
-      <details><summary class="link" style="text-decoration:none">Show model answer</summary><div class="model"><b>What to write</b>${pt.model}</div></details></section>`; });
+      <details><summary class="link" style="text-decoration:none">Show model answer</summary><div class="model"><b>What to write</b>${rich(pt.model)}</div></details></section>`; });
   h+=checklist(p.tpl)+`<button class="btn go wide" data-act="exam" data-t="${PR.t||0}">Another exam problem</button><button class="btn ghost wide" data-act="home">Home</button>`;
   show(h);
 }
