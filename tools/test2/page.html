@@ -255,6 +255,17 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 .seqs span{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
 .seqs .s{background:var(--good)}.seqs .f{background:var(--bad)}
 .fb .vz figcaption{color:var(--ink-2)}
+/* answer style + calculator */
+.seg.two{grid-template-columns:1fr 1fr;margin-top:2px}
+.opt.calc{font-variant-numeric:tabular-nums;font-weight:600;font-size:15.5px}
+.cdisp{padding:14px 16px 6px;text-align:right;font-variant-numeric:tabular-nums}
+#cexpr{font-size:22px;font-weight:600;word-break:break-all;min-height:30px}
+#cres{font-size:18px;color:var(--good);font-weight:800;min-height:26px}
+.ckeys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 12px 12px}
+.ckeys button{height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface-2);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.ckeys button.op{background:color-mix(in srgb,var(--m-learn) 14%,var(--surface));color:var(--m-learn)}
+.ckeys button.fn{color:var(--bad)}
+.ckeys button:active{transform:scale(.96)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -264,6 +275,12 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 <div class="flash" id="flash" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="sheet" id="calcsheet" hidden><div class="in">
+  <div class="sh"><b>Calculator</b><button class="x" id="calcclose" aria-label="Close calculator"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>
+  <div class="cdisp"><div id="cexpr">0</div><div id="cres"></div></div>
+  <div class="ckeys" id="ckeys"></div>
+  <div style="padding:0 12px 12px"><button class="btn go wide" id="cuse">Use this answer</button></div>
+</div></div>
 <div class="sheet" id="zsheet" hidden><div class="in">
   <div class="sh"><b>Standard normal table</b><button class="x" id="zclose" aria-label="Close table"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>
   <div class="zsel" id="zsel">Area to the <b>left</b> of z. Tap a cell to read it. For negative z use symmetry: P(Z &lt; −z) = 1 − P(Z &lt; z).</div>

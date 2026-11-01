@@ -17,6 +17,13 @@ const C=(n,k)=>fact(n)/(fact(k)*fact(n-k));
 function mcShuffle(step){ const idx=step.c.map((_,i)=>i); for(let i=idx.length-1;i>0;i--){ const j=rnd(i+1); [idx[i],idx[j]]=[idx[j],idx[i]]; }
   return {...step, c:idx.map(i=>step.c[i]), a:idx.indexOf(step.a), ce:step.ce?idx.map(i=>step.ce[i]):undefined}; }
 function uniqOpts(correct, others){ const seen=new Set([correct]); const out=[correct]; others.forEach(o=>{ if(!seen.has(o)&&out.length<4){ seen.add(o); out.push(o); } }); return out; }
+/* Calculation steps carry a multiple-choice version (step.mc): the right working plus common wrong setups,
+   each written out to its result, so no calculator is needed. Duplicated results are dropped. */
+function calc(step, right, wrongs, key=o=>f4(o.v)){
+  const seen=new Set([key(right)]), out=[right];
+  wrongs.forEach(w=>{ if(!w||(w.v!=null&&!isFinite(w.v))) return; const k=key(w); if(!seen.has(k)&&out.length<4){ seen.add(k); out.push(w); } });
+  step.mc={c:out.map(o=>o.t), a:0, ce:out.map((o,i)=>i?o.w:"Right setup. "+(right.w||"")), e:right.w||""};
+  return step; }
 const list=v=>v.length===1?`X = ${v[0]}`:`X = ${v.slice(0,-1).join(", ")} or ${v[v.length-1]}`;
 
 /* ---------- normal table ---------- */
@@ -104,19 +111,38 @@ function genT1(){
     steps:[mcShuffle({k:"mc", q:"Discrete or continuous?", c:[`Discrete: X takes a finite number of values (specifically, ${k}), which can be listed.`, `Continuous: X can take any value between ${lo} and ${hi}.`, `Discrete: the probabilities sum to 1.`, `Continuous: E[X] does not have to be a whole number.`], a:0, e:"Decide by the set of values X can take, with a one-sentence reason.", o:["P1","D1"]})],
     model:`X assumes a finite number of values (specifically, ${k}), and therefore it is discrete.`},
    {label:"b", q:"Use the information in the table to find the probability distribution for X.",
-    steps:[{k:"multi", q:`Divide each count by ${N}. Enter P(x):`, fields:vals.map((x,i)=>({l:`P(${x})`, ans:P[i]})), tol:.0006, o:["P2","D2"]}],
+    steps:[calc({k:"multi", q:`Divide each count by ${N}. Enter P(x):`, fields:vals.map((x,i)=>({l:`P(${x})`, ans:P[i]})), tol:.0006, o:["P2","D2"]},
+      {t:`count ÷ ${N}: ${P.map(fnum).join(", ")}`, w:`Each count divided by the total, ${N}. They sum to 1.`},
+      [{t:`running totals: ${P.map((_,i)=>fnum(P.slice(0,i+1).reduce((a,b)=>a+b,0))).join(", ")}`, w:"Those are cumulative totals, P(X ≤ x), not P(X = x). They don't sum to 1."},
+       {t:`count ÷ ${k}: ${cnt.map(c=>fnum(c/k)).join(", ")}`, w:`Divide by the total number of observations (${N}), not by the number of values (${k}).`},
+       {t:`1 ÷ ${k} each: ${vals.map(()=>fnum(1/k)).join(", ")}`, w:"The values aren't equally likely. Use each count."}], o=>o.t)],
     model:`We have a total of ${N} observations, so divide each count by ${N}:<table class="dt"><tr><th>x</th>${vals.map(x=>`<td>${x}</td>`).join("")}</tr><tr><th>P(x)</th>${P.map(p=>`<td>${fnum(p)}</td>`).join("")}</tr></table>Check: each is between 0 and 1, and they sum to 1.[[bars:${BARS}|cap=The distribution of X as bars]]`},
    {label:"c", q:`Find the probability that ${ctx.ev(ev.w)}, that is, ${ev.sym}.`,
     steps:[mcShuffle({k:"mc", q:`Which values of X make ${ev.sym} true?`, c:opts, a:0, e:"Watch strict versus non-strict inequalities: \"fewer than\" and \"more than\" exclude the boundary, \"at least\" and \"at most\" include it.", o:["D1","P3"]}),
-           {k:"num", q:`${ev.sym} = ?`, ans:pv, tol:.0006, o:["P3"]}],
+           calc({k:"num", q:`${ev.sym} = ?`, ans:pv, tol:.0006, o:["P3"]},
+             {t:`${ev.v.map(x=>`p(${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}`, v:pv, w:`Add P(X = x) for ${list(ev.v)}.`},
+             [...ev.wrong.filter(w=>w.length).map(wv=>{ const sv=wv.reduce((a,x)=>a+P[vals.indexOf(x)],0); return {t:`${wv.map(x=>`p(${x})`).join(" + ")} = ${wv.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(sv)}`, v:sv, w:`That adds ${list(wv)}: check the boundary. ${ev.sym} means ${list(ev.v)}.`}; }),
+              {t:`1 − ${fnum(pv)} = ${fnum(1-pv)}`, v:1-pv, w:"That's the complement: the probability of every other value."}])],
     model:`${ev.sym} = ${ev.v.map(x=>`P(X = ${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}<br>We may add because different values of X are mutually exclusive events.[[bars:${BARS}|hl=${ev.v.join(",")}|cap=${ev.sym}: the highlighted bars]]`},
    {label:"d", q:"Find the expected value of X and practically interpret the result.",
-    steps:[{k:"num", q:"E[X] = Σ x·P(x) = ?", ans:E, tol:.006, o:["D3"]},
+    steps:[calc({k:"num", q:"E[X] = Σ x·P(x) = ?", ans:E, tol:.006, o:["D3"]},
+             {t:`${sumE} = ${fnum(E)}`, v:E, w:"Each value times its probability, all added."},
+             [{t:`(${vals.join(" + ")}) ÷ ${k} = ${fnum(vals.reduce((a,b)=>a+b,0)/k)}`, v:vals.reduce((a,b)=>a+b,0)/k, w:"That averages the values as if they were equally likely. Weight each by P(x)."},
+              {t:`most likely value: ${vals[P.indexOf(Math.max(...P))]}`, v:vals[P.indexOf(Math.max(...P))], w:"That's the most likely value (the mode), not the expected value."},
+              {t:`(${sumE}) ÷ ${k} = ${fnum(E/k)}`, v:E/k, w:"Don't divide by the number of values: the probabilities already do the averaging."}]),
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:interpOpts, a:0, ce:["Full credit: an average, what it's averaged over, context and units.","Partial: it says average, but not of what. That's where the meaning of E[X] lives.","No credit: E[X] is not a prediction of one result.","No credit: E[X] is not the most likely value; it may not even be a possible value."], e:"E[X] is an average over the set (or over many repetitions), never a prediction.", o:["D3"]})],
     model:`E[X] = Σ x·P(x) = ${sumE} = ${fnum(E)}<br>Interpretation: ${ctx.interp(Er,N)}[[bars:${BARS}|E=${fnum(E)}|cap=The mean is the balance point of the bars]]`},
    {label:"e", q:"Find the standard deviation of X.",
-    steps:[{k:"num", q:"Var(X) = Σ (x − E[X])²·P(x) = ?", ans:V, tol:.006, o:["D3"]},
-           {k:"num", q:"SD(X) = √Var(X) = ?", ans:SD, tol:.006, o:["D3"]}],
+    steps:[calc({k:"num", q:"Var(X) = Σ (x − E[X])²·P(x) = ?", ans:V, tol:.006, o:["D3"]},
+             {t:`${prod.map(f4).join(" + ")} = ${f4(V)}`, v:V, w:"Squared deviation times P(x) for each value, added (the last column of the table)."},
+             [{t:`Σ (x − E[X])·P(x) = ${dev.map((d,i)=>f4(d*P[i])).join(" + ")} = 0`, v:0, w:"Without squaring, the deviations always average to 0. That's why we square."},
+              {t:`Σ (x − E[X])² ÷ ${k} = (${sq.map(f4).join(" + ")}) ÷ ${k} = ${f4(sq.reduce((a,b)=>a+b,0)/k)}`, v:sq.reduce((a,b)=>a+b,0)/k, w:"Weight each squared deviation by P(x); don't divide by the number of values."},
+              {t:`Σ x²·P(x) = ${f4(vals.reduce((a,x,i)=>a+x*x*P[i],0))}`, v:vals.reduce((a,x,i)=>a+x*x*P[i],0), w:"That's E[X²]. You forgot to subtract E[X] from each value."}]),
+           calc({k:"num", q:"SD(X) = √Var(X) = ?", ans:SD, tol:.006, o:["D3"]},
+             {t:`√${f4(V)} = ${f4(SD)}`, v:SD, w:"The square root of the variance, in the units of X."},
+             [{t:`${f4(V)} (the variance)`, v:V, w:"That's the variance. The SD is its square root."},
+              {t:`${f4(V)}² = ${f4(V*V)}`, v:V*V, w:"Square root, not square."},
+              {t:`√${f4(sq.reduce((a,b)=>a+b,0)/k)} = ${f4(Math.sqrt(sq.reduce((a,b)=>a+b,0)/k))}`, v:Math.sqrt(sq.reduce((a,b)=>a+b,0)/k), w:"That's the root of an unweighted variance. Weight by P(x) first."}])],
     model:`<table class="dt sm"><tr><th>x</th><th>P(x)</th><th>x − E[X]</th><th>(x − E[X])²</th><th>P(x)(x − E[X])²</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${fnum(P[i])}</td><td>${fnum(dev[i])}</td><td>${f4(sq[i])}</td><td>${f4(prod[i])}</td></tr>`).join("")}</table>Var(X) = ${prod.map(f4).join(" + ")} = ${f4(V)}<br>SD(X) = √${f4(V)} = ${f4(SD)} ${ctx.unit}[[bars:${BARS}|E=${fnum(E)}|sd=${f4(SD)}|cap=Shaded band: one SD either side of the mean]]`}
   ];
   return {tpl:1, title:ctx.name, setup:ctx.setup(N)+tbl, parts};
@@ -147,6 +173,17 @@ function genT2(){
   const term=x=>{ const c=C(n,x), a=r4(Math.pow(p,x)), b=r4(Math.pow(q,n-x)), v=r4(pm(x));
     const pieces=[c!==1?`${c}`:null, x>0?`${ps}${x>1?sup(x):""}`:null, n-x>0?`${qs}${n-x>1?sup(n-x):""}`:null].filter(Boolean).join(" × ");
     return {v, line:`P(X = ${x}) = ${n}!/(${x}!·${n-x}!) × ${ps}${sup(x)} × ${qs}${sup(n-x)} = ${pieces} = ${f4(v)}`}; };
+  // multiple-choice working for P(X = x): the right product and the usual slips
+  const pw=x=>{ const c=C(n,x), v=pm(x), sx=x?`${ps}${x>1?sup(x):""}`:"", sf=n-x?`${qs}${n-x>1?sup(n-x):""}`:"";
+    const body=[c!==1?c:null, sx||null, sf||null].filter(Boolean).join(" × ");
+    const right={t:`${body} = ${f4(v)}`, v, w:`C(${n}, ${x}) = ${c}, then p for each of the ${x} successes and 1 − p for each of the ${n-x} failures.`};
+    const sw=[c!==1?c:null, x?`${qs}${x>1?sup(x):""}`:null, n-x?`${ps}${n-x>1?sup(n-x):""}`:null].filter(Boolean).join(" × ");
+    const wr=[{t:`${sw} = ${f4(C(n,x)*Math.pow(q,x)*Math.pow(p,n-x))}`, v:C(n,x)*Math.pow(q,x)*Math.pow(p,n-x), w:"Exponents swapped: p goes with the successes, 1 − p with the failures."}];
+    if(c!==1) wr.push({t:`${[sx,sf].filter(Boolean).join(" × ")} = ${f4(v/c)}`, v:v/c, w:`Missing C(${n}, ${x}) = ${c}: that's the probability of just one order. There are ${c} orders.`});
+    if(c!==1&&n*x!==c) wr.push({t:`${n*x} × ${[sx,sf].filter(Boolean).join(" × ")} = ${f4(v/c*n*x)}`, v:v/c*n*x, w:`C(${n}, ${x}) = ${n}!/(${x}!·${n-x}!) = ${c}, not ${n} × ${x}.`});
+    if(c===1) wr.push({t:`1 − ${body} = ${f4(1-v)}`, v:1-v, w:"That's the complement. You want this outcome itself."},{t:`${n} × ${x===n?ps:qs} = ${fnum(n*(x===n?p:q))}`, v:n*(x===n?p:q), w:"Multiplying by n gives an expected count, not a probability."});
+    return [right,wr]; };
+  const sumW=(vs,sym)=>{ const v=vs.reduce((a,x)=>a+r4(pm(x)),0); return {t:vs.length>1?`${vs.map(x=>`p(${x})`).join(" + ")} = ${vs.map(x=>f4(pm(x))).join(" + ")} = ${f4(v)}`:`p(${vs[0]}) only = ${f4(v)}`, v, w:`${sym}: add P(X = x) for ${list(vs)}. Adding is fine because the values are mutually exclusive.`}; };
   const W=(c,s)=>c===1?`${ctx.who[0]} ${s[0]}`:`${ctx.who[1]} ${s[1]}`;
   const Xdef=`Let X = number of ${ctx.xs} out of ${n}.`;
   // (a) all or none
@@ -166,6 +203,13 @@ function genT2(){
   if(cK==="le"&&hiP){ const tn=term(n); cAns=r4(1-tn.v); cModel=`${cSym} = P(X = 0) + ... + P(X = ${n-1}). Quicker by the complement: the only value left out is X = ${n}.<br>${cSym} = 1 − P(X = ${n})<br>P(X = ${n}) = ${ps}${sup(n)} = ${f4(tn.v)}<br>${cSym} = 1 − ${f4(tn.v)} = ${f4(cAns)}`; }
   else if(cK==="ge1"){ const t0=term(0); cAns=r4(1-t0.v); cModel=`The complement of "at least one" is "none":<br>P(X ≥ 1) = 1 − P(X = 0)<br>${t0.line}<br>P(X ≥ 1) = 1 − ${f4(t0.v)} = ${f4(cAns)}`; }
   else { const ts=cv.map(term); cAns=r4(ts.reduce((s,t)=>s+t.v,0)); cModel=`${cSym} = ${cv.map(x=>`P(X = ${x})`).join(" + ")}<br>${ts.map(t=>t.line).join("<br>")}<br>${cSym} = ${ts.map(t=>f4(t.v)).join(" + ")} = ${f4(cAns)}`; }
+  function cWork(){
+    if(cK==="ge1"||(cK==="le"&&hiP)){ const left=cK==="ge1"?0:n, tv=pm(left);
+      return [{t:`1 − P(X = ${left}) = 1 − ${f4(tv)} = ${f4(cAns)}`, v:cAns, w:`Every value except X = ${left}, so use the complement.`},
+        [{t:`P(X = ${left}) = ${f4(tv)}`, v:tv, w:`That's the one value you leave out. Subtract it from 1.`},
+         {t:`P(X = ${cK==="ge1"?1:n-1}) = ${f4(pm(cK==="ge1"?1:n-1))}`, v:pm(cK==="ge1"?1:n-1), w:`That's only one of the values in ${cSym}.`},
+         {t:`1 − P(X = ${cK==="ge1"?1:n-1}) = ${f4(1-pm(cK==="ge1"?1:n-1))}`, v:1-pm(cK==="ge1"?1:n-1), w:`Complement of the wrong value: the one left out is X = ${left}.`}]]; }
+    return [sumW(cv,cSym), [...cWrong.filter(w=>w.length).map(wv=>({...sumW(wv,""), w:`That adds ${list(wv)}: check the boundary. ${cSym} means ${list(cv)}.`})), {t:`1 − ${f4(cAns)} = ${f4(1-cAns)}`, v:1-cAns, w:"That's the complement: the probability of the other values."}]]; }
   // (d) more than a but fewer than b
   const a=Math.max(0,Math.min(n-3,Math.round(n*p)-2+rnd(2))), b=a+3, dv=range(a+1,b-1), td=dv.map(term), dAns=r4(td.reduce((s,t)=>s+t.v,0));
   const dSym=`P(${a} < X < ${b})`;
@@ -183,24 +227,29 @@ function genT2(){
         ce:["Full credit: X defined, structure named, parameters given.","No credit for the justification: two outcomes is only one of the four assumptions.","Partial: the model is stated but nothing shows why it fits.","Not a reason, and the parameters are in the wrong order: B(n, p)."],
         e:"Define X in words, name the structure, then X ~ B(n, p).", o:["D1","D4"]}),
       mcShuffle({k:"mc", q:`Which values of X?`, c:uniqOpts(list([allNone]), [list([allNone===n?0:n]), list(allNone===n?range(1,n):range(0,1)), allNone===n?`X ≥ 1`:`X ≤ 1`]), a:0, e:allNone===n?"All of them succeed: X = n.":"None succeed: X = 0.", o:["D5"]}),
-      {k:"num", q:`P(X = ${allNone}) = ?`, ans:ta.v, tol:.0015, o:["D5","P5"]}],
+      calc({k:"num", q:`P(X = ${allNone}) = ?`, ans:ta.v, tol:.0015, o:["D5","P5"]}, ...pw(allNone))],
     model:`${Xdef} Since this random variable can be represented as a number of successes in ${n} identical independent trials, X ~ B(${n}, ${ps}).<br>P(X = ${allNone}) = ${allNone===n?`${ps}${sup(n)}`:`${qs}${sup(n)}`} = ${f4(ta.v)}[[binom:${n},${ps}|hl=${allNone}]]`},
    {label:"b", q:bQ,
     steps:[mcShuffle({k:"mc", q:"Which value of X?", c:uniqOpts(list([xb]), [list([kf]), `X ≤ ${kf}`, `X ≥ ${xb}`, list([Math.max(0,xb-1)])]), a:0, e:`X counts ${ctx.xs}. ${kf} failure${kf>1?"s":""} out of ${n} leaves ${xb} successes.`, o:["D5"]}),
-           {k:"num", q:`P(X = ${xb}) = ?`, ans:tb.v, tol:.0015, o:["D5","P5"]}],
+           calc({k:"num", q:`P(X = ${xb}) = ?`, ans:tb.v, tol:.0015, o:["D5","P5"]}, ...pw(xb))],
     model:`${kf} ${kf===1?ctx.who[0]:ctx.who[1]} that ${kf===1?ctx.no[0]:ctx.no[1]} out of ${n} means X = ${xb}.<br>${tb.line}[[binom:${n},${ps}|hl=${xb}]]`},
    {label:"c", q:cQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(cv,cWrong), a:0, e:"\"At least\" and \"at most\" include the boundary.", o:["D5","P3"]}),
            ...(cK==="ge1"?[mcShuffle({k:"mc", q:"Quickest route?", c:["1 − P(X = 0)",`P(X = 1)`,`${n} × ${ps}`,`P(X = 0)`], a:0, e:"The complement of \"at least one\" is \"none\".", o:["P3"]})]:[]),
-           {k:"num", q:`${cSym} = ?`, ans:cAns, tol:.002, o:["D5","P3","P4"]}],
+           calc({k:"num", q:`${cSym} = ?`, ans:cAns, tol:.002, o:["D5","P3","P4"]}, ...cWork())],
     model:cModel+(cK==="ge1"?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=0|cap=${cSym}: 1 minus the red bar]]`:cK==="le"&&hiP?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=${n}|cap=${cSym}: 1 minus the red bar]]`:`[[binom:${n},${ps}|hl=${cv.join(",")}|cap=${cSym}: the highlighted bars]]`)},
    {label:"d", q:dQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(dv,[range(a,b), range(a,b-1), range(a+1,b)]), a:0, e:"Both inequalities are strict for a discrete X.", o:["D5","P3"]}),
            mcShuffle({k:"mc", q:"Why may you add these probabilities?", c:["The values of X are mutually exclusive events","The trials are independent","X is binomial","Each probability is less than 1"], a:0, e:"Mutual exclusivity justifies adding across values; independence justifies multiplying inside each term.", o:["P4"]}),
-           {k:"num", q:`${dSym} = ?`, ans:dAns, tol:.002, o:["D5","P3"]}],
+           calc({k:"num", q:`${dSym} = ?`, ans:dAns, tol:.002, o:["D5","P3"]}, sumW(dv,dSym),
+             [range(a,b), range(a,b-1), range(a+1,b)].filter(w=>w.every(x=>x>=0&&x<=n)).map(wv=>({...sumW(wv,""), w:`That adds ${list(wv)}. Both inequalities are strict: only ${list(dv)}.`})))],
     model:`${dSym} = ${dv.map(x=>`P(X = ${x})`).join(" + ")}<br>${td.map(t=>t.line).join("<br>")}<br>${dSym} = ${td.map(t=>f4(t.v)).join(" + ")} = ${f4(dAns)}[[binom:${n},${ps}|hl=${dv.join(",")}|cap=${dSym}: the highlighted bars]]`},
    {label:"e", q:`Find the expected number of ${ctx.xs} and practically interpret it.`,
-    steps:[{k:"num", q:"E[X] = np = ?", ans:E, tol:.006, o:["D3"]},
+    steps:[calc({k:"num", q:"E[X] = np = ?", ans:E, tol:.006, o:["D3"]},
+             {t:`${n} × ${ps} = ${fnum(E)}`, v:E, w:"np: the number of trials times the probability of success."},
+             [{t:`${n} × ${qs} = ${fnum(n*q)}`, v:n*q, w:"That's n(1 − p), the expected number of failures."},
+              {t:`${n} × ${ps} × ${qs} = ${fnum(n*p*q)}`, v:n*p*q, w:"That's np(1 − p), the variance."},
+              {t:`√(${n} × ${ps} × ${qs}) = ${fnum(Math.sqrt(n*p*q))}`, v:Math.sqrt(n*p*q), w:"That's the standard deviation."}]),
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:[interp, `On average, ${fnum(E)} ${ctx.succ}.`, `${fnum(E)} of the ${n} ${ctx.who[1]} will ${ctx.yes[1]}.`, `${fnum(E)} is the most likely number of ${ctx.succ}.`], a:0,
              ce:["Full credit: average, over many repetitions, in context.","Partial: an average of what? Say it's over many repetitions of the experiment.","No credit: a prediction of one result. A count can't even be a decimal.","No credit: E[X] is not the most likely value."], e:"An average over many repetitions of the same experiment.", o:["D3"]})],
     model:`E[X] = np = ${n} × ${ps} = ${fnum(E)}<br>Interpretation: ${interp}[[binom:${n},${ps}|E=${fnum(E)}|cap=E = np sits at the balance point of the bars]]`}
@@ -255,6 +304,10 @@ function nx(ctx,zlo,zhi,sign){ // a value of x, on the grid, whose z lands in [z
     const z=r2((x-ctx.mu)/ctx.sd); if(Math.abs(z)>=zlo&&Math.abs(z)<=zhi) return {x:+x.toFixed(2), z}; }
   return {x:ctx.mu+sign*ctx.sd, z:sign*1}; }
 const pctS=p=>String(r2(p*100));
+function zW(x,ctx,z){ return [{t:`(${x} − ${ctx.mu}) / ${ctx.sd} = ${fz(z)}`, v:z, w:"Subtract the mean, then divide by the SD."},
+  [{t:`(${ctx.mu} − ${x}) / ${ctx.sd} = ${fz(-z)}`, v:-z, w:"Backwards: it's x minus the mean, so the sign is flipped."},
+   {t:`(${x} − ${ctx.mu}) / ${ctx.sd}² = ${fz(r2((x-ctx.mu)/(ctx.sd*ctx.sd)))}`, v:r2((x-ctx.mu)/(ctx.sd*ctx.sd)), w:"Divide by σ, not σ² (the variance)."},
+   {t:`${x} / ${ctx.sd} = ${fz(r2(x/ctx.sd))}`, v:r2(x/ctx.sd), w:"Subtract the mean first."}], o=>o.v.toFixed(2)]; }
 function zLine(x,ctx,z){ return `z = (x − μ)/σ = (${x} − ${ctx.mu})/${ctx.sd} = ${fz(z)}`; }
 function genT3(){
   const ctx=pick(T3CTX);
@@ -285,17 +338,33 @@ function genT3(){
   const parts=[
    {label:"a", q:cut.q,
     steps:[mcShuffle({k:"mc", q:"What are you looking for?", c:pctOpts, a:0, e:`${cut.why}.`, o:["C5"]}),
-           {k:"num", q:"z from the table = ?", ans:zf.z, alt:zf.alt, tol:.0051, o:["C4","C5"]},
-           {k:"num", q:`x = μ + zσ = ? (${ctx.unit})`, ans:xc, alt:xAlt, tol, o:["C5","C6"]}],
+           calc({k:"num", q:"z from the table = ?", ans:zf.z, alt:zf.alt, tol:.0051, o:["C4","C5"]},
+             {t:cut.P<.5?`look up ${r2(1-cut.P)}: ${f4(zf.t)} at ${fz(-zf.z)}, below the mean so z = ${fz(zf.z)}`:`closest to ${cut.P} is ${f4(zf.t)} → z = ${fz(zf.z)}`, v:zf.z, w:cut.P<.5?"Bottom tail: find the matching upper-tail z, then make it negative.":"Find the probability inside the table and read off its z."},
+             [{t:`z = ${fz(-zf.z)}`, v:-zf.z, w:cut.P<.5?"This cutoff is below the mean, so z must be negative.":"This cutoff is above the mean, so z must be positive."},
+              {t:`z = ${cut.P}`, v:cut.P, w:"That's the probability, not a z-score. Find it inside the table."},
+              {t:`z = ${fz(r2(zf.z+(zf.z>0?-.1:.1)))}`, v:r2(zf.z+(zf.z>0?-.1:.1)), w:`Wrong row: the closest table probability sits at z = ${fz(Math.abs(zf.z))}.`}], o=>o.v.toFixed(2)),
+           calc({k:"num", q:`x = μ + zσ = ? (${ctx.unit})`, ans:xc, alt:xAlt, tol, o:["C5","C6"]},
+             {t:`${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)}`, v:xc, w:"x = μ + zσ, keeping the sign of z."},
+             [{t:`${ctx.mu} − (${fz(zf.z)})(${ctx.sd}) = ${fnum(r2(ctx.mu-zf.z*ctx.sd))}`, v:r2(ctx.mu-zf.z*ctx.sd), w:"Sign flipped: that puts the cutoff on the wrong side of the mean."},
+              {t:`${ctx.mu} + ${zf.z<0?`(${fz(zf.z)})`:fz(zf.z)} = ${fnum(r2(ctx.mu+zf.z))}`, v:r2(ctx.mu+zf.z), w:"z counts standard deviations: multiply it by σ."},
+              {t:`(${fz(zf.z)})(${ctx.sd}) = ${fnum(r2(zf.z*ctx.sd))}`, v:r2(zf.z*ctx.sd), w:"That's only the distance from the mean. Add μ."}], o=>o.v.toFixed(2))],
     model:`${lookup}<br>x = μ + zσ = ${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)} ${ctx.unit}${xAlt!=null?` (with z = ${fz(zf.alt)}: ${fnum(xAlt)})`:""}<br>${cut.c(xc)}${cutViz}`},
    {label:"b", q:bq,
-    steps:[{k:"num", q:"z = (x − μ)/σ = ?", ans:bz, tol:.0051, o:["C5"]},
-           {k:"num", q:"Probability (as a decimal) = ?", ans:bAns, tol:.0015, pct:true, o:["C4","P3"]}],
+    steps:[calc({k:"num", q:"z = (x − μ)/σ = ?", ans:bz, tol:.0051, o:["C5"]}, ...zW(bx,ctx,bz)),
+           calc({k:"num", q:"Probability (as a decimal) = ?", ans:bAns, tol:.0015, pct:true, o:["C4","P3"]},
+             {t:bModel.replace(/^By symmetry, /,"").replace(/^P\(X [<>] [^)]*\) = /,""), v:bAns, w:"Table value, then the complement or symmetry if the question needs it."},
+             [{t:bAns===t?`1 − ${f4(t)} = ${f4(1-t)}`:`${f4(t)} (the table value)`, v:bAns===t?1-t:t, w:bAns===t?"No complement needed here: the area you want is the table value itself.":"The table gives the area to the LEFT. This question needs the other side: 1 minus it."},
+              {t:`${f4(t)} − 0.5 = ${f4(t-.5)}`, v:t-.5, w:"The table isn't the area between 0 and z. It's everything to the left."},
+              {t:`P(Z < ${fz(Math.abs(bz)+.1)}) = ${f4(phi(Math.abs(bz)+.1))}`, v:phi(r2(Math.abs(bz)+.1)), w:`Wrong row: z is ${az}, so read row ${az.slice(0,3)}, column 0.0${az.slice(-1)}.`}])],
     model:`${zLine(bx,ctx,bz)}<br>The table gives P(Z < ${az}) = ${f4(t)}.<br>${bModel}<br>${bSent}[[normal:${ctx.mu},${ctx.sd}|${bk.startsWith("above")?"gt":"lt"}=${bx}]]`},
    {label:"c", q:ctx.between(c1.x,c2.x),
-    steps:[{k:"num", q:`z for ${c1.x} = ?`, ans:c1.z, tol:.0051, o:["C5"]},
-           {k:"num", q:`z for ${c2.x} = ?`, ans:c2.z, tol:.0051, o:["C5"]},
-           {k:"num", q:"Probability (as a decimal) = ?", ans:cAns, tol:.0015, pct:true, o:["C4","P3"]}],
+    steps:[calc({k:"num", q:`z for ${c1.x} = ?`, ans:c1.z, tol:.0051, o:["C5"]}, ...zW(c1.x,ctx,c1.z)),
+           calc({k:"num", q:`z for ${c2.x} = ?`, ans:c2.z, tol:.0051, o:["C5"]}, ...zW(c2.x,ctx,c2.z)),
+           calc({k:"num", q:"Probability (as a decimal) = ?", ans:cAns, tol:.0015, pct:true, o:["C4","P3"]},
+             {t:`${f4(p2)} − ${f4(p1)} = ${f4(cAns)}`, v:cAns, w:`Area below ${c2.x} minus area below ${c1.x}.${c1.z<0?` For the negative z: 1 − ${f4(phi(-c1.z))} = ${f4(p1)}.`:""}`},
+             [{t:`${f4(p2)} + ${f4(p1)} = ${f4(p2+p1)}`, v:p2+p1, w:"Subtract the two left areas, don't add them."},
+              c1.z<0?{t:`${f4(p2)} − ${f4(phi(-c1.z))} = ${f4(p2-phi(-c1.z))}`, v:p2-phi(-c1.z), w:`A negative z needs symmetry: P(Z < ${fz(c1.z)}) = 1 − ${f4(phi(-c1.z))} = ${f4(p1)}.`}:{t:`${f4(p2)} (area below ${c2.x})`, v:p2, w:`That's everything below ${c2.x}. Subtract the area below ${c1.x}.`},
+              {t:`1 − (${f4(p2)} − ${f4(p1)}) = ${f4(1-cAns)}`, v:1-cAns, w:"That's the area outside the interval."}])],
     model:`P(${c1.x} < X < ${c2.x}) = P(X < ${c2.x}) − P(X < ${c1.x})<br>${zLine(c2.x,ctx,c2.z)} → P(X < ${c2.x}) = ${f4(p2)}<br>${zLine(c1.x,ctx,c1.z)} → ${p1txt}<br>P(${c1.x} < X < ${c2.x}) = ${f4(p2)} − ${f4(p1)} = ${f4(cAns)}<br>${ctx.sBetween(c1.x,c2.x,pctS(cAns))}[[normal:${ctx.mu},${ctx.sd}|btw=${c1.x},${c2.x}]]`}
   ];
   return {tpl:3, title:ctx.name, setup:ctx.setup, parts};

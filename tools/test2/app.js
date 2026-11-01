@@ -8,7 +8,7 @@ const shuf=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(M
 const TPL={1:{name:"Table",long:"Distribution from a table",c:"--t1"},2:{name:"Binomial",long:"Binomial",c:"--t2"},3:{name:"Normal",long:"Normal",c:"--t3"}};
 
 /* ---------- saved progress ---------- */
-let S={cards:{}, qc:{}, sess:0, obj:{}, tests:[], sound:true, pr:{}, drills:{}, days:[]};
+let S={cards:{}, qc:{}, sess:0, obj:{}, tests:[], sound:true, pr:{}, drills:{}, days:[], style:"mc"};
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
 function rec(objs,ok){ (objs||[]).forEach(o=>{ const s=S.obj[o]||(S.obj[o]={r:0,w:0}); ok?s.r++:s.w++; }); }
@@ -63,7 +63,7 @@ const IC={
  test:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 9.5v4l2.5 2M9.5 3h5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
  logo:'<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M6 27c5 0 6-15 12-15s7 15 12 15" fill="none" stroke="var(--m-learn)" stroke-width="3" stroke-linecap="round"/><path d="M6 28.5h24" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/><circle cx="27" cy="9" r="3.5" fill="var(--sun)" stroke="var(--ink)" stroke-width="2"/></svg>'
 };
-function bar(title,opts={}){ return `<div class="bar"><button class="x" data-act="${opts.back||"home"}" aria-label="Back">${opts.close?IC.x:IC.back}</button>${opts.prog!=null?`<div class="steps"><i style="width:${opts.prog*100}%"></i></div>`:`<div class="ttl">${esc(title)}</div>`}${opts.z?'<button class="zbtn" data-act="ztable">z table</button>':""}${opts.timer?'<span class="timer" id="timer">0:00</span>':""}</div>`; }
+function bar(title,opts={}){ return `<div class="bar"><button class="x" data-act="${opts.back||"home"}" aria-label="Back">${opts.close?IC.x:IC.back}</button>${opts.prog!=null?`<div class="steps"><i style="width:${opts.prog*100}%"></i></div>`:`<div class="ttl">${esc(title)}</div>`}${opts.calc?'<button class="zbtn" data-act="calc" aria-label="Calculator">Calc</button>':""}${opts.z?'<button class="zbtn" data-act="ztable">z table</button>':""}${opts.timer?'<span class="timer" id="timer">0:00</span>':""}</div>`; }
 function show(html){ app.innerHTML=html; window.scrollTo(0,0); }
 
 /* ---------- derived stats ---------- */
@@ -159,6 +159,7 @@ function practice(){
     <button class="btn go wide" data-act="qc">Start 10 questions</button></section>
   <section class="card"><h3>Step-by-step problems</h3><p class="muted">A fresh test-style problem in a new context, broken into small steps with feedback on each. The model answer after every part shows exactly what to write.</p>
     <div class="seg" role="group" aria-label="Problem type">${[1,2,3,0].map(t=>`<button data-act="ptype" data-t="${t}" aria-pressed="${PT===t}">${t?TPL[t].name:"Mixed"}<span>${t?["Template 1","Template 2","Template 3"][t-1]:"Any"}</span></button>`).join("")}</div>
+    ${styleSeg()}
     <button class="btn wide" data-act="prob">Start a problem</button></section>
   ${drillCard()}
   ${objs.length?`<section class="card"><h3>Accuracy by topic</h3><div class="weak">${objs.map(k=>{ const o=S.obj[k]; return wrow(k,o.r/(o.r+o.w)); }).join("")}</div></section>`:""}`);
@@ -185,7 +186,7 @@ function runQC(list,mode,title,drill){ QR={items:list.map(x=>typeof x==="number"
 const qBack=()=>QR.mode==="test"?"testmenu":"practice";
 function renderQ(){
   const q=QR.items[QR.i], n=QR.items.length;
-  show(`${bar(QR.title,{back:qBack(), close:true, prog:QR.i/n, timer:QR.mode!=="prac"})}
+  show(`${bar(QR.title,{back:qBack(), close:true, prog:QR.i/n, timer:QR.mode!=="prac", z:QR.drill==="ztable"})}
   <div class="eyebrow">${QR.drill?esc(DRILLS[QR.drill].title)+" · ":""}Question ${QR.i+1} of ${n}${STK>=2&&QR.mode!=="test"?` <span class="streak">${STK} in a row</span>`:""}</div>
   <div class="qtext">${esc(q.q)}</div>
   <div class="opts">${q.c.map((c,k)=>`<button class="opt" data-act="qopt" data-o="${k}">${esc(c)}</button>`).join("")}</div>
@@ -244,9 +245,14 @@ function cram(){
 
 /* ================= PROBLEMS (practice: step by step; exam: all at once) ================= */
 let PR=null;
+/* answer style: "mc" turns every calculation into a choice between fully worked lines (no calculator needed); "type" keeps number entry */
+function asStyle(p){ if(S.style==="type") return p;
+  p.parts.forEach(pt=>{ pt.steps=pt.steps.map(s=>s.mc?mcShuffle({k:"mc", calc:true, q:s.q.replace(/ \(as a decimal\)/,"").replace(/ = \?.*$/,"").replace(/[.:]?\s*Enter P\(x\):?$/,"").replace(/[:\s]+$/,"")+": which working is right?", c:s.mc.c, a:s.mc.a, ce:s.mc.ce, e:s.mc.e, o:s.o}):s); });
+  return p; }
+function styleSeg(){ return `<div class="seg two" role="group" aria-label="Answer style"><button data-act="style" data-v="mc" aria-pressed="${S.style!=="type"}">Multiple choice<span>Pick the right working</span></button><button data-act="style" data-v="type" aria-pressed="${S.style==="type"}">Type answers<span>Built-in calculator</span></button></div>`; }
 function newProblem(t,mode){
   const tpl=t||1+Math.floor(Math.random()*3);
-  PR={p:GEN[tpl](), mode, t, pi:0, si:0, res:{}, val:{}, right:0, total:0};
+  PR={p:asStyle(GEN[tpl]()), mode, t, pi:0, si:0, res:{}, val:{}, right:0, total:0};
   if(mode==="exam"){ startTimer(); renderExam(); } else renderProb();
 }
 const sid=(pi,si)=>pi+"-"+si;
@@ -264,9 +270,9 @@ function stepHTML(s,pi,si,mode){
   if(s.k==="mc"){
     h+=`<div class="opts">${s.c.map((c,k)=>{ let st=""; if(r){ st=k===s.a?"right":k===r.k?"wrong":"fade"; } else if(mode==="exam"&&v===k) st="pick";
       const why=r&&s.ce&&(k===r.k||k===s.a)?`<small>${esc(s.ce[k])}</small>`:"";
-      return `<button class="opt" data-act="sopt" data-id="${id}" data-o="${k}" ${r?"disabled":""} ${st?`data-s="${st}"`:""}>${esc(c)}${why}</button>`; }).join("")}</div>`;
+      return `<button class="opt${s.calc?" calc":""}" data-act="sopt" data-id="${id}" data-o="${k}" ${r?"disabled":""} ${st?`data-s="${st}"`:""}>${esc(c)}${why}</button>`; }).join("")}</div>`;
     if(r&&!s.ce) h+=`<div class="fb" data-k="${r.ok?"ok":"no"}"><b>${r.ok?"Right.":"Not quite."}</b>${esc(s.e)}</div>`;
-    else if(r&&!r.ok) h+=`<div class="fb" data-k="no">${esc(s.e)}</div>`;
+    else if(r&&!r.ok&&!s.calc) h+=`<div class="fb" data-k="no">${esc(s.e)}</div>`;
   } else if(s.k==="num"){
     h+=`<div class="num"><input inputmode="decimal" autocomplete="off" enterkeyhint="done" data-id="${id}" value="${v!=null?esc(v):""}" ${r?`disabled data-s="${r.ok?"right":"wrong"}"`:""} placeholder="${s.pct?"e.g. 0.0918":"Your answer"}" aria-label="${esc(s.q)}">${mode==="prac"&&!r?`<button class="btn small" data-act="schk" data-id="${id}">Check</button>`:""}</div>`;
     if(r) h+=`<div class="fb" data-k="${r.ok?"ok":"no"}"><b>${r.ok?"Right.":"Not quite."}</b>${r.ok?`Answer: ${fmtAns(s)}`:`The answer is ${fmtAns(s)}.`}</div>`;
@@ -287,7 +293,7 @@ function gradeStep(s,id){
 function renderProb(){
   const p=PR.p, part=p.parts[PR.pi];
   const nSteps=p.parts.reduce((a,x)=>a+x.steps.length,0), doneSteps=Object.keys(PR.res).length;
-  let h=`${bar("",{back:"practice", close:true, prog:doneSteps/nSteps, z:p.tpl===3})}${setupHTML(PR.pi===0)}`;
+  let h=`${bar("",{back:"practice", close:true, prog:doneSteps/nSteps, z:p.tpl===3, calc:S.style==="type"})}${setupHTML(PR.pi===0)}`;
   p.parts.slice(0,PR.pi).forEach(pt=>{ h+=`<details class="part"><summary><b>(${pt.label})</b> ${esc(pt.q)}</summary><div class="model"><b>What to write</b>${rich(pt.model)}</div></details>`; });
   h+=`<section class="part"><h3><span class="pl">${part.label}</span>${esc(part.q)}</h3>`;
   for(let si=0;si<=Math.min(PR.si,part.steps.length-1);si++) h+=stepHTML(part.steps[si],PR.pi,si,"prac");
@@ -329,7 +335,7 @@ function checklist(t){ return `<section class="card"><h3>Wording check</h3><p cl
 /* exam: every part at once, no feedback until Submit */
 function renderExam(){
   const p=PR.p;
-  let h=`${bar("",{back:"testmenu", close:true, timer:true, z:p.tpl===3})}
+  let h=`${bar("",{back:"testmenu", close:true, timer:true, z:p.tpl===3, calc:S.style==="type"})}
   <p class="muted">Work it on paper the way you would on the test, then enter your numbers and choices here. Nothing is graded until you submit.</p>${setupHTML(true)}`;
   p.parts.forEach((pt,pi)=>{ h+=`<section class="part"><h3><span class="pl">${pt.label}</span>${esc(pt.q)}</h3>${pt.steps.map((s,si)=>stepHTML(s,pi,si,"exam")).join("")}</section>`; });
   h+=`<button class="btn go wide" data-act="esubmit">Submit and grade</button>`;
@@ -362,11 +368,34 @@ function testmenu(){
   show(`${bar("Test mode")}
   <section class="card"><h3>Exam simulation</h3><p class="muted">One full problem like the real test, in a new context, timed. Answer every part, then submit for your score and the model answers.</p>
     <div class="seg" role="group" aria-label="Problem type">${[0,1,2,3].map(t=>`<button data-act="etype" data-t="${t}" aria-pressed="${ET===t}">${t?TPL[t].name:"Random"}<span>${t?["Template 1","Template 2","Template 3"][t-1]:"Like the test"}</span></button>`).join("")}</div>
+    ${styleSeg()}
     <button class="btn go wide" data-act="exam" data-t="${ET}">Start exam</button>${spark(ex,"--m-test")}</section>
   <section class="card"><h3>Concept quiz</h3><p class="muted">12 quick questions across every topic, timed, with a topic breakdown at the end.</p>
     <button class="btn wide" data-act="quiz">Start quiz</button>${spark(qz,"--m-learn")}</section>
   ${rows?`<section class="card"><h3>History</h3><div class="hist">${rows}</div></section>`:""}`);
 }
+
+/* ================= calculator (for "Type answers") ================= */
+let lastInp=null, cx="";
+app.addEventListener("focusin",e=>{ if(e.target.matches("input[data-id]")) lastInp=e.target; });
+const CKEYS=["C","(",")","⌫","7","8","9","÷","4","5","6","×","1","2","3","−","0",".","^","+","√","x²","n!","="];
+function calcEval(str){
+  let t=str.replace(/÷/g,"/").replace(/×/g,"*").replace(/−/g,"-").replace(/\^/g,"**").replace(/²/g,"**2");
+  t=t.replace(/(\d+)!/g,(m,n)=>String(fact(+n)));
+  t=t.replace(/√/g,"S");
+  if(!/^[0-9+\-*/().S\s]*$/.test(t)) return null;
+  t=t.replace(/S/g,"Math.sqrt");
+  const opens=(t.match(/\(/g)||[]).length-(t.match(/\)/g)||[]).length; if(opens>0) t+=")".repeat(opens);
+  try{ const v=Function('"use strict";return ('+t+')')(); return typeof v==="number"&&isFinite(v)?v:null; }catch(e){ return null; } }
+function calcShow(){ $('cexpr').textContent=cx||"0"; const v=cx?calcEval(cx):null; $('cres').textContent=v==null?"":"= "+(Math.round(v*1e6)/1e6); $('cuse').disabled=v==null||!lastInp||lastInp.disabled; }
+function openCalc(){ $('calcsheet').hidden=false; calcShow(); }
+$('ckeys').innerHTML=CKEYS.map(k=>`<button data-k="${k}" class="${/[÷×−+^=]/.test(k)?"op":/[C⌫]/.test(k)?"fn":""}">${k}</button>`).join("");
+$('ckeys').addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const k=b.dataset.k;
+  if(k==="C") cx=""; else if(k==="⌫") cx=cx.slice(0,-1); else if(k==="=") { const v=calcEval(cx); if(v!=null) cx=String(Math.round(v*1e6)/1e6); }
+  else if(k==="√") cx+="√("; else if(k==="x²") cx+="²"; else if(k==="n!") cx+="!"; else cx+=k; calcShow(); });
+$('cuse').onclick=()=>{ const v=calcEval(cx); if(v==null||!lastInp) return; lastInp.value=String(Math.round(v*1e4)/1e4); lastInp.dispatchEvent(new Event("input",{bubbles:true})); $('calcsheet').hidden=true; };
+$('calcclose').onclick=()=>{ $('calcsheet').hidden=true; };
+$('calcsheet').addEventListener("click",e=>{ if(e.target.id==="calcsheet") $('calcsheet').hidden=true; });
 
 /* ================= z table sheet ================= */
 function buildZ(){
@@ -421,6 +450,8 @@ app.addEventListener("click",e=>{
       if(missing&&!b.dataset.sure){ b.dataset.sure="1"; b.textContent=`${missing} blank. Tap again to submit`; return; }
       return examSubmit(); }
     case "ztable": $('zsheet').hidden=false; return;
+    case "calc": openCalc(); return;
+    case "style": S.style=b.dataset.v; save(); { const y=window.scrollY; (app.querySelector('[data-act="etype"]')?testmenu:practice)(); window.scrollTo(0,y); } return;
     case "sound": S.sound=!S.sound; save(); return home();
     case "reset": if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all 640 progress"; return; }
       S={cards:{}, qc:{}, sess:0, obj:{}, tests:[], sound:S.sound, pr:{}, drills:{}, days:[]}; save(); return home();

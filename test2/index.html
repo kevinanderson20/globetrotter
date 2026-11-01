@@ -255,6 +255,17 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 .seqs span{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
 .seqs .s{background:var(--good)}.seqs .f{background:var(--bad)}
 .fb .vz figcaption{color:var(--ink-2)}
+/* answer style + calculator */
+.seg.two{grid-template-columns:1fr 1fr;margin-top:2px}
+.opt.calc{font-variant-numeric:tabular-nums;font-weight:600;font-size:15.5px}
+.cdisp{padding:14px 16px 6px;text-align:right;font-variant-numeric:tabular-nums}
+#cexpr{font-size:22px;font-weight:600;word-break:break-all;min-height:30px}
+#cres{font-size:18px;color:var(--good);font-weight:800;min-height:26px}
+.ckeys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 12px 12px}
+.ckeys button{height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface-2);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.ckeys button.op{background:color-mix(in srgb,var(--m-learn) 14%,var(--surface));color:var(--m-learn)}
+.ckeys button.fn{color:var(--bad)}
+.ckeys button:active{transform:scale(.96)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -264,6 +275,12 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 <div class="flash" id="flash" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="sheet" id="calcsheet" hidden><div class="in">
+  <div class="sh"><b>Calculator</b><button class="x" id="calcclose" aria-label="Close calculator"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>
+  <div class="cdisp"><div id="cexpr">0</div><div id="cres"></div></div>
+  <div class="ckeys" id="ckeys"></div>
+  <div style="padding:0 12px 12px"><button class="btn go wide" id="cuse">Use this answer</button></div>
+</div></div>
 <div class="sheet" id="zsheet" hidden><div class="in">
   <div class="sh"><b>Standard normal table</b><button class="x" id="zclose" aria-label="Close table"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>
   <div class="zsel" id="zsel">Area to the <b>left</b> of z. Tap a cell to read it. For negative z use symmetry: P(Z &lt; −z) = 1 − P(Z &lt; z).</div>
@@ -607,6 +624,13 @@ const C=(n,k)=>fact(n)/(fact(k)*fact(n-k));
 function mcShuffle(step){ const idx=step.c.map((_,i)=>i); for(let i=idx.length-1;i>0;i--){ const j=rnd(i+1); [idx[i],idx[j]]=[idx[j],idx[i]]; }
   return {...step, c:idx.map(i=>step.c[i]), a:idx.indexOf(step.a), ce:step.ce?idx.map(i=>step.ce[i]):undefined}; }
 function uniqOpts(correct, others){ const seen=new Set([correct]); const out=[correct]; others.forEach(o=>{ if(!seen.has(o)&&out.length<4){ seen.add(o); out.push(o); } }); return out; }
+/* Calculation steps carry a multiple-choice version (step.mc): the right working plus common wrong setups,
+   each written out to its result, so no calculator is needed. Duplicated results are dropped. */
+function calc(step, right, wrongs, key=o=>f4(o.v)){
+  const seen=new Set([key(right)]), out=[right];
+  wrongs.forEach(w=>{ if(!w||(w.v!=null&&!isFinite(w.v))) return; const k=key(w); if(!seen.has(k)&&out.length<4){ seen.add(k); out.push(w); } });
+  step.mc={c:out.map(o=>o.t), a:0, ce:out.map((o,i)=>i?o.w:"Right setup. "+(right.w||"")), e:right.w||""};
+  return step; }
 const list=v=>v.length===1?`X = ${v[0]}`:`X = ${v.slice(0,-1).join(", ")} or ${v[v.length-1]}`;
 
 /* ---------- normal table ---------- */
@@ -694,19 +718,38 @@ function genT1(){
     steps:[mcShuffle({k:"mc", q:"Discrete or continuous?", c:[`Discrete: X takes a finite number of values (specifically, ${k}), which can be listed.`, `Continuous: X can take any value between ${lo} and ${hi}.`, `Discrete: the probabilities sum to 1.`, `Continuous: E[X] does not have to be a whole number.`], a:0, e:"Decide by the set of values X can take, with a one-sentence reason.", o:["P1","D1"]})],
     model:`X assumes a finite number of values (specifically, ${k}), and therefore it is discrete.`},
    {label:"b", q:"Use the information in the table to find the probability distribution for X.",
-    steps:[{k:"multi", q:`Divide each count by ${N}. Enter P(x):`, fields:vals.map((x,i)=>({l:`P(${x})`, ans:P[i]})), tol:.0006, o:["P2","D2"]}],
+    steps:[calc({k:"multi", q:`Divide each count by ${N}. Enter P(x):`, fields:vals.map((x,i)=>({l:`P(${x})`, ans:P[i]})), tol:.0006, o:["P2","D2"]},
+      {t:`count ÷ ${N}: ${P.map(fnum).join(", ")}`, w:`Each count divided by the total, ${N}. They sum to 1.`},
+      [{t:`running totals: ${P.map((_,i)=>fnum(P.slice(0,i+1).reduce((a,b)=>a+b,0))).join(", ")}`, w:"Those are cumulative totals, P(X ≤ x), not P(X = x). They don't sum to 1."},
+       {t:`count ÷ ${k}: ${cnt.map(c=>fnum(c/k)).join(", ")}`, w:`Divide by the total number of observations (${N}), not by the number of values (${k}).`},
+       {t:`1 ÷ ${k} each: ${vals.map(()=>fnum(1/k)).join(", ")}`, w:"The values aren't equally likely. Use each count."}], o=>o.t)],
     model:`We have a total of ${N} observations, so divide each count by ${N}:<table class="dt"><tr><th>x</th>${vals.map(x=>`<td>${x}</td>`).join("")}</tr><tr><th>P(x)</th>${P.map(p=>`<td>${fnum(p)}</td>`).join("")}</tr></table>Check: each is between 0 and 1, and they sum to 1.[[bars:${BARS}|cap=The distribution of X as bars]]`},
    {label:"c", q:`Find the probability that ${ctx.ev(ev.w)}, that is, ${ev.sym}.`,
     steps:[mcShuffle({k:"mc", q:`Which values of X make ${ev.sym} true?`, c:opts, a:0, e:"Watch strict versus non-strict inequalities: \"fewer than\" and \"more than\" exclude the boundary, \"at least\" and \"at most\" include it.", o:["D1","P3"]}),
-           {k:"num", q:`${ev.sym} = ?`, ans:pv, tol:.0006, o:["P3"]}],
+           calc({k:"num", q:`${ev.sym} = ?`, ans:pv, tol:.0006, o:["P3"]},
+             {t:`${ev.v.map(x=>`p(${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}`, v:pv, w:`Add P(X = x) for ${list(ev.v)}.`},
+             [...ev.wrong.filter(w=>w.length).map(wv=>{ const sv=wv.reduce((a,x)=>a+P[vals.indexOf(x)],0); return {t:`${wv.map(x=>`p(${x})`).join(" + ")} = ${wv.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(sv)}`, v:sv, w:`That adds ${list(wv)}: check the boundary. ${ev.sym} means ${list(ev.v)}.`}; }),
+              {t:`1 − ${fnum(pv)} = ${fnum(1-pv)}`, v:1-pv, w:"That's the complement: the probability of every other value."}])],
     model:`${ev.sym} = ${ev.v.map(x=>`P(X = ${x})`).join(" + ")} = ${ev.v.map(x=>fnum(P[vals.indexOf(x)])).join(" + ")} = ${fnum(pv)}<br>We may add because different values of X are mutually exclusive events.[[bars:${BARS}|hl=${ev.v.join(",")}|cap=${ev.sym}: the highlighted bars]]`},
    {label:"d", q:"Find the expected value of X and practically interpret the result.",
-    steps:[{k:"num", q:"E[X] = Σ x·P(x) = ?", ans:E, tol:.006, o:["D3"]},
+    steps:[calc({k:"num", q:"E[X] = Σ x·P(x) = ?", ans:E, tol:.006, o:["D3"]},
+             {t:`${sumE} = ${fnum(E)}`, v:E, w:"Each value times its probability, all added."},
+             [{t:`(${vals.join(" + ")}) ÷ ${k} = ${fnum(vals.reduce((a,b)=>a+b,0)/k)}`, v:vals.reduce((a,b)=>a+b,0)/k, w:"That averages the values as if they were equally likely. Weight each by P(x)."},
+              {t:`most likely value: ${vals[P.indexOf(Math.max(...P))]}`, v:vals[P.indexOf(Math.max(...P))], w:"That's the most likely value (the mode), not the expected value."},
+              {t:`(${sumE}) ÷ ${k} = ${fnum(E/k)}`, v:E/k, w:"Don't divide by the number of values: the probabilities already do the averaging."}]),
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:interpOpts, a:0, ce:["Full credit: an average, what it's averaged over, context and units.","Partial: it says average, but not of what. That's where the meaning of E[X] lives.","No credit: E[X] is not a prediction of one result.","No credit: E[X] is not the most likely value; it may not even be a possible value."], e:"E[X] is an average over the set (or over many repetitions), never a prediction.", o:["D3"]})],
     model:`E[X] = Σ x·P(x) = ${sumE} = ${fnum(E)}<br>Interpretation: ${ctx.interp(Er,N)}[[bars:${BARS}|E=${fnum(E)}|cap=The mean is the balance point of the bars]]`},
    {label:"e", q:"Find the standard deviation of X.",
-    steps:[{k:"num", q:"Var(X) = Σ (x − E[X])²·P(x) = ?", ans:V, tol:.006, o:["D3"]},
-           {k:"num", q:"SD(X) = √Var(X) = ?", ans:SD, tol:.006, o:["D3"]}],
+    steps:[calc({k:"num", q:"Var(X) = Σ (x − E[X])²·P(x) = ?", ans:V, tol:.006, o:["D3"]},
+             {t:`${prod.map(f4).join(" + ")} = ${f4(V)}`, v:V, w:"Squared deviation times P(x) for each value, added (the last column of the table)."},
+             [{t:`Σ (x − E[X])·P(x) = ${dev.map((d,i)=>f4(d*P[i])).join(" + ")} = 0`, v:0, w:"Without squaring, the deviations always average to 0. That's why we square."},
+              {t:`Σ (x − E[X])² ÷ ${k} = (${sq.map(f4).join(" + ")}) ÷ ${k} = ${f4(sq.reduce((a,b)=>a+b,0)/k)}`, v:sq.reduce((a,b)=>a+b,0)/k, w:"Weight each squared deviation by P(x); don't divide by the number of values."},
+              {t:`Σ x²·P(x) = ${f4(vals.reduce((a,x,i)=>a+x*x*P[i],0))}`, v:vals.reduce((a,x,i)=>a+x*x*P[i],0), w:"That's E[X²]. You forgot to subtract E[X] from each value."}]),
+           calc({k:"num", q:"SD(X) = √Var(X) = ?", ans:SD, tol:.006, o:["D3"]},
+             {t:`√${f4(V)} = ${f4(SD)}`, v:SD, w:"The square root of the variance, in the units of X."},
+             [{t:`${f4(V)} (the variance)`, v:V, w:"That's the variance. The SD is its square root."},
+              {t:`${f4(V)}² = ${f4(V*V)}`, v:V*V, w:"Square root, not square."},
+              {t:`√${f4(sq.reduce((a,b)=>a+b,0)/k)} = ${f4(Math.sqrt(sq.reduce((a,b)=>a+b,0)/k))}`, v:Math.sqrt(sq.reduce((a,b)=>a+b,0)/k), w:"That's the root of an unweighted variance. Weight by P(x) first."}])],
     model:`<table class="dt sm"><tr><th>x</th><th>P(x)</th><th>x − E[X]</th><th>(x − E[X])²</th><th>P(x)(x − E[X])²</th></tr>${vals.map((x,i)=>`<tr><td>${x}</td><td>${fnum(P[i])}</td><td>${fnum(dev[i])}</td><td>${f4(sq[i])}</td><td>${f4(prod[i])}</td></tr>`).join("")}</table>Var(X) = ${prod.map(f4).join(" + ")} = ${f4(V)}<br>SD(X) = √${f4(V)} = ${f4(SD)} ${ctx.unit}[[bars:${BARS}|E=${fnum(E)}|sd=${f4(SD)}|cap=Shaded band: one SD either side of the mean]]`}
   ];
   return {tpl:1, title:ctx.name, setup:ctx.setup(N)+tbl, parts};
@@ -737,6 +780,17 @@ function genT2(){
   const term=x=>{ const c=C(n,x), a=r4(Math.pow(p,x)), b=r4(Math.pow(q,n-x)), v=r4(pm(x));
     const pieces=[c!==1?`${c}`:null, x>0?`${ps}${x>1?sup(x):""}`:null, n-x>0?`${qs}${n-x>1?sup(n-x):""}`:null].filter(Boolean).join(" × ");
     return {v, line:`P(X = ${x}) = ${n}!/(${x}!·${n-x}!) × ${ps}${sup(x)} × ${qs}${sup(n-x)} = ${pieces} = ${f4(v)}`}; };
+  // multiple-choice working for P(X = x): the right product and the usual slips
+  const pw=x=>{ const c=C(n,x), v=pm(x), sx=x?`${ps}${x>1?sup(x):""}`:"", sf=n-x?`${qs}${n-x>1?sup(n-x):""}`:"";
+    const body=[c!==1?c:null, sx||null, sf||null].filter(Boolean).join(" × ");
+    const right={t:`${body} = ${f4(v)}`, v, w:`C(${n}, ${x}) = ${c}, then p for each of the ${x} successes and 1 − p for each of the ${n-x} failures.`};
+    const sw=[c!==1?c:null, x?`${qs}${x>1?sup(x):""}`:null, n-x?`${ps}${n-x>1?sup(n-x):""}`:null].filter(Boolean).join(" × ");
+    const wr=[{t:`${sw} = ${f4(C(n,x)*Math.pow(q,x)*Math.pow(p,n-x))}`, v:C(n,x)*Math.pow(q,x)*Math.pow(p,n-x), w:"Exponents swapped: p goes with the successes, 1 − p with the failures."}];
+    if(c!==1) wr.push({t:`${[sx,sf].filter(Boolean).join(" × ")} = ${f4(v/c)}`, v:v/c, w:`Missing C(${n}, ${x}) = ${c}: that's the probability of just one order. There are ${c} orders.`});
+    if(c!==1&&n*x!==c) wr.push({t:`${n*x} × ${[sx,sf].filter(Boolean).join(" × ")} = ${f4(v/c*n*x)}`, v:v/c*n*x, w:`C(${n}, ${x}) = ${n}!/(${x}!·${n-x}!) = ${c}, not ${n} × ${x}.`});
+    if(c===1) wr.push({t:`1 − ${body} = ${f4(1-v)}`, v:1-v, w:"That's the complement. You want this outcome itself."},{t:`${n} × ${x===n?ps:qs} = ${fnum(n*(x===n?p:q))}`, v:n*(x===n?p:q), w:"Multiplying by n gives an expected count, not a probability."});
+    return [right,wr]; };
+  const sumW=(vs,sym)=>{ const v=vs.reduce((a,x)=>a+r4(pm(x)),0); return {t:vs.length>1?`${vs.map(x=>`p(${x})`).join(" + ")} = ${vs.map(x=>f4(pm(x))).join(" + ")} = ${f4(v)}`:`p(${vs[0]}) only = ${f4(v)}`, v, w:`${sym}: add P(X = x) for ${list(vs)}. Adding is fine because the values are mutually exclusive.`}; };
   const W=(c,s)=>c===1?`${ctx.who[0]} ${s[0]}`:`${ctx.who[1]} ${s[1]}`;
   const Xdef=`Let X = number of ${ctx.xs} out of ${n}.`;
   // (a) all or none
@@ -756,6 +810,13 @@ function genT2(){
   if(cK==="le"&&hiP){ const tn=term(n); cAns=r4(1-tn.v); cModel=`${cSym} = P(X = 0) + ... + P(X = ${n-1}). Quicker by the complement: the only value left out is X = ${n}.<br>${cSym} = 1 − P(X = ${n})<br>P(X = ${n}) = ${ps}${sup(n)} = ${f4(tn.v)}<br>${cSym} = 1 − ${f4(tn.v)} = ${f4(cAns)}`; }
   else if(cK==="ge1"){ const t0=term(0); cAns=r4(1-t0.v); cModel=`The complement of "at least one" is "none":<br>P(X ≥ 1) = 1 − P(X = 0)<br>${t0.line}<br>P(X ≥ 1) = 1 − ${f4(t0.v)} = ${f4(cAns)}`; }
   else { const ts=cv.map(term); cAns=r4(ts.reduce((s,t)=>s+t.v,0)); cModel=`${cSym} = ${cv.map(x=>`P(X = ${x})`).join(" + ")}<br>${ts.map(t=>t.line).join("<br>")}<br>${cSym} = ${ts.map(t=>f4(t.v)).join(" + ")} = ${f4(cAns)}`; }
+  function cWork(){
+    if(cK==="ge1"||(cK==="le"&&hiP)){ const left=cK==="ge1"?0:n, tv=pm(left);
+      return [{t:`1 − P(X = ${left}) = 1 − ${f4(tv)} = ${f4(cAns)}`, v:cAns, w:`Every value except X = ${left}, so use the complement.`},
+        [{t:`P(X = ${left}) = ${f4(tv)}`, v:tv, w:`That's the one value you leave out. Subtract it from 1.`},
+         {t:`P(X = ${cK==="ge1"?1:n-1}) = ${f4(pm(cK==="ge1"?1:n-1))}`, v:pm(cK==="ge1"?1:n-1), w:`That's only one of the values in ${cSym}.`},
+         {t:`1 − P(X = ${cK==="ge1"?1:n-1}) = ${f4(1-pm(cK==="ge1"?1:n-1))}`, v:1-pm(cK==="ge1"?1:n-1), w:`Complement of the wrong value: the one left out is X = ${left}.`}]]; }
+    return [sumW(cv,cSym), [...cWrong.filter(w=>w.length).map(wv=>({...sumW(wv,""), w:`That adds ${list(wv)}: check the boundary. ${cSym} means ${list(cv)}.`})), {t:`1 − ${f4(cAns)} = ${f4(1-cAns)}`, v:1-cAns, w:"That's the complement: the probability of the other values."}]]; }
   // (d) more than a but fewer than b
   const a=Math.max(0,Math.min(n-3,Math.round(n*p)-2+rnd(2))), b=a+3, dv=range(a+1,b-1), td=dv.map(term), dAns=r4(td.reduce((s,t)=>s+t.v,0));
   const dSym=`P(${a} < X < ${b})`;
@@ -773,24 +834,29 @@ function genT2(){
         ce:["Full credit: X defined, structure named, parameters given.","No credit for the justification: two outcomes is only one of the four assumptions.","Partial: the model is stated but nothing shows why it fits.","Not a reason, and the parameters are in the wrong order: B(n, p)."],
         e:"Define X in words, name the structure, then X ~ B(n, p).", o:["D1","D4"]}),
       mcShuffle({k:"mc", q:`Which values of X?`, c:uniqOpts(list([allNone]), [list([allNone===n?0:n]), list(allNone===n?range(1,n):range(0,1)), allNone===n?`X ≥ 1`:`X ≤ 1`]), a:0, e:allNone===n?"All of them succeed: X = n.":"None succeed: X = 0.", o:["D5"]}),
-      {k:"num", q:`P(X = ${allNone}) = ?`, ans:ta.v, tol:.0015, o:["D5","P5"]}],
+      calc({k:"num", q:`P(X = ${allNone}) = ?`, ans:ta.v, tol:.0015, o:["D5","P5"]}, ...pw(allNone))],
     model:`${Xdef} Since this random variable can be represented as a number of successes in ${n} identical independent trials, X ~ B(${n}, ${ps}).<br>P(X = ${allNone}) = ${allNone===n?`${ps}${sup(n)}`:`${qs}${sup(n)}`} = ${f4(ta.v)}[[binom:${n},${ps}|hl=${allNone}]]`},
    {label:"b", q:bQ,
     steps:[mcShuffle({k:"mc", q:"Which value of X?", c:uniqOpts(list([xb]), [list([kf]), `X ≤ ${kf}`, `X ≥ ${xb}`, list([Math.max(0,xb-1)])]), a:0, e:`X counts ${ctx.xs}. ${kf} failure${kf>1?"s":""} out of ${n} leaves ${xb} successes.`, o:["D5"]}),
-           {k:"num", q:`P(X = ${xb}) = ?`, ans:tb.v, tol:.0015, o:["D5","P5"]}],
+           calc({k:"num", q:`P(X = ${xb}) = ?`, ans:tb.v, tol:.0015, o:["D5","P5"]}, ...pw(xb))],
     model:`${kf} ${kf===1?ctx.who[0]:ctx.who[1]} that ${kf===1?ctx.no[0]:ctx.no[1]} out of ${n} means X = ${xb}.<br>${tb.line}[[binom:${n},${ps}|hl=${xb}]]`},
    {label:"c", q:cQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(cv,cWrong), a:0, e:"\"At least\" and \"at most\" include the boundary.", o:["D5","P3"]}),
            ...(cK==="ge1"?[mcShuffle({k:"mc", q:"Quickest route?", c:["1 − P(X = 0)",`P(X = 1)`,`${n} × ${ps}`,`P(X = 0)`], a:0, e:"The complement of \"at least one\" is \"none\".", o:["P3"]})]:[]),
-           {k:"num", q:`${cSym} = ?`, ans:cAns, tol:.002, o:["D5","P3","P4"]}],
+           calc({k:"num", q:`${cSym} = ?`, ans:cAns, tol:.002, o:["D5","P3","P4"]}, ...cWork())],
     model:cModel+(cK==="ge1"?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=0|cap=${cSym}: 1 minus the red bar]]`:cK==="le"&&hiP?`[[binom:${n},${ps}|hl=${cv.join(",")}|cmp=${n}|cap=${cSym}: 1 minus the red bar]]`:`[[binom:${n},${ps}|hl=${cv.join(",")}|cap=${cSym}: the highlighted bars]]`)},
    {label:"d", q:dQ,
     steps:[mcShuffle({k:"mc", q:`Which values of X?`, c:opt(dv,[range(a,b), range(a,b-1), range(a+1,b)]), a:0, e:"Both inequalities are strict for a discrete X.", o:["D5","P3"]}),
            mcShuffle({k:"mc", q:"Why may you add these probabilities?", c:["The values of X are mutually exclusive events","The trials are independent","X is binomial","Each probability is less than 1"], a:0, e:"Mutual exclusivity justifies adding across values; independence justifies multiplying inside each term.", o:["P4"]}),
-           {k:"num", q:`${dSym} = ?`, ans:dAns, tol:.002, o:["D5","P3"]}],
+           calc({k:"num", q:`${dSym} = ?`, ans:dAns, tol:.002, o:["D5","P3"]}, sumW(dv,dSym),
+             [range(a,b), range(a,b-1), range(a+1,b)].filter(w=>w.every(x=>x>=0&&x<=n)).map(wv=>({...sumW(wv,""), w:`That adds ${list(wv)}. Both inequalities are strict: only ${list(dv)}.`})))],
     model:`${dSym} = ${dv.map(x=>`P(X = ${x})`).join(" + ")}<br>${td.map(t=>t.line).join("<br>")}<br>${dSym} = ${td.map(t=>f4(t.v)).join(" + ")} = ${f4(dAns)}[[binom:${n},${ps}|hl=${dv.join(",")}|cap=${dSym}: the highlighted bars]]`},
    {label:"e", q:`Find the expected number of ${ctx.xs} and practically interpret it.`,
-    steps:[{k:"num", q:"E[X] = np = ?", ans:E, tol:.006, o:["D3"]},
+    steps:[calc({k:"num", q:"E[X] = np = ?", ans:E, tol:.006, o:["D3"]},
+             {t:`${n} × ${ps} = ${fnum(E)}`, v:E, w:"np: the number of trials times the probability of success."},
+             [{t:`${n} × ${qs} = ${fnum(n*q)}`, v:n*q, w:"That's n(1 − p), the expected number of failures."},
+              {t:`${n} × ${ps} × ${qs} = ${fnum(n*p*q)}`, v:n*p*q, w:"That's np(1 − p), the variance."},
+              {t:`√(${n} × ${ps} × ${qs}) = ${fnum(Math.sqrt(n*p*q))}`, v:Math.sqrt(n*p*q), w:"That's the standard deviation."}]),
            mcShuffle({k:"mc", q:"Which interpretation earns full credit?", c:[interp, `On average, ${fnum(E)} ${ctx.succ}.`, `${fnum(E)} of the ${n} ${ctx.who[1]} will ${ctx.yes[1]}.`, `${fnum(E)} is the most likely number of ${ctx.succ}.`], a:0,
              ce:["Full credit: average, over many repetitions, in context.","Partial: an average of what? Say it's over many repetitions of the experiment.","No credit: a prediction of one result. A count can't even be a decimal.","No credit: E[X] is not the most likely value."], e:"An average over many repetitions of the same experiment.", o:["D3"]})],
     model:`E[X] = np = ${n} × ${ps} = ${fnum(E)}<br>Interpretation: ${interp}[[binom:${n},${ps}|E=${fnum(E)}|cap=E = np sits at the balance point of the bars]]`}
@@ -845,6 +911,10 @@ function nx(ctx,zlo,zhi,sign){ // a value of x, on the grid, whose z lands in [z
     const z=r2((x-ctx.mu)/ctx.sd); if(Math.abs(z)>=zlo&&Math.abs(z)<=zhi) return {x:+x.toFixed(2), z}; }
   return {x:ctx.mu+sign*ctx.sd, z:sign*1}; }
 const pctS=p=>String(r2(p*100));
+function zW(x,ctx,z){ return [{t:`(${x} − ${ctx.mu}) / ${ctx.sd} = ${fz(z)}`, v:z, w:"Subtract the mean, then divide by the SD."},
+  [{t:`(${ctx.mu} − ${x}) / ${ctx.sd} = ${fz(-z)}`, v:-z, w:"Backwards: it's x minus the mean, so the sign is flipped."},
+   {t:`(${x} − ${ctx.mu}) / ${ctx.sd}² = ${fz(r2((x-ctx.mu)/(ctx.sd*ctx.sd)))}`, v:r2((x-ctx.mu)/(ctx.sd*ctx.sd)), w:"Divide by σ, not σ² (the variance)."},
+   {t:`${x} / ${ctx.sd} = ${fz(r2(x/ctx.sd))}`, v:r2(x/ctx.sd), w:"Subtract the mean first."}], o=>o.v.toFixed(2)]; }
 function zLine(x,ctx,z){ return `z = (x − μ)/σ = (${x} − ${ctx.mu})/${ctx.sd} = ${fz(z)}`; }
 function genT3(){
   const ctx=pick(T3CTX);
@@ -875,17 +945,33 @@ function genT3(){
   const parts=[
    {label:"a", q:cut.q,
     steps:[mcShuffle({k:"mc", q:"What are you looking for?", c:pctOpts, a:0, e:`${cut.why}.`, o:["C5"]}),
-           {k:"num", q:"z from the table = ?", ans:zf.z, alt:zf.alt, tol:.0051, o:["C4","C5"]},
-           {k:"num", q:`x = μ + zσ = ? (${ctx.unit})`, ans:xc, alt:xAlt, tol, o:["C5","C6"]}],
+           calc({k:"num", q:"z from the table = ?", ans:zf.z, alt:zf.alt, tol:.0051, o:["C4","C5"]},
+             {t:cut.P<.5?`look up ${r2(1-cut.P)}: ${f4(zf.t)} at ${fz(-zf.z)}, below the mean so z = ${fz(zf.z)}`:`closest to ${cut.P} is ${f4(zf.t)} → z = ${fz(zf.z)}`, v:zf.z, w:cut.P<.5?"Bottom tail: find the matching upper-tail z, then make it negative.":"Find the probability inside the table and read off its z."},
+             [{t:`z = ${fz(-zf.z)}`, v:-zf.z, w:cut.P<.5?"This cutoff is below the mean, so z must be negative.":"This cutoff is above the mean, so z must be positive."},
+              {t:`z = ${cut.P}`, v:cut.P, w:"That's the probability, not a z-score. Find it inside the table."},
+              {t:`z = ${fz(r2(zf.z+(zf.z>0?-.1:.1)))}`, v:r2(zf.z+(zf.z>0?-.1:.1)), w:`Wrong row: the closest table probability sits at z = ${fz(Math.abs(zf.z))}.`}], o=>o.v.toFixed(2)),
+           calc({k:"num", q:`x = μ + zσ = ? (${ctx.unit})`, ans:xc, alt:xAlt, tol, o:["C5","C6"]},
+             {t:`${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)}`, v:xc, w:"x = μ + zσ, keeping the sign of z."},
+             [{t:`${ctx.mu} − (${fz(zf.z)})(${ctx.sd}) = ${fnum(r2(ctx.mu-zf.z*ctx.sd))}`, v:r2(ctx.mu-zf.z*ctx.sd), w:"Sign flipped: that puts the cutoff on the wrong side of the mean."},
+              {t:`${ctx.mu} + ${zf.z<0?`(${fz(zf.z)})`:fz(zf.z)} = ${fnum(r2(ctx.mu+zf.z))}`, v:r2(ctx.mu+zf.z), w:"z counts standard deviations: multiply it by σ."},
+              {t:`(${fz(zf.z)})(${ctx.sd}) = ${fnum(r2(zf.z*ctx.sd))}`, v:r2(zf.z*ctx.sd), w:"That's only the distance from the mean. Add μ."}], o=>o.v.toFixed(2))],
     model:`${lookup}<br>x = μ + zσ = ${ctx.mu} + (${fz(zf.z)})(${ctx.sd}) = ${fnum(xc)} ${ctx.unit}${xAlt!=null?` (with z = ${fz(zf.alt)}: ${fnum(xAlt)})`:""}<br>${cut.c(xc)}${cutViz}`},
    {label:"b", q:bq,
-    steps:[{k:"num", q:"z = (x − μ)/σ = ?", ans:bz, tol:.0051, o:["C5"]},
-           {k:"num", q:"Probability (as a decimal) = ?", ans:bAns, tol:.0015, pct:true, o:["C4","P3"]}],
+    steps:[calc({k:"num", q:"z = (x − μ)/σ = ?", ans:bz, tol:.0051, o:["C5"]}, ...zW(bx,ctx,bz)),
+           calc({k:"num", q:"Probability (as a decimal) = ?", ans:bAns, tol:.0015, pct:true, o:["C4","P3"]},
+             {t:bModel.replace(/^By symmetry, /,"").replace(/^P\(X [<>] [^)]*\) = /,""), v:bAns, w:"Table value, then the complement or symmetry if the question needs it."},
+             [{t:bAns===t?`1 − ${f4(t)} = ${f4(1-t)}`:`${f4(t)} (the table value)`, v:bAns===t?1-t:t, w:bAns===t?"No complement needed here: the area you want is the table value itself.":"The table gives the area to the LEFT. This question needs the other side: 1 minus it."},
+              {t:`${f4(t)} − 0.5 = ${f4(t-.5)}`, v:t-.5, w:"The table isn't the area between 0 and z. It's everything to the left."},
+              {t:`P(Z < ${fz(Math.abs(bz)+.1)}) = ${f4(phi(Math.abs(bz)+.1))}`, v:phi(r2(Math.abs(bz)+.1)), w:`Wrong row: z is ${az}, so read row ${az.slice(0,3)}, column 0.0${az.slice(-1)}.`}])],
     model:`${zLine(bx,ctx,bz)}<br>The table gives P(Z < ${az}) = ${f4(t)}.<br>${bModel}<br>${bSent}[[normal:${ctx.mu},${ctx.sd}|${bk.startsWith("above")?"gt":"lt"}=${bx}]]`},
    {label:"c", q:ctx.between(c1.x,c2.x),
-    steps:[{k:"num", q:`z for ${c1.x} = ?`, ans:c1.z, tol:.0051, o:["C5"]},
-           {k:"num", q:`z for ${c2.x} = ?`, ans:c2.z, tol:.0051, o:["C5"]},
-           {k:"num", q:"Probability (as a decimal) = ?", ans:cAns, tol:.0015, pct:true, o:["C4","P3"]}],
+    steps:[calc({k:"num", q:`z for ${c1.x} = ?`, ans:c1.z, tol:.0051, o:["C5"]}, ...zW(c1.x,ctx,c1.z)),
+           calc({k:"num", q:`z for ${c2.x} = ?`, ans:c2.z, tol:.0051, o:["C5"]}, ...zW(c2.x,ctx,c2.z)),
+           calc({k:"num", q:"Probability (as a decimal) = ?", ans:cAns, tol:.0015, pct:true, o:["C4","P3"]},
+             {t:`${f4(p2)} − ${f4(p1)} = ${f4(cAns)}`, v:cAns, w:`Area below ${c2.x} minus area below ${c1.x}.${c1.z<0?` For the negative z: 1 − ${f4(phi(-c1.z))} = ${f4(p1)}.`:""}`},
+             [{t:`${f4(p2)} + ${f4(p1)} = ${f4(p2+p1)}`, v:p2+p1, w:"Subtract the two left areas, don't add them."},
+              c1.z<0?{t:`${f4(p2)} − ${f4(phi(-c1.z))} = ${f4(p2-phi(-c1.z))}`, v:p2-phi(-c1.z), w:`A negative z needs symmetry: P(Z < ${fz(c1.z)}) = 1 − ${f4(phi(-c1.z))} = ${f4(p1)}.`}:{t:`${f4(p2)} (area below ${c2.x})`, v:p2, w:`That's everything below ${c2.x}. Subtract the area below ${c1.x}.`},
+              {t:`1 − (${f4(p2)} − ${f4(p1)}) = ${f4(1-cAns)}`, v:1-cAns, w:"That's the area outside the interval."}])],
     model:`P(${c1.x} < X < ${c2.x}) = P(X < ${c2.x}) − P(X < ${c1.x})<br>${zLine(c2.x,ctx,c2.z)} → P(X < ${c2.x}) = ${f4(p2)}<br>${zLine(c1.x,ctx,c1.z)} → ${p1txt}<br>P(${c1.x} < X < ${c2.x}) = ${f4(p2)} − ${f4(p1)} = ${f4(cAns)}<br>${ctx.sBetween(c1.x,c2.x,pctS(cAns))}[[normal:${ctx.mu},${ctx.sd}|btw=${c1.x},${c2.x}]]`}
   ];
   return {tpl:3, title:ctx.name, setup:ctx.setup, parts};
@@ -1034,7 +1120,7 @@ function seqs(n,x){
 </script>
 <script>
 /* ================= 640 TEST 2 APP ================= */
-const APP_VERSION="2026.10.31-1751";
+const APP_VERSION="2026.11.01-1240";
 const LS="globetrotter.test2.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -1043,7 +1129,7 @@ const shuf=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(M
 const TPL={1:{name:"Table",long:"Distribution from a table",c:"--t1"},2:{name:"Binomial",long:"Binomial",c:"--t2"},3:{name:"Normal",long:"Normal",c:"--t3"}};
 
 /* ---------- saved progress ---------- */
-let S={cards:{}, qc:{}, sess:0, obj:{}, tests:[], sound:true, pr:{}, drills:{}, days:[]};
+let S={cards:{}, qc:{}, sess:0, obj:{}, tests:[], sound:true, pr:{}, drills:{}, days:[], style:"mc"};
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
 function rec(objs,ok){ (objs||[]).forEach(o=>{ const s=S.obj[o]||(S.obj[o]={r:0,w:0}); ok?s.r++:s.w++; }); }
@@ -1098,7 +1184,7 @@ const IC={
  test:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 9.5v4l2.5 2M9.5 3h5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
  logo:'<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M6 27c5 0 6-15 12-15s7 15 12 15" fill="none" stroke="var(--m-learn)" stroke-width="3" stroke-linecap="round"/><path d="M6 28.5h24" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/><circle cx="27" cy="9" r="3.5" fill="var(--sun)" stroke="var(--ink)" stroke-width="2"/></svg>'
 };
-function bar(title,opts={}){ return `<div class="bar"><button class="x" data-act="${opts.back||"home"}" aria-label="Back">${opts.close?IC.x:IC.back}</button>${opts.prog!=null?`<div class="steps"><i style="width:${opts.prog*100}%"></i></div>`:`<div class="ttl">${esc(title)}</div>`}${opts.z?'<button class="zbtn" data-act="ztable">z table</button>':""}${opts.timer?'<span class="timer" id="timer">0:00</span>':""}</div>`; }
+function bar(title,opts={}){ return `<div class="bar"><button class="x" data-act="${opts.back||"home"}" aria-label="Back">${opts.close?IC.x:IC.back}</button>${opts.prog!=null?`<div class="steps"><i style="width:${opts.prog*100}%"></i></div>`:`<div class="ttl">${esc(title)}</div>`}${opts.calc?'<button class="zbtn" data-act="calc" aria-label="Calculator">Calc</button>':""}${opts.z?'<button class="zbtn" data-act="ztable">z table</button>':""}${opts.timer?'<span class="timer" id="timer">0:00</span>':""}</div>`; }
 function show(html){ app.innerHTML=html; window.scrollTo(0,0); }
 
 /* ---------- derived stats ---------- */
@@ -1194,6 +1280,7 @@ function practice(){
     <button class="btn go wide" data-act="qc">Start 10 questions</button></section>
   <section class="card"><h3>Step-by-step problems</h3><p class="muted">A fresh test-style problem in a new context, broken into small steps with feedback on each. The model answer after every part shows exactly what to write.</p>
     <div class="seg" role="group" aria-label="Problem type">${[1,2,3,0].map(t=>`<button data-act="ptype" data-t="${t}" aria-pressed="${PT===t}">${t?TPL[t].name:"Mixed"}<span>${t?["Template 1","Template 2","Template 3"][t-1]:"Any"}</span></button>`).join("")}</div>
+    ${styleSeg()}
     <button class="btn wide" data-act="prob">Start a problem</button></section>
   ${drillCard()}
   ${objs.length?`<section class="card"><h3>Accuracy by topic</h3><div class="weak">${objs.map(k=>{ const o=S.obj[k]; return wrow(k,o.r/(o.r+o.w)); }).join("")}</div></section>`:""}`);
@@ -1220,7 +1307,7 @@ function runQC(list,mode,title,drill){ QR={items:list.map(x=>typeof x==="number"
 const qBack=()=>QR.mode==="test"?"testmenu":"practice";
 function renderQ(){
   const q=QR.items[QR.i], n=QR.items.length;
-  show(`${bar(QR.title,{back:qBack(), close:true, prog:QR.i/n, timer:QR.mode!=="prac"})}
+  show(`${bar(QR.title,{back:qBack(), close:true, prog:QR.i/n, timer:QR.mode!=="prac", z:QR.drill==="ztable"})}
   <div class="eyebrow">${QR.drill?esc(DRILLS[QR.drill].title)+" · ":""}Question ${QR.i+1} of ${n}${STK>=2&&QR.mode!=="test"?` <span class="streak">${STK} in a row</span>`:""}</div>
   <div class="qtext">${esc(q.q)}</div>
   <div class="opts">${q.c.map((c,k)=>`<button class="opt" data-act="qopt" data-o="${k}">${esc(c)}</button>`).join("")}</div>
@@ -1279,9 +1366,14 @@ function cram(){
 
 /* ================= PROBLEMS (practice: step by step; exam: all at once) ================= */
 let PR=null;
+/* answer style: "mc" turns every calculation into a choice between fully worked lines (no calculator needed); "type" keeps number entry */
+function asStyle(p){ if(S.style==="type") return p;
+  p.parts.forEach(pt=>{ pt.steps=pt.steps.map(s=>s.mc?mcShuffle({k:"mc", calc:true, q:s.q.replace(/ \(as a decimal\)/,"").replace(/ = \?.*$/,"").replace(/[.:]?\s*Enter P\(x\):?$/,"").replace(/[:\s]+$/,"")+": which working is right?", c:s.mc.c, a:s.mc.a, ce:s.mc.ce, e:s.mc.e, o:s.o}):s); });
+  return p; }
+function styleSeg(){ return `<div class="seg two" role="group" aria-label="Answer style"><button data-act="style" data-v="mc" aria-pressed="${S.style!=="type"}">Multiple choice<span>Pick the right working</span></button><button data-act="style" data-v="type" aria-pressed="${S.style==="type"}">Type answers<span>Built-in calculator</span></button></div>`; }
 function newProblem(t,mode){
   const tpl=t||1+Math.floor(Math.random()*3);
-  PR={p:GEN[tpl](), mode, t, pi:0, si:0, res:{}, val:{}, right:0, total:0};
+  PR={p:asStyle(GEN[tpl]()), mode, t, pi:0, si:0, res:{}, val:{}, right:0, total:0};
   if(mode==="exam"){ startTimer(); renderExam(); } else renderProb();
 }
 const sid=(pi,si)=>pi+"-"+si;
@@ -1299,9 +1391,9 @@ function stepHTML(s,pi,si,mode){
   if(s.k==="mc"){
     h+=`<div class="opts">${s.c.map((c,k)=>{ let st=""; if(r){ st=k===s.a?"right":k===r.k?"wrong":"fade"; } else if(mode==="exam"&&v===k) st="pick";
       const why=r&&s.ce&&(k===r.k||k===s.a)?`<small>${esc(s.ce[k])}</small>`:"";
-      return `<button class="opt" data-act="sopt" data-id="${id}" data-o="${k}" ${r?"disabled":""} ${st?`data-s="${st}"`:""}>${esc(c)}${why}</button>`; }).join("")}</div>`;
+      return `<button class="opt${s.calc?" calc":""}" data-act="sopt" data-id="${id}" data-o="${k}" ${r?"disabled":""} ${st?`data-s="${st}"`:""}>${esc(c)}${why}</button>`; }).join("")}</div>`;
     if(r&&!s.ce) h+=`<div class="fb" data-k="${r.ok?"ok":"no"}"><b>${r.ok?"Right.":"Not quite."}</b>${esc(s.e)}</div>`;
-    else if(r&&!r.ok) h+=`<div class="fb" data-k="no">${esc(s.e)}</div>`;
+    else if(r&&!r.ok&&!s.calc) h+=`<div class="fb" data-k="no">${esc(s.e)}</div>`;
   } else if(s.k==="num"){
     h+=`<div class="num"><input inputmode="decimal" autocomplete="off" enterkeyhint="done" data-id="${id}" value="${v!=null?esc(v):""}" ${r?`disabled data-s="${r.ok?"right":"wrong"}"`:""} placeholder="${s.pct?"e.g. 0.0918":"Your answer"}" aria-label="${esc(s.q)}">${mode==="prac"&&!r?`<button class="btn small" data-act="schk" data-id="${id}">Check</button>`:""}</div>`;
     if(r) h+=`<div class="fb" data-k="${r.ok?"ok":"no"}"><b>${r.ok?"Right.":"Not quite."}</b>${r.ok?`Answer: ${fmtAns(s)}`:`The answer is ${fmtAns(s)}.`}</div>`;
@@ -1322,7 +1414,7 @@ function gradeStep(s,id){
 function renderProb(){
   const p=PR.p, part=p.parts[PR.pi];
   const nSteps=p.parts.reduce((a,x)=>a+x.steps.length,0), doneSteps=Object.keys(PR.res).length;
-  let h=`${bar("",{back:"practice", close:true, prog:doneSteps/nSteps, z:p.tpl===3})}${setupHTML(PR.pi===0)}`;
+  let h=`${bar("",{back:"practice", close:true, prog:doneSteps/nSteps, z:p.tpl===3, calc:S.style==="type"})}${setupHTML(PR.pi===0)}`;
   p.parts.slice(0,PR.pi).forEach(pt=>{ h+=`<details class="part"><summary><b>(${pt.label})</b> ${esc(pt.q)}</summary><div class="model"><b>What to write</b>${rich(pt.model)}</div></details>`; });
   h+=`<section class="part"><h3><span class="pl">${part.label}</span>${esc(part.q)}</h3>`;
   for(let si=0;si<=Math.min(PR.si,part.steps.length-1);si++) h+=stepHTML(part.steps[si],PR.pi,si,"prac");
@@ -1364,7 +1456,7 @@ function checklist(t){ return `<section class="card"><h3>Wording check</h3><p cl
 /* exam: every part at once, no feedback until Submit */
 function renderExam(){
   const p=PR.p;
-  let h=`${bar("",{back:"testmenu", close:true, timer:true, z:p.tpl===3})}
+  let h=`${bar("",{back:"testmenu", close:true, timer:true, z:p.tpl===3, calc:S.style==="type"})}
   <p class="muted">Work it on paper the way you would on the test, then enter your numbers and choices here. Nothing is graded until you submit.</p>${setupHTML(true)}`;
   p.parts.forEach((pt,pi)=>{ h+=`<section class="part"><h3><span class="pl">${pt.label}</span>${esc(pt.q)}</h3>${pt.steps.map((s,si)=>stepHTML(s,pi,si,"exam")).join("")}</section>`; });
   h+=`<button class="btn go wide" data-act="esubmit">Submit and grade</button>`;
@@ -1397,11 +1489,34 @@ function testmenu(){
   show(`${bar("Test mode")}
   <section class="card"><h3>Exam simulation</h3><p class="muted">One full problem like the real test, in a new context, timed. Answer every part, then submit for your score and the model answers.</p>
     <div class="seg" role="group" aria-label="Problem type">${[0,1,2,3].map(t=>`<button data-act="etype" data-t="${t}" aria-pressed="${ET===t}">${t?TPL[t].name:"Random"}<span>${t?["Template 1","Template 2","Template 3"][t-1]:"Like the test"}</span></button>`).join("")}</div>
+    ${styleSeg()}
     <button class="btn go wide" data-act="exam" data-t="${ET}">Start exam</button>${spark(ex,"--m-test")}</section>
   <section class="card"><h3>Concept quiz</h3><p class="muted">12 quick questions across every topic, timed, with a topic breakdown at the end.</p>
     <button class="btn wide" data-act="quiz">Start quiz</button>${spark(qz,"--m-learn")}</section>
   ${rows?`<section class="card"><h3>History</h3><div class="hist">${rows}</div></section>`:""}`);
 }
+
+/* ================= calculator (for "Type answers") ================= */
+let lastInp=null, cx="";
+app.addEventListener("focusin",e=>{ if(e.target.matches("input[data-id]")) lastInp=e.target; });
+const CKEYS=["C","(",")","⌫","7","8","9","÷","4","5","6","×","1","2","3","−","0",".","^","+","√","x²","n!","="];
+function calcEval(str){
+  let t=str.replace(/÷/g,"/").replace(/×/g,"*").replace(/−/g,"-").replace(/\^/g,"**").replace(/²/g,"**2");
+  t=t.replace(/(\d+)!/g,(m,n)=>String(fact(+n)));
+  t=t.replace(/√/g,"S");
+  if(!/^[0-9+\-*/().S\s]*$/.test(t)) return null;
+  t=t.replace(/S/g,"Math.sqrt");
+  const opens=(t.match(/\(/g)||[]).length-(t.match(/\)/g)||[]).length; if(opens>0) t+=")".repeat(opens);
+  try{ const v=Function('"use strict";return ('+t+')')(); return typeof v==="number"&&isFinite(v)?v:null; }catch(e){ return null; } }
+function calcShow(){ $('cexpr').textContent=cx||"0"; const v=cx?calcEval(cx):null; $('cres').textContent=v==null?"":"= "+(Math.round(v*1e6)/1e6); $('cuse').disabled=v==null||!lastInp||lastInp.disabled; }
+function openCalc(){ $('calcsheet').hidden=false; calcShow(); }
+$('ckeys').innerHTML=CKEYS.map(k=>`<button data-k="${k}" class="${/[÷×−+^=]/.test(k)?"op":/[C⌫]/.test(k)?"fn":""}">${k}</button>`).join("");
+$('ckeys').addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const k=b.dataset.k;
+  if(k==="C") cx=""; else if(k==="⌫") cx=cx.slice(0,-1); else if(k==="=") { const v=calcEval(cx); if(v!=null) cx=String(Math.round(v*1e6)/1e6); }
+  else if(k==="√") cx+="√("; else if(k==="x²") cx+="²"; else if(k==="n!") cx+="!"; else cx+=k; calcShow(); });
+$('cuse').onclick=()=>{ const v=calcEval(cx); if(v==null||!lastInp) return; lastInp.value=String(Math.round(v*1e4)/1e4); lastInp.dispatchEvent(new Event("input",{bubbles:true})); $('calcsheet').hidden=true; };
+$('calcclose').onclick=()=>{ $('calcsheet').hidden=true; };
+$('calcsheet').addEventListener("click",e=>{ if(e.target.id==="calcsheet") $('calcsheet').hidden=true; });
 
 /* ================= z table sheet ================= */
 function buildZ(){
@@ -1456,6 +1571,8 @@ app.addEventListener("click",e=>{
       if(missing&&!b.dataset.sure){ b.dataset.sure="1"; b.textContent=`${missing} blank. Tap again to submit`; return; }
       return examSubmit(); }
     case "ztable": $('zsheet').hidden=false; return;
+    case "calc": openCalc(); return;
+    case "style": S.style=b.dataset.v; save(); { const y=window.scrollY; (app.querySelector('[data-act="etype"]')?testmenu:practice)(); window.scrollTo(0,y); } return;
     case "sound": S.sound=!S.sound; save(); return home();
     case "reset": if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all 640 progress"; return; }
       S={cards:{}, qc:{}, sess:0, obj:{}, tests:[], sound:S.sound, pr:{}, drills:{}, days:[]}; save(); return home();
