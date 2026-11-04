@@ -273,9 +273,11 @@ function home(){
   <button class="tile" data-act="progress"><b>Progress</b><span>Charts of your speed, accuracy, sprints and Daily 20 over time</span></button>
   <div class="foot">
     <div>Progress saves on this device</div>
+    <div id="bk" style="width:100%"></div>
     <div class="row" style="justify-content:center"><button class="btn ghost small" data-act="sound">Sounds ${S.sound?"on":"off"}</button><button class="btn ghost small" data-act="reset">Start over</button></div>
     <div>Version ${esc(APP_VERSION)}</div>
   </div>`);
+  GT_BK.ui($('bk'),{beforeBackup:save});
 }
 const sprintKey=()=>S.ops.slice().sort().join(",")+"|"+(S.lv==="c"?`d${S.cust.a}x${S.cust.b}`:S.lv);
 

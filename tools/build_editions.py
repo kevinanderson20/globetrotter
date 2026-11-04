@@ -13,6 +13,11 @@ _src = open('index.html', encoding='utf-8').read()
 _src = re.sub(r'const APP_VERSION="[^"]*";', f'const APP_VERSION="{VERSION}";', _src)
 open('index.html', 'w', encoding='utf-8').write(_src)
 json.dump({"v": VERSION}, open('version.json', 'w'))
+# the shared all-tab backup lives in tools/backup.js; copy it into the World source between its markers
+_bk = open('tools/backup.js', encoding='utf-8').read().strip()
+_a = _src.index('/* ==BACKUP== */'); _b = _src.index('/* ==/BACKUP== */', _a) + len('/* ==/BACKUP== */')
+_src = _src[:_a] + _bk + _src[_b:]
+open('index.html', 'w', encoding='utf-8').write(_src)
 SRC = _src
 
 
@@ -56,7 +61,6 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     app = rep(app, '"World"', f'"{all_key}"')
     app = rep(app, '"GLOBE1:"', f'"{backup}:"')
     app = rep(app, '/^GLOBE1:/', f'/^{backup}:/')
-    app = rep(app, 'including GLOBE1: at', f'including {backup}: at')
     app = rep(app, '"globetrotter-"+key', f'"{seed}"+key', 1)
     app = rep(app, '`Globetrotter ${practice?', f'`{share} ${{practice?', 1)
     app = rep(app, 'navigator.serviceWorker.register("sw.js")', 'navigator.serviceWorker.register("../sw.js")', 1)
@@ -92,7 +96,7 @@ build('usa', 'Globetrotter USA',
 ''', 'const ALIAS={WA:["washingtonstate"],NY:["newyorkstate"]};\n',
       'globetrotter.usa.v1', 'West', 'All 50', 'GLOBEUSA1', 'globetrotter-usa-', 'Globetrotter USA',
       'state', 'states', 'region',
-      extra_head=[('aria-label="World map"', 'aria-label="Map of the United States"'),
+      extra_head=[('aria-label="World map"', 'aria-label="Map of the United States"'), ('<b>Mystery country</b>', '<b>Mystery state</b>'),
                   ('#mmap{width:100%;aspect-ratio:2.05/1;', '#mmap{width:100%;aspect-ratio:1.6/1;')],
       extra_app=[('const worldFrame=()=>ED.globe?{lon:20,lat:18,s:worldScale}:({lon:11,lat:8,s:worldScale});', 'const worldFrame=()=>frameIds(IDS.filter(i=>i!=="AK"&&i!=="HI"),1.04,10);'),
                  ('scaleExtent([.6,80])', 'scaleExtent([.2,80])'),
@@ -121,6 +125,7 @@ build('earth', 'Globetrotter Earth',
       extra_head=[('aria-label="World map"', 'aria-label="Map of the Earth"'),
                   ('<button class="tile" id="nbBtn">', '<button class="tile" id="nbBtn" hidden>'),
                   ('<button class="tile" id="chainBtn">', '<button class="tile" id="chainBtn" hidden>'),
+                  ('<button class="tile wide" id="mysBtn">', '<button class="tile wide" id="mysBtn" hidden>'),
                   ('#mmap{width:100%;aspect-ratio:2.05/1;', '#mmap{width:100%;aspect-ratio:2/1;')],
       extra_app=[('const ED={base:()=>null, under:()=>false, otherFill:"land-off", itemFill:"land", otherAlpha:1, hideUnseen:false, proj:null, image:null, globe:false, texture:null, grid:true, borderColor:null, dimFill:null, alphaScale:1, targetAlpha:1, targetStroke:null};',
                   # 3D globe: a WebGL sphere wrapped in a public-domain satellite texture (from three-globe's examples), faint borders on top; each place in its type's color
@@ -133,7 +138,7 @@ build('earth', 'Globetrotter Earth',
 # Assembled from tools/math/: page.html is the shell and styles, app.js the game.
 page = open('tools/math/page.html', encoding='utf-8').read()
 code = rep(open('tools/math/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
-page = rep(page, '/*APP*/', code, 1)
+page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('math', exist_ok=True)
 open('math/index.html', 'w', encoding='utf-8').write(page)
 print('math/index.html', len(page), VERSION)
