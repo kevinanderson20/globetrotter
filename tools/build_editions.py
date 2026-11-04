@@ -49,7 +49,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     head = rep(head, '<title>Globetrotter</title>', f'<title>{title}</title>', 1)
     for icon in ('icon-180.png', 'icon-192.png', 'manifest.webmanifest'):
         head = rep(head, f'href="{icon}"', f'href="../{icon}"', 1)
-    head = rep(head, '<a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a><a href="math/">Math</a>', tabs, 1)
+    head = rep(head, '<a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a><a href="math/">Math</a><a href="brain/">Brain</a>', tabs, 1)
     head = rep(head, 'Every country in a region', f'Every {unit} in a {region_word}', 1)
     for a, b in extra_head:
         head = rep(head, a, b)
@@ -85,7 +85,7 @@ def tighten_frames(app):  # states are small: shrink the minimum zoom spans used
 
 # ---------------- USA ----------------
 build('usa', 'Globetrotter USA',
-      '<a href="../">World</a><a href="./" aria-current="page">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a>',
+      '<a href="../">World</a><a href="./" aria-current="page">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="../brain/">Brain</a>',
       open('tools/us-map.json').read(), open('tools/us-meta.json').read(),
       '''const CONTS=[
   {key:"West",short:"W",tok:"c-sa",groups:[["Pacific",["Pacific"]],["Mountain West",["Mountain West"]]]},
@@ -111,7 +111,7 @@ build('usa', 'Globetrotter USA',
 
 # ---------------- Earth ----------------
 build('earth', 'Globetrotter Earth',
-      '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a><a href="../math/">Math</a>',
+      '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a><a href="../math/">Math</a><a href="../brain/">Brain</a>',
       open('tools/earth-map.json').read(), open('tools/earth-meta.json').read(),
       '''const CONTS=[
   {key:"Oceans & Seas",short:"OS",tok:"t-sea",groups:[["Oceans",["Oceans"]],["Seas of Europe & Africa",["Seas of Europe & Africa"]],["Seas of the Americas",["Seas of the Americas"]],["Seas of Asia",["Seas of Asia"]]]},
@@ -142,3 +142,11 @@ page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('math', exist_ok=True)
 open('math/index.html', 'w', encoding='utf-8').write(page)
 print('math/index.html', len(page), VERSION)
+
+# ---------------- Brain (memory, speed and logic games) ----------------
+page = open('tools/brain/page.html', encoding='utf-8').read()
+code = rep(open('tools/brain/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
+page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
+os.makedirs('brain', exist_ok=True)
+open('brain/index.html', 'w', encoding='utf-8').write(page)
+print('brain/index.html', len(page), VERSION)

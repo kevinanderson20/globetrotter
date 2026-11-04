@@ -49,8 +49,8 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap;row-gap:12px}
 .brand h1{font-size:24px;font-weight:800}
 .brand svg{flex:none}
-.tabs{order:3;flex:1 1 100%;display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
-.tabs a{padding:7px 6px;border-radius:999px;font-weight:700;font-size:13px;color:var(--ink-2);text-decoration:none;text-align:center;white-space:nowrap}
+.tabs{order:3;flex:1 1 100%;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.tabs a{padding:7px 2px;border-radius:999px;font-weight:700;font-size:12.5px;color:var(--ink-2);text-decoration:none;text-align:center;white-space:nowrap}
 .tabs a[aria-current="page"]{background:var(--ink);color:var(--surface)}
 /* rank */
 .rank{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center}
@@ -248,7 +248,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 <script>
 /* ==BACKUP== */
-/* One backup for the whole app: every tab (World, USA, Earth, Math) keeps its progress in this
+/* One backup for the whole app: every tab (World, USA, Earth, Math, Brain) keeps its progress in this
    phone's storage under a "globetrotter." key, so one code carries all of it to a new phone.
    Codes start with GTZ1: (compressed) or GT1: (plain). Copy the code, or save it as a file. */
 const GT_BK=(()=>{
@@ -272,7 +272,7 @@ const GT_BK=(()=>{
   function apply(o){ Object.entries(o.d).forEach(([k,v])=>{ if(k.startsWith(PFX)&&typeof v==="string") localStorage.setItem(k,v); });
     // until the page reloads, stop this tab from saving its old in-memory progress over what was just restored
     const set=Storage.prototype.setItem; Storage.prototype.setItem=function(k,v){ if(String(k).startsWith(PFX)) return; return set.call(this,k,v); }; }
-  const TABS=[["globetrotter.v1","World"],["globetrotter.usa.v1","USA"],["globetrotter.earth.v1","Earth"],["globetrotter.math.v1","Math"]];
+  const TABS=[["globetrotter.v1","World"],["globetrotter.usa.v1","USA"],["globetrotter.earth.v1","Earth"],["globetrotter.math.v1","Math"],["globetrotter.brain.v1","Brain"]];
   const tabsIn=d=>TABS.filter(([k])=>d[k]).map(([,n])=>n);
   const CSS=`.gtbk{display:grid;gap:10px}.gtbk .gtrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .gtbk .gtpane{display:grid;gap:10px;background:var(--surface-2);border-radius:14px;padding:12px;font-size:14px;color:var(--ink-2)}
@@ -284,7 +284,7 @@ const GT_BK=(()=>{
     if(!document.getElementById("gtbkcss")){ const st=document.createElement("style"); st.id="gtbkcss"; st.textContent=CSS; document.head.appendChild(st); }
     box.classList.add("gtbk");
     box.innerHTML=`<div class="gtrow"><button class="btn ghost" data-g="bk" type="button">Back up progress</button><button class="btn ghost" data-g="rs" type="button">Restore</button></div>
-    <div class="gtpane" data-p="bk" hidden><span>One code holds your progress from every tab: World, USA, Earth and Math. Keep it in Notes, email it to yourself, or save it as a file. On a new phone, open the app, tap Restore and paste it.</span>
+    <div class="gtpane" data-p="bk" hidden><span>One code holds your progress from every tab: World, USA, Earth, Math and Brain. Keep it in Notes, email it to yourself, or save it as a file. On a new phone, open the app, tap Restore and paste it.</span>
       <textarea readonly data-t="code" aria-label="Backup code">Making your code…</textarea>
       <div class="gtrow"><button class="btn" data-g="copy" type="button">Copy code</button><button class="btn ghost" data-g="file" type="button">Save as file</button></div><span class="gtmsg" data-m="bk"></span></div>
     <div class="gtpane" data-p="rs" hidden><span>Paste a backup code, or open a backup file. It replaces the progress on this phone for the tabs in the backup.</span>
@@ -321,7 +321,7 @@ const GT_BK=(()=>{
 })();
 /* ==/BACKUP== */
 /* ================= MATH: rapid-fire mental arithmetic ================= */
-const APP_VERSION="2026.11.03-2216";
+const APP_VERSION="2026.11.03-2232";
 const LS="globetrotter.math.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -569,7 +569,7 @@ function home(){
   const sample=S.ops.map(o=>{ const p=genP(o,S.lv); return `<span style="color:var(${OPS[o].c})">${esc(ptext(p))}</span>`; }).join(" · ");
   show(`
   <div class="brand">${IC.logo}<h1>Math</h1>
-    <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="./" aria-current="page">Math</a></nav></div>
+    <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="./" aria-current="page">Math</a><a href="../brain/">Brain</a></nav></div>
   <section class="rank"><div class="badge">${rk.i+1}</div><b>${esc(rk.name)}</b>
     <div class="xpbar"><i style="width:${Math.max(3,rk.frac*100)}%"></i></div>
     <div class="sub">${rk.next?`${rk.need} XP to ${esc(rk.next)}`:"Top rank reached"} · ${S.solved} solved</div></section>
@@ -913,7 +913,7 @@ async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v6"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v7"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });

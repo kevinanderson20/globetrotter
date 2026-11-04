@@ -1,8 +1,8 @@
-// Globetrotter offline support: keeps a copy of every tab (World, USA, Earth, Math) on the device.
+// Globetrotter offline support: keeps a copy of every tab (World, USA, Earth, Math, Brain) on the device.
 // Pages open instantly from the saved copy, and a fresh copy is fetched in the background for next time.
 // The app checks version.json and offers "tap to update" when a newer version is online.
-const CACHE = "globetrotter-v6";
-const CORE = ["./", "./usa/", "./earth/", "./math/", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+const CACHE = "globetrotter-v7";
+const CORE = ["./", "./usa/", "./earth/", "./math/", "./brain/", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
