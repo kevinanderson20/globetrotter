@@ -1,5 +1,5 @@
 /* ==BACKUP== */
-/* One backup for the whole app: every tab (World, USA, Earth, Math, Brain) keeps its progress in this
+/* One backup for the whole app: every tab (World, USA, Earth, Math, Games) keeps its progress in this
    phone's storage under a "globetrotter." key, so one code carries all of it to a new phone.
    Codes start with GTZ1: (compressed) or GT1: (plain). Copy the code, or save it as a file. */
 const GT_BK=(()=>{
@@ -23,19 +23,20 @@ const GT_BK=(()=>{
   function apply(o){ Object.entries(o.d).forEach(([k,v])=>{ if(k.startsWith(PFX)&&typeof v==="string") localStorage.setItem(k,v); });
     // until the page reloads, stop this tab from saving its old in-memory progress over what was just restored
     const set=Storage.prototype.setItem; Storage.prototype.setItem=function(k,v){ if(String(k).startsWith(PFX)) return; return set.call(this,k,v); }; }
-  const TABS=[["globetrotter.v1","World"],["globetrotter.usa.v1","USA"],["globetrotter.earth.v1","Earth"],["globetrotter.math.v1","Math"],["globetrotter.brain.v1","Brain"]];
+  const TABS=[["globetrotter.v1","World"],["globetrotter.usa.v1","USA"],["globetrotter.earth.v1","Earth"],["globetrotter.math.v1","Math"],["globetrotter.brain.v1","Games"]];
   const tabsIn=d=>TABS.filter(([k])=>d[k]).map(([,n])=>n);
   const CSS=`.gtbk{display:grid;gap:10px}.gtbk .gtrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .gtbk .gtpane{display:grid;gap:10px;background:var(--surface-2);border-radius:14px;padding:12px;font-size:14px;color:var(--ink-2)}
 .gtbk textarea{width:100%;min-height:84px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:12px ui-monospace,Menlo,monospace;padding:8px;resize:vertical;box-sizing:border-box}
 .gtbk .gtmsg{font-size:14px;font-weight:700;min-height:18px}.gtbk .gtmsg.ok{color:var(--good)}.gtbk .gtmsg.no{color:var(--bad)}
-.gtbk .gtfile{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}`;
+.gtbk .gtfile{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.gtbk [hidden]{display:none!important}`;
   /* the backup/restore panel; opts.legacy(code) can restore an older single-tab code */
   function ui(box,opts={}){
     if(!document.getElementById("gtbkcss")){ const st=document.createElement("style"); st.id="gtbkcss"; st.textContent=CSS; document.head.appendChild(st); }
     box.classList.add("gtbk");
     box.innerHTML=`<div class="gtrow"><button class="btn ghost" data-g="bk" type="button">Back up progress</button><button class="btn ghost" data-g="rs" type="button">Restore</button></div>
-    <div class="gtpane" data-p="bk" hidden><span>One code holds your progress from every tab: World, USA, Earth, Math and Brain. Keep it in Notes, email it to yourself, or save it as a file. On a new phone, open the app, tap Restore and paste it.</span>
+    <div class="gtpane" data-p="bk" hidden><span>One code holds your progress from every tab: World, USA, Earth, Math and Games. Keep it in Notes, email it to yourself, or save it as a file. On a new phone, open the app, tap Restore and paste it.</span>
       <textarea readonly data-t="code" aria-label="Backup code">Making your code…</textarea>
       <div class="gtrow"><button class="btn" data-g="copy" type="button">Copy code</button><button class="btn ghost" data-g="file" type="button">Save as file</button></div><span class="gtmsg" data-m="bk"></span></div>
     <div class="gtpane" data-p="rs" hidden><span>Paste a backup code, or open a backup file. It replaces the progress on this phone for the tabs in the backup.</span>
