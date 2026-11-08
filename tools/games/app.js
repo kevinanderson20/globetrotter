@@ -444,13 +444,20 @@ const NM={
     hintLabel:"Top answers", hint:L=>L.items.slice(0,3)}
 };
 const nmCap=s=>s.replace(/(^|[\s-])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(Dc|Uk|Usa|Us|Uae|Drc|Bmw|Gmc|Vw|Byd|Tvr|Bmx|K2|Lbj|Jfk|Fdr)\b/g,x=>x.toUpperCase()).replace(/\bAnd\b/g,"and").replace(/\bOf\b/g,"of").replace(/\bThe\b(?!^)/g,"the").replace(/^the/,"The");
+/* daily prompts follow one fixed rotation, so a prompt can't come back until every other prompt has had its turn.
+   Each day gets one or two country prompts; Sky climb runs half a cycle ahead, so the two games never share a prompt on the same day. */
+let NM_ROT=null;
+function nmDay(mode,d){
+  if(!NM_ROT){ const r=seeded("globetrotter-name-it-v1"), ks=[...LISTS.keys()], isC=k=>/countr/i.test(LISTS[k].p);
+    const C=shuf(ks.filter(isC),r), O=shuf(ks.filter(k=>!isC(k)),r), days=Math.floor(ks.length/7); let o=0; NM_ROT=[];
+    for(let j=0;j<days;j++){ const c=C.slice(Math.floor(j*C.length/days),Math.floor((j+1)*C.length/days)), day=c.concat(O.slice(o,o+7-c.length)); o+=7-c.length; NM_ROT.push(shuf(day,r)); } }
+  const n=NM_ROT.length, j=(((d+(mode==="climb"?Math.floor(n/2):0))%n)+n)%n; return NM_ROT[j]; }
 function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`Today's done · ${d.m.toLocaleString()} m ${NM[k].verb}`:"Today's prompts are ready"; }
 function startNm(mode,opt={}){
   const M=NM[mode]; S.nm=S.nm||{}; S.nm[mode]=S.nm[mode]||{};
   const done=S.nm[mode][today()], daily=!opt.practice&&!done;
   if(!opt.practice&&done) toast(`Today's ${M.name.toLowerCase()} is done. Here's a practice round.`);
-  const rnd=daily?seeded(mode+"|"+today()):Math.random, picks=[]; let nc=0; // at most two country prompts a round, so it isn't all geography
-  for(const k of shuf([...LISTS.keys()],rnd)){ const c=/countr/i.test(LISTS[k].p); if(c&&nc>=2) continue; nc+=c; picks.push(nmPrep(LISTS[k])); if(picks.length===7) break; }
+  const picks=(daily?nmDay(mode,dayIndex()):shuf([...LISTS.keys()]).slice(0,7)).map(i=>nmPrep(LISTS[i]));
   begin(mode,daily?`${M.name} · today`:`${M.name} · practice`);
   let i=0, res=[], m=0, locked=false, deadline=0, tmr=0;
   const TIME=25000;
