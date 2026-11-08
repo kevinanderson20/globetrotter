@@ -428,7 +428,9 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .nmrow summary em{font-style:normal;font-weight:800;color:var(--ink-2);font-size:15px}
 .nmchev{font-style:normal;color:var(--ink-3);font-size:20px;transition:transform .2s}
 .nmrow[open] .nmchev{transform:rotate(90deg)}
-.nmrow .nmall{padding:2px 0 6px 38px}
+.nmrow .nmall{margin:8px 0 4px;padding:4px 10px 10px;max-height:min(46vh,360px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:12px;background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+.nmrow .nmgrp p span{font-size:12px;padding:2px 7px}
+.nmrow .nmgrp h5{font-size:13px;position:sticky;top:-4px;background:inherit;padding-top:4px}
 .nmlist{display:grid;gap:8px}
 .nmlist>div div{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center}
 .nmlist>div div>span{font-size:22px;text-align:center}
@@ -533,7 +535,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.08-1204";
+const APP_VERSION="2026.11.08-1227";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -1192,8 +1194,7 @@ function startNm(mode,opt={}){
     const m0=m; m+=pts; res.push({L,it,pts,em,lab,ti});
     stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7</div><div class="nmq">${esc(L.p)}</div>
       <div class="nmres ${it?"ok":"no"} t${ti}"><b>${it?esc(nmCap(it.show)):"No answer"}</b><span>${em} ${esc(lab)}${it?` · ${esc(why)}`:""}</span><em>+${pts}</em></div>
-      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button>
-      ${nmAll(L,it)}</div></div>`;
+      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button></div></div>`;
     __b.nm={mode,list:L,i,pts};
     if(it){ const d=stage.querySelector(".nmdepth b"); if(d&&!reduceMotion){ const t0=performance.now(), g=GS; const run=()=>{ if(GS!==g) return; const k=Math.min(1,(performance.now()-t0)/700); d.innerHTML=Math.round(m0+(m-m0)*k)+"<small> / 700</small>"; if(k<1) requestAnimationFrame(run); }; run(); } }
     $('nmnext').onclick=()=>{ i++; if(i<7) ask(); else done_(); }; }
@@ -1205,7 +1206,8 @@ function startNm(mode,opt={}){
     if(daily){ S.nm[mode][today()]={m,e:em}; const ks=Object.keys(S.nm[mode]).sort(); ks.slice(0,-60).forEach(k=>delete S.nm[mode][k]); save(); }
     const share=`${M.name} ${M.ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m} / 700 · ${M.zone(m)}`;
     const html=`<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):"No answer"}</b><small>${esc(r.lab)}</small></p><em>+${r.pts}</em><i class="nmchev">›</i></summary>${nmAll(r.L,r.it,true).replace('<details class="nmall" open><summary>See all '+r.L.N+' answers</summary>','<div class="nmall">').replace(/<\/details>$/,"</div>")}</details>`).join("")}</div></section>`;
-    finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true}); }
+    finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true});
+    document.querySelectorAll(".nmrow").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open) document.querySelectorAll(".nmrow[open]").forEach(o=>{ if(o!==d) o.open=false; }); })); }
   ask();
 }
 

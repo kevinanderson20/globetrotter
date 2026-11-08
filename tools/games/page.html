@@ -428,7 +428,9 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .nmrow summary em{font-style:normal;font-weight:800;color:var(--ink-2);font-size:15px}
 .nmchev{font-style:normal;color:var(--ink-3);font-size:20px;transition:transform .2s}
 .nmrow[open] .nmchev{transform:rotate(90deg)}
-.nmrow .nmall{padding:2px 0 6px 38px}
+.nmrow .nmall{margin:8px 0 4px;padding:4px 10px 10px;max-height:min(46vh,360px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:12px;background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+.nmrow .nmgrp p span{font-size:12px;padding:2px 7px}
+.nmrow .nmgrp h5{font-size:13px;position:sticky;top:-4px;background:inherit;padding-top:4px}
 .nmlist{display:grid;gap:8px}
 .nmlist>div div{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center}
 .nmlist>div div>span{font-size:22px;text-align:center}

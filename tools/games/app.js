@@ -500,8 +500,7 @@ function startNm(mode,opt={}){
     const m0=m; m+=pts; res.push({L,it,pts,em,lab,ti});
     stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7</div><div class="nmq">${esc(L.p)}</div>
       <div class="nmres ${it?"ok":"no"} t${ti}"><b>${it?esc(nmCap(it.show)):"No answer"}</b><span>${em} ${esc(lab)}${it?` · ${esc(why)}`:""}</span><em>+${pts}</em></div>
-      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button>
-      ${nmAll(L,it)}</div></div>`;
+      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button></div></div>`;
     __b.nm={mode,list:L,i,pts};
     if(it){ const d=stage.querySelector(".nmdepth b"); if(d&&!reduceMotion){ const t0=performance.now(), g=GS; const run=()=>{ if(GS!==g) return; const k=Math.min(1,(performance.now()-t0)/700); d.innerHTML=Math.round(m0+(m-m0)*k)+"<small> / 700</small>"; if(k<1) requestAnimationFrame(run); }; run(); } }
     $('nmnext').onclick=()=>{ i++; if(i<7) ask(); else done_(); }; }
@@ -513,7 +512,8 @@ function startNm(mode,opt={}){
     if(daily){ S.nm[mode][today()]={m,e:em}; const ks=Object.keys(S.nm[mode]).sort(); ks.slice(0,-60).forEach(k=>delete S.nm[mode][k]); save(); }
     const share=`${M.name} ${M.ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m} / 700 · ${M.zone(m)}`;
     const html=`<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):"No answer"}</b><small>${esc(r.lab)}</small></p><em>+${r.pts}</em><i class="nmchev">›</i></summary>${nmAll(r.L,r.it,true).replace('<details class="nmall" open><summary>See all '+r.L.N+' answers</summary>','<div class="nmall">').replace(/<\/details>$/,"</div>")}</details>`).join("")}</div></section>`;
-    finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true}); }
+    finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true});
+    document.querySelectorAll(".nmrow").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open) document.querySelectorAll(".nmrow[open]").forEach(o=>{ if(o!==d) o.open=false; }); })); }
   ask();
 }
 
