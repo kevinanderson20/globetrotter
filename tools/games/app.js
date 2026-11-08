@@ -29,7 +29,7 @@ const GAMES={
  groups:{cat:"daily", col:"--wd", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
  dive:{cat:"daily", col:"--nm", ic:"🦐", name:"Krillion", desc:"Name one answer per prompt. Rarer answers score more. 700 is perfect.", hi:true, fmt:v=>`${v} / 700`},
  climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
- dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"Classic 9×9 with pencil notes. Easy early in the week, hard on weekends.", hi:false, fmt:v=>fmtT(v)},
+ dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"A classic 9×9, easy level, with pencil notes. One puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
 const WORKOUT=["num","schulte","sudoku"];
@@ -531,30 +531,30 @@ function dsSolve(g,limit,r){ const R=Array(9).fill(0),C=Array(9).fill(0),B=Array
     for(const v of ds){ const b=1<<v; g[bi]=v; R[ro]|=b; C[co]|=b; B[bo]|=b; if(go()) return true; g[bi]=0; R[ro]&=~b; C[co]&=~b; B[bo]&=~b; }
     return false; })();
   return n; }
-const DS_LEVELS={easy:38,medium:31,hard:26};
-function dsLevel(d=new Date()){ const w=d.getDay(); return w===1||w===2?"easy":w===0||w===6?"hard":"medium"; }
+const DS_LEVELS={easy:40,medium:31,hard:26};
+function dsLevel(){ return "easy"; }
 let DS_CACHE=null;
 function dsToday(){ const day=today(); if(DS_CACHE&&DS_CACHE.day===day) return DS_CACHE;
-  const r=seeded("globetrotter-daily-sudoku-"+day), sol=Array(81).fill(0); dsSolve(sol,1,r);
+  const r=seeded("globetrotter-daily-sudoku-easy-"+day), sol=Array(81).fill(0); dsSolve(sol,1,r);
   const p=sol.slice(), lvl=dsLevel(), target=DS_LEVELS[lvl];
   for(const i of shuf([...Array(81).keys()],r)){ if(p.filter(Boolean).length<=target) break; const v=p[i]; p[i]=0; if(dsSolve(p.slice(),2)!==1) p[i]=v; }
   return DS_CACHE={day,sol,p,lvl,clues:p.filter(Boolean).length}; }
 function dsStatus(){ S.ds=S.ds||{done:{}}; const P=dsToday(), d=S.ds.done[P.day], cap=P.lvl[0].toUpperCase()+P.lvl.slice(1);
-  return d!=null?`Today's done · ${fmtT(d)}`:S.ds.day===P.day&&S.ds.g?`Today's ${P.lvl} · in progress`:`Today's puzzle: ${cap}`; }
+  return d!=null?`Today's done · ${fmtT(d)}`:S.ds.day===P.day&&S.ds.lvl===P.lvl&&S.ds.g?`Today's ${P.lvl} · in progress`:`Today's puzzle: ${cap}`; }
 function startDSudoku(){
   S.ds=S.ds||{done:{}}; const P=dsToday(), done=S.ds.done[P.day]!=null;
-  const fresh=S.ds.day!==P.day||!S.ds.g||done;
+  const fresh=S.ds.day!==P.day||S.ds.lvl!==P.lvl||!S.ds.g||done;
   const g=fresh?P.p.slice():S.ds.g.slice(), notes=fresh?Array(81).fill(0):(S.ds.n||Array(81).fill(0)).slice();
   let errs=fresh?0:(S.ds.e||0), sel=g.findIndex(v=>!v), noting=false, won=false;
   const cap=P.lvl[0].toUpperCase()+P.lvl.slice(1);
   begin("dsudoku",`Daily sudoku · ${cap}`); clock(); if(!fresh&&S.ds.t) GS.t0-=S.ds.t;
   __b.ds=P;
-  const store=()=>{ if(won) return; S.ds.day=P.day; S.ds.g=g; S.ds.n=notes; S.ds.e=errs; S.ds.t=GS?elapsed():S.ds.t; save(); };
+  const store=()=>{ if(won) return; S.ds.day=P.day; S.ds.lvl=P.lvl; S.ds.g=g; S.ds.n=notes; S.ds.e=errs; S.ds.t=GS?elapsed():S.ds.t; save(); };
   const peers=i=>{ const r=Math.floor(i/9),c=i%9,b=DS_BOX(i),o=[]; for(let j=0;j<81;j++) if(j!==i&&(Math.floor(j/9)===r||j%9===c||DS_BOX(j)===b)) o.push(j); return o; };
   const clash=i=>g[i]&&peers(i).some(j=>g[j]===g[i]);
   function render(){ const sv=sel>=0?g[sel]:0, pe=sel>=0?new Set(peers(sel)):new Set();
     stage.innerHTML=`<div class="ds ${won?"won":""}" id="dg">${g.map((v,i)=>{ const r=Math.floor(i/9),c=i%9;
-      const cls=[P.p[i]?"given":"", i===sel?"sel":v&&v===sv?"same":pe.has(i)?"peer":"", clash(i)?"bad":"", r===2||r===5?"rb":"", c===2||c===5?"cb":""].filter(Boolean).join(" ");
+      const cls=[P.p[i]?"given":"", i===sel?"sel":v&&v===sv?"same":pe.has(i)?"peer":"", clash(i)?"bad":"", r===2||r===5?"rb":"", c===2||c===5?"cb":"", c===3||c===6?"cl":"", r===3||r===6?"rt":""].filter(Boolean).join(" ");
       const inner=v?v:notes[i]?`<span class="dn">${[1,2,3,4,5,6,7,8,9].map(n=>`<i>${notes[i]&(1<<n)?n:""}</i>`).join("")}</span>`:"";
       return `<button data-i="${i}" class="${cls}" aria-label="Row ${r+1} column ${c+1}${v?`: ${v}`:""}">${inner}</button>`; }).join("")}</div>
       <div class="dspad" id="dp">${[1,2,3,4,5,6,7,8,9].map(v=>`<button data-v="${v}">${v}<small>${9-g.filter(x=>x===v).length||""}</small></button>`).join("")}</div>
