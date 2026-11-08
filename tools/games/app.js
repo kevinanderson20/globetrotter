@@ -31,7 +31,7 @@ const GAMES={
  climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
  diveu:{cat:"unl", col:"--nm", ic:"🦐", name:"Unlimited Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
  climbu:{cat:"unl", col:"--nm", ic:"🎈", name:"Unlimited Reverse Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
- dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"A classic 9×9, easy level, with pencil notes. One puzzle a day.", hi:false, fmt:v=>fmtT(v)},
+ dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"An easy 6×6 with pencil notes. One new puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
 const WORKOUT=["num","schulte","sudoku"];
@@ -532,47 +532,32 @@ function startNm(mode,opt={}){
   ask();
 }
 
-/* ================= DAILY SUDOKU: classic 9×9, one puzzle a day ================= */
-/* bitmask solver with "fewest options first"; counts solutions up to 2 so every puzzle has exactly one answer */
-const DS_BOX=i=>Math.floor(Math.floor(i/9)/3)*3+Math.floor((i%9)/3);
-function dsSolve(g,limit,r){ const R=Array(9).fill(0),C=Array(9).fill(0),B=Array(9).fill(0);
-  for(let i=0;i<81;i++) if(g[i]){ const b=1<<g[i]; R[Math.floor(i/9)]|=b; C[i%9]|=b; B[DS_BOX(i)]|=b; }
-  let n=0;
-  (function go(){ let bi=-1,bm=0,bc=10;
-    for(let i=0;i<81;i++) if(!g[i]){ const m=~(R[Math.floor(i/9)]|C[i%9]|B[DS_BOX(i)])&0x3fe; let c=0; for(let x=m;x;x&=x-1) c++; if(c<bc){ bc=c; bi=i; bm=m; if(c<=1) break; } }
-    if(bi<0){ n++; return n>=limit; } if(!bc) return false;
-    let ds=[]; for(let v=1;v<=9;v++) if(bm&(1<<v)) ds.push(v); if(r) ds=shuf(ds,r);
-    const ro=Math.floor(bi/9),co=bi%9,bo=DS_BOX(bi);
-    for(const v of ds){ const b=1<<v; g[bi]=v; R[ro]|=b; C[co]|=b; B[bo]|=b; if(go()) return true; g[bi]=0; R[ro]&=~b; C[co]&=~b; B[bo]&=~b; }
-    return false; })();
-  return n; }
-const DS_LEVELS={easy:40,medium:31,hard:26};
-function dsLevel(){ return "easy"; }
+/* ================= DAILY SUDOKU: one easy 6×6 a day ================= */
 let DS_CACHE=null;
+/* the daily puzzle is a 6×6 (2×3 boxes), easy, from the same generator as Mini sudoku */
+const DN=6, DBOX=i=>Math.floor(Math.floor(i/6)/2)*2+Math.floor((i%6)/3);
 function dsToday(){ const day=today(); if(DS_CACHE&&DS_CACHE.day===day) return DS_CACHE;
-  const r=seeded("globetrotter-daily-sudoku-easy-"+day), sol=Array(81).fill(0); dsSolve(sol,1,r);
-  const p=sol.slice(), lvl=dsLevel(), target=DS_LEVELS[lvl];
-  for(const i of shuf([...Array(81).keys()],r)){ if(p.filter(Boolean).length<=target) break; const v=p[i]; p[i]=0; if(dsSolve(p.slice(),2)!==1) p[i]=v; }
-  return DS_CACHE={day,sol,p,lvl,clues:p.filter(Boolean).length}; }
-function dsStatus(){ S.ds=S.ds||{done:{}}; const P=dsToday(), d=S.ds.done[P.day], cap=P.lvl[0].toUpperCase()+P.lvl.slice(1);
-  return d!=null?`Today's done · ${fmtT(d)}`:S.ds.day===P.day&&S.ds.lvl===P.lvl&&S.ds.g?`Today's ${P.lvl} · in progress`:`Today's puzzle: ${cap}`; }
+  const M=makeSudoku("easy",seeded("globetrotter-daily-sudoku6-"+day));
+  return DS_CACHE={day,sol:M.sol,p:M.p,lvl:"easy6",clues:M.p.filter(Boolean).length}; }
+function dsStatus(){ S.ds=S.ds||{done:{}}; const P=dsToday(), d=S.ds.done[P.day], cap="Easy";
+  return d!=null?`Today's done · ${fmtT(d)}`:S.ds.day===P.day&&S.ds.lvl===P.lvl&&S.ds.g?`Today's puzzle · in progress`:`Today's puzzle: ${cap}`; }
 function startDSudoku(){
   S.ds=S.ds||{done:{}}; const P=dsToday(), done=S.ds.done[P.day]!=null;
   const fresh=S.ds.day!==P.day||S.ds.lvl!==P.lvl||!S.ds.g||done;
-  const g=fresh?P.p.slice():S.ds.g.slice(), notes=fresh?Array(81).fill(0):(S.ds.n||Array(81).fill(0)).slice();
+  const g=fresh?P.p.slice():S.ds.g.slice(), notes=fresh?Array(DN*DN).fill(0):(S.ds.n||Array(DN*DN).fill(0)).slice();
   let errs=fresh?0:(S.ds.e||0), sel=g.findIndex(v=>!v), noting=false, won=false;
-  const cap=P.lvl[0].toUpperCase()+P.lvl.slice(1);
+  const cap="Easy";
   begin("dsudoku",`Daily sudoku · ${cap}`); clock(); if(!fresh&&S.ds.t) GS.t0-=S.ds.t;
   __b.ds=P;
   const store=()=>{ if(won) return; S.ds.day=P.day; S.ds.lvl=P.lvl; S.ds.g=g; S.ds.n=notes; S.ds.e=errs; S.ds.t=GS?elapsed():S.ds.t; save(); };
-  const peers=i=>{ const r=Math.floor(i/9),c=i%9,b=DS_BOX(i),o=[]; for(let j=0;j<81;j++) if(j!==i&&(Math.floor(j/9)===r||j%9===c||DS_BOX(j)===b)) o.push(j); return o; };
+  const peers=i=>{ const r=Math.floor(i/DN),c=i%DN,b=DBOX(i),o=[]; for(let j=0;j<DN*DN;j++) if(j!==i&&(Math.floor(j/DN)===r||j%DN===c||DBOX(j)===b)) o.push(j); return o; };
   const clash=i=>g[i]&&peers(i).some(j=>g[j]===g[i]);
   function render(){ const sv=sel>=0?g[sel]:0, pe=sel>=0?new Set(peers(sel)):new Set();
-    stage.innerHTML=`<div class="ds ${won?"won":""}" id="dg">${g.map((v,i)=>{ const r=Math.floor(i/9),c=i%9;
-      const cls=[P.p[i]?"given":"", i===sel?"sel":v&&v===sv?"same":pe.has(i)?"peer":"", clash(i)?"bad":"", r===2||r===5?"rb":"", c===2||c===5?"cb":"", c===3||c===6?"cl":"", r===3||r===6?"rt":""].filter(Boolean).join(" ");
-      const inner=v?v:notes[i]?`<span class="dn">${[1,2,3,4,5,6,7,8,9].map(n=>`<i>${notes[i]&(1<<n)?n:""}</i>`).join("")}</span>`:"";
+    stage.innerHTML=`<div class="ds ${won?"won":""}" id="dg">${g.map((v,i)=>{ const r=Math.floor(i/DN),c=i%DN;
+      const cls=[P.p[i]?"given":"", i===sel?"sel":v&&v===sv?"same":pe.has(i)?"peer":"", clash(i)?"bad":"", r===1||r===3?"rb":"", c===2?"cb":""].filter(Boolean).join(" ");
+      const inner=v?v:notes[i]?`<span class="dn">${[1,2,3,4,5,6].map(n=>`<i>${notes[i]&(1<<n)?n:""}</i>`).join("")}</span>`:"";
       return `<button data-i="${i}" class="${cls}" aria-label="Row ${r+1} column ${c+1}${v?`: ${v}`:""}">${inner}</button>`; }).join("")}</div>
-      <div class="dspad" id="dp">${[1,2,3,4,5,6,7,8,9].map(v=>`<button data-v="${v}">${v}<small>${9-g.filter(x=>x===v).length||""}</small></button>`).join("")}</div>
+      <div class="dspad" id="dp">${[1,2,3,4,5,6].map(v=>`<button data-v="${v}">${v}<small>${DN-g.filter(x=>x===v).length||""}</small></button>`).join("")}</div>
       <div class="dstools"><button id="dnote" class="btn ${noting?"go":"ghost"}" aria-pressed="${noting}">✏️ Notes ${noting?"on":"off"}</button><button id="derase" class="btn ghost">⌫ Erase</button></div>
       <div class="gsub">${won?"Solved!":`${cap} · ${P.clues} clues · ${errs?`${errs} clash${errs>1?"es":""}`:"no clashes yet"}`}</div>`;
     $('dg').addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b||won) return; e.preventDefault(); sel=+b.dataset.i; render(); });
@@ -590,8 +575,8 @@ function startDSudoku(){
     if(!g.includes(0)) toast("Something clashes. Look for red.");
     else if(!clash(sel)){ const nx=g.findIndex((x,i)=>i>sel&&!x); if(nx>=0) sel=nx; }
     store(); render(); }
-  window._dsKey=k=>{ if(/^[1-9]$/.test(k)) put(+k); else if(k==="Backspace"||k==="Delete"||k==="0") put(0); else if(k==="n"||k==="N"){ noting=!noting; render(); }
-    else if(k.startsWith("Arrow")&&sel>=0){ const d={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k], n=sel+d; if(n>=0&&n<81) { sel=n; render(); } } };
+  window._dsKey=k=>{ if(/^[1-6]$/.test(k)) put(+k); else if(k==="Backspace"||k==="Delete"||k==="0") put(0); else if(k==="n"||k==="N"){ noting=!noting; render(); }
+    else if(k.startsWith("Arrow")&&sel>=0){ const d={ArrowUp:-DN,ArrowDown:DN,ArrowLeft:-1,ArrowRight:1}[k], n=sel+d; if(n>=0&&n<DN*DN) { sel=n; render(); } } };
   if(done){ toast("You solved today's puzzle. Here it is again for fun; your time is saved."); }
   render();
 }

@@ -347,8 +347,8 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 
 
 /* daily sudoku 9×9 */
-.ds{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:1px;width:min(100%,42vh,360px);border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:color-mix(in srgb,var(--ink) 30%,var(--surface));margin:0 auto;box-sizing:border-box}
-.ds button{aspect-ratio:1;min-width:0;width:100%;border:0;background:var(--surface);font-family:var(--f-display);font-weight:800;font-size:clamp(15px,4.4vw,21px);color:var(--log);padding:0;font-variant-numeric:tabular-nums;position:relative;cursor:pointer;line-height:1}
+.ds{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;width:min(100%,42vh,340px);border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:color-mix(in srgb,var(--ink) 30%,var(--surface));margin:0 auto;box-sizing:border-box}
+.ds button{aspect-ratio:1;min-width:0;width:100%;border:0;background:var(--surface);font-family:var(--f-display);font-weight:800;font-size:clamp(20px,6vw,28px);color:var(--log);padding:0;font-variant-numeric:tabular-nums;position:relative;cursor:pointer;line-height:1}
 .ds button.given{color:var(--ink)}
 .ds button.rb{box-shadow:inset 0 -2px 0 var(--ink)}.ds button.cb{box-shadow:inset -2px 0 0 var(--ink)}.ds button.rb.cb{box-shadow:inset -2px -2px 0 var(--ink)}
 .ds button.sel{background:color-mix(in srgb,var(--sun) 38%,var(--surface))}
@@ -356,10 +356,10 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .ds button.same{background:color-mix(in srgb,var(--log) 24%,var(--surface))}
 .ds button.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
 .ds.won button{background:color-mix(in srgb,var(--good) 16%,var(--surface))}
-.dn{position:absolute;inset:1px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
-.dn i{font-style:normal;font-size:clamp(7px,2vw,10px);font-weight:700;color:var(--ink-2);line-height:1;display:grid;place-items:center}
-.dspad{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;width:min(100%,360px);margin:10px auto 0}
-.dspad button{height:46px;min-width:0;border:0;border-radius:10px;background:var(--surface);box-shadow:0 2px 0 var(--line);font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--ink);display:grid;place-items:center;padding:0;line-height:1;cursor:pointer}
+.dn{position:absolute;inset:2px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
+.dn i{font-style:normal;font-size:clamp(9px,2.6vw,12px);font-weight:700;color:var(--ink-2);line-height:1;display:grid;place-items:center}
+.dspad{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;width:min(100%,360px);margin:10px auto 0}
+.dspad button{height:52px;min-width:0;border:0;border-radius:10px;background:var(--surface);box-shadow:0 2px 0 var(--line);font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--ink);display:grid;place-items:center;padding:0;line-height:1;cursor:pointer}
 .dspad button small{font-size:9px;font-weight:700;color:var(--ink-3);margin-top:-6px}
 .dspad button:active{transform:translateY(2px);box-shadow:none}
 .dstools{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(100%,360px);margin:8px auto 0}.dstools .btn{min-height:44px;padding:8px 12px}
