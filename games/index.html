@@ -345,6 +345,25 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .gpgridtxt{font-size:22px;line-height:1.2;letter-spacing:2px}
 
 
+
+/* daily sudoku 9×9 */
+.ds{display:grid;grid-template-columns:repeat(9,1fr);width:min(100%,46vh,420px);border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:color-mix(in srgb,var(--ink) 35%,var(--surface));gap:1px;margin:0 auto}
+.ds button{aspect-ratio:1;border:0;background:var(--surface);font-family:var(--f-display);font-weight:800;font-size:clamp(17px,5.2vw,24px);color:var(--log);padding:0;font-variant-numeric:tabular-nums;position:relative;cursor:pointer}
+.ds button.given{color:var(--ink)}
+.ds button.rb{margin-bottom:2px}.ds button.cb{margin-right:2px}
+.ds{row-gap:1px}
+.ds button.sel{background:color-mix(in srgb,var(--sun) 38%,var(--surface))}
+.ds button.peer{background:color-mix(in srgb,var(--log) 9%,var(--surface))}
+.ds button.same{background:color-mix(in srgb,var(--log) 24%,var(--surface))}
+.ds button.bad{color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
+.ds.won button{background:color-mix(in srgb,var(--good) 16%,var(--surface))}
+.dn{position:absolute;inset:1px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+.dn i{font-style:normal;font-size:clamp(8px,2.3vw,11px);font-weight:700;color:var(--ink-2);line-height:1;display:grid;place-items:center}
+.dspad{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;width:min(100%,420px);margin:12px auto 0}
+.dspad button{height:54px;border:0;border-radius:12px;background:var(--surface);box-shadow:0 2px 0 var(--line);font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--ink);display:grid;place-items:center;padding:0;line-height:1;cursor:pointer}
+.dspad button small{font-size:10px;font-weight:700;color:var(--ink-3);margin-top:-6px}
+.dspad button:active{transform:translateY(2px);box-shadow:none}
+.dstools{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(100%,420px);margin:10px auto 0}
 /* results card */
 .sharerow{display:grid;grid-template-columns:1fr auto;gap:10px}.sharerow .btn{width:100%}.sharerow #copyB{min-width:96px}
 .center{text-align:center}
@@ -383,14 +402,39 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .nmres span{font-size:15px;color:var(--ink-2);font-weight:600}
 .nmres em{font-style:normal;font-family:var(--f-display);font-weight:800;font-size:19px;color:var(--good)}
 .nmres.no em{color:var(--ink-3)}
-.nmex{font-size:14px;color:var(--ink-2);line-height:1.4}
-.nmex span{font-weight:800;color:var(--ink)}
+.nmdepth b small{font-size:15px;opacity:.85}
+.nmmsg.sug{color:var(--ink-2);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nmmsg.sug>span{width:100%;font-weight:800;color:var(--ink)}
+.nmsug{border:2px solid var(--nm);background:color-mix(in srgb,var(--nm) 12%,var(--surface));color:var(--ink);font:800 16px var(--f-body);padding:9px 14px;border-radius:12px;cursor:pointer}
+.nmsug:active{transform:scale(.96)}
+.nmall summary{cursor:pointer;font-weight:800;color:var(--nm);font-size:15px;padding:4px 0;list-style:none}
+.nmall summary::-webkit-details-marker,.nmrow summary::-webkit-details-marker{display:none}
+.nmall summary::before{content:"▸ ";}
+.nmall[open] summary::before{content:"▾ ";}
+.nmgrp{margin-top:10px}
+.nmgrp h5{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--ink)}
+.nmgrp h5 small{font-weight:700;color:var(--ink-3);margin-left:4px}
+.nmgrp p{margin:0;display:flex;flex-wrap:wrap;gap:5px}
+.nmgrp p span{font-size:13px;padding:3px 8px;border-radius:8px;background:var(--surface-2);color:var(--ink-2)}
+.nmgrp p span.me{background:var(--nm);color:#fff;font-weight:800}
+.nmtip{margin:-4px 0 6px;font-size:13px}
+.nmrow{border-top:1px solid var(--line);padding:8px 0}
+.nmrow:first-child{border-top:0}
+.nmrow summary{display:grid;grid-template-columns:30px 1fr auto 16px;gap:8px;align-items:center;cursor:pointer;list-style:none}
+.nmrow summary>span{font-size:22px;text-align:center}
+.nmrow summary p{margin:0;font-size:13px;color:var(--ink-3);display:grid}
+.nmrow summary p b{font-size:16px;color:var(--ink)}
+.nmrow summary p small{font-size:12px;font-weight:700;color:var(--nm)}
+.nmrow summary em{font-style:normal;font-weight:800;color:var(--ink-2);font-size:15px}
+.nmchev{font-style:normal;color:var(--ink-3);font-size:20px;transition:transform .2s}
+.nmrow[open] .nmchev{transform:rotate(90deg)}
+.nmrow .nmall{padding:2px 0 6px 38px}
 .nmlist{display:grid;gap:8px}
-.nmlist div{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center}
-.nmlist div>span{font-size:22px;text-align:center}
-.nmlist p{margin:0;font-size:13px;color:var(--ink-3);display:grid}
-.nmlist p b{font-size:16px;color:var(--ink)}
-.nmlist em{font-style:normal;font-weight:800;color:var(--ink-2);font-size:14px}
+.nmlist>div div{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center}
+.nmlist>div div>span{font-size:22px;text-align:center}
+.nmlist>div p{margin:0;font-size:13px;color:var(--ink-3);display:grid}
+.nmlist>div p b{font-size:16px;color:var(--ink)}
+.nmlist>div em{font-style:normal;font-weight:800;color:var(--ink-2);font-size:14px}
 .arch{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
 .arch button{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 6px;display:grid;gap:2px;text-align:center}
 .arch b{font-family:var(--f-display);font-size:17px}
@@ -489,7 +533,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.07-2021";
+const APP_VERSION="2026.11.08-1204";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -504,7 +548,7 @@ function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++)
   return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
 
 /* ---------- the games ---------- */
-const CATS=[["word","Word puzzles","A new one every day","--wd"],["nm","Name it","Seven prompts, 25 seconds each","--nm"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
+const CATS=[["daily","Daily games","New puzzles every day","--wd"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
 const GAMES={
  seq:{cat:"mem", ic:"🔲", name:"Sequence memory", desc:"Tiles light up in order. Repeat the pattern; it grows each round.", hi:true, fmt:v=>`Level ${v}`},
  num:{cat:"mem", ic:"🔢", name:"Number memory", desc:"A number flashes. Type it back. One more digit each round.", hi:true, fmt:v=>`${v} digits`},
@@ -513,11 +557,12 @@ const GAMES={
  stroop:{cat:"spd", ic:"🎨", name:"Color clash", desc:"Tap the ink color, not the word. 30 seconds.", hi:true, fmt:v=>`${v} pts`},
  schulte:{cat:"spd", ic:"🎯", name:"Number hunt", desc:"Tap 1 to 25 in order as fast as you can.", hi:false, fmt:v=>fmtT(v)},
  count:{cat:"log", ic:"🧮", name:"Countdown", desc:"Hit the target with six numbers and + − × ÷.", hi:false, fmt:v=>fmtT(v)},
- sudoku:{cat:"log", ic:"🧩", name:"Mini sudoku", desc:"6×6: every row, column and box gets 1 to 6. New daily puzzle.", hi:false, fmt:v=>fmtT(v)},
- mini:{cat:"word", ic:"✏️", name:"Mini crossword", desc:"A quick 5×5 crossword. New puzzle every day.", hi:false, fmt:v=>fmtT(v)},
- groups:{cat:"word", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
- dive:{cat:"nm", ic:"🦐", name:"Krillion", desc:"Name something that fits each prompt. The rarer your answer, the deeper you dive.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
- climb:{cat:"nm", ic:"🎈", name:"Reverse Krillion", desc:"The reverse: give the answer most people would. The more common, the higher you climb.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
+ sudoku:{cat:"log", ic:"🧩", name:"Mini sudoku", desc:"6×6: every row, column and box gets 1 to 6. Unlimited puzzles, easy to hard.", hi:false, fmt:v=>fmtT(v)},
+ mini:{cat:"daily", col:"--wd", ic:"✏️", name:"Mini crossword", desc:"A quick 5×5 crossword. New puzzle every day.", hi:false, fmt:v=>fmtT(v)},
+ groups:{cat:"daily", col:"--wd", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
+ dive:{cat:"daily", col:"--nm", ic:"🦐", name:"Krillion", desc:"Name one answer per prompt. Rarer answers score more. 700 is perfect.", hi:true, fmt:v=>`${v} / 700`},
+ climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
+ dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"Classic 9×9 with pencil notes. Easy early in the week, hard on weekends.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
 const WORKOUT=["num","schulte","sudoku"];
@@ -728,7 +773,7 @@ function makeSudoku(diff,r=Math.random){ const sol=Array(36).fill(0); sudFill(so
   return {sol,p}; }
 function startSudoku(opt={}){
   const daily=!!opt.daily, diff=daily?"medium":S.sud, key=`sudoku:${daily?"daily":diff}`;
-  begin("sudoku",daily?"Daily sudoku":`Mini sudoku · ${diff}`);
+  begin("sudoku",daily?"Workout sudoku":`Mini sudoku · ${diff}`);
   const P=makeSudoku(diff,daily?seeded("brain-sudoku-"+today()):Math.random), g=P.p.slice(); let sel=g.indexOf(0), won=false, errs=0;
   __b.sud=P; clock();
   function bad6(i){ const v=g[i]; if(!v) return false; const row=Math.floor(i/6), col=i%6; g[i]=0; const ok=ok6(g,row,col,v); g[i]=v; return !ok; }
@@ -1076,22 +1121,37 @@ function nmMatch(L,input){ nmPrep(L); const q=L.norm(input); if(!q) return null;
   const vars=new Set(); [q,qs].forEach(v=>{ vars.add(v); vars.add(v+"s"); if(v.endsWith("ies")) vars.add(v.slice(0,-3)+"y"); if(v.endsWith("es")) vars.add(v.slice(0,-2)); if(v.endsWith("s")) vars.add(v.slice(0,-1)); });
   for(const it of L.items) for(const k of it.keys){ if(vars.has(k)||vars.has(k.replace(/ /g,""))) return it; }
   if(L.t){ const w=q.split(" "); for(let s=1;s<w.length;s++){ const tail=w.slice(s).join(" "), tv=new Set([tail,tail.replace(/ /g,""),tail.replace(/s$/,""),tail+"s"]); for(const it of L.items) if(it.keys.some(k=>tv.has(k)||tv.has(k.replace(/ /g,"")))) return it; } }
-  if(qs.length<5) return null; let best=null,bd=9;
-  for(const it of L.items) for(const k of it.keys){ const ks=k.replace(/ /g,""); if(Math.abs(ks.length-qs.length)>2) continue; const d=lev(qs,ks), lim=ks.length>=10?2:1; if(d<=lim&&d<bd){ bd=d; best=it; } }
-  return best; }
+  return null; }
+/* near misses: typos, a missing word, the start of a longer name. Returns up to 3 answers for "Did you mean…?" */
+function nmSuggest(L,input){ nmPrep(L); const q=L.norm(input), qs=q.replace(/ /g,""); if(qs.length<3) return [];
+  const tries=[qs]; if(L.t){ const w=q.split(" "); if(w.length>1) tries.push(w[w.length-1]); }
+  const sc=new Map();
+  for(const it of L.items) for(const k of it.keys){ const ks=k.replace(/ /g,""); let best=9;
+    for(const t of tries){ if(t.length<3) continue;
+      const lim=t.length<5?1:t.length<9?2:3;
+      if(Math.abs(ks.length-t.length)<=lim){ const d=lev(t,ks); if(d<=lim) best=Math.min(best,d); }
+      if(t.length>=4&&ks.startsWith(t)) best=Math.min(best,1.5);
+      if(t.length>=4&&k.split(" ").some(w=>w===t||(w.length>=5&&lev(w,t)<=1))) best=Math.min(best,1.2);
+      if(t.length>=5&&ks.includes(t)) best=Math.min(best,1.8); }
+    if(best<9&&(!sc.has(it)||sc.get(it)>best)) sc.set(it,best); }
+  return [...sc.entries()].sort((a,b)=>a[1]-b[1]||a[0].r-b[0].r).slice(0,3).map(e=>e[0]); }
+/* five tiers, 100 points max per prompt, 700 a round.
+   Krillion counts from the rare end: the single rarest answer is the Krillion. Reverse Krillion counts from the common end. */
+const NM_TIERS={
+  dive:[[100,"Krillion","The rarest answer on the list","🐋"],[85,"Deep cut","Among the rarest 25%","🐙"],[60,"Rare","Rarer than most","🦑"],[30,"Schooler","A common pick","🐠"],[10,"Plankton","Everyone says it","🫧"]],
+  climb:[[100,"Top answer","The #1 answer most people give","🚀"],[85,"Crowd favorite","Among the most common 25%","🛰️"],[60,"Popular","More common than most","✈️"],[30,"Uncommon","The crowd mostly went elsewhere","☁️"],[10,"Too rare","Almost nobody says that","🌱"]]};
+function nmTierIx(mode,r,N){ const k=mode==="dive"?N-1-r:r, q=k/N; return k===0?0:q<.25?1:q<.65?2:q<.9?3:4; }
 const NM={
-  dive:{name:"Krillion", verb:"down", ic:"🦐", tag:"Rarer answers dive deeper",
-    tier(r,N){ const f=r/N; return f<.06?[10,"Sunlit: everyone says it","🫧"]:f<.15?[20,"Shallows: a common pick","🐟"]:f<.3?[35,"Reef: nicely done","🐠"]:f<.5?[55,"Twilight: getting rare","🦑"]:f<.75?[80,"Midnight: a deep cut","🐙"]:[100,"The abyss: almost nobody says that","🐋"]; },
-    zone:m=>m<200?"Sunlit zone":m<1000?"Twilight zone":m<4000?"Midnight zone":m<6000?"Abyssal zone":"Hadal trench",
-    col:f=>`color-mix(in srgb,#8fd8f5 ${Math.round((1-f)*100)}%,#04162b)`,
-    hintLabel:"Deepest answers", hint:L=>L.items.slice(-3).reverse()},
-  climb:{name:"Reverse Krillion", verb:"up", ic:"🎈", tag:"The answer most people give climbs highest",
-    tier(r,N){ const f=r/N; return r===0?[100,"Top answer! Exactly what most people say","🚀"]:r===1?[85,"The #2 answer","🛰️"]:r===2?[70,"The #3 answer","✈️"]:r<5?[55,"Top 5 answer","☁️"]:f<.15?[40,"Popular pick","🏔️"]:f<.3?[25,"Fairly common","🌳"]:f<.5?[15,"Uncommon: too clever","🌿"]:[10,"Rare: the crowd didn't go there","🌱"]; },
-    zone:m=>m<500?"Treetops":m<2000?"Low clouds":m<4000?"Alpine peaks":m<6000?"Thin air":"Top of the world",
-    col:f=>`color-mix(in srgb,#bfe9a6 ${Math.round((1-f)*100)}%,#3a7bd5)`,
-    hintLabel:"Top answers", hint:L=>L.items.slice(0,3)}
+  dive:{name:"Krillion", ic:"🦐", tag:"The rarer the answer, the more points",
+    zone:p=>p<20?"Sunlit zone":p<100?"Twilight zone":p<400?"Midnight zone":p<600?"Abyssal zone":"Hadal trench",
+    col:f=>`color-mix(in srgb,#8fd8f5 ${Math.round((1-f)*100)}%,#04162b)`},
+  climb:{name:"Reverse Krillion", ic:"🎈", tag:"The more common the answer, the more points",
+    zone:p=>p<50?"Treetops":p<200?"Low clouds":p<400?"Alpine peaks":p<600?"Thin air":"Top of the world",
+    col:f=>`color-mix(in srgb,#bfe9a6 ${Math.round((1-f)*100)}%,#3a7bd5)`}
 };
-const nmCap=s=>s.replace(/(^|[\s-])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(Dc|Uk|Usa|Us|Uae|Drc|Bmw|Gmc|Vw|Byd|Tvr|Bmx|K2|Lbj|Jfk|Fdr)\b/g,x=>x.toUpperCase()).replace(/\bAnd\b/g,"and").replace(/\bOf\b/g,"of").replace(/\bThe\b(?!^)/g,"the").replace(/^the/,"The");
+const nmCap=s=>s.replace(/(^|[\s\-&])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bMc([a-z])/g,(m,a)=>"Mc"+a.toUpperCase()).replace(/\b(Dc|Uk|Usa|Us|Uae|Drc|Bmw|Gmc|Vw|Byd|Tvr|Bmx|K2|Lbj|Jfk|Fdr|Kfc|Hiit|Bbq|Led|Tv|Mma|Bjj|Usb)\b/g,x=>x.toUpperCase()).replace(/\bAnd\b/g,"and").replace(/\bOf\b/g,"of").replace(/\bThe\b(?!^)/g,"the").replace(/^the/,"The");
+/* scores used to be meters (x10); bring old saves onto the 700-point scale once */
+if(!S.nmPts){ ["dive","climb"].forEach(k=>{ if(S.best[k]!=null) S.best[k]=Math.round(S.best[k]/10); (S.hist[k]||[]).forEach(h=>h.v=Math.round(h.v/10)); Object.values((S.nm||{})[k]||{}).forEach(d=>{ if(d&&d.m!=null) d.m=Math.round(d.m/10); }); }); S.nmPts=1; try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
 /* daily prompts follow one fixed rotation, so a prompt can't come back until every other prompt has had its turn.
    Each day gets one or two country prompts; Sky climb runs half a cycle ahead, so the two games never share a prompt on the same day. */
 let NM_ROT=null;
@@ -1100,17 +1160,17 @@ function nmDay(mode,d){
     const C=shuf(ks.filter(isC),r), O=shuf(ks.filter(k=>!isC(k)),r), days=Math.floor(ks.length/7); let o=0; NM_ROT=[];
     for(let j=0;j<days;j++){ const c=C.slice(Math.floor(j*C.length/days),Math.floor((j+1)*C.length/days)), day=c.concat(O.slice(o,o+7-c.length)); o+=7-c.length; NM_ROT.push(shuf(day,r)); } }
   const n=NM_ROT.length, j=(((d+(mode==="climb"?Math.floor(n/2):0))%n)+n)%n; return NM_ROT[j]; }
-function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`Today's done · ${d.m.toLocaleString()} m ${NM[k].verb}`:"Today's prompts are ready"; }
+function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`Today's done · ${d.m} / 700`:"Today's prompts are ready"; }
 function startNm(mode,opt={}){
-  const M=NM[mode]; S.nm=S.nm||{}; S.nm[mode]=S.nm[mode]||{};
+  const M=NM[mode], T=NM_TIERS[mode]; S.nm=S.nm||{}; S.nm[mode]=S.nm[mode]||{};
   const done=S.nm[mode][today()], daily=!opt.practice&&!done;
-  if(!opt.practice&&done) toast(`Today's ${M.name.toLowerCase()} is done. Here's a practice round.`);
+  if(!opt.practice&&done) toast(`Today's ${M.name} is done. Here's a practice round.`);
   const picks=(daily?nmDay(mode,dayIndex()):shuf([...LISTS.keys()]).slice(0,7)).map(i=>nmPrep(LISTS[i]));
   begin(mode,daily?`${M.name} · today`:`${M.name} · practice`);
   let i=0, res=[], m=0, locked=false, deadline=0, tmr=0;
   const TIME=25000;
-  function scene(){ const f=Math.min(1,m/7000);
-    return `<div class="nmscene ${mode}" style="--sc:${M.col(f)};--pos:${(mode==="dive"?f:1-f)*100}%"><div class="nmtrack"><i></i><span>${M.ic}</span></div><div class="nmdepth"><b>${m.toLocaleString()} m</b><span>${M.zone(m)}</span></div></div>`; }
+  function scene(){ const f=Math.min(1,m/700);
+    return `<div class="nmscene ${mode}" style="--sc:${M.col(f)};--pos:${(mode==="dive"?f:1-f)*100}%"><div class="nmtrack"><i></i><span>${M.ic}</span></div><div class="nmdepth"><b>${m}<small> / 700</small></b><span>${M.zone(m)}</span></div></div>`; }
   function ask(){ locked=false; const L=picks[i];
     stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7 · ${esc(M.tag)}</div><div class="nmq">${esc(L.p)}</div>
       <div class="nmtime"><i id="nmbar"></i></div>
@@ -1121,26 +1181,96 @@ function startNm(mode,opt={}){
     deadline=performance.now()+TIME; tmr=later(()=>reveal(null),TIME);
     const g=GS, step=()=>{ if(GS!==g||locked) return; const left=Math.max(0,deadline-performance.now()); const b=$('nmbar'); if(b){ b.style.width=(left/TIME*100)+"%"; b.classList.toggle("low",left<6000); } $('ginfo').textContent=Math.ceil(left/1000)+"s"; g.raf=requestAnimationFrame(step); }; g.raf=requestAnimationFrame(step);
     $('nmf').onsubmit=e=>{ e.preventDefault(); if(locked) return; const v=inp.value.trim(); if(!v) return;
-      const it=nmMatch(L,v); if(!it){ bad(); inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); $('nmmsg').textContent=`"${v}" isn't on the list. Try another.`; inp.select(); return; }
-      reveal(it,v); }; }
-  function reveal(it,typed){ if(locked) return; locked=true; clearTimeout(tmr); cancelAnimationFrame(GS.raf); $('ginfo').textContent=""; const L=picks[i];
-    let pts=0, lab="Time's up", em="⬛";
-    if(it){ [pts,lab,em]=M.tier(it.r,L.N); good(); } else bad();
-    const m0=m; m+=pts*10; res.push({p:L.p,a:it?nmCap(it.show):null,pts,em,lab});
-    const ex=M.hint(L).map(x=>nmCap(x.show)).join(", ");
+      const it=nmMatch(L,v); if(it) return reveal(it);
+      const sug=nmSuggest(L,v), msg=$('nmmsg');
+      if(sug.length){ msg.className="nmmsg sug"; msg.innerHTML=`<span>Did you mean…</span>${sug.map((s,j)=>`<button type="button" class="nmsug" data-j="${j}">${esc(nmCap(s.show))}</button>`).join("")}`;
+        msg.querySelectorAll(".nmsug").forEach(b=>b.onclick=()=>reveal(sug[+b.dataset.j])); return; }
+      bad(); inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); msg.className="nmmsg"; msg.textContent=`"${v}" isn't on the list. Try another.`; inp.select(); }; }
+  function reveal(it){ if(locked) return; locked=true; clearTimeout(tmr); cancelAnimationFrame(GS.raf); $('ginfo').textContent=""; const L=picks[i];
+    const ti=it?nmTierIx(mode,it.r,L.N):-1, [pts,lab,why,em]=it?T[ti]:[0,"Time's up","No answer this time","⬛"];
+    if(it) good(); else bad();
+    const m0=m; m+=pts; res.push({L,it,pts,em,lab,ti});
     stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7</div><div class="nmq">${esc(L.p)}</div>
-      <div class="nmres ${it?"ok":"no"}"><b>${it?esc(nmCap(it.show)):"No answer"}</b><span>${esc(lab)}</span><em>${it?`+${(pts*10).toLocaleString()} m ${M.verb}`:"+0 m"}</em></div>
-      <div class="nmex"><span>${esc(M.hintLabel)}:</span> ${esc(ex)}</div>
-      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button></div></div>`;
+      <div class="nmres ${it?"ok":"no"} t${ti}"><b>${it?esc(nmCap(it.show)):"No answer"}</b><span>${em} ${esc(lab)}${it?` · ${esc(why)}`:""}</span><em>+${pts}</em></div>
+      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button>
+      ${nmAll(L,it)}</div></div>`;
     __b.nm={mode,list:L,i,pts};
-    if(it){ const d=stage.querySelector(".nmdepth b"); if(d&&!reduceMotion){ const t0=performance.now(); const g=GS; const run=()=>{ if(GS!==g) return; const k=Math.min(1,(performance.now()-t0)/700); d.textContent=Math.round(m0+(m-m0)*k).toLocaleString()+" m"; if(k<1) requestAnimationFrame(run); }; run(); } }
+    if(it){ const d=stage.querySelector(".nmdepth b"); if(d&&!reduceMotion){ const t0=performance.now(), g=GS; const run=()=>{ if(GS!==g) return; const k=Math.min(1,(performance.now()-t0)/700); d.innerHTML=Math.round(m0+(m-m0)*k)+"<small> / 700</small>"; if(k<1) requestAnimationFrame(run); }; run(); } }
     $('nmnext').onclick=()=>{ i++; if(i<7) ask(); else done_(); }; }
+  /* every answer on the list, grouped by tier, best tier first; yours is highlighted */
+  function nmAll(L,it,open){ const g=T.map(()=>[]);
+    const order=mode==="dive"?[...L.items].reverse():L.items; order.forEach(x=>g[nmTierIx(mode,x.r,L.N)].push(x));
+    return `<details class="nmall"${open?" open":""}><summary>See all ${L.N} answers</summary>${g.map((xs,ti)=>xs.length?`<div class="nmgrp"><h5>${T[ti][3]} ${esc(T[ti][1])} <small>${T[ti][0]} pts · ${xs.length}</small></h5><p>${xs.map(x=>`<span${x===it?' class="me"':""}>${esc(nmCap(x.show))}</span>`).join("")}</p></div>`:"").join("")}</details>`; }
   function done_(){ const em=res.map(r=>r.em).join("");
     if(daily){ S.nm[mode][today()]={m,e:em}; const ks=Object.keys(S.nm[mode]).sort(); ks.slice(0,-60).forEach(k=>delete S.nm[mode][k]); save(); }
-    const share=`${M.name} ${M.ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m.toLocaleString()} m ${M.verb} · ${M.zone(m)}`;
-    const html=`<section class="card"><h3>Your answers</h3><div class="nmlist">${res.map(r=>`<div><span>${r.em}</span><p>${esc(r.p)}<b>${r.a?esc(r.a):"No answer"}</b></p><em>${r.pts?`+${(r.pts*10).toLocaleString()} m`:"0"}</em></div>`).join("")}</div></section>`;
+    const share=`${M.name} ${M.ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m} / 700 · ${M.zone(m)}`;
+    const html=`<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):"No answer"}</b><small>${esc(r.lab)}</small></p><em>+${r.pts}</em><i class="nmchev">›</i></summary>${nmAll(r.L,r.it,true).replace('<details class="nmall" open><summary>See all '+r.L.N+' answers</summary>','<div class="nmall">').replace(/<\/details>$/,"</div>")}</details>`).join("")}</div></section>`;
     finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true}); }
   ask();
+}
+
+/* ================= DAILY SUDOKU: classic 9×9, one puzzle a day ================= */
+/* bitmask solver with "fewest options first"; counts solutions up to 2 so every puzzle has exactly one answer */
+const DS_BOX=i=>Math.floor(Math.floor(i/9)/3)*3+Math.floor((i%9)/3);
+function dsSolve(g,limit,r){ const R=Array(9).fill(0),C=Array(9).fill(0),B=Array(9).fill(0);
+  for(let i=0;i<81;i++) if(g[i]){ const b=1<<g[i]; R[Math.floor(i/9)]|=b; C[i%9]|=b; B[DS_BOX(i)]|=b; }
+  let n=0;
+  (function go(){ let bi=-1,bm=0,bc=10;
+    for(let i=0;i<81;i++) if(!g[i]){ const m=~(R[Math.floor(i/9)]|C[i%9]|B[DS_BOX(i)])&0x3fe; let c=0; for(let x=m;x;x&=x-1) c++; if(c<bc){ bc=c; bi=i; bm=m; if(c<=1) break; } }
+    if(bi<0){ n++; return n>=limit; } if(!bc) return false;
+    let ds=[]; for(let v=1;v<=9;v++) if(bm&(1<<v)) ds.push(v); if(r) ds=shuf(ds,r);
+    const ro=Math.floor(bi/9),co=bi%9,bo=DS_BOX(bi);
+    for(const v of ds){ const b=1<<v; g[bi]=v; R[ro]|=b; C[co]|=b; B[bo]|=b; if(go()) return true; g[bi]=0; R[ro]&=~b; C[co]&=~b; B[bo]&=~b; }
+    return false; })();
+  return n; }
+const DS_LEVELS={easy:38,medium:31,hard:26};
+function dsLevel(d=new Date()){ const w=d.getDay(); return w===1||w===2?"easy":w===0||w===6?"hard":"medium"; }
+let DS_CACHE=null;
+function dsToday(){ const day=today(); if(DS_CACHE&&DS_CACHE.day===day) return DS_CACHE;
+  const r=seeded("globetrotter-daily-sudoku-"+day), sol=Array(81).fill(0); dsSolve(sol,1,r);
+  const p=sol.slice(), lvl=dsLevel(), target=DS_LEVELS[lvl];
+  for(const i of shuf([...Array(81).keys()],r)){ if(p.filter(Boolean).length<=target) break; const v=p[i]; p[i]=0; if(dsSolve(p.slice(),2)!==1) p[i]=v; }
+  return DS_CACHE={day,sol,p,lvl,clues:p.filter(Boolean).length}; }
+function dsStatus(){ S.ds=S.ds||{done:{}}; const P=dsToday(), d=S.ds.done[P.day], cap=P.lvl[0].toUpperCase()+P.lvl.slice(1);
+  return d!=null?`Today's done · ${fmtT(d)}`:S.ds.day===P.day&&S.ds.g?`Today's ${P.lvl} · in progress`:`Today's puzzle: ${cap}`; }
+function startDSudoku(){
+  S.ds=S.ds||{done:{}}; const P=dsToday(), done=S.ds.done[P.day]!=null;
+  const fresh=S.ds.day!==P.day||!S.ds.g||done;
+  const g=fresh?P.p.slice():S.ds.g.slice(), notes=fresh?Array(81).fill(0):(S.ds.n||Array(81).fill(0)).slice();
+  let errs=fresh?0:(S.ds.e||0), sel=g.findIndex(v=>!v), noting=false, won=false;
+  const cap=P.lvl[0].toUpperCase()+P.lvl.slice(1);
+  begin("dsudoku",`Daily sudoku · ${cap}`); clock(); if(!fresh&&S.ds.t) GS.t0-=S.ds.t;
+  __b.ds=P;
+  const store=()=>{ if(won) return; S.ds.day=P.day; S.ds.g=g; S.ds.n=notes; S.ds.e=errs; S.ds.t=GS?elapsed():S.ds.t; save(); };
+  const peers=i=>{ const r=Math.floor(i/9),c=i%9,b=DS_BOX(i),o=[]; for(let j=0;j<81;j++) if(j!==i&&(Math.floor(j/9)===r||j%9===c||DS_BOX(j)===b)) o.push(j); return o; };
+  const clash=i=>g[i]&&peers(i).some(j=>g[j]===g[i]);
+  function render(){ const sv=sel>=0?g[sel]:0, pe=sel>=0?new Set(peers(sel)):new Set();
+    stage.innerHTML=`<div class="ds ${won?"won":""}" id="dg">${g.map((v,i)=>{ const r=Math.floor(i/9),c=i%9;
+      const cls=[P.p[i]?"given":"", i===sel?"sel":v&&v===sv?"same":pe.has(i)?"peer":"", clash(i)?"bad":"", r===2||r===5?"rb":"", c===2||c===5?"cb":""].filter(Boolean).join(" ");
+      const inner=v?v:notes[i]?`<span class="dn">${[1,2,3,4,5,6,7,8,9].map(n=>`<i>${notes[i]&(1<<n)?n:""}</i>`).join("")}</span>`:"";
+      return `<button data-i="${i}" class="${cls}" aria-label="Row ${r+1} column ${c+1}${v?`: ${v}`:""}">${inner}</button>`; }).join("")}</div>
+      <div class="dspad" id="dp">${[1,2,3,4,5,6,7,8,9].map(v=>`<button data-v="${v}">${v}<small>${9-g.filter(x=>x===v).length||""}</small></button>`).join("")}</div>
+      <div class="dstools"><button id="dnote" class="btn ${noting?"go":"ghost"}" aria-pressed="${noting}">✏️ Notes ${noting?"on":"off"}</button><button id="derase" class="btn ghost">⌫ Erase</button></div>
+      <div class="gsub">${won?"Solved!":`${cap} · ${P.clues} clues · ${errs?`${errs} clash${errs>1?"es":""}`:"no clashes yet"}`}</div>`;
+    $('dg').addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b||won) return; e.preventDefault(); sel=+b.dataset.i; render(); });
+    $('dp').addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b) return; e.preventDefault(); put(+b.dataset.v); });
+    $('dnote').onclick=()=>{ noting=!noting; render(); };
+    $('derase').onclick=()=>put(0); }
+  function put(v){ if(won||sel<0||P.p[sel]) return;
+    if(noting&&v){ if(g[sel]) return; notes[sel]^=(1<<v); tone(500+v*40,.05,"sine",.04); store(); return render(); }
+    g[sel]=v; if(!v){ notes[sel]=0; store(); return render(); }
+    notes[sel]=0; peers(sel).forEach(j=>notes[j]&=~(1<<v));
+    if(clash(sel)){ errs++; bad(); } else tone(560+v*40,.07,"sine",.05);
+    if(g.every((x,i)=>x===P.sol[i])){ won=true; const t=elapsed(); S.ds.done[P.day]=t; S.ds.g=null; save(); render(); good();
+      const share=`Daily sudoku ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${cap}\n⏱️ ${fmtT(t)} · ${errs?`${errs} clash${errs>1?"es":""}`:"no clashes ✨"}`;
+      later(()=>finish("dsudoku",t,{sub:`${cap} · ${errs?`${errs} clash${errs>1?"es":""}`:"no clashes"}`, share, practice:false, daily:true, nextG:"sudoku", nextLabel:"Unlimited mini sudoku"}),1000); return; }
+    if(!g.includes(0)) toast("Something clashes. Look for red.");
+    else if(!clash(sel)){ const nx=g.findIndex((x,i)=>i>sel&&!x); if(nx>=0) sel=nx; }
+    store(); render(); }
+  window._dsKey=k=>{ if(/^[1-9]$/.test(k)) put(+k); else if(k==="Backspace"||k==="Delete"||k==="0") put(0); else if(k==="n"||k==="N"){ noting=!noting; render(); }
+    else if(k.startsWith("Arrow")&&sel>=0){ const d={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k], n=sel+d; if(n>=0&&n<81) { sel=n; render(); } } };
+  if(done){ toast("You solved today's puzzle. Here it is again for fun; your time is saved."); }
+  render();
 }
 
 /* ================= RESULTS ================= */
@@ -1157,14 +1287,14 @@ function finish(game,v,o={}){
   const wkDone=WORKOUT.every(x=>(S.work[today()]||{})[x]!=null), wkNext=WORKOUT.find(x=>(S.work[today()]||{})[x]==null);
   const cheer=o.archive?(game==="mini"?(o.noRecord?"Solved with help. Try one clean tomorrow!":(r.better&&r.prev!=null?`New best time! Old best: ${g.fmt(r.prev)}`:r.prev!=null?`Your best: ${g.fmt(r.prev)}`:"Nice solve!")):(v===0?"Perfect: no mistakes!":"Solved!")):r.prev==null?"First score. Now beat it!":r.better?`New best! Old best: ${g.fmt(r.prev)}`:`Your best: ${g.fmt(r.prev)}`;
   show(`${bar(g.name)}
-  <section class="card center" style="--c:var(--${g.cat})"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">${esc(g.name)}</div>
+  <section class="card center" style="--c:var(${g.col||"--"+g.cat})"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">${esc(g.name)}</div>
     <div class="big">${esc(g.fmt(v))}</div><p class="muted">${esc(o.sub||"")}</p>${o.note?`<p class="muted">${esc(o.note)}</p>`:""}<p class="cheer" style="${r.better?"":"color:var(--ink-2)"}">${esc(cheer)}</p></section>
   ${o.html||""}
-  ${(S.hist[key]||[]).length>1?`<section class="card" style="--c:var(--${g.cat})"><h3>Your trend</h3>${bigChart(S.hist[key],g)}<p class="muted">${g.hi?"Higher is better.":"Lower is better."} ${S.hist[key].length} games played.</p></section>`:""}
+  ${(S.hist[key]||[]).length>1?`<section class="card" style="--c:var(${g.col||"--"+g.cat})"><h3>Your trend</h3>${bigChart(S.hist[key],g)}<p class="muted">${g.hi?"Higher is better.":"Lower is better."} ${S.hist[key].length} games played.</p></section>`:""}
   ${WK&&wkNext?`<button class="btn go wide" data-act="wk">Workout: next is ${esc(GAMES[wkNext].name)}</button>`:""}
   ${WK&&wkDone&&game===WK?`<section class="card center"><p class="cheer">Daily workout complete!</p><p class="muted">${dayStreak()}-day streak. Come back tomorrow.</p></section>`:""}
   ${o.share?`<div class="sharerow"><button class="btn go" id="shareB">Share result</button><button class="btn" id="copyB">Copy</button></div>`:""}
-  ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="${o.practice?"nmp":"play"}" data-g="${game}">${o.practice?"Practice round":o.daily?"Practice another":"Play again"}</button>`}
+  ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="${o.practice?"nmp":"play"}" data-g="${o.nextG||game}">${o.nextLabel||(o.practice?"Practice round":o.daily?"Practice another":"Play again")}</button>`}
   <button class="btn ghost wide" data-act="home">Home</button>`);
   if(o.share){ $('shareB').onclick=()=>shareText(o.share,$('shareB'));
     $('copyB').onclick=async()=>{ const t=o.share+"\n"+location.origin+location.pathname, b=$('copyB');
@@ -1186,10 +1316,10 @@ function home(){
   <div class="brand">${LOGO}<h1>Games</h1>
     <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="./" aria-current="page">Games</a></nav></div>
   <button class="workout" data-act="wk"><b>${wdone===3?"Workout done ✓":"Daily workout"}</b><span>${wdone===3?`Nice. ${st}-day streak. Replay any game below.`:"Three games, about four minutes: memory, speed, logic."}</span>
-    <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Daily sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
+    <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="word"?esc(wordStatus(k)):g.cat==="nm"?esc(nmStatus(k))+(b.v!=null?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="word"||g.cat==="nm"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
@@ -1202,7 +1332,7 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();
@@ -1214,9 +1344,10 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
   if(a==="lit"){ S.lit=+b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
   if(a==="sound"){ S.sound=!S.sound; save(); return home(); }
-  if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; save(); return home(); }
+  if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; S.nmPts=1; save(); return home(); }
 });
 document.addEventListener("keydown",e=>{ if(play.hidden) return; if(e.key==="Escape"){ end(); home(); return; }
+  if(GS&&GS.game==="dsudoku"&&window._dsKey&&!e.metaKey&&!e.ctrlKey){ if(/^[0-9nN]$/.test(e.key)||["Backspace","Delete","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._dsKey(e.key); } return; }
   if(GS&&GS.game==="mini"&&window._xwKey&&!e.metaKey&&!e.ctrlKey){ if(/^[a-z]$/i.test(e.key)||["Backspace","Tab","Enter"," ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._xwKey(e.key); } return; }
   if(GS&&GS.game==="num"&&window._numKey){ if(/^[0-9]$/.test(e.key)) window._numKey(e.key); else if(e.key==="Backspace") window._numKey("del"); else if(e.key==="Enter") window._numKey("ok"); } });
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") save(); });
