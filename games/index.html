@@ -288,6 +288,69 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .chart2 polyline{fill:none;stroke:var(--c);stroke-width:2.5;stroke-linejoin:round}
 .chart2 circle{fill:var(--c)}
 .chart2 text{font:10px var(--f-body);fill:var(--ink-3)}
+/* ================= word puzzles ================= */
+:root{--xblk:#10233a;--wd:#d9466f;--t0:#9fdcbc;--t1:#f8bf8f;--t2:#9cc9f3;--t3:#c9b0f2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--xblk:#03070b;--wd:#ff6f94;--t0:#5fb98e;--t1:#e39a62;--t2:#5d9bd6;--t3:#9a7bd6}}
+:root[data-theme="dark"]{--xblk:#03070b;--wd:#ff6f94;--t0:#5fb98e;--t1:#e39a62;--t2:#5d9bd6;--t3:#9a7bd6}
+.games .game:nth-child(2):last-child{grid-column:auto}
+.xwwrap{display:flex;flex-direction:column;align-items:center;width:100%;height:100%;gap:8px}
+.xwwrap .sp{flex:1;min-height:4px}
+.xw{display:grid;grid-template-columns:repeat(5,1fr);width:min(100%,46vh,380px);border:2px solid var(--xblk);background:var(--xblk);gap:1px;flex:none}
+.xc{position:relative;aspect-ratio:1;border:0;background:var(--surface);padding:0;display:grid;place-items:center;color:var(--ink);touch-action:manipulation}
+.xc.blk{background:var(--xblk)}
+.xc .n{position:absolute;top:2px;left:4px;font:700 11px var(--f-body);color:var(--ink-2)}
+.xc .l{font-family:var(--f-body);font-weight:700;font-size:clamp(22px,7.4vw,34px);text-transform:uppercase}
+.xc.word{background:color-mix(in srgb,var(--wd) 16%,var(--surface))}
+.xc.sel{background:color-mix(in srgb,var(--sun) 70%,var(--surface))}
+.xc.wrong .l{color:var(--bad)}
+.xc.wrong::after{content:"";position:absolute;inset:auto 0 0 auto;width:0;height:0;border-left:10px solid transparent;border-bottom:10px solid var(--bad)}
+.xc.rev::after{content:"";position:absolute;top:0;right:0;width:0;height:0;border-left:10px solid transparent;border-top:10px solid var(--wd)}
+.xc.won{background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.xwtools{display:flex;gap:6px;align-items:center;min-height:36px;flex-wrap:wrap;justify-content:center}
+.xwtools button{min-height:34px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:13px;color:var(--ink-2);padding:0 12px}
+.xwtools .xlab{font-size:13px;font-weight:800;color:var(--ink-2)}
+.xwtools .xdone{font-family:var(--f-display);font-weight:800;color:var(--good);font-size:17px}
+.xwclue{display:grid;grid-template-columns:40px 1fr 40px;align-items:stretch;width:100%;background:color-mix(in srgb,var(--wd) 16%,var(--surface));border-radius:14px;min-height:58px;touch-action:manipulation}
+.xwclue .xarr{border:0;background:transparent;font-size:28px;font-weight:700;color:var(--ink-2)}
+.xct{display:flex;align-items:center;gap:8px;font-size:16px;line-height:1.3;padding:6px 2px;cursor:pointer}
+.xct b{font-family:var(--f-display);font-weight:800;color:var(--wd);flex:none}
+.kb{display:grid;gap:6px;width:100%;touch-action:manipulation}
+.kb div{display:flex;gap:5px;justify-content:center}
+.kb button{flex:1;max-width:44px;height:clamp(44px,6.6vh,56px);border:0;border-radius:8px;background:var(--surface);box-shadow:0 2px 0 var(--line);font:700 17px var(--f-body);color:var(--ink);padding:0}
+.kb button.bk{max-width:66px;flex:1.5;font-size:19px}
+.kb button.down{transform:translateY(2px);box-shadow:none;background:var(--surface-2)}
+.gpwrap{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:420px}
+.gphead{font-size:15px;color:var(--ink-2);min-height:20px}
+.gpsolved{display:grid;gap:8px;width:100%}
+.gpbar{border-radius:14px;padding:12px 10px;text-align:center;display:grid;gap:2px;color:#13202e;animation:pop .3s ease-out}
+.gpbar b{font-family:var(--f-display);font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:.02em}
+.gpbar span{font-size:14px;font-weight:600;text-transform:uppercase}
+.gpbar.t0{background:var(--t0)}.gpbar.t1{background:var(--t1)}.gpbar.t2{background:var(--t2)}.gpbar.t3{background:var(--t3)}
+@keyframes pop{from{transform:scale(.92);opacity:.3}}
+.gpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.gpw{height:clamp(64px,10vh,80px);border:0;border-radius:12px;background:color-mix(in srgb,var(--ink-3) 22%,var(--surface));font:800 15px var(--f-body);color:var(--ink);text-transform:uppercase;padding:0 2px;word-break:break-word;line-height:1.1;transition:background .12s,transform .12s}
+.gpw.l{font-size:13px}.gpw.xl{font-size:11px;letter-spacing:-.02em}
+.gpw.on{background:var(--ink);color:var(--surface)}
+.gpw.hop{animation:hop .35s ease-out}
+.gpw.shake{animation:shake .35s}
+@keyframes hop{40%{transform:translateY(-8px)}}
+.gpmist{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink-2)}
+.gpmist i{width:12px;height:12px;border-radius:50%;background:var(--ink-2)}
+.gpmist i.off{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line)}
+.gpbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.gpbtns .btn[disabled]{opacity:.4}
+.gpout{display:grid;gap:10px;justify-items:center;width:100%;text-align:center;padding-top:6px}
+.gpout b{font-family:var(--f-display);font-size:20px}
+.gpout span{font-size:14px;color:var(--ink-2)}
+.gpgridtxt{font-size:22px;line-height:1.2;letter-spacing:2px}
+.arch{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.arch button{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 6px;display:grid;gap:2px;text-align:center}
+.arch b{font-family:var(--f-display);font-size:17px}
+.arch span{font-size:11.5px;color:var(--ink-2)}
+.arch button.ok{border-color:color-mix(in srgb,var(--good) 55%,var(--line));background:color-mix(in srgb,var(--good) 10%,var(--surface))}
+.arch button.lost{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.arch button.today{box-shadow:0 0 0 2.5px var(--wd)}
+.sharetxt{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:8px;font:14px var(--f-body);background:var(--surface);color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -378,7 +441,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.03-2240";
+const APP_VERSION="2026.11.07-1814";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -393,7 +456,7 @@ function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++)
   return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
 
 /* ---------- the games ---------- */
-const CATS=[["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
+const CATS=[["word","Word puzzles","A new one every day","--wd"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
 const GAMES={
  seq:{cat:"mem", ic:"🔲", name:"Sequence memory", desc:"Tiles light up in order. Repeat the pattern; it grows each round.", hi:true, fmt:v=>`Level ${v}`},
  num:{cat:"mem", ic:"🔢", name:"Number memory", desc:"A number flashes. Type it back. One more digit each round.", hi:true, fmt:v=>`${v} digits`},
@@ -403,12 +466,14 @@ const GAMES={
  schulte:{cat:"spd", ic:"🎯", name:"Number hunt", desc:"Tap 1 to 25 in order as fast as you can.", hi:false, fmt:v=>fmtT(v)},
  count:{cat:"log", ic:"🧮", name:"Countdown", desc:"Hit the target with six numbers and + − × ÷.", hi:false, fmt:v=>fmtT(v)},
  sudoku:{cat:"log", ic:"🧩", name:"Mini sudoku", desc:"6×6: every row, column and box gets 1 to 6. New daily puzzle.", hi:false, fmt:v=>fmtT(v)},
+ mini:{cat:"word", ic:"✏️", name:"Mini crossword", desc:"A quick 5×5 crossword. New puzzle every day.", hi:false, fmt:v=>fmtT(v)},
+ groups:{cat:"word", ic:"🗂️", name:"Groups", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
 const WORKOUT=["num","schulte","sudoku"];
 
 /* ---------- saved progress ---------- */
-const FRESH=()=>({best:{}, hist:{}, days:[], sound:true, work:{}, plays:0, sud:"easy", lit:5});
+const FRESH=()=>({best:{}, hist:{}, days:[], sound:true, work:{}, plays:0, sud:"easy", lit:5, xw:{done:{},prog:{}}, gp:{done:{}}});
 let S=FRESH();
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
@@ -647,6 +712,176 @@ function startLights(){
     if(!on.some(Boolean)){ good(); later(()=>finish("lights",elapsed(),{key, sub:`${moves} moves (best possible: ${presses} or fewer).`}),700); } });
 }
 
+/* ================= WORD PUZZLES: original puzzles written for this app =================
+   MINIS: 5×5 crosswords. g = rows ("#" is a black square); c = a clue for every answer.
+   GROUPS: 16 words in 4 groups of 4, listed easiest (1) to trickiest (4).
+   One of each is the daily puzzle; all of them stay playable from the archive. Add more anywhere in the lists. */
+const MINIS=[
+ {g:["#met#","board","anger","delay","#yet#"], c:{MET:"Came across",BOARD:"Get on, as a plane",ANGER:"Rage",DELAY:"Word no traveler wants to see on the departures screen",YET:"So far",BAD:"Opposite of good",MONEY:"What an ATM hands out",EAGLE:"Two under par, in golf",TREAT:"Halloween handout",DRY:"Like a desert, or a deadpan wit"}},
+ {g:["#put#","final","alike","noted","#ten#"], c:{PUT:"Placed",FINAL:"Last exam of the term",ALIKE:"Similar",NOTED:"Well-known",TEN:"A perfect score, often",FAN:"Ceiling spinner",PILOT:"First episode of a TV series",UNITE:"Come together",TAKEN:"Already spoken for",LED:"Was out in front"}},
+ {g:["#liar","manga","under","scene","text#"], c:{LIAR:"Pinocchio, famously",MANGA:"Japanese comics",UNDER:"Beneath",SCENE:"Part of an act in a play",TEXT:"Message on a phone",MUST:"Have-to item",LANCE:"Jousting weapon",INDEX:"List at the back of a book",AGENT:"Secret ___ (spy)",RARE:"Like a steak with a red center"}},
+ {g:["one##","went#","extra","#teen","##red"], c:{ONE:"Single",WENT:"Left",EXTRA:"Background actor in a crowd scene",TEEN:"Someone aged 13 to 19",RED:"Color of a fire truck",OWE:"Be in debt",NEXT:"\"Who's ___?\"",ENTER:"Keyboard key that starts a new line",TREE:"Oak or maple",AND:"Plus"}},
+ {g:["own##","deep#","dream","#edge","##set"], c:{OWN:"Possess",DEEP:"Like the end of the pool with the diving board",DREAM:"Something you have while asleep",EDGE:"A cliff has a steep one",SET:"Part of a tennis match",ODD:"Strange",WERE:"\"If I ___ you...\"",NEEDS:"Requires",PAGE:"One side of a sheet in a book",MET:"Greeted at the airport, say"}},
+ {g:["##how","#soda","study","pass#","are##"], c:{HOW:"\"___ are you?\"",SODA:"Fizzy drink",STUDY:"Hit the books",PASS:"Hall ___ (school slip)",ARE:"\"You ___ here\" (map words)",SPA:"Place for a massage",STAR:"Twinkler in the night sky",HOUSE:"Home",ODDS:"Bookmaker's numbers",WAY:"Path"}},
+ {g:["##for","#lane","could","ugly#","pot##"], c:{FOR:"In favor of",LANE:"Bowling alley strip",COULD:"Was able to",UGLY:"Far from pretty",POT:"Stew holder",CUP:"World ___ (soccer tournament)",LOGO:"Brand symbol",FAULT:"Serve that misses, in tennis",ONLY:"Sole",RED:"Seeing ___ (furious)"}},
+ {g:["##for","#have","lived","iron#","per##"], c:{FOR:"Pro",HAVE:"Own",LIVED:"Resided",IRON:"Wrinkle remover",PER:"For each",LIP:"Part of the mouth",HIRE:"Bring on staff",FAVOR:"Party bag goodie",OVEN:"Pizza cooker",RED:"Like a cardinal's feathers"}},
+ {g:["#arm#","proof","argue","round","#wet#"], c:{ARM:"Limb",PROOF:"Evidence",ARGUE:"Debate",ROUND:"Shaped like a ball",WET:"Damp",PAR:"Golf standard",ARROW:"A bow's partner",ROGUE:"Scoundrel",MOUNT:"Climb onto, as a horse",FED:"Gave dinner to"}},
+ {g:["#met#","pearl","argue","yield","#try#"], c:{MET:"Encountered",PEARL:"Gem from an oyster",ARGUE:"Bicker",YIELD:"Give way",TRY:"Attempt",PAY:"Salary",MERIT:"Deserve",EAGER:"Keen",TRULY:"\"Yours ___\" (letter sign-off)",LED:"Headed the parade"}},
+ {g:["##who","#said","third","rose#","yet##"], c:{WHO:"\"___'s there?\"",SAID:"Spoke",THIRD:"Bronze medal place",ROSE:"Thorny flower",YET:"Not ___ (still to come)",TRY:"Score in rugby",SHOE:"Sneaker, for one",WAIST:"Where a belt goes",HIRE:"Employ",ODD:"Like the number 7"}},
+ {g:["act##","root#","motor","#lane","##led"], c:{ACT:"Perform on stage",ROOT:"Carrot part you eat",MOTOR:"Engine",LANE:"Swimming pool division",LED:"Conducted",ARM:"Sleeve filler",COOL:"Chill",TOTAL:"Sum",TONE:"Quality of a voice",RED:"Ruby's color"}},
+ {g:["##who","#then","share","pale#","ate##"], c:{WHO:"Doctor ___ (time-traveling TV hero)",THEN:"Back ___ (in those days)",SHARE:"Split with others",PALE:"Light in color",ATE:"Had dinner",SPA:"Resort with mud baths",THAT:"Not this",WHALE:"Ocean giant",HERE:"\"Present!\" at roll call",ONE:"Uno"}},
+ {g:["#cab#","polar","arise","naked","#led#"], c:{CAB:"Taxi",POLAR:"Kind of bear or ice cap",ARISE:"Get up",NAKED:"___ eye (unaided vision)",LED:"Guided",PAN:"Sweep a camera sideways",CORAL:"Reef builder",ALIKE:"Like two peas in a pod",BASED:"___ on a true story",RED:"Stop light color"}}
+];
+const GROUPS=[
+ [["Kitchen tools","WHISK LADLE SPATULA GRATER"],["Planets","VENUS SATURN NEPTUNE MARS"],["Chocolate ___","CHIP BAR MILK CAKE"],["Start with a body part","ARMY LEGEND SHINE EARTH"]],
+ [["Dog breeds","POODLE BEAGLE PUG HUSKY"],["Card games","POKER BRIDGE SNAP RUMMY"],["___bell","DOOR BLUE DUMB BAR"],["Hidden animals","SCATTER BEARD PLANT SCOWL"]],
+ [["Breakfast foods","PANCAKE WAFFLE BAGEL MUFFIN"],["Ways to cook an egg","POACHED SCRAMBLED FRIED BOILED"],["Steal","SWIPE PINCH LIFT NICK"],["___cake","CUP CHEESE SPONGE CARROT"]],
+ [["Colors","TEAL IVORY LILAC CORAL"],["Landforms","CANYON MESA VALLEY DELTA"],["Greek letters","ALPHA BETA GAMMA OMEGA"],["Abandon","MAROON STRAND DESERT DITCH"]],
+ [["Precipitation","RAIN SNOW HAIL SLEET"],["Royalty","KING QUEEN PRINCE DUKE"],["Chess pieces","KNIGHT BISHOP ROOK PAWN"],["___storm","BRAIN THUNDER FIRE SAND"]],
+ [["Coffee drinks","LATTE MOCHA ESPRESSO CAPPUCCINO"],["Shades of brown","TAN BEIGE KHAKI TAUPE"],["Units of time","SECOND HOUR DECADE CENTURY"],["Very small","TEENY PUNY MINUTE WEE"]],
+ [["Sea creatures","SHARK WHALE DOLPHIN SQUID"],["Card suits","HEART SPADE CLUB DIAMOND"],["Golf terms","EAGLE BIRDIE BOGEY PUTT"],["Things with shells","TURTLE SNAIL TACO EGG"]],
+ [["Instruments","GUITAR VIOLIN TRUMPET FLUTE"],["Parts of a tree","BARK BRANCH LEAF TRUNK"],["Dog sounds","WOOF YAP HOWL GROWL"],["___ beer","ROOT GINGER CRAFT DRAFT"]],
+ [["Vegetables","CARROT BROCCOLI CELERY SPINACH"],["Car parts","WHEEL HORN TRUNK MIRROR"],["Animals with horns","RHINO GOAT RAM BULL"],["___stick","CANDLE LIP JOY DRUM"]],
+ [["Shapes","CIRCLE SQUARE TRIANGLE OVAL"],["School subjects","MATH HISTORY SCIENCE MUSIC"],["Things with screens","PHONE TV LAPTOP TABLET"],["___work","HOME FRAME TEAM ART"]],
+ [["Insects","BEETLE MOTH GNAT LOCUST"],["Things that sting","BEE WASP NETTLE SCORPION"],["Sports","SOCCER TENNIS CRICKET RUGBY"],["___ market","STOCK SUPER BLACK FLEA"]],
+ [["Pasta","PENNE LINGUINE RAVIOLI FUSILLI"],["Italian cities","ROME VENICE MILAN NAPLES"],["___ pie","APPLE PORK HUMBLE CUTIE"],["Hidden numbers","OFTEN CANINE LONELY WEIGHT"]],
+ [["Birds","ROBIN SPARROW PARROT FINCH"],["Archery","ARROW BOW TARGET BULLSEYE"],["Shake","TREMBLE SHIVER QUAKE QUIVER"],["___bar","CROW SAND SNACK CANDY"]],
+ [["Months","JUNE AUGUST APRIL JULY"],["Walk","STROLL HIKE AMBLE MARCH"],["Could be","CAN MIGHT MUST MAY"],["___fish","SWORD CAT STAR JELLY"]]
+];
+
+
+/* ================= WORD PUZZLES: mini crossword and groups ================= */
+const DAY0=new Date(2026,0,1);
+const dayIndex=()=>{ const n=new Date(); return Math.round((new Date(n.getFullYear(),n.getMonth(),n.getDate())-DAY0)/864e5); };
+const dailyOf=list=>((dayIndex()%list.length)+list.length)%list.length;
+function shareText(text,btn){ const t=text+"\n"+location.origin+location.pathname;
+  (async()=>{ try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
+    try{ await navigator.clipboard.writeText(t); btn.textContent="Copied to clipboard"; }
+    catch(e){ btn.insertAdjacentHTML("afterend",`<textarea class="sharetxt" readonly rows="5">${esc(t)}</textarea>`); btn.remove(); const ta=document.querySelector(".sharetxt"); ta.focus(); ta.select(); } })(); }
+
+/* ---------- mini crossword ---------- */
+function parseMini(P){
+  const g=P.g.map(r=>r.toUpperCase()), open=(r,c)=>r>=0&&r<5&&c>=0&&c<5&&g[r][c]!=="#";
+  const num=Array(25).fill(0), words=[], cw=[...Array(25)].map(()=>({})); let n=0;
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++){ if(!open(r,c)) continue;
+    const sa=!open(r,c-1)&&open(r,c+1), sd=!open(r-1,c)&&open(r+1,c); if(sa||sd) num[r*5+c]=++n;
+    if(sa){ const cells=[]; for(let k=c;open(r,k);k++) cells.push(r*5+k); words.push({dir:"a",num:n,cells}); }
+    if(sd){ const cells=[]; for(let k=r;open(k,c);k++) cells.push(k*5+c); words.push({dir:"d",num:n,cells}); } }
+  words.sort((x,y)=>x.dir===y.dir?x.num-y.num:x.dir==="a"?-1:1);
+  words.forEach((w,k)=>{ w.ans=w.cells.map(i=>g[Math.floor(i/5)][i%5]).join(""); w.clue=P.c[w.ans]; w.cells.forEach(i=>cw[i][w.dir]=k); });
+  const sol=[...Array(25)].map((_,i)=>open(Math.floor(i/5),i%5)?g[Math.floor(i/5)][i%5]:null);
+  return {num,words,cw,sol}; }
+function startMini(opt={}){
+  const id=opt.id!=null?opt.id:dailyOf(MINIS), daily=opt.id==null||opt.id===dailyOf(MINIS), X=parseMini(MINIS[id]);
+  begin("mini",`Mini crossword #${id+1}`);
+  S.xw=S.xw||{done:{},prog:{}}; const saved=S.xw.prog[id], prev=S.xw.done[id];
+  const fill=saved?saved.f.split(","):Array(25).fill(""), wrong=new Set(), rev=new Set(saved&&saved.r?saved.r:[]);
+  let sel=X.words[0].cells[0], dir="a", won=!!prev, menu=null;
+  if(prev) X.sol.forEach((L,i)=>{ if(L) fill[i]=L; });
+  clock(); if(saved) GS.t0-=saved.ms; if(prev){ cancelAnimationFrame(GS.raf); $('ginfo').textContent=fmtT(prev.t); }
+  const word=()=>X.words[X.cw[sel][dir]];
+  stage.innerHTML=`<div class="xwwrap"><div class="xw" id="xg">${X.sol.map((L,i)=>L?`<button class="xc" data-i="${i}">${X.num[i]?`<span class="n">${X.num[i]}</span>`:""}<span class="l"></span></button>`:`<span class="xc blk"></span>`).join("")}</div>
+    <div class="xwtools" id="xt"></div><div class="sp"></div>
+    <div class="xwclue" id="xcb"><button class="xarr" data-d="-1" aria-label="Previous clue">‹</button><div class="xct" id="xct" role="button" tabindex="0" aria-label="Switch direction"></div><button class="xarr" data-d="1" aria-label="Next clue">›</button></div>
+    <div class="kb" id="kb">${["QWERTYUIOP","ASDFGHJKL","ZXCVBNM<"].map(r=>`<div>${[...r].map(k=>`<button data-k="${k}" class="${k==="<"?"bk":""}" aria-label="${k==="<"?"Delete":k}">${k==="<"?"⌫":k}</button>`).join("")}</div>`).join("")}</div></div>`;
+  const cells=[...stage.querySelectorAll("#xg .xc")], byI={}; cells.forEach(b=>{ if(b.dataset.i) byI[b.dataset.i]=b; });
+  function paint(){ const w=word(), inW=new Set(w.cells);
+    for(const i in byI){ const b=byI[i], k=+i; b.querySelector(".l").textContent=fill[k]||"";
+      b.className="xc"+(k===sel?" sel":inW.has(k)?" word":"")+(wrong.has(k)?" wrong":"")+(rev.has(k)?" rev":"")+(won?" won":""); }
+    $('xct').innerHTML=`<b>${w.num}${w.dir==="a"?"A":"D"}</b> ${esc(w.clue)}`;
+    $('xt').innerHTML=won?`<span class="xdone">${prev?"Solved":"Solved!"}</span>`:menu?`<span class="xlab">${menu==="chk"?"Check":"Reveal"}:</span>${["Square","Word","Puzzle"].map(x=>`<button data-m="${x}">${x}</button>`).join("")}<button data-m="x" aria-label="Close">✕</button>`:`<button data-m="chk">Check</button><button data-m="rev">Reveal</button>`; }
+  const store=()=>{ if(won) return; S.xw.prog[id]={f:fill.join(","),ms:elapsed(),r:[...rev]}; save(); };
+  function next(){ const w=word(), pos=w.cells.indexOf(sel), empty=i=>!fill[i];
+    const after=w.cells.slice(pos+1).find(empty); if(after!=null){ sel=after; return; }
+    const before=w.cells.slice(0,pos).find(empty); if(before!=null){ sel=before; return; }
+    const k=X.cw[sel][dir]; for(let s=1;s<=X.words.length;s++){ const nw=X.words[(k+s)%X.words.length], e=nw.cells.find(empty); if(e!=null){ sel=e; dir=nw.dir; return; } }
+    if(pos<w.cells.length-1) sel=w.cells[pos+1]; }
+  function type(L){ if(won) return; if(rev.has(sel)){ next(); return paint(); } fill[sel]=L; wrong.delete(sel); tone(520+L.charCodeAt(0)*4,.05,"sine",.035); next(); paint(); store(); done(); }
+  function back(){ if(won) return; const w=word(), pos=w.cells.indexOf(sel);
+    if(fill[sel]&&!rev.has(sel)){ fill[sel]=""; wrong.delete(sel); }
+    else if(pos>0){ sel=w.cells[pos-1]; if(!rev.has(sel)){ fill[sel]=""; wrong.delete(sel); } }
+    paint(); store(); }
+  function jump(d){ const k=X.cw[sel][dir], nw=X.words[(k+d+X.words.length)%X.words.length]; dir=nw.dir; sel=nw.cells.find(i=>!fill[i])??nw.cells[0]; paint(); }
+  function done(){ if(fill.some((L,i)=>X.sol[i]&&!L)) return;
+    if(fill.every((L,i)=>!X.sol[i]||L===X.sol[i])){ won=true; cancelAnimationFrame(GS.raf); const t=elapsed(); delete S.xw.prog[id];
+      if(!prev) S.xw.done[id]={t,rev:rev.size,d:today()}; save(); paint(); good();
+      const clean=!rev.size;
+      later(()=>finish("mini",t,{noRecord:!clean, sub:`Puzzle #${id+1}${daily?" (today's)":""}${clean?"":` · ${rev.size} square${rev.size>1?"s":""} revealed`}`, archive:true,
+        share:`Mini crossword #${id+1}\n✅ Solved in ${fmtT(t)}${clean?"":` · ${rev.size} revealed`}`}),1100); }
+    else toast("Not quite. Something's off."); }
+  function act(m){ if(m==="chk"||m==="rev"){ menu=m; return paint(); } if(m==="x"){ menu=null; return paint(); }
+    const set=m==="Square"?[sel]:m==="Word"?word().cells:X.sol.map((L,i)=>L?i:-1).filter(i=>i>=0);
+    if(menu==="chk"){ let n=0; set.forEach(i=>{ if(fill[i]&&fill[i]!==X.sol[i]){ wrong.add(i); n++; } }); n?bad():toast(set.some(i=>!fill[i])?"No mistakes so far":"All correct"); }
+    else { set.forEach(i=>{ if(fill[i]!==X.sol[i]){ fill[i]=X.sol[i]; rev.add(i); wrong.delete(i); } }); store(); }
+    menu=null; paint(); done(); }
+  $('xg').addEventListener("pointerdown",e=>{ const b=e.target.closest(".xc[data-i]"); if(!b) return; e.preventDefault(); const i=+b.dataset.i;
+    if(i===sel){ const o=dir==="a"?"d":"a"; if(X.cw[i][o]!=null) dir=o; } else { sel=i; if(X.cw[i][dir]==null) dir=dir==="a"?"d":"a"; } paint(); });
+  $('kb').addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b) return; e.preventDefault(); b.classList.add("down"); setTimeout(()=>b.classList.remove("down"),90); b.dataset.k==="<"?back():type(b.dataset.k); });
+  $('xcb').addEventListener("pointerdown",e=>{ const a=e.target.closest(".xarr"); e.preventDefault(); if(a) return jump(+a.dataset.d); const o=dir==="a"?"d":"a"; if(X.cw[sel][o]!=null){ dir=o; paint(); } });
+  $('xt').addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) act(b.dataset.m); });
+  window._xwKey=k=>{ if(/^[a-z]$/i.test(k)) type(k.toUpperCase()); else if(k==="Backspace") back(); else if(k==="Tab"||k==="Enter") jump(1); else if(k===" "){ const o=dir==="a"?"d":"a"; if(X.cw[sel][o]!=null){ dir=o; paint(); } }
+    else if(k.startsWith("Arrow")){ const r=Math.floor(sel/5), c=sel%5, [dr,dc]={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[k], nd=dc?"a":"d";
+      if(dir!==nd&&X.cw[sel][nd]!=null){ dir=nd; return paint(); } let rr=r+dr, cc=c+dc; while(rr>=0&&rr<5&&cc>=0&&cc<5&&!X.sol[rr*5+cc]){ rr+=dr; cc+=dc; } if(rr>=0&&rr<5&&cc>=0&&cc<5){ sel=rr*5+cc; if(X.cw[sel][dir]==null) dir=nd; paint(); } } };
+  __b.mini=X; paint();
+}
+
+/* ---------- groups: find four groups of four ---------- */
+const GP_EM=["🟩","🟧","🟦","🟪"];
+function startGroups(opt={}){
+  const id=opt.id!=null?opt.id:dailyOf(GROUPS), daily=opt.id==null||opt.id===dailyOf(GROUPS);
+  const groups=GROUPS[id].map(([name,ws],k)=>({k,name,words:ws.split(" ")}));
+  begin("groups",`Groups #${id+1}`); S.gp=S.gp||{done:{}};
+  let left=shuf(groups.flatMap(g=>g.words)), solved=[], sel=new Set(), mistakes=0, guesses=[], over=false, busy=false;
+  const prev=S.gp.done[id];
+  function render(){
+    stage.innerHTML=`<div class="gpwrap"><div class="gphead">${over?"":"Make four groups of four."}</div>
+      <div class="gpsolved">${solved.map(g=>`<div class="gpbar t${g.k}"><b>${esc(g.name)}</b><span>${g.words.map(esc).join(", ")}</span></div>`).join("")}</div>
+      ${left.length?`<div class="gpgrid" id="gg">${left.map(w=>`<button class="gpw${sel.has(w)?" on":""}${w.length>8?" xl":w.length>6?" l":""}" data-w="${w}">${w}</button>`).join("")}</div>`:""}
+      ${over?"":`<div class="gpmist">Mistakes left: ${[0,1,2,3].map(k=>`<i class="${k<4-mistakes?"":"off"}"></i>`).join("")}</div>
+      <div class="gpbtns"><button class="btn ghost small" id="gsh">Shuffle</button><button class="btn ghost small" id="gde" ${sel.size?"":"disabled"}>Deselect all</button><button class="btn small" id="gsu" ${sel.size===4?"":"disabled"}>Submit</button></div>`}
+      <div id="gpend"></div></div>`;
+    if(over) return;
+    $('gg')&&$('gg').addEventListener("pointerdown",e=>{ const b=e.target.closest(".gpw"); if(!b||busy) return; e.preventDefault(); const w=b.dataset.w;
+      if(sel.has(w)) sel.delete(w); else if(sel.size<4) sel.add(w); else return; tone(sel.has(w)?660:440,.05,"sine",.04); render(); });
+    $('gsh').onclick=()=>{ if(busy) return; left=shuf(left); render(); };
+    $('gde').onclick=()=>{ if(busy) return; sel.clear(); render(); };
+    $('gsu').onclick=submit; }
+  function submit(){ if(sel.size!==4||busy) return;
+    const key=[...sel].sort().join("|"); if(guesses.some(g=>g.key===key)){ toast("Already guessed!"); return; }
+    const tiers=[...sel].map(w=>groups.find(g=>g.words.includes(w)).k); guesses.push({key,tiers});
+    const hit=groups.find(g=>!solved.includes(g)&&g.words.every(w=>sel.has(w)));
+    const tiles=[...stage.querySelectorAll(".gpw.on")]; busy=true;
+    if(hit){ tiles.forEach((t,k)=>setTimeout(()=>t.classList.add("hop"),k*80)); good();
+      later(()=>{ solved.push(hit); left=left.filter(w=>!hit.words.includes(w)); sel.clear(); busy=false; render(); if(solved.length===4) end(true); },650); return; }
+    mistakes++; const one=groups.some(g=>!solved.includes(g)&&g.words.filter(w=>sel.has(w)).length===3);
+    tiles.forEach(t=>t.classList.add("shake")); bad(); toast(one?"One away…":"Not a group");
+    later(()=>{ busy=false; render(); if(mistakes>=4){ over=true; reveal(); } },550); }
+  function reveal(){ const rest=groups.filter(g=>!solved.includes(g)).sort((a,b)=>a.k-b.k); sel.clear(); render();
+    rest.forEach((g,k)=>later(()=>{ solved.push(g); left=left.filter(w=>!g.words.includes(w)); render(); if(k===rest.length-1) end(false); },700*(k+1))); }
+  function end(won){ over=true; if(!prev) S.gp.done[id]={won,m:mistakes,d:today()}; save();
+    const grid=guesses.map(g=>g.tiers.map(t=>GP_EM[t]).join("")).join("\n"), share=`Groups #${id+1}\n${grid}`;
+    if(won) return later(()=>finish("groups",mistakes,{sub:`Puzzle #${id+1}${daily?" (today's)":""} · ${guesses.length} guesses`, archive:true, share}),900);
+    render(); $('gpend').innerHTML=`<div class="gpout"><b>Out of mistakes</b><span>Here are the groups. A new puzzle is waiting tomorrow.</span><div class="gpgridtxt">${grid.replace(/\n/g,"<br>")}</div>
+      <button class="btn go wide" id="gshr">Share result</button><div class="row" style="width:100%"><button class="btn wide" id="garc">More puzzles</button><button class="btn ghost" id="ghm">Home</button></div></div>`;
+    $('gshr').onclick=()=>shareText(share,$('gshr')); $('garc').onclick=()=>{ end_(); archive(); }; $('ghm').onclick=()=>{ end_(); home(); }; }
+  const end_=()=>{ cancelAnimationFrame(GS&&GS.raf); play.hidden=true; document.body.classList.remove("playing"); GS&&GS.timers.forEach(clearTimeout); GS=null; };
+  if(prev){ solved=groups.slice(); left=[]; over=true; render(); $('gpend').innerHTML=`<div class="gpout"><b>${prev.won?(prev.m?`Solved with ${prev.m} mistake${prev.m>1?"s":""}`:"Solved with no mistakes"):"You've played this one"}</b><div class="row" style="width:100%"><button class="btn wide" id="garc">More puzzles</button><button class="btn ghost" id="ghm">Home</button></div></div>`;
+    $('garc').onclick=()=>{ end_(); archive(); }; $('ghm').onclick=()=>{ end_(); home(); }; return; }
+  __b.groups=groups; render();
+}
+
+/* ---------- archive: every puzzle, playable any time ---------- */
+function archive(){
+  S.xw=S.xw||{done:{},prog:{}}; S.gp=S.gp||{done:{}};
+  const dm=dailyOf(MINIS), dg=dailyOf(GROUPS);
+  show(`${bar("Puzzle archive")}
+  <p class="muted">Today's puzzles are marked. Play any of them; your first solve of each is saved.</p>
+  <section class="card"><h3>✏️ Mini crossword</h3><div class="arch">${MINIS.map((_,i)=>{ const d=S.xw.done[i], p=S.xw.prog[i]; return `<button data-act="pmini" data-id="${i}" class="${d?"ok":""}${i===dm?" today":""}"><b>#${i+1}</b><span>${i===dm?"Today":d?fmtT(d.t):p?"In progress":"Not played"}</span></button>`; }).join("")}</div></section>
+  <section class="card"><h3>🗂️ Groups</h3><div class="arch">${GROUPS.map((_,i)=>{ const d=S.gp.done[i]; return `<button data-act="pgrp" data-id="${i}" class="${d?(d.won?"ok":"lost"):""}${i===dg?" today":""}"><b>#${i+1}</b><span>${i===dg?"Today":d?(d.won?(d.m?`${d.m} mistake${d.m>1?"s":""}`:"Perfect"):"Missed"):"Not played"}</span></button>`; }).join("")}</div></section>`);
+}
+function wordStatus(k){ if(k==="mini"){ S.xw=S.xw||{done:{},prog:{}}; const i=dailyOf(MINIS), d=S.xw.done[i], p=S.xw.prog[i]; return d?`Today's done · ${fmtT(d.t)}`:p?`Today's #${i+1} · in progress`:`Today's #${i+1} is ready`; }
+  S.gp=S.gp||{done:{}}; const i=dailyOf(GROUPS), d=S.gp.done[i]; return d?(d.won?`Today's done · ${d.m?`${d.m} mistake${d.m>1?"s":""}`:"perfect"}`:"Today's done"):`Today's #${i+1} is ready`; }
+
 /* ================= RESULTS ================= */
 function spark(hist,hi){ if(!hist||hist.length<2) return ""; const v=hist.slice(-12).map(h=>h.v), mx=Math.max(...v), mn=Math.min(...v), sp=(mx-mn)||1;
   const pts=v.map((x,i)=>`${(i/(v.length-1)*54+1).toFixed(1)},${(hi?17-(x-mn)/sp*16:1+(x-mn)/sp*16).toFixed(1)}`).join(" ");
@@ -656,19 +891,21 @@ function bigChart(hist,g){ if(!hist||hist.length<2) return ""; const v=hist.slic
   return `<svg class="chart2" viewBox="0 0 ${W} ${H}" role="img" aria-label="Your recent results">${`<polyline points="${v.map((h,i)=>`${x(i).toFixed(1)},${y(h.v).toFixed(1)}`).join(" ")}"/>`}${v.map((h,i)=>`<circle cx="${x(i)}" cy="${y(h.v)}" r="3.5"/>`).join("")}<text x="${L}" y="${H}">older</text><text x="${W-L}" y="${H}" text-anchor="end">latest</text></svg>`; }
 let WK=null; // set when a game is part of the daily workout
 function finish(game,v,o={}){
-  end(); const g=GAMES[game], key=o.key||game, r=record(game,v,key);
+  end(); const g=GAMES[game], key=o.key||game, r=o.noRecord?{better:false,prev:S.best[key]}:record(game,v,key); if(o.noRecord){ S.plays++; studied(); save(); }
   if(WK&&game===WK){ (S.work[today()]=S.work[today()]||{})[game]=v; save(); }
   const wkDone=WORKOUT.every(x=>(S.work[today()]||{})[x]!=null), wkNext=WORKOUT.find(x=>(S.work[today()]||{})[x]==null);
-  const cheer=r.prev==null?"First score. Now beat it!":r.better?`New best! Old best: ${g.fmt(r.prev)}`:`Your best: ${g.fmt(r.prev)}`;
+  const cheer=o.archive?(game==="mini"?(o.noRecord?"Solved with help. Try one clean tomorrow!":(r.better&&r.prev!=null?`New best time! Old best: ${g.fmt(r.prev)}`:r.prev!=null?`Your best: ${g.fmt(r.prev)}`:"Nice solve!")):(v===0?"Perfect: no mistakes!":"Solved!")):r.prev==null?"First score. Now beat it!":r.better?`New best! Old best: ${g.fmt(r.prev)}`:`Your best: ${g.fmt(r.prev)}`;
   show(`${bar(g.name)}
   <section class="card center" style="--c:var(--${g.cat})"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">${esc(g.name)}</div>
     <div class="big">${esc(g.fmt(v))}</div><p class="muted">${esc(o.sub||"")}</p>${o.note?`<p class="muted">${esc(o.note)}</p>`:""}<p class="cheer" style="${r.better?"":"color:var(--ink-2)"}">${esc(cheer)}</p></section>
   ${(S.hist[key]||[]).length>1?`<section class="card" style="--c:var(--${g.cat})"><h3>Your trend</h3>${bigChart(S.hist[key],g)}<p class="muted">${g.hi?"Higher is better.":"Lower is better."} ${S.hist[key].length} games played.</p></section>`:""}
   ${WK&&wkNext?`<button class="btn go wide" data-act="wk">Workout: next is ${esc(GAMES[wkNext].name)}</button>`:""}
   ${WK&&wkDone&&game===WK?`<section class="card center"><p class="cheer">Daily workout complete!</p><p class="muted">${dayStreak()}-day streak. Come back tomorrow.</p></section>`:""}
-  <button class="btn ${WK&&wkNext?"":"go"} wide" data-act="play" data-g="${game}">${o.daily?"Practice another":"Play again"}</button>
+  ${o.share?`<button class="btn go wide" id="shareB">Share result</button>`:""}
+  ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="play" data-g="${game}">${o.daily?"Practice another":"Play again"}</button>`}
   <button class="btn ghost wide" data-act="home">Home</button>`);
-  if(WK&&wkDone&&game===WK){ setTimeout(confetti,150); toast("Workout complete!"); } else if(r.better&&r.prev!=null) setTimeout(confetti,150);
+  if(o.share) $('shareB').onclick=()=>shareText(o.share,$('shareB'));
+  if(o.archive) setTimeout(confetti,150); else if(WK&&wkDone&&game===WK){ setTimeout(confetti,150); toast("Workout complete!"); } else if(r.better&&r.prev!=null) setTimeout(confetti,150);
   WK=null;
 }
 
@@ -687,7 +924,8 @@ function home(){
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Daily sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+    return `<button class="game" style="--c:var(${col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="word"?esc(wordStatus(k)):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="word"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+  <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Groups puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
     <div class="sech"><span>Lights out</span></div><div class="levels">${[3,5,8].map(d=>`<button data-act="lit" data-v="${d}" aria-pressed="${S.lit===d}">${d} taps</button>`).join("")}</div></section>
@@ -699,9 +937,12 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
+  if(a==="arch") return archive();
+  if(a==="pmini") return startMini({id:+b.dataset.id});
+  if(a==="pgrp") return startGroups({id:+b.dataset.id});
   if(a==="play"){ WK=null; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
   if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
   if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
@@ -710,6 +951,7 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; save(); return home(); }
 });
 document.addEventListener("keydown",e=>{ if(play.hidden) return; if(e.key==="Escape"){ end(); home(); return; }
+  if(GS&&GS.game==="mini"&&window._xwKey&&!e.metaKey&&!e.ctrlKey){ if(/^[a-z]$/i.test(e.key)||["Backspace","Tab","Enter"," ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._xwKey(e.key); } return; }
   if(GS&&GS.game==="num"&&window._numKey){ if(/^[0-9]$/.test(e.key)) window._numKey(e.key); else if(e.key==="Backspace") window._numKey("del"); else if(e.key==="Enter") window._numKey("ok"); } });
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") save(); });
 
