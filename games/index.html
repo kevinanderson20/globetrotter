@@ -534,7 +534,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.08-1233";
+const APP_VERSION="2026.11.08-1235";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -1168,16 +1168,18 @@ function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`T
 function nmAllHtml(mode,L,it){ const T=NM_TIERS[mode], g=T.map(()=>[]);
   (mode==="dive"?[...L.items].reverse():L.items).forEach(x=>g[nmTierIx(mode,x.r,L.N)].push(x));
   return `<div class="nmall">${g.map((xs,ti)=>xs.length?`<div class="nmgrp"><h5>${T[ti][3]} ${esc(T[ti][1])} <small>${T[ti][0]} pts · ${xs.length}</small></h5><p>${xs.map(x=>`<span${x===it?' class="me"':""}>${esc(nmCap(x.show))}</span>`).join("")}</p></div>`:"").join("")}</div>`; }
-function nmResultsHtml(mode,res){ return `<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):"No answer"}</b><small>${esc(r.lab)}</small></p><em>+${r.pts}</em><i class="nmchev">›</i></summary>${nmAllHtml(mode,r.L,r.it)}</details>`).join("")}</div></section>`; }
+function nmResultsHtml(mode,res){ return `<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):r.pts==null?"Tap to see every answer":"No answer"}</b><small>${esc(r.lab)}</small></p><em>${r.pts==null?"":"+"+r.pts}</em><i class="nmchev">›</i></summary>${nmAllHtml(mode,r.L,r.it)}</details>`).join("")}</div></section>`; }
 function nmWireRows(){ document.querySelectorAll(".nmrow").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open) document.querySelectorAll(".nmrow[open]").forEach(o=>{ if(o!==d) o.open=false; }); })); }
 const nmShareText=(mode,m,em)=>`${NM[mode].name} ${NM[mode].ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m} / 700 · ${NM[mode].zone(m)}`;
 /* today's round is played once; after that the daily card shows what you answered */
 function nmToday(mode){ const M=NM[mode], T=NM_TIERS[mode], d=S.nm[mode][today()];
-  const res=(d.a||[]).map(([k,r])=>{ const L=nmPrep(LISTS[k]), it=r>=0?L.items[r]:null, t=it?T[nmTierIx(mode,it.r,L.N)]:[0,"Time's up","","⬛"]; return {L,it,pts:t[0],lab:t[1],em:t[3]}; });
+  const res=d.a?d.a.map(([k,r])=>{ const L=nmPrep(LISTS[k]), it=r>=0?L.items[r]:null, t=it?T[nmTierIx(mode,it.r,L.N)]:[0,"Time's up","","⬛"]; return {L,it,pts:t[0],lab:t[1],em:t[3]}; })
+    // rounds saved before answers were stored: today's prompts are still known, just not what was typed
+    :nmDay(mode,dayIndex()).map(k=>({L:nmPrep(LISTS[k]),it:null,pts:null,lab:"Your answer wasn't saved",em:"▫️"}));
   show(`${bar(M.name)}
   <section class="card center" style="--c:var(${GAMES[mode].col})"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's ${esc(M.name)}</div>
     <div class="big">${d.m} / 700</div><p class="muted">${esc(M.zone(d.m))}</p><p class="cheer" style="color:var(--ink-2)">New prompts tomorrow</p></section>
-  ${res.length?nmResultsHtml(mode,res):`<section class="card"><p class="muted">Answers from rounds played before this update weren't saved. From tomorrow, they will be.</p></section>`}
+  ${nmResultsHtml(mode,res)}
   ${SHARE_ROW}
   <button class="btn wide" data-act="play" data-g="${mode}u">Play unlimited ${esc(M.name)}</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
