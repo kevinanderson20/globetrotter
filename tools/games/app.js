@@ -29,8 +29,14 @@ const GAMES={
  groups:{cat:"daily", col:"--wd", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
  dive:{cat:"daily", col:"--nm", ic:"🦐", name:"Krillion", desc:"Name one answer per prompt. Rarer answers score more. 700 is perfect.", hi:true, fmt:v=>`${v} / 700`},
  climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
+ strandsu:{cat:"unl", col:"--wd", ic:"🧵", name:"Unlimited Strands", desc:"Play any of the Strands boards, as many as you like.", hi:false, fmt:v=>v===0?"Perfect":`${v} hint${v>1?"s":""}`},
+ worldleu:{cat:"unl", col:"--geo", ic:"🗺️", name:"Unlimited Worldle", desc:"A random country outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
+ travleu:{cat:"unl", col:"--geo", ic:"🧭", name:"Unlimited Travle", desc:"A random pair of countries every round.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
  diveu:{cat:"unl", col:"--nm", ic:"🦐", name:"Unlimited Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
  climbu:{cat:"unl", col:"--nm", ic:"🎈", name:"Unlimited Reverse Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
+ strands:{cat:"daily", col:"--wd", ic:"🧵", name:"Strands", desc:"Find the hidden theme words on a 6×8 board. One spangram crosses it end to end.", hi:false, fmt:v=>v===0?"Perfect":`${v} hint${v>1?"s":""}`},
+ worldle:{cat:"daily", col:"--geo", ic:"🗺️", name:"Worldle", desc:"Guess the country from its outline. Six tries, with distance and direction hints.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
+ travle:{cat:"daily", col:"--geo", ic:"🧭", name:"Travle", desc:"Connect two countries through the countries in between, in as few guesses as you can.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
  dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"An easy 6×6 with pencil notes. One new puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
@@ -77,7 +83,7 @@ function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.inner
 /* ---------- game shell: timers are tracked so quitting always cleans up ---------- */
 let GS=null; window.__b={}; // read by automated tests
 function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
-  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; return GS; }
+  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage"; return GS; }
 const later=(fn,ms)=>{ const g=GS; const id=setTimeout(()=>{ if(GS===g) fn(); },ms); g&&g.timers.push(id); return id; };
 function clock(fmt=ms=>fmtT(ms)){ const g=GS; g.t0=performance.now(); const step=()=>{ if(GS!==g) return; $('ginfo').textContent=fmt(performance.now()-g.t0); g.raf=requestAnimationFrame(step); }; g.raf=requestAnimationFrame(step); }
 const elapsed=()=>Math.round(performance.now()-GS.t0);
@@ -581,6 +587,8 @@ function startDSudoku(){
   render();
 }
 
+/*GEOGAMES*/
+/*STRANDSGAME*/
 /* ================= RESULTS ================= */
 function spark(hist,hi){ if(!hist||hist.length<2) return ""; const v=hist.slice(-12).map(h=>h.v), mx=Math.max(...v), mn=Math.min(...v), sp=(mx-mn)||1;
   const pts=v.map((x,i)=>`${(i/(v.length-1)*54+1).toFixed(1)},${(hi?17-(x-mn)/sp*16:1+(x-mn)/sp*16).toFixed(1)}`).join(" ");
@@ -631,7 +639,7 @@ function home(){
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
@@ -644,7 +652,7 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();
@@ -658,6 +666,7 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; S.nmPts=1; save(); return home(); }
 });
 document.addEventListener("keydown",e=>{ if(play.hidden) return; if(e.key==="Escape"){ end(); home(); return; }
+  if(GS&&(GS.game==="strands"||GS.game==="strandsu")&&window._stKey&&(e.key==="Enter"||e.key==="Escape")){ e.preventDefault(); window._stKey(e.key); return; }
   if(GS&&GS.game==="dsudoku"&&window._dsKey&&!e.metaKey&&!e.ctrlKey){ if(/^[0-9nN]$/.test(e.key)||["Backspace","Delete","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._dsKey(e.key); } return; }
   if(GS&&GS.game==="mini"&&window._xwKey&&!e.metaKey&&!e.ctrlKey){ if(/^[a-z]$/i.test(e.key)||["Backspace","Tab","Enter"," ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._xwKey(e.key); } return; }
   if(GS&&GS.game==="num"&&window._numKey){ if(/^[0-9]$/.test(e.key)) window._numKey(e.key); else if(e.key==="Backspace") window._numKey("del"); else if(e.key==="Enter") window._numKey("ok"); } });

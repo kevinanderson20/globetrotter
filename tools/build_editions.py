@@ -148,6 +148,8 @@ page = open('tools/games/page.html', encoding='utf-8').read()
 code = rep(open('tools/games/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
 code = rep(code, '/*PUZZLES*/', open('tools/games/puzzles.js', encoding='utf-8').read(), 1)
 code = rep(code, '/*LISTS*/', open('tools/games/lists.js', encoding='utf-8').read(), 1)  # answer lists for Deep dive and Sky climb  # the crossword and Groups puzzles live in their own file
+code = rep(code, '/*GEOGAMES*/', open('tools/games/geogames.js', encoding='utf-8').read(), 1)  # Worldle and Travle
+code = rep(code, '/*STRANDSGAME*/', open('tools/games/strandsgame.js', encoding='utf-8').read().replace('/*STRANDS_DATA*/', open('tools/games/strands.js', encoding='utf-8').read()), 1)  # Strands
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('games', exist_ok=True)
 open('games/index.html', 'w', encoding='utf-8').write(page)

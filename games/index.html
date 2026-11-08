@@ -289,9 +289,9 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .chart2 circle{fill:var(--c)}
 .chart2 text{font:10px var(--f-body);fill:var(--ink-3)}
 /* ================= word puzzles ================= */
-:root{--nm:#1689b5;--xblk:#10233a;--wd:#d9466f;--t0:#9fdcbc;--t1:#f8bf8f;--t2:#9cc9f3;--t3:#c9b0f2}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--nm:#4cc3e9;--xblk:#03070b;--wd:#ff6f94;--t0:#5fb98e;--t1:#e39a62;--t2:#5d9bd6;--t3:#9a7bd6}}
-:root[data-theme="dark"]{--nm:#4cc3e9;--xblk:#03070b;--wd:#ff6f94;--t0:#5fb98e;--t1:#e39a62;--t2:#5d9bd6;--t3:#9a7bd6}
+:root{--geo:#2e9e6a;--nm:#1689b5;--xblk:#10233a;--wd:#d9466f;--t0:#9fdcbc;--t1:#f8bf8f;--t2:#9cc9f3;--t3:#c9b0f2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--geo:#4fd08f;--nm:#4cc3e9;--xblk:#03070b;--wd:#ff6f94;--t0:#5fb98e;--t1:#e39a62;--t2:#5d9bd6;--t3:#9a7bd6}}
+:root[data-theme="dark"]{--geo:#4fd08f;--nm:#4cc3e9;--xblk:#03070b;--wd:#ff6f94;--t0:#5fb98e;--t1:#e39a62;--t2:#5d9bd6;--t3:#9a7bd6}
 .games .game:nth-child(2):last-child{grid-column:auto}
 .xwwrap{display:flex;flex-direction:column;align-items:center;width:100%;height:100%;gap:8px}
 .xwwrap .sp{flex:1;min-height:4px}
@@ -363,6 +363,98 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .dspad button small{font-size:9px;font-weight:700;color:var(--ink-3);margin-top:-6px}
 .dspad button:active{transform:translateY(2px);box-shadow:none}
 .dstools{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(100%,360px);margin:8px auto 0}.dstools .btn{min-height:44px;padding:8px 12px}
+
+/* scrolling game screens (Worldle, Travle, Strands) */
+.gstage.scroll{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;user-select:auto;-webkit-user-select:auto;padding-bottom:12px}
+/* country input with suggestions */
+.cin{display:flex;gap:8px;width:100%}
+.cinwrap{position:relative;flex:1;min-width:0}
+.cin input{width:100%;box-sizing:border-box;height:50px;border:2px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:700 17px var(--f-body);padding:0 14px}
+.cin input:focus{outline:none;border-color:var(--geo)}
+.cin .btn{min-width:76px}
+.cinlist{position:absolute;left:0;right:0;bottom:calc(100% + 6px);z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden;display:grid}
+.cinlist button{border:0;background:none;text-align:left;padding:12px 14px;font:700 16px var(--f-body);color:var(--ink);border-top:1px solid var(--line);cursor:pointer}
+.cinlist button:first-child{border-top:0}
+.cinlist button.on{background:color-mix(in srgb,var(--geo) 14%,var(--surface))}
+/* maps */
+.gmap{width:100%;height:auto;display:block;border-radius:14px;background:color-mix(in srgb,#5aa9e6 20%,var(--surface))}
+.gmap path,.gmap circle{stroke:var(--surface);stroke-width:var(--sw);stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.gmap .g-land{fill:color-mix(in srgb,var(--ink-3) 30%,var(--surface))}
+.gmap .g-ghost{fill:color-mix(in srgb,var(--ink-3) 18%,var(--surface));stroke:color-mix(in srgb,var(--ink-3) 55%,var(--surface));stroke-width:.8px}
+.gmap .g-hit{fill:var(--good)}
+.gmap .g-tried{fill:color-mix(in srgb,var(--sun) 70%,var(--surface))}
+.gmap .g-start{fill:#2f7de1}.gmap .g-end{fill:#e2483d}
+.gmap .g-ok{fill:#3fbf6b}.gmap .g-near{fill:#f09a2b}.gmap .g-far{fill:#d9534f}
+.gmap .g-next{fill:none;stroke:var(--ink);stroke-width:2px;stroke-dasharray:4 3}
+.gmap .g-miss{fill:color-mix(in srgb,var(--ink-3) 45%,var(--surface));stroke:var(--ink);stroke-dasharray:3 3}
+/* worldle */
+.wl{display:grid;gap:12px;width:100%;max-width:440px;margin:0 auto}
+.wlshape{position:relative;background:var(--surface);border-radius:18px;padding:14px;display:grid;place-items:center}
+.wlshape svg{width:min(100%,34vh,280px);height:auto;display:block}
+.wlshape path{fill:var(--ink);stroke:var(--ink);stroke-width:2;fill-rule:evenodd;transition:fill .5s}
+.wlshape.won path{fill:var(--good);stroke:var(--good)}
+.wlshape.lost path{fill:var(--bad);stroke:var(--bad)}
+.wlshape.small svg{width:min(60%,160px)}
+.wlname{font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)}
+.wlrows{display:grid;gap:5px}
+.wlrow{display:grid;grid-template-columns:minmax(0,1fr) auto 30px 54px;gap:5px;align-items:stretch}
+.wlrow>*{background:var(--surface);border-radius:10px;min-height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;padding:0 8px}
+.wlrow b{justify-content:flex-start;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:block;line-height:38px}
+.wlrow .wldist{min-width:76px;color:var(--ink-2);cursor:pointer}
+.wlrow .wlarr{padding:0;font-size:18px}
+.wlrow .wlpct{background:linear-gradient(90deg,color-mix(in srgb,var(--good) 35%,var(--surface)) var(--p),var(--surface) var(--p))}
+.wlrow.hit>*{background:color-mix(in srgb,var(--good) 30%,var(--surface))}
+.wlrow.empty>*{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+/* travle */
+.tv{display:grid;gap:10px;width:100%;max-width:520px;margin:0 auto;position:relative}
+.tvhead{font-size:17px;text-align:center;color:var(--ink-2)}
+.tvhead b{font-family:var(--f-display);font-weight:800}.tva{color:#2f7de1}.tvb{color:#e2483d}
+.tvmap .gmap{max-height:42vh;object-fit:contain}
+.tvbar{display:flex;justify-content:space-between;align-items:center;font-weight:800;color:var(--ink-2)}
+.btn.sm{min-height:38px;padding:6px 12px;font-size:15px;width:auto}
+.tvinit{text-align:center;font-weight:700;color:var(--ink-2)}
+.tvmsg{text-align:center;font-size:14px;color:var(--ink-2)}
+.tvlist{display:flex;flex-wrap:wrap;gap:6px}
+.tvg{background:var(--surface);border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px;border:1px solid var(--line)}
+.tvhints{position:absolute;inset:auto 0 0 0;background:var(--surface);border-radius:18px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:16px;display:grid;gap:8px;z-index:6}
+.tvhints p{margin:0;font-size:14px;color:var(--ink-2);text-align:center}
+
+/* strands */
+:root{--st-blue:#aedfee;--st-blue-ink:#123;--st-yel:#f8cd05;--st-sel:#d6d0c4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--st-blue:#4a8fa8;--st-blue-ink:#fff;--st-sel:#5a5a64}}
+:root[data-theme="dark"]{--st-blue:#4a8fa8;--st-blue-ink:#fff;--st-sel:#5a5a64}
+.st{display:grid;gap:10px;width:100%;max-width:400px;margin:0 auto;justify-items:center}
+.stclue{width:100%;border-radius:14px;overflow:hidden;background:var(--surface);text-align:center;box-shadow:0 1px 0 var(--line)}
+.stclue span{display:block;background:var(--st-blue);color:var(--st-blue-ink);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px}
+.stclue b{display:block;font-family:var(--f-display);font-weight:800;font-size:21px;padding:9px 10px 11px;color:var(--ink)}
+.stword{min-height:30px;display:flex;align-items:center;justify-content:center;text-align:center}
+.stword b{font-family:var(--f-display);font-weight:800;font-size:24px;letter-spacing:.06em;color:var(--ink)}
+.stword span{font-weight:800;font-size:17px}.stword .dim{color:var(--ink-3)}.stword .good{color:var(--ink-2)}
+.stword .themew{color:var(--ink);background:var(--st-blue);padding:3px 12px;border-radius:999px}
+.stword .spang{color:#3a2c00;background:var(--st-yel);padding:3px 12px;border-radius:999px;letter-spacing:.08em}
+.stboard{position:relative;display:grid;grid-template-columns:repeat(6,1fr);width:min(100%,calc((100dvh - 270px)*.75),360px);aspect-ratio:3/4;touch-action:none;user-select:none;-webkit-user-select:none}
+.stboard.mini{width:min(78%,260px);margin:0 auto;pointer-events:none}
+.stlines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.stlines .ln{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:26}
+.stlines .ln.theme{stroke:var(--st-blue)}.stlines .ln.span{stroke:var(--st-yel)}.stlines .ln.sel{stroke:var(--st-sel)}
+.stc{position:relative;display:grid;place-items:center;aspect-ratio:1;min-width:0}
+.stc span{width:78%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:clamp(17px,5.4vw,25px);color:var(--ink);transition:background .15s,transform .15s;position:relative;z-index:1}
+.stboard.mini .stc span{font-size:clamp(11px,3.4vw,15px)}
+.stc.sel span{background:var(--st-sel)}
+.stc.theme span{background:var(--st-blue);color:var(--st-blue-ink)}
+.stc.span span{background:var(--st-yel);color:#3a2c00}
+.stc.hinted span{outline:2.5px dashed var(--ink-2);outline-offset:-2px}
+.stc[data-ord]:not([data-ord=""])::after{content:attr(data-ord);position:absolute;top:2px;right:4px;z-index:2;font-size:10px;font-weight:800;color:var(--ink-2)}
+.stc.pop span{transform:scale(1.18)}
+.stboard.won .stc span{animation:stwin .6s ease both}
+@keyframes stwin{40%{transform:scale(1.12)}}
+.stfoot{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;width:100%}
+.sthint{position:relative;overflow:hidden;border:2px solid var(--line);background:var(--surface);color:var(--ink-3);border-radius:999px;padding:9px 22px;font:800 16px var(--f-body);cursor:pointer}
+.sthint i{position:absolute;inset:0;width:var(--hp,0%);background:color-mix(in srgb,var(--ink-3) 18%,transparent);transition:width .3s}
+.sthint span{position:relative}
+.sthint.ready{border-color:var(--ink);color:var(--ink)}
+.sthint.ready i{width:0}
+.stprog{font-size:15px;color:var(--ink-2);text-align:right}
 /* results card */
 .sharerow{display:grid;grid-template-columns:1fr auto;gap:10px}.sharerow .btn{width:100%}.sharerow #copyB{min-width:96px}
 .center{text-align:center}
@@ -534,7 +626,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.08-1237";
+const APP_VERSION="2026.11.08-1302";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -563,8 +655,14 @@ const GAMES={
  groups:{cat:"daily", col:"--wd", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
  dive:{cat:"daily", col:"--nm", ic:"🦐", name:"Krillion", desc:"Name one answer per prompt. Rarer answers score more. 700 is perfect.", hi:true, fmt:v=>`${v} / 700`},
  climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
+ strandsu:{cat:"unl", col:"--wd", ic:"🧵", name:"Unlimited Strands", desc:"Play any of the Strands boards, as many as you like.", hi:false, fmt:v=>v===0?"Perfect":`${v} hint${v>1?"s":""}`},
+ worldleu:{cat:"unl", col:"--geo", ic:"🗺️", name:"Unlimited Worldle", desc:"A random country outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
+ travleu:{cat:"unl", col:"--geo", ic:"🧭", name:"Unlimited Travle", desc:"A random pair of countries every round.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
  diveu:{cat:"unl", col:"--nm", ic:"🦐", name:"Unlimited Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
  climbu:{cat:"unl", col:"--nm", ic:"🎈", name:"Unlimited Reverse Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
+ strands:{cat:"daily", col:"--wd", ic:"🧵", name:"Strands", desc:"Find the hidden theme words on a 6×8 board. One spangram crosses it end to end.", hi:false, fmt:v=>v===0?"Perfect":`${v} hint${v>1?"s":""}`},
+ worldle:{cat:"daily", col:"--geo", ic:"🗺️", name:"Worldle", desc:"Guess the country from its outline. Six tries, with distance and direction hints.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
+ travle:{cat:"daily", col:"--geo", ic:"🧭", name:"Travle", desc:"Connect two countries through the countries in between, in as few guesses as you can.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
  dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"An easy 6×6 with pencil notes. One new puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
@@ -611,7 +709,7 @@ function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.inner
 /* ---------- game shell: timers are tracked so quitting always cleans up ---------- */
 let GS=null; window.__b={}; // read by automated tests
 function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
-  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; return GS; }
+  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage"; return GS; }
 const later=(fn,ms)=>{ const g=GS; const id=setTimeout(()=>{ if(GS===g) fn(); },ms); g&&g.timers.push(id); return id; };
 function clock(fmt=ms=>fmtT(ms)){ const g=GS; g.t0=performance.now(); const step=()=>{ if(GS!==g) return; $('ginfo').textContent=fmt(performance.now()-g.t0); g.raf=requestAnimationFrame(step); }; g.raf=requestAnimationFrame(step); }
 const elapsed=()=>Math.round(performance.now()-GS.t0);
@@ -1274,6 +1372,313 @@ function startDSudoku(){
   render();
 }
 
+/* ================= WORLDLE + TRAVLE: country games built on the World tab's map ================= */
+/* geo.json (built by tools/build-games-geo.mjs) holds every country's silhouette, world-map outline, centre, area and borders.
+   It loads the first time one of these games opens and is kept offline by the service worker. */
+let GEO=null, GEO_P=null;
+function geoLoad(){ if(GEO) return Promise.resolve(GEO); if(GEO_P) return GEO_P;
+  GEO_P=fetch("geo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(d=>{
+    const by={}; d.c.forEach(c=>{ by[c.id]=c; c.keys=[...new Set([c.n,...c.al].map(geoNorm))]; });
+    GEO={W:d.w,list:d.c,by}; return GEO; }).catch(e=>{ GEO_P=null; throw e; });
+  return GEO_P; }
+const geoNorm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/&/g,"and").replace(/^the\s+/,"").replace(/[^a-z]/g,"");
+function geoFind(text){ const q=geoNorm(text); if(!q) return null; return GEO.list.find(c=>c.keys.includes(q))||null; }
+function geoMatches(text,skip){ const raw=String(text).trim().toLowerCase(); if(!raw) return [];
+  const q=geoNorm(raw), words=c=>c.n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().split(/[^a-z]+/);
+  const scored=[]; GEO.list.forEach(c=>{ if(skip&&skip.has(c.id)) return; let sc=9;
+    if(c.keys.includes(q)) sc=0; else if(geoNorm(c.n).startsWith(q)) sc=1; else if(words(c).some(w=>w.startsWith(q))) sc=2; else if(c.keys.some(k=>k.startsWith(q))) sc=3; else if(q.length>=3&&geoNorm(c.n).includes(q)) sc=4;
+    if(sc<9) scored.push([sc,c]); });
+  return scored.sort((a,b)=>a[0]-b[0]||a[1].n.localeCompare(b[1].n)).slice(0,6).map(x=>x[1]); }
+/* a country-name box with suggestions, like the real games: type, tap a suggestion or press Enter */
+function geoInput(box,{placeholder,skip,onPick,btn="Guess"}){
+  box.innerHTML=`<form class="cin" autocomplete="off"><div class="cinwrap"><input type="text" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="${esc(placeholder)}" aria-label="${esc(placeholder)}"><div class="cinlist" role="listbox" hidden></div></div><button class="btn go" type="submit">${esc(btn)}</button></form>`;
+  const f=box.querySelector("form"), inp=f.querySelector("input"), list=f.querySelector(".cinlist"); let opts=[], hi=0;
+  const draw=()=>{ opts=geoMatches(inp.value,skip()); hi=0;
+    list.hidden=!opts.length||!inp.value.trim(); list.innerHTML=opts.map((c,i)=>`<button type="button" role="option" data-i="${i}" class="${i===hi?"on":""}">${esc(c.n)}</button>`).join(""); };
+  inp.addEventListener("input",draw);
+  inp.addEventListener("keydown",e=>{ if(list.hidden) return; if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); hi=(hi+(e.key==="ArrowDown"?1:opts.length-1))%opts.length; [...list.children].forEach((b,i)=>b.classList.toggle("on",i===hi)); } if(e.key==="Escape") list.hidden=true; });
+  list.addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b) return; e.preventDefault(); pick(opts[+b.dataset.i]); });
+  f.onsubmit=e=>{ e.preventDefault(); const exact=geoFind(inp.value);
+    if(exact) return pick(exact,inp.value);
+    if(!list.hidden&&opts.length===1) return pick(opts[0]);
+    if(!list.hidden&&opts.length&&document.activeElement===inp&&list.querySelector(".on")&&hi>0) return pick(opts[hi]);
+    if(opts.length){ toast("Tap the country you mean from the list"); return; }
+    pick(null,inp.value); };
+  function pick(c,typed){ if(!c){ if(String(typed||"").trim()){ bad(); toast("Not a country on the list. Pick one from the suggestions."); } return; }
+    if(onPick(c)!==false){ inp.value=""; list.hidden=true; } }
+  setTimeout(()=>{ try{ inp.focus({preventScroll:true}); }catch(e){} },80);
+  return {focus:()=>inp.focus(), el:inp}; }
+function geoLoading(){ stage.innerHTML=`<div class="gmsg">Loading the map…</div>`; }
+function geoFail(){ stage.innerHTML=`<div class="gmsg">Couldn't load the map. Connect once to the internet so it can be saved for offline play.</div>`; }
+const KM=(a,b)=>{ const r=Math.PI/180, [l1,p1]=a, [l2,p2]=b, dp=(p2-p1)*r, dl=(l2-l1)*r, h=Math.sin(dp/2)**2+Math.cos(p1*r)*Math.cos(p2*r)*Math.sin(dl/2)**2; return 2*6371*Math.asin(Math.min(1,Math.sqrt(h))); };
+// compass (rhumb-line) bearing, as Worldle uses: the arrow never points over a pole
+const BEARING=(a,b)=>{ const r=Math.PI/180, p1=a[1]*r, p2=b[1]*r; let dl=(b[0]-a[0])*r; if(Math.abs(dl)>Math.PI) dl=dl>0?-(2*Math.PI-dl):2*Math.PI+dl;
+  const dpsi=Math.log(Math.tan(Math.PI/4+p2/2)/Math.tan(Math.PI/4+p1/2)); return (Math.atan2(dl,dpsi)/r+360)%360; };
+const ARROWS=["⬆️","↗️","➡️","↘️","⬇️","↙️","⬅️","↖️"];
+/* the world map zoomed to a set of countries, used for results and for Travle's board */
+function geoBox(ids,pad=.18,minW=220){ let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  ids.forEach(id=>{ const b=GEO.by[id].bb; x0=Math.min(x0,b[0]); y0=Math.min(y0,b[1]); x1=Math.max(x1,b[2]); y1=Math.max(y1,b[3]); });
+  let w=Math.max(x1-x0,minW), h=Math.max(y1-y0,minW*.62); const cx=(x0+x1)/2, cy=(y0+y1)/2;
+  if(w/h<1.25) w=h*1.25; else h=w/1.25; w*=1+pad*2; h*=1+pad*2; return [cx-w/2,cy-h/2,w,h]; }
+function geoPathEl(c,cls,extra=""){ return c.wp?`<path class="${cls}" d="${c.wp}" ${extra}/>`:`<circle class="${cls}" cx="${c.cp[0]}" cy="${c.cp[1]}" r="3" ${extra}/>`; }
+function geoMapSVG(box,layers){ const [x,y,w,h]=box, sw=(w/400).toFixed(2);
+  const inView=c=>{ const b=c.bb; return b[2]>=x&&b[0]<=x+w&&b[3]>=y&&b[1]<=y+h; };
+  return `<svg class="gmap" viewBox="${x.toFixed(0)} ${y.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" style="--sw:${sw}">${layers(inView)}</svg>`; }
+
+/* ---------------- WORLDLE ---------------- */
+/* six guesses at a country's silhouette; each miss shows the distance, the direction and how close it was */
+let WL_ROT=null;
+const wlDaily=()=>{ if(!WL_ROT) WL_ROT=shuf(GEO.list.map(c=>c.id).sort(),seeded("globetrotter-worldle-v1")); const n=WL_ROT.length; return WL_ROT[((dayIndex()%n)+n)%n]; };
+const wlNum=()=>dayIndex()+1;
+const wlProx=d=>Math.max(0,Math.floor((20000-d)/20000*100));
+const wlSquares=p=>{ const t=Math.floor(p/10); return "🟩".repeat(Math.floor(t/2))+(t%2?"🟨":"")+"⬛".repeat(5-Math.floor(t/2)-(t%2)); };
+const wlUnit=d=>S.wlMi?`${Math.round(d*0.621371).toLocaleString()} mi`:`${Math.round(d).toLocaleString()} km`;
+function wlRow(t,gid){ const g=GEO.by[gid]; if(gid===t.id) return {id:gid,n:g.n,d:0,a:"🎉",p:100};
+  const d=KM(g.ll,t.ll); return {id:gid,n:g.n,d,a:ARROWS[Math.round(BEARING(g.ll,t.ll)/45)%8],p:wlProx(d)}; }
+function wlStatus(){ S.wl=S.wl||{}; const d=S.wl[today()]; return d&&d.over?(d.won?`Today's done · ${d.g.length}/6`:"Today's done · missed it"):d&&d.g.length?`Today's #${wlNum()} · ${d.g.length}/6 guessed`:`Today's #${wlNum()} is ready`; }
+function wlShare(t,rows,won,daily){ const best=Math.max(...rows.map(r=>r.p));
+  return `#Worldle ${daily?"#"+wlNum():"(unlimited)"} ${won?rows.length:"X"}/6 (${best}%)\n${rows.map(r=>r.d===0?"🟩🟩🟩🟩🟩🎉":wlSquares(r.p)+r.a).join("\n")}`; }
+async function startWorldle(opt={}){
+  const daily=!opt.unlimited, gid=daily?"worldle":"worldleu";
+  begin(gid,daily?`Worldle #${dayIndex()+1}`:"Unlimited Worldle"); stage.className="gstage scroll"; geoLoading();
+  try{ await geoLoad(); }catch(e){ return geoFail(); }
+  if(!GS||GS.game!==gid) return;
+  S.wl=S.wl||{}; const key=today();
+  if(daily&&S.wl[key]&&S.wl[key].over){ end(); return wlResults(true); }
+  const t=GEO.by[daily?wlDaily():pickRandom()], st=daily?(S.wl[key]=S.wl[key]||{g:[]}):{g:[]};
+  function pickRandom(){ const ok=GEO.list.filter(c=>c.km2>3000); return ok[Math.floor(Math.random()*ok.length)].id; }
+  __b.wl={t:t.id};
+  let over=false;
+  function render(){ const rows=st.g.map(id=>wlRow(t,id));
+    stage.innerHTML=`<div class="wl">
+      <div class="wlshape ${over?(rows.some(r=>r.d===0)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery country outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
+      <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?`<div class="wlrow ${r.d===0?"hit":""}"><b>${esc(r.n)}</b><span class="wldist" role="button" tabindex="0">${r.d===0?"":wlUnit(r.d)}</span><span class="wlarr">${r.a}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`:`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
+      <div id="wlin"></div></div>`;
+    stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
+    if(!over) geoInput($('wlin'),{placeholder:"Country, territory…",skip:()=>new Set(st.g),onPick:guess}); }
+  function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }
+    st.g.push(c.id); if(daily) save();
+    if(c.id===t.id){ good(); over=true; finishUp(true); return; }
+    bad(); if(st.g.length>=6){ over=true; finishUp(false); return; }
+    render(); }
+  function finishUp(won){ render(); const rows=st.g.map(id=>wlRow(t,id));
+    if(daily){ st.over=1; st.won=won?1:0; st.t=t.id; save(); }
+    if(won) setTimeout(confetti,200); else toast(`It was ${t.n}`);
+    later(()=>finish(gid,won?rows.length:7,{sub:won?`${t.n} in ${rows.length}`:`It was ${t.n}`, share:wlShare(t,rows,won,daily), html:wlMapCard(t,rows), nextG:"worldleu", nextLabel:daily?"Play unlimited Worldle":"Play again"}),won?1300:1800); }
+  if(st.g.includes(t.id)||st.g.length>=6){ over=true; finishUp(st.g.includes(t.id)); } else render();
+}
+function wlMapCard(t,rows){ const ids=[t.id,...rows.map(r=>r.id)], box=geoBox([t.id],.55,150);
+  return `<section class="card"><h3>${esc(t.n)} on the map</h3>${geoMapSVG(box,inView=>GEO.list.filter(inView).map(c=>geoPathEl(c,c.id===t.id?"g-hit":ids.includes(c.id)?"g-tried":"g-land")).join(""))}<p class="muted">${esc(t.c)} · ${Math.round(t.km2).toLocaleString()} km²${t.b.length?` · borders ${t.b.map(id=>GEO.by[id].n).join(", ")}`:" · no land borders"}</p></section>`; }
+function wlResults(daily){ const st=S.wl[today()], t=GEO.by[st.t||wlDaily()], rows=st.g.map(id=>wlRow(t,id)), won=!!st.won;
+  show(`${bar("Worldle")}
+  <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Worldle #${wlNum()}</div>
+    <div class="big">${won?rows.length:"X"}/6</div><p class="muted">${won?`You found ${esc(t.n)}`:`It was ${esc(t.n)}`}</p><p class="cheer" style="color:var(--ink-2)">New country tomorrow</p></section>
+  <section class="card"><div class="wlshape small ${won?"won":"lost"}"><svg viewBox="0 0 400 400"><path d="${t.sh}"/></svg></div>
+    <div class="wlrows">${rows.map(r=>`<div class="wlrow ${r.d===0?"hit":""}"><b>${esc(r.n)}</b><span class="wldist">${r.d===0?"":wlUnit(r.d)}</span><span class="wlarr">${r.a}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`).join("")}</div></section>
+  ${wlMapCard(t,rows)}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="worldleu">Play unlimited Worldle</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(wlShare(t,rows,won,true)); }
+
+/* ---------------- TRAVLE ---------------- */
+/* connect two countries through the countries in between. Rules follow travle.earth:
+   guesses allowed = shortest route + 4 to 8 extra; ✅ on a best route and linked to the start, 🟩 on a best route,
+   🟧 a route through it is at most one longer, 🟥 further off. "Perfect" = the shortest route with every guess ✅. */
+const TV_EXTRA=n=>n<=3?4:n<=6?5:n<=9?6:n<=12?7:8;
+/* fewest new countries needed to join a and b when guessed countries are free (0-1 shortest path) */
+function tvDist(from,set,free){ const D={}, P={}; GEO.list.forEach(c=>D[c.id]=1e9); const dq=[from]; D[from]=free.has(from)?0:1;
+  while(dq.length){ let bi=0; for(let i=1;i<dq.length;i++) if(D[dq[i]]<D[dq[bi]]) bi=i; const u=dq.splice(bi,1)[0];
+    for(const v of GEO.by[u].b){ const nd=D[u]+(free.has(v)?0:1); if(nd<D[v]){ D[v]=nd; P[v]=u; dq.push(v); } } }
+  D.__p=P; return D; }
+function tvNeed(a,b,free){ const D=tvDist(a,null,free); return D[b]>=1e9?1e9:D[b]; } // a and b are free, so this counts only the countries in between
+function tvPathCountries(a,b,free){ // one best route's unguessed countries, in order
+  const D=tvDist(a,null,free); if(D[b]>=1e9) return []; const path=[]; let u=b, guard=0;
+  while(u!==a&&guard++<300){ if(!free.has(u)) path.unshift(u); u=D.__p[u]; if(!u) break; }
+  return path; }
+function tvComponent(a,free){ const seen=new Set([a]), q=[a]; while(q.length){ const u=q.shift(); for(const v of GEO.by[u].b) if(free.has(v)&&!seen.has(v)){ seen.add(v); q.push(v); } } return seen; }
+let TV_POOL=null;
+function tvPair(rnd){ if(!TV_POOL) TV_POOL=GEO.list.filter(c=>c.b.length&&c.km2>12000).map(c=>c.id).sort();
+  for(let k=0;k<400;k++){ const a=TV_POOL[Math.floor(rnd()*TV_POOL.length)], b=TV_POOL[Math.floor(rnd()*TV_POOL.length)]; if(a===b) continue;
+    const n=tvNeed(a,b,new Set([a,b])); if(n>=3&&n<=7) return [a,b]; }
+  return ["FRA","POL"]; }
+const tvNum=()=>dayIndex()+1;
+function tvStatus(){ S.tv=S.tv||{}; const d=S.tv[today()]; return d&&d.over?(d.won?`Today's done · ${d.score===0?"perfect":"+"+d.score}`:"Today's done · didn't make it"):d&&d.g.length?`Today's #${tvNum()} · in progress`:`Today's #${tvNum()} is ready`; }
+function tvShare(st,daily){ return `#travle ${daily?"#"+tvNum():"(unlimited)"} ${st.won?"+"+st.score:"(?/"+st.max+")"}${st.won&&st.score===0&&st.e.every(x=>x==="✅")?" (Perfect)":""}${st.h?` (${st.h} hint${st.h>1?"s":""})`:""}\n${st.e.join("")}`; }
+async function startTravle(opt={}){
+  const daily=!opt.unlimited, gid=daily?"travle":"travleu";
+  begin(gid,daily?`Travle #${tvNum()}`:"Unlimited Travle"); stage.className="gstage scroll"; geoLoading();
+  try{ await geoLoad(); }catch(e){ return geoFail(); }
+  if(!GS||GS.game!==gid) return;
+  S.tv=S.tv||{}; const key=today();
+  if(daily&&S.tv[key]&&S.tv[key].over){ end(); return tvResults(); }
+  let st;
+  if(daily&&S.tv[key]) st=S.tv[key];
+  else { const [a,b]=tvPair(daily?seeded("globetrotter-travle-v1-"+key):Math.random), n=tvNeed(a,b,new Set([a,b]));
+    st={a,b,n,max:n+TV_EXTRA(n),g:[],e:[],h:0,hints:{}}; if(daily){ S.tv[key]=st; save(); } }
+  const A=GEO.by[st.a], B=GEO.by[st.b];
+  __b.tv=st;
+  const free=()=>new Set([st.a,st.b,...st.g]);
+  let over=false;
+  const baseBox=geoBox([st.a,st.b,...tvPathCountries(st.a,st.b,new Set([st.a,st.b]))],.22,160);
+  function render(msg){ const fr=free(), need=tvNeed(st.a,st.b,fr), left=st.max-st.g.length;
+    const col={}; st.g.forEach((id,i)=>col[id]=st.e[i]==="✅"||st.e[i]==="🟩"?"g-ok":st.e[i]==="🟧"?"g-near":"g-far");
+    const next=!over&&(st.hints.next||st.hints.init)?tvPathCountries(st.a,st.b,fr)[0]:null;
+    const map=geoMapSVG(baseBox,inView=>{ let s="";
+      if(st.hints.outlines||over) s+=GEO.list.filter(inView).filter(c=>!fr.has(c.id)).map(c=>geoPathEl(c,"g-ghost")).join("");
+      if(next&&st.hints.next) s+=geoPathEl(GEO.by[next],"g-next");
+      s+=st.g.map(id=>geoPathEl(GEO.by[id],col[id])).join("");
+      if(over&&!st.won) s+=tvPathCountries(st.a,st.b,fr).map(id=>geoPathEl(GEO.by[id],"g-miss")).join("");
+      s+=geoPathEl(A,"g-start")+geoPathEl(B,"g-end");
+      return s; });
+    stage.innerHTML=`<div class="tv">
+      <div class="tvhead">Travel from <b class="tva">${esc(A.n)}</b> to <b class="tvb">${esc(B.n)}</b></div>
+      <div class="tvmap">${map}</div>
+      <div class="tvbar"><span>${over?(st.won?(st.score===0?"Perfect route!":`Made it · +${st.score}`):"Out of guesses"):`${left} guess${left===1?"":"es"} left`}</span>${over?"":`<button class="btn ghost sm" id="tvhint">💡 Hint${st.h?` (${st.h})`:""}</button>`}</div>
+      ${next&&st.hints.init?`<div class="tvinit">Next country starts with <b>${esc(GEO.by[next].n[0])}</b></div>`:""}
+      ${msg?`<div class="tvmsg">${msg}</div>`:""}
+      <div class="tvlist">${st.g.map((id,i)=>`<span class="tvg ${col[id]}">${st.e[i]} ${esc(GEO.by[id].n)}</span>`).join("")}</div>
+      ${over?"":`<div id="tvin"></div>`}
+      ${over&&!st.won?`<div class="tvmsg">One shortest route: ${esc([st.a,...tvPathCountries(st.a,st.b,new Set([st.a,st.b])),st.b].map(id=>GEO.by[id].n).join(" → "))}</div>`:""}
+    </div>`;
+    if(!over){ geoInput($('tvin'),{placeholder:"Type a country",skip:()=>free(),onPick:guess});
+      $('tvhint').onclick=hintMenu; }
+    __b.tvNeed=need; }
+  function hintMenu(){ const opts=[["outlines","Show all borders on the map"],["init","First letter of the next country"],["next","Outline the next country"]].filter(([k])=>!st.hints[k]);
+    if(!opts.length){ toast("No hints left"); return; }
+    const box=document.createElement("div"); box.className="tvhints"; box.innerHTML=`<p>Each hint is noted in your result.</p>${opts.map(([k,l])=>`<button class="btn" data-k="${k}">${esc(l)}</button>`).join("")}<button class="btn ghost" data-k="">Cancel</button>`;
+    stage.querySelector(".tv").appendChild(box);
+    box.onclick=e=>{ const b=e.target.closest("button"); if(!b) return; box.remove(); if(!b.dataset.k) return; st.hints[b.dataset.k]=1; st.h++; if(daily) save(); render(); }; }
+  function guess(c){ if(over) return false;
+    if(c.id===st.a||c.id===st.b){ toast(`${c.n} is on the map already`); return false; }
+    if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }
+    const fr=free(), before=tvNeed(st.a,st.b,fr);
+    const ds=tvDist(st.a,null,fr), de=tvDist(st.b,null,fr), through=ds[c.id]>=1e9||de[c.id]>=1e9?1e9:ds[c.id]+de[c.id]-1;
+    st.g.push(c.id); const fr2=free(), after=tvNeed(st.a,st.b,fr2);
+    let e; if(after<before) e=tvComponent(st.a,fr2).has(c.id)?"✅":"🟩"; else e=through<=before+1?"🟧":"🟥";
+    st.e.push(e); if(e==="✅"||e==="🟩") good(); else bad();
+    if(after===0){ over=true; st.won=1; st.score=st.g.length-st.n; return done(); }
+    if(st.g.length>=st.max){ over=true; st.won=0; return done(); }
+    if(daily) save(); render(); }
+  function done(){ st.over=1; if(daily) save(); render(); if(st.won) setTimeout(confetti,250);
+    later(()=>finish(gid,st.won?st.score:99,{sub:st.won?`${A.n} → ${B.n} · ${st.g.length} guesses (best possible ${st.n})${st.h?` · ${st.h} hint${st.h>1?"s":""}`:""}`:`${A.n} → ${B.n} · didn't make it`, share:tvShare(st,daily), html:tvMapCard(st)+tvRouteCard(st), nextG:"travleu", nextLabel:daily?"Play unlimited Travle":"Play again"}),2200); }
+  if(st.over){ over=true; } render();
+}
+function tvMapCard(st){ const col={}; st.g.forEach((id,i)=>col[id]=st.e[i]==="✅"||st.e[i]==="🟩"?"g-ok":st.e[i]==="🟧"?"g-near":"g-far");
+  return `<section class="card"><div class="tvmap">${geoMapSVG(geoBox([st.a,st.b,...st.g.filter((id,i)=>st.e[i]!=="🟥")],.18,160),inView=>GEO.list.filter(inView).filter(c=>c.id!==st.a&&c.id!==st.b&&!col[c.id]).map(c=>geoPathEl(c,"g-ghost")).join("")+st.g.map(id=>geoPathEl(GEO.by[id],col[id])).join("")+geoPathEl(GEO.by[st.a],"g-start")+geoPathEl(GEO.by[st.b],"g-end"))}</div></section>`; }
+function tvRouteCard(st){ const best=[st.a,...tvPathCountries(st.a,st.b,new Set([st.a,st.b])),st.b].map(id=>GEO.by[id].n);
+  return `<section class="card"><h3>Your route</h3><div class="tvlist">${st.g.map((id,i)=>`<span class="tvg">${st.e[i]} ${esc(GEO.by[id].n)}</span>`).join("")}</div><p class="muted" style="margin-top:10px">One shortest route (${st.n} in between): ${esc(best.join(" → "))}</p></section>`; }
+function tvResults(){ const st=S.tv[today()];
+  show(`${bar("Travle")}
+  <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Travle #${tvNum()}</div>
+    <div class="big">${st.won?(st.score===0?"Perfect":"+"+st.score):"✗"}</div><p class="muted">${esc(GEO.by[st.a].n)} → ${esc(GEO.by[st.b].n)}${st.h?` · ${st.h} hint${st.h>1?"s":""}`:""}</p><p class="cheer" style="color:var(--ink-2)">New route tomorrow</p></section>
+  ${tvMapCard(st)}
+  ${tvRouteCard(st)}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="travleu">Play unlimited Travle</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(tvShare(st,true)); }
+
+/* ================= STRANDS: find the theme words on a 6×8 board ================= */
+/* Strands puzzles, generated by tools/build-strands.py: g = 48 letters row by row (6 wide), w = [word, cell indexes] with the spangram first, x = other words on the board */
+const STRANDS=[{"c":"Hit the road","g":"SASUIBNTLTOLACAERLOFKSUBLORNSOYISTDARALPRPOADTRI","s":"ROADTRIP","w":[["ROADTRIP",[36,42,43,44,45,46,47,41]],["SNACKS",[0,6,12,13,20,21]],["PLAYLIST",[39,38,37,30,24,31,32,33]],["ATLAS",[14,7,8,1,2]],["SUNROOF",[28,22,27,26,25,18,19]],["ROUTE",[16,10,3,9,15]],["BILLBOARD",[5,4,11,17,23,29,35,40,34]]],"x":"AIRSTRIP ALAS ALERT ALSO ALTER ASSERT ASSET ASSETS ASSURE BILL BITE BLUE BLUES BLUNT BOARD BOARDS BOIL BORE BOSS BOUND BOUNDS BOUT BREAK BULL BUNKER BUST CAKE CANAL CANT CASE CLAN CLASS CLUSTER COAT COLOR COLORS COOK COOKER COOL DAILY DAIRY EATS FACT FAKE FAKER FATAL FATE FLOAT FLOCK FLOOR FOCAL FOIL FOOL FORK FORT FROST LACK LAKE LASER LAST LATE LATER LEAF LEAK LESS LIAR LILY LIST LITE LOAN LOCAL LOCATE LOCK LOCKER LOOK LOST LOTS LOTUS LOYAL LURE LUST NULL NURSE ORAL OURS OUTER PART PARTS PASS PAST PLAY RAIL REACT REAL ROAD ROAST ROLL ROOF ROYAL RUST SACK SAIL SAILOR SAKE SALAD SALARY SALE SALT SALUTE SATAN SEAL SEAT SKATE SLACK SLATE SNACK SOAP SODA SOFA SOIL SOLO SORT SOUL SOUND SOUR STACK STAKE STATE STATS STATUS STEAK STEAL STILL STORE STRAP STREAK STRESS STRIP STROKE SUIT SUITE SULTAN SUNK SUNSET SURE TAKE TALE TALES TASK TASTE TATE TILL TOLL TORE TRAP TREAT TREK TRIAL TRIO TRIP TROLL TROY TRUE TRUNK TRUST USER YORK"},{"c":"Deep blue","g":"SQYOESDIUSRACRATECOCBLEALRASRTEAEHNUOLAWIRDLPHSE","s":"SEACREATURES","w":[["SEACREATURES",[5,4,11,17,10,16,23,29,35,41,47,46]],["WHALE",[39,33,38,37,30]],["SQUID",[0,1,8,7,6]],["CORAL",[12,18,13,14,21]],["DOLPHIN",[42,36,43,44,45,40,34]],["SEAL",[27,32,31,24]],["CRAB",[19,25,26,20]],["OYSTER",[3,2,9,15,22,28]]],"x":"ABLE ACCORD ACRE ALAS ALERT ALOE ALPHA ALTAR ALTER AREA AROSE ATLAS AURORA BALE BARE BASE BASES BASH BATS BLAH BLAIR BLAST BREW BRUTAL CABLE CAESAR CARD CARE CAREER CARL CAROL CART CARTER CASE CASH CAST CASTE CASTLE CAUSE CEASE CIRCA CIRCLE CLEAR COCA COLA COLE CORD CORE CRASH CRATE CREATE CREATURE CREST CREW CROC CRUST DIAL DOLL DOLLAR EARL EARN EASE ELSE ERASE HALE HALL HALO HALT HARE HEAL HEAR HELLO HELP HERALD HERB HERE HERO HINT HIRE INSERT INTER LAID LASER LAST LATE LATER LAWN LEAP LEARN LEARNT LEASE LEWIS LOCAL LOCATE LORD NURSE ORACLE ORAL OUTER OUTLET PALE PLEA PLEASE RACE RAID RALPH RASH RATE REAL REAR REEL RELATE RELEASE RESET RESIN REST RETREAT RETURN RISE ROLE ROSE ROSTER ROUTE RUIN RUST SAID SALE SALT SEAT SECRET SELL SHAH SHALE SHALL SHARE SHAW SHELL SHIN SLATE SORE SORT SOUR STAB STABLE STAR STEEL STEER STEREO STERN STREET SWAP SWEAR SWELL TABLE TABLES TABLET TALE TALES TEAR TRACE TREAT TREE TROY TURN TURNS USER WALL WEAR WELL WERE WHERE WINTER WIRE WISE WISH YOUR"},{"c":"Capital idea","g":"ATSMUDHNIRABEAPDDLRIOKNISTIMYYCILAOTCAROICAPITAL","s":"CAPITALCITY","w":[["CAPITALCITY",[36,42,43,44,45,46,47,41,40,35,29]],["PARIS",[14,13,18,19,24]],["LIMA",[32,26,27,33]],["CAIRO",[30,37,31,38,39]],["TOKYO",[25,20,21,28,34]],["MADRID",[3,10,16,9,8,15]],["ATHENS",[0,1,6,12,7,2]],["DUBLIN",[5,4,11,17,23,22]]],"x":"ALBUM AMID ANIMAL ANTI APART ARENA ARMS ATHEIST BALD BLIND BLINK BURP BURST CALM CAPITAL CARL CAROL CART CITY CLIT COAL COIL COMA COOL DINK DRUM DUAL HAIR HARE HART HEAR HEART HEARTS HEIR HERS IRIS LIAR LIMO LINK LIST MAIL MALIK MARIA MARINA MARINE MART MARTIAL MILITIA MINA MINE MINT MIST MOIST MOOT NEAR ORAL PACT PAIN PAINT PAIR PALM PANT PANTHER PANTS PARA PARENT PART PARTIAL PARTS PIER PINE PINT PITS PRAY PRINT RACIST RAID RAIL RAIN RANT RAPID RAPIST RENT RIOT RITA ROOM ROOT SCAR SMITH SNAP STIR STOP STRAIN STRAIT STRAP STRIP TAIL THAN THEIR THEIRS THEN THERAPIST TIDAL TIER TIRE TOOL TRACT TRAIL TRAIN TRAIT TRANSIT TRANSMIT TRAP TRAY TRIAL TRIO TRIP URINE"},{"c":"Rise and shine","g":"WAESOBFLBTARFNOAMETOACEAESLSAKGGETLFEGABLACREATS","s":"BREAKFAST","w":[["BREAKFAST",[5,11,17,23,29,35,41,47,46]],["EGGS",[24,31,30,25]],["BACON",[8,15,21,14,13]],["TOAST",[18,19,20,27,33]],["WAFFLES",[0,1,6,12,7,2,3]],["CEREAL",[42,36,43,44,45,40]],["OATMEAL",[4,10,9,16,22,28,34]],["BAGEL",[39,38,37,32,26]]],"x":"ABLE ABSORB ACME ALAS ALGAE ALOE ALSO ALTAR AREA AROSE ASCOT ATLAS BALE BALL BALLS BARE BASE BATON BATS BEAR BEAT BELT BEST BETA BLAKE BLAST BLOC BOAT BOOST BOOT BOOTS BORE BOSTON BREAK BREAST CABLE CAKE CALF CALL CAME CAMERA CANOE CANT CASE CAST CASTE CASTLE CEASE CLAN CLEAR CLOSE CLOSET COAL COAST COASTAL COAT COLA COLE COOL COOLANT CRAB CRATE CREATE EAGER EAGLE EASE EAST EATS ELSE ERASE FACE FAKE FALL FALSE FAST FATAL FATE FLAT FLAW FLOAT FONT FOOL FOOT GATE GEAR GRAB GREAT GREATEST LABEL LACE LAKE LAST LATE LATEST LEAF LOAN LOCAL LOCATE LOOSE LOSE LOST LOTS MAKE MARE MATE MEAL MEAT MESA NOBLE NOSE NOTABLE NOTE OBSTACLE ONTO RAGE RATE REAL REBEL REMAKE ROAST ROSE SAKE SALE SALON SALT SAME SCALE SCALES SCAM SCAN SEAL SEAT SEEM SELF SLATE SLOT SOFT SOLE SOON SORE STAB STABLE STAGE STAKE STALL STAR STARE STEAL STOLE STORE STORM TABLE TABLES TAKE TALK TALL TEAR TEST TOOL TORE"},{"c":"Nothing but net","g":"STSISATEAUPSALYFLBLTOULOIONUDCPVKOOKBETHPLASKBAL","s":"BASKETBALL","w":[["BASKETBALL",[36,42,43,44,37,38,45,46,47,41]],["DUNK",[28,27,26,32]],["ASSIST",[5,11,4,3,2,1]],["LAYUP",[13,8,14,9,10]],["HOOP",[39,34,33,40]],["BLOCK",[17,16,23,29,35]],["STEAL",[0,6,7,12,18]],["PIVOT",[30,24,31,25,19]],["FOUL",[15,20,21,22]]],"x":"ALAS ALIVE ALLEY ALLOY ALLY ATLAS ATOP BALL BALLOON BASE BASKET BEAST BEST BETH BLOC BLUNT BOLD COLA COLD COOK COOP COULD COUNT COUNTY DOCK DOLL DONT DUKE DULL EAST EATS EVIL FALL FAST FATE FLOCK FONT FOOL FOOT FULL FUNK FUSE FUSS HALL HALO HOOD HOOK KNOT LAST LATE LATELY LATEST LEAF LEAST LION LIVE LOCK LOCO LOOK LOOP LOUD LOVE LUKE LUST NOPE NOTE NULL OLIVE ONTO PASS PEST PILL PILOT PITY PLUS POKE POLL POOL PULL SALE SALON SALT SALTY SEAL SEAT SELL SETH STALL STATION STAY STELLA STEP STOKE STOOD STOP TALE TALES TALL TALLY TATE TELL TEST THOU TILL TOLL TOOK TOOL UNTIL UNTO VEST VETO VILLA VIOLATE VITAL YALE YEAST YELL"},{"c":"Board meeting","g":"HESAMECSGCIBOPCSASEHCKTHNEOOLOINRKEPNEEUQAGTIBMG","s":"CHESSGAME","w":[["CHESSGAME",[6,0,1,2,7,8,3,4,5]],["QUEEN",[40,39,38,37,31]],["ROOK",[32,26,27,33]],["BISHOP",[11,10,17,23,29,35]],["CHECK",[14,19,25,20,21]],["CASTLE",[9,16,15,22,28,34]],["GAMBIT",[47,41,46,45,44,43]],["OPENING",[12,13,18,24,30,36,42]]],"x":"ACME AMBER AMBIENT ASCOT ATOP BASH BASIC BASICS BASIS BATH BATS BEEN BEER BERET BIAS BITE BURKE BURN BURNING CAGE CAME CASE CASH CAST CHEER CHESS CHOKE CHOP CHOSE COHERENT COKE COLE CONE COOK COOKER COOL COPE CORE CORK CORN ECHO ENTER GAME GEEK GENE GENIE GENRE HECK HERE HEREIN HERO HOLE HOLT HOOK HOOKER HOPE HORN HOSE IMAGE INHERENT INNER INTER INTERN KEEN LEAP LOCK LOCO LOOK LOTS MAPLE MASS MIST NECK NEON NINE OPEN OPENER PEER PHONE PLEA PLOT POLE POLO POSE QUEER QUIET QUIT QUITE RECKON RENT ROCK ROLE ROOT SAGE SAME SCAM SCENE SCHOOL SCOPE SCORE SHOE SHOP SHOT SPEECH SPHERE STAB STOCK STOCKS STOKE STOLE STOP STORE TASK TEEN TIER TOKEN TOOK TORE TORN"},{"c":"Sweet tooth","g":"DSUCPCENAEAUSDLCEKSARATEEIFRTERSEUDGTUSIKOSMOEOC","s":"DESSERTS","w":[["DESSERTS",[0,6,12,18,24,30,36,42]],["COOKIE",[47,46,41,40,39,32]],["FUDGE",[26,33,34,35,29]],["SUNDAE",[1,2,7,13,8,9]],["TART",[28,21,27,22]],["MOUSSE",[43,44,37,31,38,45]],["CUPCAKE",[5,11,4,3,10,17,23]],["ECLAIR",[16,15,14,19,25,20]]],"x":"ACTRESS ALAS ARCADE ARISE ARREST ASSERT ASSESS ASSIST CAKE CANDLE CANE CAPE CARD CARE CARL CARR CARRIER CART CASE CAUSE CEASE CLAN CLASS CLASSES CLAUSE CLEAN CODE COKE COOK CRATE DALE DESSERT DOCK DRESS DRESSER DUKE EARL EASE EASIER EASIEST FACE FACT FADE FADED FAIR FARE FATE FERAL FEST FEUD FIRE FIRST FIST FRAT FUSE FUSS GEEK ISSUE KEEP KISS LACE LADEN LAND LANDED LANE LASER LATE LEAD LEAK LEAN LEAP LEASE MOSS MOUSE MUST NESS OURS PACE PACT PEACE PEAK PEEK RACE RAISE RARE RATE RATED READ REAL REAR REFUSE REFUTE RESIDE RESIST REST RISE RUDE RUSSIA RUST SADNESS SAFARI SAFE SALAD SALE SAND SANE SAUCE SEAL SEND SERIAL SERIES SERUM SIDE SIERRA SOUR STRESS SURE SURF SURFACE TALE TARA TATE TEAR TRACE TRACT TRIAL TRUE TURF UNSAFE USED USER"},{"c":"In full bloom","g":"FVITOPLOEDYPOLAROPWIPLESESIIRSRYLLIIBATUYAEDILHD","s":"FLOWERBED","w":[["FLOWERBED",[0,6,12,18,24,30,36,42,43]],["ROSE",[15,16,23,22]],["TULIP",[38,39,32,26,20]],["DAISY",[9,14,19,25,31]],["LILY",[21,27,33,40]],["POPPY",[5,4,11,17,10]],["IRIS",[34,28,35,29]],["DAHLIA",[47,41,46,45,44,37]],["VIOLET",[1,2,7,13,8,3]]],"x":"ADORE AIDE ALLIES ALLOW ALLY ALOE AROSE BAIL BAIT BALL BARE BEAR BEAT BREW DAILY DALE DARE DAYS DEAL DEALER DEALT DEAR DELL DIAL DIARY DIET DIVE DOES DOPE DOSE DRESS DROP EARL EARLIER EDIT FLOW FLOWER FOLLOW FOOL HAIL HAIR HULL IDEA IDEAL IDEALLY IDOL LADY LAID LAYER LEAD LEAP LESS LIAR LOAD LORD LOSE LOSER LOSS LOVE LOVED LOVER LOWER LULLABY OILED OPERA OPPOSE ORAL OVER OVERALL OVERLAP PALE PARODY PAROLE PIER PILE PILL PILLAR PILLOW PLEA PLEAD POLAR POLE POPE POSE PRAISE PREP PRESS PROP PROPER PROPERLY PROPS PROSE RADIO RAID RAIL RAISE RALLY READ READY REAL REPS REREAD RISE RODE ROLE ROPE ROPES ROSS SILLY SLIP SODA SOLAR SOLE SORE SPAR SPARE SPILL SPREAD TAIL TALL TALLY TEAR TELL TIDAL TIDE TIED TIER TYPE TYRE VERA VERY VETO VIDEO VOID WILL WISE WOLF WOOL"},{"c":"Under the weather","g":"RECASTOLZZIDFEYNIRWNHSNAINAOWRNRUILUDOMSDOYSTYLC","s":"FORECAST","w":[["FORECAST",[12,6,0,1,2,3,4,5]],["RAIN",[29,23,16,15]],["SNOW",[21,22,27,28]],["HAIL",[20,26,33,34]],["SUNNY",[39,32,25,19,14]],["WINDY",[18,24,30,36,42]],["CLOUDY",[47,46,41,35,40,45]],["DRIZZLE",[11,17,10,9,8,7,13]],["STORM",[43,44,37,31,38]]],"x":"ANEW ARMS ARMY CAST CLOUD COLD COLON COULD DINOSAUR DISH DRAIN DRAW DRAWN DRUM FLEW HARD HARDY HARM HOLD HOUR IDOL INSANE IRIS IRON LIAR LIDO LIMO LION LIST LOAN LOUD LOUDLY MIDST MILD MIST MOST MUST NAIL NASH NINE NOISY NORM NOSY NOUN ONWARDS RAID RAIL RAINY RASH RELY ROLE RUST RUSTY SAID SAIL SANE SHELF SHOW SHOWN SLIM SLOW SOIL SOLD SOLID SOLO SONNY SOUR STIR SWAN SWIM TINY TORN TOUR URINE WARD WARDS WARN WILD WILDLY WIND WINE YOUR ZERO"},{"c":"Drawer full","g":"TENSILUONEFSTGEROIRSLKFNESADKNTIKLVOAWHEEOGRSIPS","s":"UTENSILS","w":[["UTENSILS",[6,0,1,2,3,4,5,11]],["WHISK",[37,38,31,25,32]],["LADLE",[33,26,27,20,14]],["TONGS",[12,7,8,13,19]],["GRATER",[42,43,36,30,24,18]],["SIEVE",[44,45,40,34,39]],["SPOON",[47,46,41,35,29]],["KNIFE",[28,23,17,10,9]],["FORK",[22,16,15,21]]],"x":"AISLE ASSERT ASSET DALE ELSE FEEL FOREGONE FOREST FREE GATE GENE GENESIS GENRE GLAD GLASS GOES GONE HEEL HIKE ISLE KEEN KEEP KISS LAKE LASER LAST LENS LESS LESSER LIEN LIFE NEON NESS NEST NOEL NONE NOTE NOVEL PEEK PEEL POSE RAISE RATE REEF REEL REGRET RESET REST SAKE SALE SEEK SEEN SENSE SHEEP SHIELD SHIP SINK SITE SKIES SOON SORE STAR STONE STOUT SWISS TENSE TEST TIER TONE TONGUE WAIST WAIT WAITER WATER WHEEL WHIP WHITE WHITES WISE"},{"c":"Out of this world","g":"NPTSOLEUMORANSRMOSEUSANYRNNETSUUVOUTTNSLPESAARUM","s":"SOLARSYSTEM","w":[["SOLARSYSTEM",[3,4,5,11,10,17,23,29,35,41,47]],["MARS",[15,21,14,20]],["VENUS",[32,27,26,19,13]],["SATURN",[42,43,36,30,24,25]],["URANUS",[46,45,44,37,31,38]],["NEPTUNE",[0,6,1,2,7,12,18]],["PLUTO",[40,39,34,28,33]],["MOON",[8,9,16,22]]],"x":"ALOE ALONE ALSO ARMOR ARMS ASSURE ATOP EATS ENSURE LONE LOST LOTS LOTUS LOVE LUMP LUST MANNER MANOR MANURE MANY MASS MATE MATTE MONTE MOOT MORAL MORMON MORON MOST NATURE NEAR NEAT NEON NESS NOPE NORM NORMAN NOSY NOTE NURSE NUTS ONSET ONTO ORAL OVEN PETTY PLAN PLANT PLOT PLUS POET POLAR PURSE PURSUE RANSOM RANT RATE ROAR ROOM ROOMMATE ROOT RUMOR RUNNER SALON SALUTE SANE SEAT SENSE SENSOR SENT SEPT SETUP SLOPE SLOT SOLAR SOLVE SONS SOON SOUL SOUP STAR STEAM STEM STEP STONE STOP STORM STOUT STOVE SUNSET SURE SYSTEM TEAM TEAR TEMP TEMPO TENURE TOMATO TONE TOOL TUMOR TUNA TUNE TURN TURNS UNSURE UPON USER VENT VENUE VETO VOLUME VOTE"},{"c":"Strike up the band","g":"ONAPINFBAIRSLUPAUTUTRHBMATEOOELEUMSNIODRETVOLLCS","s":"INSTRUMENTS","w":[["INSTRUMENTS",[4,5,11,17,10,16,23,29,35,41,47]],["CELLO",[46,40,45,44,43]],["FLUTE",[6,12,18,25,31]],["OBOE",[28,22,27,26]],["HARP",[21,15,20,14]],["TUBA",[19,13,7,8]],["PIANO",[3,9,2,1,0]],["DRUMS",[38,39,32,33,34]],["VIOLA",[42,36,37,30,24]]],"x":"ABOUT ALOE ALTER APART APARTMENT AROSE BARE BARN BENT BEST BONE BONER BOOM BOOST BORE BOSOM BOUT BURN BURP BURST BUST BUTTER CELL CENT CREST CRUDE CRUEL DEAL DEALT DEER DELTA DOLL DRUM DUEL ENTER ERUPT HAIR HARE HART HEEL HERO HOME HOMER HONEST HOSE HOST HOUR HURT INSTRUMENT IRIS LATE LATER LATTER LEMON LENS LENT LETTER LIED LOUD LURE MEET MELD META METAL MOMENT MONSTER MONTE MOON MOOSE MORE MORPH MORTAL MOST MUST MUTE MUTT MUTUAL NAPA NEST NOSE OBESE OILED ONSET OURS OUTER PAIR PAPA PART PARTED PARTS PHONE PROBE PROSE PURE RARE REED REEL RENT RESORT REST ROBUST ROOM ROSE ROSTER ROUTE RUDE RUMOR RUST SCENE SCENT SELL SENSE SENSOR SENT SERUM SMELL SOME SOON SOONER SORE SORT SORTED SOUR SOURCE STEM STRAP STRIP TALE TATE TELL TENSE TERM TRAP TREE TRIP TROUT TUBE TUMOR TURN TURNS TURTLE ULTRA UTMOST UTTER VILE VIOLATE VIOLET"},{"c":"Paint the town","g":"CIMSCORDNIOLIGORNOOTGNAREELBGWLUAERHOELTEEVINELE","s":"COLORWHEEL","w":[["COLORWHEEL",[4,5,11,17,23,29,35,41,47,46]],["ORANGE",[14,15,22,21,20,25]],["GREEN",[28,34,40,45,44]],["BLUE",[27,26,31,37]],["INDIGO",[9,8,7,12,13,18]],["VIOLET",[42,43,36,30,24,19]],["TEAL",[39,33,32,38]],["CRIMSON",[0,6,1,2,3,10,16]]],"x":"ABLE AGREE ALERT ALIEN ALIVE ALTER ANGEL ANGER ANGLE BAGEL BALE BANG BANNING BARN BARON BEAT BEATEN BEER BELT BERET BETA CLOSING COIN COLON COLOR COOL CORN COSMIC DING DOING DONG EATEN ENTER EVIL GANG GLUE GOING GONNA GRAB GREAT GREET GRID GRIM GRIND GROAN GROIN HEEL HERB HERE ICON IDIOT INTER IONIC IRON LABEL LATE LATER LENT LIEN LINE LIVE LOAN LOCO LOSING LOVE MINA MIND MINOR NEAL NEAT NOTE ONION ORGAN ORGANIC OVEN RAGE RANG RANGE RANGER REAL REEL RELATE RIDING RING RIOT RITE ROAR SCORING SING SOLO SONIC SOON TABLE TABLET TALE TEEN TORN TREE VEIL VEIN VENT VILE VINE VIOLENT WAGE WAGER WANG WARN WARNING WHEEL WHEELER WHERE"},{"c":"Eat your greens","g":"EVEGACGCARABECEORBTLRYTOAEOIOTBNEANALPELSTESKAOP","s":"VEGETABLES","w":[["VEGETABLES",[1,0,6,12,18,24,30,36,42,43]],["CARROT",[7,8,9,16,15,22]],["ONION",[28,34,27,26,31]],["PEAS",[37,32,33,40]],["POTATO",[47,46,41,35,29,23]],["CELERY",[13,14,19,25,20,21]],["CABBAGE",[5,4,11,17,10,3,2]],["KALE",[44,45,39,38]]],"x":"ABLE ABORTION ACRE AERIAL AGAR ALAS ALOE ALONE ALSO ALTER AREA ARTY ASLEEP ATOP BALE BARE BARREL BARRY BARTON BEAN BEAT BEEN BELT BETA BOOT CAGE CARE CARR CARRY CART CARTOON CAVE CEREAL CLAN CLEAN CLEAR CLONE CREATE CREEP EAGER EAST ELECT ELSE ENABLE ERROR EVER GAVE GEAR GRAB GRACE GRAVE GREY GROTTO INTO IRENE IRON KEEN KEEP LAKE LANE LAST LATE LATER LEAK LEAN LEAST LEAVE LOAN LONE LOST LOTS NEAL NEAT NITRO NOEL NOTION ONTO ORACLE OTTO PEAK PEASANT PEEK PEEL PEER POLE POST RACE RAGE RARE REACT REAL REAR REEL RELATE RIOT ROAR ROAST ROLE ROOT RORY SAINT SAKE SALE SEAL SEEN SENATE SLEEP SLOT SOAK SOLE SPEAK SPOT STOLE STOLEN STOP TABLE TABLES TALE TATTOO TEEN TIRE TOAST TOPS TORE TORY TROY TYRE VEGETABLE VERA YEAR"},{"c":"Bowl of plenty","g":"CHIWFREKIPEURHMRAIRCULPTYEAEPBGPPLEOARAPAWBNANAL","s":"FRUITBOWL","w":[["FRUITBOWL",[4,5,11,17,23,29,35,41,47]],["APPLE",[40,39,32,33,34]],["PEACH",[28,27,26,19,13]],["GRAPE",[30,37,38,31,25]],["CHERRY",[0,1,6,12,18,24]],["BANANA",[42,36,43,44,45,46]],["KIWI",[7,2,3,8]],["PLUM",[22,21,20,14]],["PEAR",[9,10,16,15]]],"x":"ACRE ALARM APPEAL BARN BEAN BOWL CALM CAPE CHECK CHIP CURE EACH EARL FEAR FEAT FERAL FRUIT GRAB HECK HIKE HIRE IMPALA KERRY LACE LARGE LAURA LEAN LEAP LUCY LUMP LURE MIKE MUCH NAPA NAPALM NAPPY PACE PACER PAGE PALACE PALE PALM PAPA PAPER PARA PEACE PEARL PEEL PEOPLE PEPPER PERCH PIER PIKE PLACE PLAN PLEA PREP RAGE RAPPER REACH REAL REALM REAR REPEAL RIPE RULE TALE TAPE TIER WEAR WIPE WIRE"},{"c":"Paws and claws","g":"ILDCATWLGEJSAINYRAVTXLTGDRESOURCELATEAORAOLOPCBB","s":"WILDCATS","w":[["WILDCATS",[6,0,1,2,3,4,5,11]],["TIGER",[19,13,8,9,16]],["JAGUAR",[10,17,23,29,34,39]],["LYNX",[21,15,14,20]],["OCELOT",[38,31,32,33,28,22]],["LEOPARD",[42,36,43,44,37,30,24]],["BOBCAT",[47,41,46,45,40,35]],["SERVAL",[27,26,25,18,12,7]]],"x":"ACRE ALAS ALERT ALIGN ALIGNED ALOE ALSO AREA ARREST ARTY AUTO BALE BARE BOAT CAESAR CARD CARE CAREER CARL CAROL CARR CAST CENT CENTER CENTRE CEREAL CERTAIN CERTAINLY COAL COCA COLA COLE COOL COOLER COOP CORAL CORE CORP CRAB CREST CROC CROP DENIAL DENT DENTAL DENY EAST EATS ELSE ENTER ERASE EXIT GILL GOAL GOAT GREAT GREY INTER INTEREST INTERVAL LACE LASER LAST LASTLY LATE LATELY LATER LATEST LEAP LINE LINED LINER LING LITE LOCAL LOOP LOSE LOSER LOST LOTS NEAT ORAL OUTLET PACE PACER PALE PARCEL POLAR POLE POLO POOL POOR RACE REAL REAR REEL RELY RENT RENTAL RESET REST RETAIL RETAIN ROAR ROLE SALE SEAL SECRET SERVING SLOT SOLAR SOLE SOLELY SOLO STAR STARE STOLE STOUT STYLE TAIL TALE TALES TALL TARA TASTY TERRACE TEST TILL TINY TOAST TOTAL TREAT TREE TYRE VAIN VINE VINYL VITAL WAIT WAITER WALL WATER WAVING WILD WILL WILLING WINE WING WINTER YEAST"},{"c":"Return to sender","g":"MILBDAATTLODERPEXRAPCAREMTERESPSLIRSOFFUOCSTOICE","s":"POSTOFFICE","w":[["POSTOFFICE",[30,36,42,43,44,37,38,45,46,47]],["STAMP",[31,25,18,24,19]],["LETTER",[9,15,8,7,12,13]],["PARCEL",[14,21,27,20,26,32]],["MAILBOX",[0,6,1,2,3,10,16]],["COURIER",[41,40,39,34,33,28,22]],["ADDRESS",[5,4,11,17,23,29,35]]],"x":"ACRE ADORE APEX APPAREL APPEAR APPETITE APPLE AREA ARREST BOLD BOLT BORE BOXER CAPE CARE CAREER CARL CARR CARRIER CELL COIL CORE CORRECT COURSE CRATE CREAM CREATE CREST CROC CROSS CULT CURE CURSE DOLL DRESS DRESSER EARL EARLIER EARLIEST EATS EXACT FIERCE FILE FILTER FIRE FOSTER FOUL FOUR LEAP LIAR LIFT LITE LITTER LITTLE LOAD LORD LURE MAIL MARC MARE MART MATE MATTE MATTER MILL MILLER MILLET OCCUR OFFICE OFFSET OURS PACE PACER PACT PARA PARSE PART PEACE PEARL PEST PETITE PLEA POSE POST POSTER PREP RACE RAIL RAMP RAPPER RARE RATE REACT REAR REPEAT RESOURCE REST RESTART RETAIL RETREAT RIFLE RIFT ROAD ROLE ROLL ROSE ROSS RULE RULER SCORE SCORER SECRET SELF SEPARATE SEPT SERIES SLEPT SMART SOFT SOIL SORE SOUL SOUR SOURCE SPOT STAR STARE START STARTER STEP STOP TAIL TAPE TARA TEAM TEAR TELL TERRACE TERRIFIC TILL TILT TITLE TOPS TOUR TRAIL TRAIT TRAP TREAT"},{"c":"Lights, camera","g":"MVSCESOIRLEQEETCKUNEICENINNATRGODYOMHPPCIETERERP","s":"MOVIENIGHT","w":[["MOVIENIGHT",[0,6,1,7,12,18,24,30,36,42]],["POPCORN",[37,31,38,39,34,29,23]],["SCREEN",[2,3,8,13,19,25]],["TICKET",[14,20,15,16,22,28]],["SEQUEL",[5,4,11,17,10,9]],["CANDY",[21,27,26,32,33]],["PREMIERE",[47,46,41,35,40,45,44,43]]],"x":"ACCENT ACNE ACTING ACTOR ADOPT ATOM ATOMIC CANE CANON CENT CERTAIN CITE COAT COME CORE CORN CRIME CRITIC DANCE DANCER DANCING DATE DOING DONATE DONE DONG DOPE EIGHT ELECT ENGINE ENGINEER EPIC GONE GONNA HERE HONDA HONG HOPE INNER IONIC IRENE ISLE KENT MERCY MERE MICE MORE MOVIE NEAT NECK NICE NICK NICKEL NIGHT NINE NONE NOPE ONCE PHONE PHONY PIER PIERCE POND PONY POPE PREMIER PREP PRICE PRIME PRIOR REACT READ READY RECIPE REMOTE RENT RETAIN RICE RIOT RIPE RITE ROAD SCREENING SECRET SEEK SELECT SITE TACKLE TACTIC TEEN TEND TERM THERE TICK TIER TINY TIRE TORE TORN TREE TREK TRIM TRIO TROY TYPE UNTO VOMITING"},{"c":"Fresh powder","g":"HOLEWICMUGGNKOIINTELSKSENYALGRIGTINSRLAKSPCUSTRO","s":"WINTERSPORTS","w":[["WINTERSPORTS",[4,5,11,17,23,29,35,41,47,46,45,44]],["SKIING",[20,21,14,15,16,10]],["SLALOM",[22,27,26,19,13,7]],["LUGE",[2,8,9,3]],["CURLING",[42,43,36,37,30,24,31]],["HOCKEY",[0,1,6,12,18,25]],["SKATING",[40,39,38,32,33,34,28]]],"x":"AGAIN AGAINST AKIN ALIGN ALOE ALSO ATLAS COIL COKE COLA COLE CRUST CULT ENSIGN GAIN GAINS GALE GIRL GLUE HOLE INNER INTER INTERN ISLE KING KISS KNIT LAST LAYING LIKING LIMO LINE LING LINK LINKS LIST LOCK LOCO LOSING LUST LYING MILE MILK MOCK MOLE NEST PORK PORT PORTAL POSING POST POSTAL RENT RESIGN RESIN REST RING ROSS RULING RUST SAGA SAIL SALE SALT SALTY SAYING SENT SIGN SILK SING SINGER SINGLE SINK SISTER SKIN SLIM SOCK SOIL SOLE SORT SOUL SPORT SPORTS STAIN STERN TAIL TAKING TALE TALK TALKING TASK TIGER TYING URINE WING WINNER WINTER YALE"},{"c":"Fix it","g":"RTCHETACSRRWRWDSEEERILINLLLELCREVPAHHEDNSEARDWAR","s":"HARDWARE","w":[["HARDWARE",[36,42,43,44,45,46,47,41]],["WRENCH",[11,10,17,23,29,35]],["PLIERS",[33,28,22,16,9,15]],["DRILL",[14,19,20,26,25]],["LEVEL",[24,31,32,27,21]],["SCREW",[8,7,12,18,13]],["RATCHET",[0,6,1,2,3,4,5]],["SANDER",[40,34,39,38,37,30]]],"x":"ACNE ACRE ALIEN ALLELE ALLIES AREA CAESAR CALL CALLER CAPE CARE CARR CART CASE CASH CATCH CHAP CHAPEL CHASE CHEAP CHEW CLAN CLASH CLEAN CLEVER CREW DEAR DEED DEER DELL DIRE DRESS DREW EACH EASE ELSE EVER HALE HALL HAND HANDED HANDER HARD HARDER HARE HEAL HEAPS HEAR HEEL HELP HERD HERE HEREIN HERS IDLE ILLNESS INCH INLAND ISLE LAND LANDED LASER LEAN LEAP LEASE LESS LEVER LEWIS LIEN LINE LINER NASH NESS NICHE PALE PEACH PLAN PLEA PLEASE RAND RARE RASH REACH REAL REAR REED REEL RELEASE RELIEVE RELIEVED RENEW RESIN REVEAL RISE RISEN SALE SAND SCAR SCARE SCRATCH SCREEN SEAL SEEN SELL SELLER SEWER SHALE SHALL SHAPE SILVER SNAP SPAN SPELL STAR STARE STRAW SWAN SWELL TREE TRENCH VEIL VEIN VERA WANDER WASH WATCH WELL WERE WILD WILL WILLIE WIRE WISE"},{"c":"Fishbowl","g":"BELLMATAPYOQTARLGUCOYEUASGBCPRSOOAPIIURTYUDSCETM","s":"AQUARIUM","w":[["AQUARIUM",[5,11,17,23,29,35,41,47]],["GUPPY",[16,22,28,34,40]],["TETRA",[46,45,39,38,33]],["BETTA",[0,1,6,12,7]],["GOBY",[25,19,26,20]],["MOLLY",[4,10,3,2,9]],["PLECO",[8,15,21,27,32]],["OSCAR",[31,24,18,13,14]],["DISCUS",[42,36,43,44,37,30]]],"x":"ACTOR ALLOY ALLY APART ARTY BALE BALL BARE BARELY BEAR BEAT BELL BELLY BETA BOAT BOOT BORE BOSS BOYCOTT CAPE CARE CARL CARPET CART COAT CORAL CORE CORP COURT CRAB CRATE CROC CROSS CURE DISC DISCUSS EARL EARLY GLUE GOAT GORE LATE LEAP LUCY LUGE MOLE MUTE MUTT OBEY ORAL OURS PACE PACER PACT PAGE PALE PAPA PAPER PARA PART PARTY PEARL PIPE PIPER PLATE PLEA PLUG PRAY PREP PREPARE PREY PROBE PULP RACE RAGE RALLY RAPPER RATE RELY REPAY RIPE ROBOT ROOT ROSS RULE RULER SCAR SCARE SCARY SCORE SCRAP SOAP SOBER SORE SORT SOUR SOURCE SURE TALE TALL TALLY TAPE TARA TATE TEAR TELL TOBY TORE TORY TOSS TOUR TRACE TRAP TRAY UGLY UPPER UTTER YOGA"},{"c":"Old MacDonald","g":"DOYUTBNEYERAKLAMKRTLFLANEDTOAYLUGACAGECKORPISRHD","s":"BARNYARD","w":[["BARNYARD",[5,11,17,23,29,35,41,47]],["HORSE",[46,40,45,44,37]],["GOAT",[32,27,33,26]],["PIGLET",[42,43,36,30,24,18]],["DONKEY",[0,1,6,12,7,8]],["TURKEY",[4,3,10,16,9,2]],["DUCK",[25,31,38,39]],["LLAMA",[13,19,14,15,22]],["CALF",[34,28,21,20]]],"x":"ALLELE ALLEY ALLY AREA ARMY ARRAY BAKE BAKER BARE BARK BARN BRAKE CACAO CAGE CALM CANAL CARD COAL COAT COLA CORD CORK CROC CROCK DEAF DEAL DEALT DELAY DELFT DELL DELTA DOCK DONE DUEL EDGE EPIC EYED FALL FALLEN FAME FLAME FLANK FLED FLOAT FLOCK FOAM FOCAL FOLK GLUE GLUED GOAL GOLF KARATE KARMA LACK LAKE LAME LAYER LEAF LEGACY LEND LOAN LOCK LOCO LUCK LUGE MAKE MAKER MALE MALL MANY MARK MARKER MARKET MAYA MEAL META NAME NARRATE NEAL NODE NOEL ONLY PICK RACK RANK RARE RATE REAL REALLY REALM REMARK ROAR ROCK SICK TAKE TARA TEAM TELL TERM TREK TRUE YALE YARD YARN YELL"},{"c":"Connect the dots","g":"COENGCNTLOUYSLRARSAISONITEGOCOIRBRAAOIIURRNVLXCD","s":"CONSTELLATION","w":[["CONSTELLATION",[0,1,6,12,7,2,8,13,18,24,30,36,42]],["ORION",[9,16,23,29,22]],["DRACO",[47,41,35,28,27]],["CYGNUS",[5,11,4,3,10,17]],["ARIES",[15,14,19,25,20]],["VIRGO",[43,37,31,26,21]],["LIBRA",[44,38,32,33,34]],["CRUX",[46,40,39,45]]],"x":"AEGIS ALISON ALLAN ALLIES ALOE ALONE ALONG ALSO ARISE AROSE BEAST BEAT BETA BOARD BREAST CARBON CARD CARGO CARR COAL COIN COLA COLE COLON COLOR COLORS COLOURS CONTRARY CONTROL CORAL CORGI CORN CUBE CURB CYRUS EAST GILL GIRL GOAL GONE GOOSE GORILLA GREAT GROIN ICON IRON LASER LAST LATE LATER LION LIST LISTEN LITE LOAN LONE LONG LOTS NEON NOEL NOISY NOSE NOTE ORAL OURS REAL RESIST RESORT RETAIL RIGOROUS RISE RITA RITE ROAR ROBIN ROGER ROLE ROLL RORY ROSE SAIL SALE SALON SALT SATIRE SEAL SEAT SITE SLATE SOBER SONIC SONS SOON SORT STELLA STOLE STOLEN STRONG SUNG TAIL TALL TASTE TELL TIER TIGER TILL TILT TIRE TOLL TRIAL TRIBE TRIO TROLL URGE YUAN"},{"c":"Grande order","g":"COATCORLTAHFTNEOCFAASMFEDBEOAEOENCCSUFSEDHMFINPO","s":"COFFEESHOP","w":[["COFFEESHOP",[4,5,11,17,23,29,35,41,47,46]],["LATTE",[7,2,3,8,14]],["MOCHA",[21,15,16,10,9]],["CORTADO",[0,1,6,12,18,24,30]],["BEANS",[25,26,19,13,20]],["MUFFIN",[42,36,43,37,44,45]],["SCONE",[38,33,27,32,31]],["DECAF",[40,39,34,28,22]]],"x":"ABSENCE ABSENT ACME ACNE AMEN ATOM ATTACH BASE BASEMENT BEAN BEAT BECOME BECOMES BEEF BEEN BEES CAME CAMEL CASE CASH CATCH CATTLE CEASE CEMENT CHAOS CHAT CHOP CHOSE CHOSEN CLEAN COACH COAL COAT COCA COFFEE COLA COLE COMA COME COMES COMET CONE CONFINED CORN DATA DEFINE DEFINED DENSE DOES DOPE EACH EASE ECHO FACE FACED FAME FENCE FIEND FIND FINE FINED FOAM HATE HOME HOPE HOPED HOSE HOTEL LATE LEAD LEAN LEASE LEMON LENS LENT MEAN MEANT MEAT MELT MENTAL MENTOR MESA META METAL MOTEL MOTOR NEAT NEED NIECE NOSE OATH OBESE OCEAN ONCE OPEN OPENED PENCE ROLE SAFE SAME SANE SATAN SCAM SCENE SEAT SEED SEEM SEEN SEND SENSE SENT SHOP SMASH SOFA SOME SOMEONE SONS TALE TALENT TALES TATE TEACH TENSE TENT THAT THOSE TORN TORNADO"},{"c":"Green thumb","g":"DENOLSRTOSHSAGLOREGEEKVADHAREEASOSESSPDESRSRENUP","s":"GARDENTOOLS","w":[["GARDENTOOLS",[18,12,6,0,1,2,7,8,3,4,5]],["RAKE",[27,26,21,20]],["SHEARS",[11,10,17,23,16,9]],["HOSE",[25,32,33,28]],["SPADE",[36,37,30,24,19]],["SEEDS",[40,34,39,38,31]],["GLOVES",[13,14,15,22,29,35]],["PRUNERS",[47,41,46,45,44,43,42]]],"x":"AGED AREA AROSE ASSURE DASH DEAR DEEP DEER DELEGATE DELTA DENSE DENT DESERVE DOES DOPE DOSE DRAG DRAGGED DRAGON EAGER EAGLE EASE EATEN ENDORSE ENSURE ERASE EVER GARDEN GATE GEAR GEEK GLOVE GONE GOSH HARE HEAR HEART HEARTED HEAT HEATED HEEL HERE HERO HERS HOLE HOLT HOPE HOPED HORSE LEAK LEASE LOGGED LONE LOOK LOVE LOVER NEED NEEDS NESS NOTE NOTED NURSE ONSHORE ONTO OPEN OPENED OVER PASS PORK POSE PRESERVE PRESS PURE PURSE RAGE RASH RATE RATED REAR REED REEL REGARD REGRET RELEASE RENT REPS RERUN RESERVE REVERSE REVERSED REVOLT RODE ROLE ROOT ROOTED ROPE ROSE ROSS ROVER SAKE SEED SEEK SEEN SEND SENSE SERVE SERVER SEVERE SHADE SHAKE SHAPE SHAPED SHARE SHARK SHED SHEER SHELTER SHOE SHOOT SHOOTER SHOP SHORE SHOVE SLOT SOAK SOLE SOLO SOON SOONER SORE SPEED SPEND SPUN SPUR SURE TAGGED TONE TOOK TOOL UNDER USED USER VERA VERSE VOLTAGE"},{"c":"Peak performance","g":"TSEREEOYMESVLPTSPAUENLALSDSATNNANAIIUTREARMOAINS","s":"MOUNTAINS","w":[["MOUNTAINS",[42,43,36,30,37,44,45,46,47]],["EVEREST",[5,11,4,3,2,1,0]],["ANDES",[31,32,25,19,26]],["ALPS",[22,21,16,15]],["RAINIER",[41,40,35,29,34,39,38]],["ATLAS",[33,28,23,17,10]],["ETNA",[9,14,20,27]],["OLYMPUS",[6,12,7,8,13,18,24]]],"x":"ALAS ALTAR ALTER ANTI AREA ARENA AROUND ASSET ATOM AUNT AUTO DARE DARN DATA DENSE DENT DEPLOY DEPOT DUEL EARN EASE EMPLOY EMPLOYER EMPTY ENTER ERASE EVER LAND LANE LASER LAST LEND LENS LENT LOSE LOSER LOST LOTS MEET MERE MESA MESS MORE MOUND MOUNT MOUNTAIN NAPA NASTY NEAR NEAT OPEN PANT PASS PAST PASTE PASTED PATIENT PEER PENALTY PENT PEST PETE PETER PLAIN PLAN PLANE PLANET PLANT PLENTY PLOT PLUS POLE POLY POLYMER POSE POST RAIN RAND RANT REAR RENT REPS RESET REST RITA ROUND SAINT SALT SALTY SAND SANE SATAN SAVE SEEM SEND SENSE SENT SEPT SEVERE SLAP SOLE SPAN SPATIAL SPERM STEER STEM STEP STOLE STOLEN STOP STYLE TAPE TARA TASTE TASTED TASTY TEMP TEMPLE TEMPO TENANT TEND TENSE TERM TIER TORE TORN TRADE TRAIN TRAIT TREAT TREND TUMOR TUNA TYPE UNTO USED VERSE"},{"c":"Go with the flow","g":"GEAUNDRTBENAREUKVIIYNOOHVNAGLREIDUSOREOGNCSMKONG","s":"GREATRIVERS","w":[["GREATRIVERS",[0,6,1,2,7,12,18,24,30,36,42]],["DANUBE",[5,11,4,3,8,13]],["VOLGA",[16,22,28,27,26]],["YUKON",[19,14,15,21,20]],["RHINE",[29,23,17,10,9]],["MEKONG",[43,37,44,45,46,47]],["INDUS",[31,25,32,33,34]],["CONGO",[41,35,40,39,38]]],"x":"AGONY AIDE AIRED AUDIO BEAT BEATEN BEND BENNY BERET BERRY BETA BUNNY BUYER COLON COLONY COLOR COLORS CONSUL DANG DEER DINNER DIRE DIVE DIVERS DIVERSE DIVINE DOES DOGS DOME DUNNO EATEN ENVY GAIN GLOVE GOES GONE GONNA GOOD GREAT GREATER GRENADE GREY HOGAN HOOK INNER KEEN LOAD LOAN LOGO LONE LONG LOOK LOONEY LOONY LOVE LUNG MEDIA MEDIAN MERE MODE MOON NAIVE NAVE NEAT NEED NEUTER NOVA NUDE OUTER OVEN REED RIDE RIVER SEEN SERIOUS SLOGAN SMOKE SMOKED SOLO SONG SUNG TERRY TUBE TUNA TUNE VAIN VEIN VERSE VIDEO VINE VIRTUE YANG"},{"c":"Island hopping","g":"HWIIAMAAJIALIAFICTSLBUYCRIALIIPBANDSAILIMSCACAAJ","s":"ISLANDS","w":[["ISLANDS",[12,18,19,26,33,34,41]],["HAWAII",[0,6,1,7,2,3]],["BALI",[31,32,38,37]],["SICILY",[35,29,23,28,27,22]],["CUBA",[16,21,20,13]],["JAMAICA",[47,46,40,45,39,44,43]],["FIJI",[14,15,8,9]],["MALTA",[5,4,11,17,10]],["CAPRI",[42,36,30,24,25]]],"x":"ACID ALAS AMID ANIMAL BAIL BALD BAND BASIL BLAIR BLIND BLIP BLISS BUILD CALM CLAIM CLAN CLINIC CLIP DIAL FAIL FIAT FLIP HAIL ISLAND JAIL LAID LAND LUCY MAID MAIL MAIN MAINLY MASS MINA MIND NAIL SAID SAIL SLIP YUAN"},{"c":"Head to toe","g":"DYPARTOTHUMSBELONBLEKESNKENCHIUNHEEBOLAWOLSHDERE","s":"BODYPARTS","w":[["BODYPARTS",[12,6,0,1,2,3,4,5,11]],["ELBOW",[47,41,35,40,39]],["KNEE",[20,26,33,34]],["ANKLE",[38,31,24,18,13]],["SHOULDER",[42,43,36,30,37,44,45,46]],["THUMB",[7,8,9,10,17]],["CHIN",[27,28,29,23]],["NOSE",[16,15,22,21]],["HEEL",[32,25,19,14]]],"x":"ALONE ALSO ARMS BECK BEEN BELOW BELT BENCH BETH BLOW BODY BORE BORED BOTH BOWED CHAD CHANNEL CHEEK CHEW DEAL HALO HANK HARM HART HAUL HEAD HEADER HEAL HECK HENCE HOLD HOLDER HOLE HOLT HOSE HOUR HULK HURT KEEN KNEW LANE LENS LONE LOSE LOWER LUKE LUNA MART MOLE NEAL NECK NEON NIECE NOEL OLDER OURS PART PARTS PHONE PYTHON READ REAL ROBIN ROLE RULE SCENE SHADE SHAH SHAW SHIN SHOULD SMART SMOKE SOLD SOLE SONS SOUL SOUP SOUR STRAP TEEN THEE THOSE THOU TRAP WADE WALSH WERE WHEEL WHEELER WHEN WORE"},{"c":"Roll the dice","g":"AOBOUBRTROBLDOGLEEGLGSECALSYRHMESIRREHKUEOSOTLCS","s":"BOARDGAMES","w":[["BOARDGAMES",[2,1,0,6,12,18,24,30,36,42]],["CHESS",[23,29,22,21,26]],["CLUE",[46,45,39,40]],["RISK",[34,33,32,38]],["SORRY",[47,41,35,28,27]],["TROUBLE",[7,8,3,4,5,11,17]],["OTHELLO",[43,44,37,31,25,19,13]],["BOGGLE",[10,9,14,20,15,16]]],"x":"BEER BEES BLESS BOARD BOAT BULB CHERRY CORE CULT CURE CURRY DOGS DOLL ELSE ERROR GALE GAME GLOBE GOES GOLD HEAL HEEL HELLO HELM HERS HOSE ISLE ISSUE KISS LAME LESS LESSER LOGO LORD LUKE LURE MALE MALL MEAL MESH MESS MESSY OBESE REEL RISE ROAR ROBOT ROLE ROLL RORY ROSE RULE RULER RUSH RUTH SCORE SCORER SEAL SEEK SEEM SELL SERIES SHELL SHOE SHOT SKIES SLAM SLOT SORE SURE SURREY THEE THEM THEME THESIS THOSE TOLD TOLL TROLL"},{"c":"Pinkies up","g":"ONSTAECEERLRSAALMGPGNEARAUMOEERSCRYYTONETEYHELTK","s":"TEAPARTY","w":[["TEAPARTY",[3,8,13,18,24,30,36,42]],["KETTLE",[47,41,46,40,45,44]],["SCONES",[12,6,0,1,7,2]],["SUGAR",[31,25,19,14,9]],["LEMON",[15,21,26,27,20]],["HONEY",[43,37,38,39,34]],["EARLGREY",[5,4,11,10,17,23,29,35]],["CREAM",[32,33,28,22,16]]],"x":"ACNE AGAR AGREE ALARM ALERT ALGAE ALLAN ALTER AMEN APART AREA ARTY ASCOT CANAL CANE CANOE CASE CEREAL COAL COME CONE CONSUME CORE CORN COST EAGLE EARL EASE EATEN EATS GALA GALE GAME GRAM GREAT GREATER GREEN GREY HEEL HENCE HENRY HOST LAME LANE LATE LATER LATERAL LEAN LEAP LEASE LENS MALE MALL MARE MEAL MEAN MEMO MEMORY MENU MORE MUST NAPA NEAL NEAR NEAREST NEST NOEL NORM NORTH OCEAN ONCE ONSET PACE PANEL PANG PART PARTS PARTY PAST PASTOR RANG RARE RATE REAL REALM REAR REEL RELATE REST ROAR RUMOR RUST RUSTY SAGA SANE SANG SAUCE SCAN SCENE SCORE SCORER SCREAM SCREEN SCUM SEAL SEEN SELL SELLER SENSE SMELL SORT SPACE SPAN SPAR SPUN SPUR STALL STAR STARE STEAL STELLA STELLAR STONE STRAP SUNG TALE TALL TALLER TARA TEAR TEEN TEENS TELL TENSE TERM THEE THEN TONE TRAP TRAPS TREE TROY TYRE YEAR"},{"c":"Pick a station","g":"SLSISMAPEACUORKLFGOAUPOENNAJSNHKZZERCOCKUETERLBS","s":"MUSICGENRES","w":[["MUSICGENRES",[5,11,4,3,10,17,23,29,35,41,47]],["JAZZ",[27,26,33,32]],["BLUES",[46,45,40,34,28]],["ROCK",[44,37,38,39]],["FOLK",[16,22,15,14]],["PUNK",[21,20,25,31]],["OPERA",[12,7,8,13,19]],["TECHNO",[42,43,36,30,24,18]],["SALSA",[0,6,1,2,9]]],"x":"AISLE ALOE ALONE ANNA AREA BEEN BEER BEES BLUE BULK BURN BUZZ CAKE CALF CASE CLERK CLONE CLOSE CLOSER CLUB CLUE CORE CORK CROC CROCK ECHO FAKE FAKER GENE GENRE GOES GOLF GONE ISLE JUNK LAKE LASER LEAF LEAK LONE LOSE LOSER LUKE LUNA LUNAR LURE MUSCLE MUSIC MUSICAL NOSE ORAL PALE PARA PARK PEAK PERK PLEA POLE POOR PORK POSE PRANK PURE PURPLE RANK REAL REPS ROPE ROPES RULE SAFE SAKE SALE SALON SCALE SCALES SCUM SEAL SEEK SEEN SELF SLAP SOFA SOLE SPAN SPAR SPARE SPARK SPEAK SPOON SPUN SPUR SURE TECH TORE UPON USER"},{"c":"Life's a beach","g":"SCOKCBEOEREUALLFRTSESUSEHWAKITOLONDERELTSVESHSAW","s":"SEASHORE","w":[["SEASHORE",[0,6,12,18,24,30,36,42]],["SAND",[20,26,33,34]],["WAVES",[47,46,41,35,40]],["TOWEL",[39,32,25,19,14]],["SHELLS",[43,44,37,31,38,45]],["BUCKET",[5,11,4,3,10,17]],["SURF",[22,21,16,15]],["KITE",[27,28,29,23]],["COOLER",[1,2,7,13,8,9]]],"x":"AKIN ALLOW ALOE ANOTHER ASHES ASSET ASSETS BECK BERET BUCK BURST CEASE CELL COAL COKE COLA COLE COOK COOKER COOL CORE CORK CROC CUBE CURE CURSE CUTE DIET DINK DISK EASE EDIT ELSE FELL FLESH FLEW FLOOR FLUID FRUIT FULL FULLER FUSE HEAL HELLO HERE HERO HERS HOLE HOLLOW HORSE INTO KINASE KIND KNIT KNOT KNOW LAND LAWSUIT LEAK LEAN LEASE LOAN LOCO LOOK LOSE LOTS LURE LUST NOEL ONSET OTHER REEL REFER REFUSAL REFUSE RELEASE RESIDE RESIN REST ROLE ROLL RUIN RULE RULER RUST SALE SALON SANK SAVE SAVED SCORE SCORER SEAL SELF SELL SELLER SHEER SHELF SHELL SHOE SHORE SHOW SIDE SIDES SINK SITE SKIES SKIN SKULL SLASH SLOT SLOW SNOW SOLE STEIN STEREO STINT STOLE STRUCK STUCK SUIT SUITE SURE SWAN SWELL TEST TESTED THEE THERE THERES THESE TIDE TIED TIER TOLL TREK TRUCK TRUE TRUST TUBE TUCKER TURF USER VAST VEIN VEST WALL WANT WASH WASNT WAVE WEAK WELL WELSH WHOLE WONT WORE WORSE"}];
+
+/* rules, as in the NYT game: every letter belongs to one theme word or the spangram; the spangram (yellow) touches two
+   opposite sides; letters connect in any of 8 directions; any other real word of 4+ letters counts toward a hint
+   (3 words = 1 hint); a hint circles one theme word's letters, and a second hint while one is showing spells out its order */
+const ST_C=6, ST_R=8;
+let ST_ROT=null;
+const stDailyIx=()=>{ if(!ST_ROT) ST_ROT=shuf([...STRANDS.keys()],seeded("globetrotter-strands-v1")); const n=ST_ROT.length; return ST_ROT[((dayIndex()%n)+n)%n]; };
+const stNum=()=>dayIndex()+1;
+function stStatus(){ S.st=S.st||{}; const d=S.st[today()]; const P=STRANDS[stDailyIx()];
+  return d&&d.done?`Today's done · ${d.h?`${d.h} hint${d.h>1?"s":""}`:"perfect"}`:d&&d.f&&d.f.length?`Today's #${stNum()} · ${d.f.length}/${P.w.length} found`:`Today's theme: "${P.c}"`; }
+function stShare(P,st,daily){ const rows=[]; for(let i=0;i<st.o.length;i+=4) rows.push(st.o.slice(i,i+4).join(""));
+  return `Strands ${daily?"#"+stNum():"(unlimited)"}\n“${P.c}”\n${rows.join("\n")}`; }
+function startStrands(opt={}){
+  const daily=!opt.unlimited, gid=daily?"strands":"strandsu";
+  S.st=S.st||{}; const key=today();
+  if(daily&&S.st[key]&&S.st[key].done) return stResults();
+  const ix=daily?stDailyIx():(()=>{ const d=stDailyIx(); let k; do{ k=Math.floor(Math.random()*STRANDS.length); }while(k===d&&STRANDS.length>1); return k; })();
+  const P=STRANDS[ix], words=P.w.map(([w,p])=>({w,p,sp:w===P.s})), extra=new Set(P.x?P.x.split(" "):[]);
+  const st=daily?(S.st[key]=S.st[key]&&S.st[key].ix===ix?S.st[key]:{ix,f:[],o:[],hp:0,h:0,hw:-1,ho:0,nw:[]}):{ix,f:[],o:[],hp:0,h:0,hw:-1,ho:0,nw:[]};
+  begin(gid,daily?`Strands #${stNum()}`:"Unlimited Strands"); stage.className="gstage scroll st-stage";
+  __b.st={P,st};
+  let sel=[], dragging=false, moved=false, msg="", msgCls="";
+  const owner=new Array(48).fill(-1); words.forEach((w,i)=>w.p.forEach(c=>owner[c]=i));
+  const persist=()=>{ if(daily) save(); };
+  stage.innerHTML=`<div class="st">
+    <div class="stclue"><span>Today's theme</span><b>${esc(P.c)}</b></div>
+    <div class="stword" id="stw"></div>
+    <div class="stboard" id="stb"><svg class="stlines" id="stl" viewBox="0 0 ${ST_C*100} ${ST_R*100}" preserveAspectRatio="none"></svg>
+      ${P.g.split("").map((ch,i)=>`<div class="stc" data-i="${i}"><span>${ch}</span></div>`).join("")}</div>
+    <div class="stfoot"><button class="sthint" id="sth"><i></i><span>Hint</span></button><div class="stprog" id="stp"></div></div></div>`;
+  const board=$('stb'), cells=[...board.querySelectorAll(".stc")];
+  const ctr=i=>[(i%ST_C)*100+50,Math.floor(i/ST_C)*100+50];
+  const adj=(a,b)=>a!==b&&Math.abs(a%ST_C-b%ST_C)<=1&&Math.abs(Math.floor(a/ST_C)-Math.floor(b/ST_C))<=1;
+  function lineFor(path,cls){ if(path.length<2) return ""; return `<polyline class="${cls}" points="${path.map(i=>ctr(i).join(",")).join(" ")}"/>`; }
+  function render(){ const fset=new Set(st.f);
+    cells.forEach((el,i)=>{ const o=owner[i], found=fset.has(o);
+      el.className="stc"+(found?(words[o].sp?" span":" theme"):"")+(sel.includes(i)?" sel":"")+(!found&&st.hw===o?" hinted":"");
+      const ord=!found&&st.hw===o&&st.ho?words[o].p.indexOf(i)+1:0; el.dataset.ord=ord||""; });
+    $('stl').innerHTML=st.f.map(k=>lineFor(words[k].p,words[k].sp?"ln span":"ln theme")).join("")+lineFor(sel,"ln sel");
+    const cur=sel.map(i=>P.g[i]).join("");
+    $('stw').innerHTML=cur?`<b>${cur}</b>`:msg?`<span class="${msgCls}">${esc(msg)}</span>`:"";
+    $('stp').innerHTML=`<b>${st.f.length}</b> of <b>${words.length}</b> theme words found.`;
+    const hb=$('sth'), can=st.hp>=3; hb.classList.toggle("ready",can); hb.style.setProperty("--hp",Math.min(3,st.hp)/3*100+"%");
+    hb.querySelector("span").textContent="Hint"; }
+  function say(t,cls=""){ msg=t; msgCls=cls; render(); if(t) later(()=>{ if(msg===t){ msg=""; render(); } },1800); }
+  function submit(){ const path=sel.slice(); sel=[]; if(path.length<1){ render(); return; }
+    const word=path.map(i=>P.g[i]).join("");
+    const k=words.findIndex(w=>w.p.length===path.length&&w.p.every((c,j)=>c===path[j]));
+    if(k>=0){ if(st.f.includes(k)){ say("Already found","dim"); return; }
+      st.f.push(k); st.o.push(words[k].sp?"🟡":"🔵"); if(st.hw===k){ st.hw=-1; st.ho=0; }
+      good(); persist(); if(words[k].sp) say("SPANGRAM!","spang"); else say(nmCap(word.toLowerCase()),"themew");
+      board.querySelectorAll(".stc").forEach(el=>{ if(words[k].p.includes(+el.dataset.i)){ el.classList.add("pop"); later(()=>el.classList.remove("pop"),450); } });
+      if(st.f.length===words.length) return win(); return; }
+    if(path.length<4){ say("Too short","dim"); bad(); return; }
+    if(extra.has(word)||words.some(w=>w.w===word)){ if(st.nw.includes(word)){ say("Already found","dim"); return; }
+      st.nw.push(word); st.hp++; persist(); tone(660,.08,"sine",.05); say(st.hp>=3&&st.hp%3===0?"Hint ready!":`${nmCap(word.toLowerCase())} · ${st.hp%3||3}/3 toward a hint`,"good"); return; }
+    bad(); say("Not in word list","dim"); }
+  function useHint(){ if(st.hp<3){ say(`Find ${3-st.hp} more word${3-st.hp>1?"s":""} of 4+ letters to earn a hint`,"dim"); return; }
+    if(st.hw>=0&&!st.f.includes(st.hw)){ if(st.ho){ say("Find the circled word first","dim"); return; } st.ho=1; }
+    else { const left=words.map((w,i)=>i).filter(i=>!st.f.includes(i)); st.hw=left.find(i=>!words[i].sp)??left[0]; st.ho=0; }
+    st.hp-=3; st.h++; st.o.push("💡"); persist(); render(); }
+  function win(){ st.done=1; persist(); render(); board.classList.add("won"); setTimeout(confetti,300);
+    later(()=>finish(gid,st.h,{sub:`“${P.c}” · ${st.h?`${st.h} hint${st.h>1?"s":""}`:"no hints"}`, share:stShare(P,st,daily), html:stBoardCard(P,st), nextG:"strandsu", nextLabel:daily?"Play unlimited Strands":"Play again"}),1600); }
+  // pointer input: drag through letters, or tap them one by one and tap the last letter again to submit
+  const hit=(x,y,strict)=>{ const r=board.getBoundingClientRect(), cw=r.width/ST_C, ch=r.height/ST_R, c=Math.floor((x-r.left)/cw), rr=Math.floor((y-r.top)/ch);
+    if(c<0||c>=ST_C||rr<0||rr>=ST_R) return -1; if(strict){ const dx=(x-r.left)-(c+.5)*cw, dy=(y-r.top)-(rr+.5)*ch; if(Math.hypot(dx,dy)>Math.min(cw,ch)*.42) return -1; } return rr*ST_C+c; };
+  board.addEventListener("pointerdown",e=>{ const i=hit(e.clientX,e.clientY,false); if(i<0||st.done) return; e.preventDefault(); board.setPointerCapture(e.pointerId);
+    dragging=true; moved=false; msg="";
+    if(sel.length&&i===sel[sel.length-1]){ dragging="tapEnd"; return; }
+    const at=sel.indexOf(i); if(at>=0){ sel=sel.slice(0,at+1); render(); return; }
+    if(sel.length&&adj(sel[sel.length-1],i)) sel.push(i); else sel=[i]; render(); });
+  board.addEventListener("pointermove",e=>{ if(!dragging) return; const i=hit(e.clientX,e.clientY,true); if(i<0) return;
+    const last=sel[sel.length-1]; if(i===last) return;
+    if(sel.length>1&&i===sel[sel.length-2]){ sel.pop(); moved=true; render(); return; }
+    if(!sel.includes(i)&&adj(last,i)){ sel.push(i); moved=true; dragging=true; render(); } });
+  const up=()=>{ if(!dragging) return; const d=dragging; dragging=false;
+    if(d==="tapEnd"&&!moved){ submit(); return; } if(moved&&sel.length>1) submit(); };
+  board.addEventListener("pointerup",up); board.addEventListener("pointercancel",()=>{ dragging=false; });
+  $('sth').onclick=useHint;
+  window._stKey=k=>{ if(k==="Enter"&&sel.length) submit(); if(k==="Escape"){ sel=[]; render(); } };
+  render();
+  if(st.f.length===words.length&&!st.done) win();
+}
+function stBoardCard(P,st){ const words=P.w.map(([w,p])=>({w,p,sp:w===P.s}));
+  const ctr=i=>[(i%ST_C)*100+50,Math.floor(i/ST_C)*100+50], owner=new Array(48).fill(-1); words.forEach((w,i)=>w.p.forEach(c=>owner[c]=i));
+  return `<section class="card"><h3>“${esc(P.c)}”</h3><div class="stboard mini won"><svg class="stlines" viewBox="0 0 ${ST_C*100} ${ST_R*100}" preserveAspectRatio="none">${words.map(w=>`<polyline class="ln ${w.sp?"span":"theme"}" points="${w.p.map(i=>ctr(i).join(",")).join(" ")}"/>`).join("")}</svg>${P.g.split("").map((ch,i)=>`<div class="stc ${words[owner[i]].sp?"span":"theme"}"><span>${ch}</span></div>`).join("")}</div>
+    <p class="muted" style="margin-top:10px">Spangram: <b>${esc(nmCap(P.s.toLowerCase()))}</b> · ${words.filter(w=>!w.sp).map(w=>esc(nmCap(w.w.toLowerCase()))).join(", ")}</p></section>`; }
+function stResults(){ const st=S.st[today()], P=STRANDS[st.ix];
+  show(`${bar("Strands")}
+  <section class="card center" style="--c:var(--wd)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Strands #${stNum()}</div>
+    <div class="big">${st.h?`${st.h} hint${st.h>1?"s":""}`:"Perfect"}</div><p class="muted">“${esc(P.c)}”</p><p class="cheer" style="color:var(--ink-2)">New theme tomorrow</p></section>
+  ${stBoardCard(P,st)}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="strandsu">Play unlimited Strands</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(stShare(P,st,true)); }
+
 /* ================= RESULTS ================= */
 function spark(hist,hi){ if(!hist||hist.length<2) return ""; const v=hist.slice(-12).map(h=>h.v), mx=Math.max(...v), mn=Math.min(...v), sp=(mx-mn)||1;
   const pts=v.map((x,i)=>`${(i/(v.length-1)*54+1).toFixed(1)},${(hi?17-(x-mn)/sp*16:1+(x-mn)/sp*16).toFixed(1)}`).join(" ");
@@ -1324,7 +1729,7 @@ function home(){
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
@@ -1337,7 +1742,7 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();
@@ -1351,6 +1756,7 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; S.nmPts=1; save(); return home(); }
 });
 document.addEventListener("keydown",e=>{ if(play.hidden) return; if(e.key==="Escape"){ end(); home(); return; }
+  if(GS&&(GS.game==="strands"||GS.game==="strandsu")&&window._stKey&&(e.key==="Enter"||e.key==="Escape")){ e.preventDefault(); window._stKey(e.key); return; }
   if(GS&&GS.game==="dsudoku"&&window._dsKey&&!e.metaKey&&!e.ctrlKey){ if(/^[0-9nN]$/.test(e.key)||["Backspace","Delete","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._dsKey(e.key); } return; }
   if(GS&&GS.game==="mini"&&window._xwKey&&!e.metaKey&&!e.ctrlKey){ if(/^[a-z]$/i.test(e.key)||["Backspace","Tab","Enter"," ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){ e.preventDefault(); window._xwKey(e.key); } return; }
   if(GS&&GS.game==="num"&&window._numKey){ if(/^[0-9]$/.test(e.key)) window._numKey(e.key); else if(e.key==="Backspace") window._numKey("del"); else if(e.key==="Enter") window._numKey("ok"); } });
