@@ -146,7 +146,8 @@ print('math/index.html', len(page), VERSION)
 # ---------------- Games (memory, speed and logic games; first called Brain) ----------------
 page = open('tools/games/page.html', encoding='utf-8').read()
 code = rep(open('tools/games/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
-code = rep(code, '/*PUZZLES*/', open('tools/games/puzzles.js', encoding='utf-8').read(), 1)  # the crossword and Groups puzzles live in their own file
+code = rep(code, '/*PUZZLES*/', open('tools/games/puzzles.js', encoding='utf-8').read(), 1)
+code = rep(code, '/*LISTS*/', open('tools/games/lists.js', encoding='utf-8').read(), 1)  # answer lists for Deep dive and Sky climb  # the crossword and Groups puzzles live in their own file
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('games', exist_ok=True)
 open('games/index.html', 'w', encoding='utf-8').write(page)

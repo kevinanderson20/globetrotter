@@ -15,7 +15,7 @@ function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++)
   return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
 
 /* ---------- the games ---------- */
-const CATS=[["word","Word puzzles","A new one every day","--wd"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
+const CATS=[["word","Word puzzles","A new one every day","--wd"],["nm","Name it","Seven prompts, 25 seconds each","--nm"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
 const GAMES={
  seq:{cat:"mem", ic:"🔲", name:"Sequence memory", desc:"Tiles light up in order. Repeat the pattern; it grows each round.", hi:true, fmt:v=>`Level ${v}`},
  num:{cat:"mem", ic:"🔢", name:"Number memory", desc:"A number flashes. Type it back. One more digit each round.", hi:true, fmt:v=>`${v} digits`},
@@ -27,12 +27,14 @@ const GAMES={
  sudoku:{cat:"log", ic:"🧩", name:"Mini sudoku", desc:"6×6: every row, column and box gets 1 to 6. New daily puzzle.", hi:false, fmt:v=>fmtT(v)},
  mini:{cat:"word", ic:"✏️", name:"Mini crossword", desc:"A quick 5×5 crossword. New puzzle every day.", hi:false, fmt:v=>fmtT(v)},
  groups:{cat:"word", ic:"🗂️", name:"Groups", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
+ dive:{cat:"nm", ic:"🦐", name:"Deep dive", desc:"Name something that fits each prompt. The rarer your answer, the deeper you dive.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
+ climb:{cat:"nm", ic:"🎈", name:"Sky climb", desc:"The reverse: give the answer most people would. The more common, the higher you climb.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
 const WORKOUT=["num","schulte","sudoku"];
 
 /* ---------- saved progress ---------- */
-const FRESH=()=>({best:{}, hist:{}, days:[], sound:true, work:{}, plays:0, sud:"easy", lit:5, xw:{done:{},prog:{}}, gp:{done:{}}});
+const FRESH=()=>({best:{}, hist:{}, days:[], sound:true, work:{}, plays:0, sud:"easy", lit:5, xw:{done:{},prog:{}}, gp:{done:{}}, nm:{}});
 let S=FRESH();
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
@@ -405,6 +407,87 @@ function archive(){
 function wordStatus(k){ if(k==="mini"){ S.xw=S.xw||{done:{},prog:{}}; const i=dailyOf(MINIS), d=S.xw.done[i], p=S.xw.prog[i]; return d?`Today's done · ${fmtT(d.t)}`:p?`Today's #${i+1} · in progress`:`Today's #${i+1} is ready`; }
   S.gp=S.gp||{done:{}}; const i=dailyOf(GROUPS), d=S.gp.done[i]; return d?(d.won?`Today's done · ${d.m?`${d.m} mistake${d.m>1?"s":""}`:"perfect"}`:"Today's done"):`Today's #${i+1} is ready`; }
 
+/* ================= DEEP DIVE + SKY CLIMB: name one answer per prompt ================= */
+/* Deep dive pays for rare answers (deeper ocean); Sky climb pays for the answer most people give (higher sky). */
+/*LISTS*/
+(()=>{ // extra prompts built from the country lists: "a country starting with M", ordered so famous ones still come first
+  const all=[EUROPE,AFRICA,ASIA,SAMERICA,NAMERICA,OCEANIA].flatMap(s=>{ const a=s.split(","); return a.map((x,i)=>({x,f:i/a.length})); })
+    .filter(o=>!["england","scotland","wales","northern ireland","palestine"].includes(o.x)).sort((a,b)=>a.f-b.f);
+  const seen=new Set(), uniq=all.filter(o=>{ const k=o.x.split("/")[0]; if(seen.has(k)) return false; seen.add(k); return true; });
+  "ABCGMNST".split("").forEach(L=>{ const it=uniq.filter(o=>o.x[0]===L.toLowerCase()).map(o=>o.x.split("/").filter(a=>a[0]===L.toLowerCase()).join("/"));
+    LISTS.push({p:`Name a country that starts with ${L}`, a:it.join(",")}); });
+})();
+const NM_NORM=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/&/g," and ").replace(/['’`.]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+function nmPrep(L){ if(L.items) return L; const drop=new Set(["the","a","an",...(L.d||[])]);
+  L.norm=s=>{ const w=NM_NORM(s).split(" ").filter(Boolean), k=w.filter(x=>!drop.has(x)); return (k.length?k:w).join(" "); };
+  L.items=L.a.split(",").map(x=>x.trim()).filter(Boolean).map((x,r)=>{ const al=x.split("/").map(s=>s.trim()); return {show:al[0],keys:[...new Set(al.map(L.norm))],r}; });
+  L.N=L.items.length; return L; }
+function lev(a,b){ const m=a.length,n=b.length; let p=[...Array(n+1).keys()];
+  for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; } return p[n]; }
+function nmMatch(L,input){ nmPrep(L); const q=L.norm(input); if(!q) return null; const qs=q.replace(/ /g,"");
+  const vars=new Set(); [q,qs].forEach(v=>{ vars.add(v); vars.add(v+"s"); if(v.endsWith("ies")) vars.add(v.slice(0,-3)+"y"); if(v.endsWith("es")) vars.add(v.slice(0,-2)); if(v.endsWith("s")) vars.add(v.slice(0,-1)); });
+  for(const it of L.items) for(const k of it.keys){ if(vars.has(k)||vars.has(k.replace(/ /g,""))) return it; }
+  if(L.t){ const w=q.split(" "); for(let s=1;s<w.length;s++){ const tail=w.slice(s).join(" "), tv=new Set([tail,tail.replace(/ /g,""),tail.replace(/s$/,""),tail+"s"]); for(const it of L.items) if(it.keys.some(k=>tv.has(k)||tv.has(k.replace(/ /g,"")))) return it; } }
+  if(qs.length<5) return null; let best=null,bd=9;
+  for(const it of L.items) for(const k of it.keys){ const ks=k.replace(/ /g,""); if(Math.abs(ks.length-qs.length)>2) continue; const d=lev(qs,ks), lim=ks.length>=10?2:1; if(d<=lim&&d<bd){ bd=d; best=it; } }
+  return best; }
+const NM={
+  dive:{name:"Deep dive", verb:"down", ic:"🦐", tag:"Rarer answers dive deeper",
+    tier(r,N){ const f=r/N; return f<.06?[10,"Sunlit: everyone says it","🫧"]:f<.15?[20,"Shallows: a common pick","🐟"]:f<.3?[35,"Reef: nicely done","🐠"]:f<.5?[55,"Twilight: getting rare","🦑"]:f<.75?[80,"Midnight: a deep cut","🐙"]:[100,"The abyss: almost nobody says that","🐋"]; },
+    zone:m=>m<200?"Sunlit zone":m<1000?"Twilight zone":m<4000?"Midnight zone":m<6000?"Abyssal zone":"Hadal trench",
+    col:f=>`color-mix(in srgb,#8fd8f5 ${Math.round((1-f)*100)}%,#04162b)`,
+    hintLabel:"Deepest answers", hint:L=>L.items.slice(-3).reverse()},
+  climb:{name:"Sky climb", verb:"up", ic:"🎈", tag:"The answer most people give climbs highest",
+    tier(r,N){ const f=r/N; return r===0?[100,"Top answer! Exactly what most people say","🚀"]:r===1?[85,"The #2 answer","🛰️"]:r===2?[70,"The #3 answer","✈️"]:r<5?[55,"Top 5 answer","☁️"]:f<.15?[40,"Popular pick","🏔️"]:f<.3?[25,"Fairly common","🌳"]:f<.5?[15,"Uncommon: too clever","🌿"]:[10,"Rare: the crowd didn't go there","🌱"]; },
+    zone:m=>m<500?"Treetops":m<2000?"Low clouds":m<4000?"Alpine peaks":m<6000?"Thin air":"Top of the world",
+    col:f=>`color-mix(in srgb,#bfe9a6 ${Math.round((1-f)*100)}%,#3a7bd5)`,
+    hintLabel:"Top answers", hint:L=>L.items.slice(0,3)}
+};
+const nmCap=s=>s.replace(/(^|[\s-])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(Dc|Uk|Usa|Us|Uae|Drc|Bmw|Gmc|Vw|Byd|Tvr|Bmx|K2|Lbj|Jfk|Fdr)\b/g,x=>x.toUpperCase()).replace(/\bAnd\b/g,"and").replace(/\bOf\b/g,"of").replace(/\bThe\b(?!^)/g,"the").replace(/^the/,"The");
+function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`Today's done · ${d.m.toLocaleString()} m ${NM[k].verb}`:"Today's prompts are ready"; }
+function startNm(mode,opt={}){
+  const M=NM[mode]; S.nm=S.nm||{}; S.nm[mode]=S.nm[mode]||{};
+  const done=S.nm[mode][today()], daily=!opt.practice&&!done;
+  if(!opt.practice&&done) toast(`Today's ${M.name.toLowerCase()} is done. Here's a practice round.`);
+  const rnd=daily?seeded(mode+"|"+today()):Math.random, picks=[]; let nc=0; // at most two country prompts a round, so it isn't all geography
+  for(const k of shuf([...LISTS.keys()],rnd)){ const c=/countr/i.test(LISTS[k].p); if(c&&nc>=2) continue; nc+=c; picks.push(nmPrep(LISTS[k])); if(picks.length===7) break; }
+  begin(mode,daily?`${M.name} · today`:`${M.name} · practice`);
+  let i=0, res=[], m=0, locked=false, deadline=0, tmr=0;
+  const TIME=25000;
+  function scene(){ const f=Math.min(1,m/7000);
+    return `<div class="nmscene ${mode}" style="--sc:${M.col(f)};--pos:${(mode==="dive"?f:1-f)*100}%"><div class="nmtrack"><i></i><span>${M.ic}</span></div><div class="nmdepth"><b>${m.toLocaleString()} m</b><span>${M.zone(m)}</span></div></div>`; }
+  function ask(){ locked=false; const L=picks[i];
+    stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7 · ${esc(M.tag)}</div><div class="nmq">${esc(L.p)}</div>
+      <div class="nmtime"><i id="nmbar"></i></div>
+      <form id="nmf" class="nmform" autocomplete="off"><input id="nmin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Type one answer" aria-label="Your answer"><button class="btn go" type="submit">Go</button></form>
+      <div class="nmmsg" id="nmmsg"></div></div></div>`;
+    __b.nm={mode,list:L,i};
+    const inp=$('nmin'); setTimeout(()=>inp.focus(),60);
+    deadline=performance.now()+TIME; tmr=later(()=>reveal(null),TIME);
+    const g=GS, step=()=>{ if(GS!==g||locked) return; const left=Math.max(0,deadline-performance.now()); const b=$('nmbar'); if(b){ b.style.width=(left/TIME*100)+"%"; b.classList.toggle("low",left<6000); } $('ginfo').textContent=Math.ceil(left/1000)+"s"; g.raf=requestAnimationFrame(step); }; g.raf=requestAnimationFrame(step);
+    $('nmf').onsubmit=e=>{ e.preventDefault(); if(locked) return; const v=inp.value.trim(); if(!v) return;
+      const it=nmMatch(L,v); if(!it){ bad(); inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); $('nmmsg').textContent=`"${v}" isn't on the list. Try another.`; inp.select(); return; }
+      reveal(it,v); }; }
+  function reveal(it,typed){ if(locked) return; locked=true; clearTimeout(tmr); cancelAnimationFrame(GS.raf); $('ginfo').textContent=""; const L=picks[i];
+    let pts=0, lab="Time's up", em="⬛";
+    if(it){ [pts,lab,em]=M.tier(it.r,L.N); good(); } else bad();
+    const m0=m; m+=pts*10; res.push({p:L.p,a:it?nmCap(it.show):null,pts,em,lab});
+    const ex=M.hint(L).map(x=>nmCap(x.show)).join(", ");
+    stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7</div><div class="nmq">${esc(L.p)}</div>
+      <div class="nmres ${it?"ok":"no"}"><b>${it?esc(nmCap(it.show)):"No answer"}</b><span>${esc(lab)}</span><em>${it?`+${(pts*10).toLocaleString()} m ${M.verb}`:"+0 m"}</em></div>
+      <div class="nmex"><span>${esc(M.hintLabel)}:</span> ${esc(ex)}</div>
+      <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button></div></div>`;
+    __b.nm={mode,list:L,i,pts};
+    if(it){ const d=stage.querySelector(".nmdepth b"); if(d&&!reduceMotion){ const t0=performance.now(); const g=GS; const run=()=>{ if(GS!==g) return; const k=Math.min(1,(performance.now()-t0)/700); d.textContent=Math.round(m0+(m-m0)*k).toLocaleString()+" m"; if(k<1) requestAnimationFrame(run); }; run(); } }
+    $('nmnext').onclick=()=>{ i++; if(i<7) ask(); else done_(); }; }
+  function done_(){ const em=res.map(r=>r.em).join("");
+    if(daily){ S.nm[mode][today()]={m,e:em}; const ks=Object.keys(S.nm[mode]).sort(); ks.slice(0,-60).forEach(k=>delete S.nm[mode][k]); save(); }
+    const share=`${M.name} ${M.ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m.toLocaleString()} m ${M.verb} · ${M.zone(m)}`;
+    const html=`<section class="card"><h3>Your answers</h3><div class="nmlist">${res.map(r=>`<div><span>${r.em}</span><p>${esc(r.p)}<b>${r.a?esc(r.a):"No answer"}</b></p><em>${r.pts?`+${(r.pts*10).toLocaleString()} m`:"0"}</em></div>`).join("")}</div></section>`;
+    finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true}); }
+  ask();
+}
+
 /* ================= RESULTS ================= */
 function spark(hist,hi){ if(!hist||hist.length<2) return ""; const v=hist.slice(-12).map(h=>h.v), mx=Math.max(...v), mn=Math.min(...v), sp=(mx-mn)||1;
   const pts=v.map((x,i)=>`${(i/(v.length-1)*54+1).toFixed(1)},${(hi?17-(x-mn)/sp*16:1+(x-mn)/sp*16).toFixed(1)}`).join(" ");
@@ -421,11 +504,12 @@ function finish(game,v,o={}){
   show(`${bar(g.name)}
   <section class="card center" style="--c:var(--${g.cat})"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">${esc(g.name)}</div>
     <div class="big">${esc(g.fmt(v))}</div><p class="muted">${esc(o.sub||"")}</p>${o.note?`<p class="muted">${esc(o.note)}</p>`:""}<p class="cheer" style="${r.better?"":"color:var(--ink-2)"}">${esc(cheer)}</p></section>
+  ${o.html||""}
   ${(S.hist[key]||[]).length>1?`<section class="card" style="--c:var(--${g.cat})"><h3>Your trend</h3>${bigChart(S.hist[key],g)}<p class="muted">${g.hi?"Higher is better.":"Lower is better."} ${S.hist[key].length} games played.</p></section>`:""}
   ${WK&&wkNext?`<button class="btn go wide" data-act="wk">Workout: next is ${esc(GAMES[wkNext].name)}</button>`:""}
   ${WK&&wkDone&&game===WK?`<section class="card center"><p class="cheer">Daily workout complete!</p><p class="muted">${dayStreak()}-day streak. Come back tomorrow.</p></section>`:""}
   ${o.share?`<button class="btn go wide" id="shareB">Share result</button>`:""}
-  ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="play" data-g="${game}">${o.daily?"Practice another":"Play again"}</button>`}
+  ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="${o.practice?"nmp":"play"}" data-g="${game}">${o.practice?"Practice round":o.daily?"Practice another":"Play again"}</button>`}
   <button class="btn ghost wide" data-act="home">Home</button>`);
   if(o.share) $('shareB').onclick=()=>shareText(o.share,$('shareB'));
   if(o.archive) setTimeout(confetti,150); else if(WK&&wkDone&&game===WK){ setTimeout(confetti,150); toast("Workout complete!"); } else if(r.better&&r.prev!=null) setTimeout(confetti,150);
@@ -447,7 +531,7 @@ function home(){
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Daily sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="word"?esc(wordStatus(k)):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="word"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+    return `<button class="game" style="--c:var(${col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="word"?esc(wordStatus(k)):g.cat==="nm"?esc(nmStatus(k))+(b.v!=null?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="word"||g.cat==="nm"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Groups puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
@@ -460,12 +544,13 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();
   if(a==="pmini") return startMini({id:+b.dataset.id});
   if(a==="pgrp") return startGroups({id:+b.dataset.id});
+  if(a==="nmp") return startNm(b.dataset.g,{practice:true});
   if(a==="play"){ WK=null; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
   if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
   if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
