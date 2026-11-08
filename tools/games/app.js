@@ -26,9 +26,9 @@ const GAMES={
  count:{cat:"log", ic:"🧮", name:"Countdown", desc:"Hit the target with six numbers and + − × ÷.", hi:false, fmt:v=>fmtT(v)},
  sudoku:{cat:"log", ic:"🧩", name:"Mini sudoku", desc:"6×6: every row, column and box gets 1 to 6. New daily puzzle.", hi:false, fmt:v=>fmtT(v)},
  mini:{cat:"word", ic:"✏️", name:"Mini crossword", desc:"A quick 5×5 crossword. New puzzle every day.", hi:false, fmt:v=>fmtT(v)},
- groups:{cat:"word", ic:"🗂️", name:"Groups", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
- dive:{cat:"nm", ic:"🦐", name:"Deep dive", desc:"Name something that fits each prompt. The rarer your answer, the deeper you dive.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
- climb:{cat:"nm", ic:"🎈", name:"Sky climb", desc:"The reverse: give the answer most people would. The more common, the higher you climb.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
+ groups:{cat:"word", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
+ dive:{cat:"nm", ic:"🦐", name:"Krillion", desc:"Name something that fits each prompt. The rarer your answer, the deeper you dive.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
+ climb:{cat:"nm", ic:"🎈", name:"Reverse Krillion", desc:"The reverse: give the answer most people would. The more common, the higher you climb.", hi:true, fmt:v=>`${v.toLocaleString()} m`},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
 const WORKOUT=["num","schulte","sudoku"];
@@ -355,7 +355,7 @@ const GP_EM=["🟩","🟧","🟦","🟪"];
 function startGroups(opt={}){
   const id=opt.id!=null?opt.id:dailyOf(GROUPS), daily=opt.id==null||opt.id===dailyOf(GROUPS);
   const groups=GROUPS[id].map(([name,ws],k)=>({k,name,words:ws.split(" ")}));
-  begin("groups",`Groups #${id+1}`); S.gp=S.gp||{done:{}};
+  begin("groups",`Connections #${id+1}`); S.gp=S.gp||{done:{}};
   let left=shuf(groups.flatMap(g=>g.words)), solved=[], sel=new Set(), mistakes=0, guesses=[], over=false, busy=false;
   const prev=S.gp.done[id];
   function render(){
@@ -384,7 +384,7 @@ function startGroups(opt={}){
   function reveal(){ const rest=groups.filter(g=>!solved.includes(g)).sort((a,b)=>a.k-b.k); sel.clear(); render();
     rest.forEach((g,k)=>later(()=>{ solved.push(g); left=left.filter(w=>!g.words.includes(w)); render(); if(k===rest.length-1) end(false); },700*(k+1))); }
   function end(won){ over=true; if(!prev) S.gp.done[id]={won,m:mistakes,d:today()}; save();
-    const grid=guesses.map(g=>g.tiers.map(t=>GP_EM[t]).join("")).join("\n"), share=`Groups #${id+1}\n${grid}`;
+    const grid=guesses.map(g=>g.tiers.map(t=>GP_EM[t]).join("")).join("\n"), share=`Connections #${id+1}\n${grid}`;
     if(won) return later(()=>finish("groups",mistakes,{sub:`Puzzle #${id+1}${daily?" (today's)":""} · ${guesses.length} guesses`, archive:true, share}),900);
     render(); $('gpend').innerHTML=`<div class="gpout"><b>Out of mistakes</b><span>Here are the groups. A new puzzle is waiting tomorrow.</span><div class="gpgridtxt">${grid.replace(/\n/g,"<br>")}</div>
       <button class="btn go wide" id="gshr">Share result</button><div class="row" style="width:100%"><button class="btn wide" id="garc">More puzzles</button><button class="btn ghost" id="ghm">Home</button></div></div>`;
@@ -402,7 +402,7 @@ function archive(){
   show(`${bar("Puzzle archive")}
   <p class="muted">Today's puzzles are marked. Play any of them; your first solve of each is saved.</p>
   <section class="card"><h3>✏️ Mini crossword</h3><div class="arch">${MINIS.map((_,i)=>{ const d=S.xw.done[i], p=S.xw.prog[i]; return `<button data-act="pmini" data-id="${i}" class="${d?"ok":""}${i===dm?" today":""}"><b>#${i+1}</b><span>${i===dm?"Today":d?fmtT(d.t):p?"In progress":"Not played"}</span></button>`; }).join("")}</div></section>
-  <section class="card"><h3>🗂️ Groups</h3><div class="arch">${GROUPS.map((_,i)=>{ const d=S.gp.done[i]; return `<button data-act="pgrp" data-id="${i}" class="${d?(d.won?"ok":"lost"):""}${i===dg?" today":""}"><b>#${i+1}</b><span>${i===dg?"Today":d?(d.won?(d.m?`${d.m} mistake${d.m>1?"s":""}`:"Perfect"):"Missed"):"Not played"}</span></button>`; }).join("")}</div></section>`);
+  <section class="card"><h3>🗂️ Connections</h3><div class="arch">${GROUPS.map((_,i)=>{ const d=S.gp.done[i]; return `<button data-act="pgrp" data-id="${i}" class="${d?(d.won?"ok":"lost"):""}${i===dg?" today":""}"><b>#${i+1}</b><span>${i===dg?"Today":d?(d.won?(d.m?`${d.m} mistake${d.m>1?"s":""}`:"Perfect"):"Missed"):"Not played"}</span></button>`; }).join("")}</div></section>`);
 }
 function wordStatus(k){ if(k==="mini"){ S.xw=S.xw||{done:{},prog:{}}; const i=dailyOf(MINIS), d=S.xw.done[i], p=S.xw.prog[i]; return d?`Today's done · ${fmtT(d.t)}`:p?`Today's #${i+1} · in progress`:`Today's #${i+1} is ready`; }
   S.gp=S.gp||{done:{}}; const i=dailyOf(GROUPS), d=S.gp.done[i]; return d?(d.won?`Today's done · ${d.m?`${d.m} mistake${d.m>1?"s":""}`:"perfect"}`:"Today's done"):`Today's #${i+1} is ready`; }
@@ -432,12 +432,12 @@ function nmMatch(L,input){ nmPrep(L); const q=L.norm(input); if(!q) return null;
   for(const it of L.items) for(const k of it.keys){ const ks=k.replace(/ /g,""); if(Math.abs(ks.length-qs.length)>2) continue; const d=lev(qs,ks), lim=ks.length>=10?2:1; if(d<=lim&&d<bd){ bd=d; best=it; } }
   return best; }
 const NM={
-  dive:{name:"Deep dive", verb:"down", ic:"🦐", tag:"Rarer answers dive deeper",
+  dive:{name:"Krillion", verb:"down", ic:"🦐", tag:"Rarer answers dive deeper",
     tier(r,N){ const f=r/N; return f<.06?[10,"Sunlit: everyone says it","🫧"]:f<.15?[20,"Shallows: a common pick","🐟"]:f<.3?[35,"Reef: nicely done","🐠"]:f<.5?[55,"Twilight: getting rare","🦑"]:f<.75?[80,"Midnight: a deep cut","🐙"]:[100,"The abyss: almost nobody says that","🐋"]; },
     zone:m=>m<200?"Sunlit zone":m<1000?"Twilight zone":m<4000?"Midnight zone":m<6000?"Abyssal zone":"Hadal trench",
     col:f=>`color-mix(in srgb,#8fd8f5 ${Math.round((1-f)*100)}%,#04162b)`,
     hintLabel:"Deepest answers", hint:L=>L.items.slice(-3).reverse()},
-  climb:{name:"Sky climb", verb:"up", ic:"🎈", tag:"The answer most people give climbs highest",
+  climb:{name:"Reverse Krillion", verb:"up", ic:"🎈", tag:"The answer most people give climbs highest",
     tier(r,N){ const f=r/N; return r===0?[100,"Top answer! Exactly what most people say","🚀"]:r===1?[85,"The #2 answer","🛰️"]:r===2?[70,"The #3 answer","✈️"]:r<5?[55,"Top 5 answer","☁️"]:f<.15?[40,"Popular pick","🏔️"]:f<.3?[25,"Fairly common","🌳"]:f<.5?[15,"Uncommon: too clever","🌿"]:[10,"Rare: the crowd didn't go there","🌱"]; },
     zone:m=>m<500?"Treetops":m<2000?"Low clouds":m<4000?"Alpine peaks":m<6000?"Thin air":"Top of the world",
     col:f=>`color-mix(in srgb,#bfe9a6 ${Math.round((1-f)*100)}%,#3a7bd5)`,
@@ -515,10 +515,13 @@ function finish(game,v,o={}){
   ${(S.hist[key]||[]).length>1?`<section class="card" style="--c:var(--${g.cat})"><h3>Your trend</h3>${bigChart(S.hist[key],g)}<p class="muted">${g.hi?"Higher is better.":"Lower is better."} ${S.hist[key].length} games played.</p></section>`:""}
   ${WK&&wkNext?`<button class="btn go wide" data-act="wk">Workout: next is ${esc(GAMES[wkNext].name)}</button>`:""}
   ${WK&&wkDone&&game===WK?`<section class="card center"><p class="cheer">Daily workout complete!</p><p class="muted">${dayStreak()}-day streak. Come back tomorrow.</p></section>`:""}
-  ${o.share?`<button class="btn go wide" id="shareB">Share result</button>`:""}
+  ${o.share?`<div class="sharerow"><button class="btn go" id="shareB">Share result</button><button class="btn" id="copyB">Copy</button></div>`:""}
   ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="${o.practice?"nmp":"play"}" data-g="${game}">${o.practice?"Practice round":o.daily?"Practice another":"Play again"}</button>`}
   <button class="btn ghost wide" data-act="home">Home</button>`);
-  if(o.share) $('shareB').onclick=()=>shareText(o.share,$('shareB'));
+  if(o.share){ $('shareB').onclick=()=>shareText(o.share,$('shareB'));
+    $('copyB').onclick=async()=>{ const t=o.share+"\n"+location.origin+location.pathname, b=$('copyB');
+      try{ await navigator.clipboard.writeText(t); b.textContent="Copied!"; good(); setTimeout(()=>{ if(b.isConnected) b.textContent="Copy"; },1800); }
+      catch(e){ if(!document.querySelector(".sharetxt")) b.parentNode.insertAdjacentHTML("afterend",`<textarea class="sharetxt" readonly rows="5">${esc(t)}</textarea>`); const ta=document.querySelector(".sharetxt"); ta.focus(); ta.select(); } }; }
   if(o.archive) setTimeout(confetti,150); else if(WK&&wkDone&&game===WK){ setTimeout(confetti,150); toast("Workout complete!"); } else if(r.better&&r.prev!=null) setTimeout(confetti,150);
   WK=null;
 }
@@ -539,7 +542,7 @@ function home(){
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
     return `<button class="game" style="--c:var(${col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="word"?esc(wordStatus(k)):g.cat==="nm"?esc(nmStatus(k))+(b.v!=null?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="word"||g.cat==="nm"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
-  <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Groups puzzle</button>
+  <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
     <div class="sech"><span>Lights out</span></div><div class="levels">${[3,5,8].map(d=>`<button data-act="lit" data-v="${d}" aria-pressed="${S.lit===d}">${d} taps</button>`).join("")}</div></section>
