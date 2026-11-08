@@ -48,5 +48,23 @@ for(const m of META){ const f=fix(feats[m.id]); if(!f){ console.warn("no shape",
   const bb=d3.geoPath(proj).bounds({type:"Feature",geometry:{type:"MultiPolygon",coordinates:polys}});
   const cp=proj(mc);
   out.push({id:m.id,n:m.n,c:m.c,b:[...B[m.id]],ll:[+mc[0].toFixed(3),+mc[1].toFixed(3)],km2:Math.round(total),sh,wp,bb:bb.flat().map(v=>Math.round(v)),cp:cp.map(v=>Math.round(v)),al:ALIAS[m.id]||[]}); }
-fs.writeFileSync("games/geo.json",JSON.stringify({w:W,c:out}));
+// closest-border distances between every pair of countries (km), for Worldle: neighbours are 0, islands get their sea gap.
+// Each outline is sampled about every 25 km; a coarse pass finds the near side, then the full sample refines it.
+const toV=([lo,la])=>{ const r=Math.PI/180, cl=Math.cos(la*r); return [cl*Math.cos(lo*r),cl*Math.sin(lo*r),Math.sin(la*r)]; };
+const PTS=out.map(o=>{ const f=feats[o.id]; const pts=[];
+  for(const poly of ringsOf(f.geometry)) for(const ring of poly){ for(let i=0;i<ring.length;i++){ const a=ring[i], b=ring[(i+1)%ring.length]; const d=d3.geoDistance(a,b)*R, n=Math.max(1,Math.ceil(d/25)), it=d3.geoInterpolate(a,b);
+      for(let k=0;k<n;k++) pts.push(toV(it(k/n))); } }
+  const fa=new Float64Array(pts.length*3); pts.forEach((v,i)=>{ fa[i*3]=v[0]; fa[i*3+1]=v[1]; fa[i*3+2]=v[2]; }); return fa; });
+const N=out.length, MD=[];
+const idx=Object.fromEntries(out.map((o,i)=>[o.id,i]));
+for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+  if(out[i].b.includes(out[j].id)&&!(["FRA","GBR"].includes(out[i].id)&&["FRA","GBR"].includes(out[j].id))&&!(["DNK","SWE"].includes(out[i].id)&&["DNK","SWE"].includes(out[j].id))){ MD.push(0); continue; }
+  const A=PTS[i], B=PTS[j]; let best=-2;
+  const sa=Math.max(1,Math.floor(A.length/3/150)), sb=Math.max(1,Math.floor(B.length/3/150)); let bi=0,bj=0;
+  for(let x=0;x<A.length;x+=3*sa) for(let y=0;y<B.length;y+=3*sb){ const d=A[x]*B[y]+A[x+1]*B[y+1]+A[x+2]*B[y+2]; if(d>best){ best=d; bi=x; bj=y; } }
+  // refine near the coarse closest pair
+  const win=3*Math.max(sa,sb)*4;
+  for(let x=Math.max(0,bi-win*sa);x<Math.min(A.length,bi+win*sa+3);x+=3) for(let y=Math.max(0,bj-win*sb);y<Math.min(B.length,bj+win*sb+3);y+=3){ const d=A[x]*B[y]+A[x+1]*B[y+1]+A[x+2]*B[y+2]; if(d>best) best=d; }
+  MD.push(Math.round(Math.acos(Math.min(1,best))*R)); }
+fs.writeFileSync("games/geo.json",JSON.stringify({w:W,c:out,md:MD}));
 console.log(out.length,"countries; shapes",shapeBytes,"world",worldBytes,"file",fs.statSync("games/geo.json").size);

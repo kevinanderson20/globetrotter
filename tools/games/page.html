@@ -397,11 +397,11 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .wlshape.small svg{width:min(60%,160px)}
 .wlname{font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)}
 .wlrows{display:grid;gap:5px}
-.wlrow{display:grid;grid-template-columns:minmax(0,1fr) auto 30px 54px;gap:5px;align-items:stretch}
+.wlrow{display:grid;grid-template-columns:minmax(0,1fr) auto 36px 54px;gap:5px;align-items:stretch}
 .wlrow>*{background:var(--surface);border-radius:10px;min-height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;padding:0 8px}
 .wlrow b{justify-content:flex-start;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:block;line-height:38px}
 .wlrow .wldist{min-width:76px;color:var(--ink-2);cursor:pointer}
-.wlrow .wlarr{padding:0;font-size:18px}
+.wlrow .wlarr{padding:0;font-size:18px}.wlrow .wlarr svg{width:22px;height:22px;fill:var(--geo);transition:transform .4s}
 .wlrow .wlpct{background:linear-gradient(90deg,color-mix(in srgb,var(--good) 35%,var(--surface)) var(--p),var(--surface) var(--p))}
 .wlrow.hit>*{background:color-mix(in srgb,var(--good) 30%,var(--surface))}
 .wlrow.empty>*{background:color-mix(in srgb,var(--surface) 55%,transparent)}

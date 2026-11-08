@@ -3,9 +3,9 @@
    It loads the first time one of these games opens and is kept offline by the service worker. */
 let GEO=null, GEO_P=null;
 function geoLoad(){ if(GEO) return Promise.resolve(GEO); if(GEO_P) return GEO_P;
-  GEO_P=fetch("geo.json").then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(d=>{
+  GEO_P=fetch("geo.json?v=2").then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(d=>{
     const by={}; d.c.forEach(c=>{ by[c.id]=c; c.keys=[...new Set([c.n,...c.al].map(geoNorm))]; });
-    GEO={W:d.w,list:d.c,by}; return GEO; }).catch(e=>{ GEO_P=null; throw e; });
+    const ix={}; d.c.forEach((c,i)=>ix[c.id]=i); GEO={W:d.w,list:d.c,by,ix,md:d.md||null}; return GEO; }).catch(e=>{ GEO_P=null; throw e; });
   return GEO_P; }
 const geoNorm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/&/g,"and").replace(/^the\s+/,"").replace(/[^a-z]/g,"");
 function geoFind(text){ const q=geoNorm(text); if(!q) return null; return GEO.list.find(c=>c.keys.includes(q))||null; }
@@ -56,14 +56,19 @@ function geoMapSVG(box,layers){ const [x,y,w,h]=box, sw=(w/400).toFixed(2);
 let WL_ROT=null;
 const wlDaily=()=>{ if(!WL_ROT) WL_ROT=shuf(GEO.list.map(c=>c.id).sort(),seeded("globetrotter-worldle-v1")); const n=WL_ROT.length; return WL_ROT[((dayIndex()%n)+n)%n]; };
 const wlNum=()=>dayIndex()+1;
-const wlProx=d=>Math.max(0,Math.floor((20000-d)/20000*100));
+/* closeness: 99% for a neighbour, falling off faster near home than real Worldle's straight line (which gave a neighbour only ~87%) */
+const wlProx=d=>Math.max(0,Math.floor(99*(1-Math.sqrt(Math.min(d,20000)/20000))));
+/* closest distance between the two countries' borders, precomputed for every pair (0 = they share a border) */
+function geoGap(a,b){ if(!GEO.md) return KM(GEO.by[a].ll,GEO.by[b].ll); let i=GEO.ix[a], j=GEO.ix[b]; if(i===j) return 0; if(i>j) [i,j]=[j,i]; const N=GEO.list.length; return GEO.md[i*N-i*(i+1)/2+(j-i-1)]; }
 const wlSquares=p=>{ const t=Math.floor(p/10); return "🟩".repeat(Math.floor(t/2))+(t%2?"🟨":"")+"⬛".repeat(5-Math.floor(t/2)-(t%2)); };
 const wlUnit=d=>S.wlMi?`${Math.round(d*0.621371).toLocaleString()} mi`:`${Math.round(d).toLocaleString()} km`;
-function wlRow(t,gid){ const g=GEO.by[gid]; if(gid===t.id) return {id:gid,n:g.n,d:0,a:"🎉",p:100};
-  const d=KM(g.ll,t.ll); return {id:gid,n:g.n,d,a:ARROWS[Math.round(BEARING(g.ll,t.ll)/45)%8],p:wlProx(d)}; }
+function wlRow(t,gid){ const g=GEO.by[gid]; if(gid===t.id) return {id:gid,n:g.n,hit:1,d:0,a:"🎉",p:100};
+  const d=geoGap(gid,t.id), deg=BEARING(g.ll,t.ll); return {id:gid,n:g.n,d,deg,a:ARROWS[Math.round(deg/45)%8],p:wlProx(d)}; }
+/* one guess row: name, border-to-border distance, an arrow at the exact compass angle, closeness */
+function wlRowHtml(r,click){ return `<div class="wlrow ${r.hit?"hit":""}"><b>${esc(r.n)}</b><span class="wldist"${click?' role="button" tabindex="0"':""}>${r.hit?"":r.d===0?"Borders it":wlUnit(r.d)}</span><span class="wlarr">${r.hit?"🎉":`<svg viewBox="0 0 24 24" style="transform:rotate(${Math.round(r.deg)}deg)" aria-label="Direction ${Math.round(r.deg)} degrees"><path d="M12 2.5 19 12h-4.6v9.5H9.6V12H5z"/></svg>`}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`; }
 function wlStatus(){ S.wl=S.wl||{}; const d=S.wl[today()]; return d&&d.over?(d.won?`Today's done · ${d.g.length}/6`:"Today's done · missed it"):d&&d.g.length?`Today's #${wlNum()} · ${d.g.length}/6 guessed`:`Today's #${wlNum()} is ready`; }
 function wlShare(t,rows,won,daily){ const best=Math.max(...rows.map(r=>r.p));
-  return `#Worldle ${daily?"#"+wlNum():"(unlimited)"} ${won?rows.length:"X"}/6 (${best}%)\n${rows.map(r=>r.d===0?"🟩🟩🟩🟩🟩🎉":wlSquares(r.p)+r.a).join("\n")}`; }
+  return `#Worldle ${daily?"#"+wlNum():"(unlimited)"} ${won?rows.length:"X"}/6 (${best}%)\n${rows.map(r=>r.hit?"🟩🟩🟩🟩🟩🎉":wlSquares(r.p)+r.a).join("\n")}`; }
 async function startWorldle(opt={}){
   const daily=!opt.unlimited, gid=daily?"worldle":"worldleu";
   begin(gid,daily?`Worldle #${dayIndex()+1}`:"Unlimited Worldle"); stage.className="gstage scroll"; geoLoading();
@@ -77,8 +82,8 @@ async function startWorldle(opt={}){
   let over=false;
   function render(){ const rows=st.g.map(id=>wlRow(t,id));
     stage.innerHTML=`<div class="wl">
-      <div class="wlshape ${over?(rows.some(r=>r.d===0)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery country outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
-      <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?`<div class="wlrow ${r.d===0?"hit":""}"><b>${esc(r.n)}</b><span class="wldist" role="button" tabindex="0">${r.d===0?"":wlUnit(r.d)}</span><span class="wlarr">${r.a}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`:`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
+      <div class="wlshape ${over?(rows.some(r=>r.hit)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery country outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
+      <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="wlin"></div></div>`;
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('wlin'),{placeholder:"Country, territory…",skip:()=>new Set(st.g),onPick:guess}); }
@@ -100,7 +105,7 @@ function wlResults(daily){ const st=S.wl[today()], t=GEO.by[st.t||wlDaily()], ro
   <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Worldle #${wlNum()}</div>
     <div class="big">${won?rows.length:"X"}/6</div><p class="muted">${won?`You found ${esc(t.n)}`:`It was ${esc(t.n)}`}</p><p class="cheer" style="color:var(--ink-2)">New country tomorrow</p></section>
   <section class="card"><div class="wlshape small ${won?"won":"lost"}"><svg viewBox="0 0 400 400"><path d="${t.sh}"/></svg></div>
-    <div class="wlrows">${rows.map(r=>`<div class="wlrow ${r.d===0?"hit":""}"><b>${esc(r.n)}</b><span class="wldist">${r.d===0?"":wlUnit(r.d)}</span><span class="wlarr">${r.a}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`).join("")}</div></section>
+    <div class="wlrows">${rows.map(r=>wlRowHtml(r)).join("")}</div></section>
   ${wlMapCard(t,rows)}
   ${SHARE_ROW}
   <button class="btn wide" data-act="play" data-g="worldleu">Play unlimited Worldle</button>
