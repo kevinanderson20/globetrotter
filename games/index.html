@@ -534,7 +534,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.08-1229";
+const APP_VERSION="2026.11.08-1233";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -549,7 +549,7 @@ function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++)
   return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
 
 /* ---------- the games ---------- */
-const CATS=[["daily","Daily games","New puzzles every day","--wd"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"]];
+const CATS=[["daily","Daily games","New puzzles every day","--wd"],["mem","Memory","Hold it in your head","--mem"],["spd","Speed & focus","React fast, stay sharp","--spd"],["log","Logic","Think it through","--log"],["unl","Unlimited","Play as much as you like","--nm"]];
 const GAMES={
  seq:{cat:"mem", ic:"🔲", name:"Sequence memory", desc:"Tiles light up in order. Repeat the pattern; it grows each round.", hi:true, fmt:v=>`Level ${v}`},
  num:{cat:"mem", ic:"🔢", name:"Number memory", desc:"A number flashes. Type it back. One more digit each round.", hi:true, fmt:v=>`${v} digits`},
@@ -563,6 +563,8 @@ const GAMES={
  groups:{cat:"daily", col:"--wd", ic:"🗂️", name:"Connections", desc:"Sort 16 words into four groups of four.", hi:false, fmt:v=>v===0?"Perfect":`${v} mistake${v>1?"s":""}`},
  dive:{cat:"daily", col:"--nm", ic:"🦐", name:"Krillion", desc:"Name one answer per prompt. Rarer answers score more. 700 is perfect.", hi:true, fmt:v=>`${v} / 700`},
  climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
+ diveu:{cat:"unl", col:"--nm", ic:"🦐", name:"Unlimited Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
+ climbu:{cat:"unl", col:"--nm", ic:"🎈", name:"Unlimited Reverse Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
  dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"A classic 9×9, easy level, with pencil notes. One puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
@@ -1161,13 +1163,31 @@ function nmDay(mode,d){
     const C=shuf(ks.filter(isC),r), O=shuf(ks.filter(k=>!isC(k)),r), days=Math.floor(ks.length/7); let o=0; NM_ROT=[];
     for(let j=0;j<days;j++){ const c=C.slice(Math.floor(j*C.length/days),Math.floor((j+1)*C.length/days)), day=c.concat(O.slice(o,o+7-c.length)); o+=7-c.length; NM_ROT.push(shuf(day,r)); } }
   const n=NM_ROT.length, j=(((d+(mode==="climb"?Math.floor(n/2):0))%n)+n)%n; return NM_ROT[j]; }
-function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`Today's done · ${d.m} / 700`:"Today's prompts are ready"; }
+function nmStatus(k){ S.nm=S.nm||{}; const d=(S.nm[k]||{})[today()]; return d?`Today's done · ${d.m} / 700 · tap for your answers`:"Today's prompts are ready"; }
+/* every answer on a list, grouped by tier, best tier first; yours is highlighted */
+function nmAllHtml(mode,L,it){ const T=NM_TIERS[mode], g=T.map(()=>[]);
+  (mode==="dive"?[...L.items].reverse():L.items).forEach(x=>g[nmTierIx(mode,x.r,L.N)].push(x));
+  return `<div class="nmall">${g.map((xs,ti)=>xs.length?`<div class="nmgrp"><h5>${T[ti][3]} ${esc(T[ti][1])} <small>${T[ti][0]} pts · ${xs.length}</small></h5><p>${xs.map(x=>`<span${x===it?' class="me"':""}>${esc(nmCap(x.show))}</span>`).join("")}</p></div>`:"").join("")}</div>`; }
+function nmResultsHtml(mode,res){ return `<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):"No answer"}</b><small>${esc(r.lab)}</small></p><em>+${r.pts}</em><i class="nmchev">›</i></summary>${nmAllHtml(mode,r.L,r.it)}</details>`).join("")}</div></section>`; }
+function nmWireRows(){ document.querySelectorAll(".nmrow").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open) document.querySelectorAll(".nmrow[open]").forEach(o=>{ if(o!==d) o.open=false; }); })); }
+const nmShareText=(mode,m,em)=>`${NM[mode].name} ${NM[mode].ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m} / 700 · ${NM[mode].zone(m)}`;
+/* today's round is played once; after that the daily card shows what you answered */
+function nmToday(mode){ const M=NM[mode], T=NM_TIERS[mode], d=S.nm[mode][today()];
+  const res=(d.a||[]).map(([k,r])=>{ const L=nmPrep(LISTS[k]), it=r>=0?L.items[r]:null, t=it?T[nmTierIx(mode,it.r,L.N)]:[0,"Time's up","","⬛"]; return {L,it,pts:t[0],lab:t[1],em:t[3]}; });
+  show(`${bar(M.name)}
+  <section class="card center" style="--c:var(${GAMES[mode].col})"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's ${esc(M.name)}</div>
+    <div class="big">${d.m} / 700</div><p class="muted">${esc(M.zone(d.m))}</p><p class="cheer" style="color:var(--ink-2)">New prompts tomorrow</p></section>
+  ${res.length?nmResultsHtml(mode,res):`<section class="card"><p class="muted">Answers from rounds played before this update weren't saved. From tomorrow, they will be.</p></section>`}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="${mode}u">Play unlimited ${esc(M.name)}</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(nmShareText(mode,d.m,d.e||"")); nmWireRows(); }
 function startNm(mode,opt={}){
   const M=NM[mode], T=NM_TIERS[mode]; S.nm=S.nm||{}; S.nm[mode]=S.nm[mode]||{};
-  const done=S.nm[mode][today()], daily=!opt.practice&&!done;
-  if(!opt.practice&&done) toast(`Today's ${M.name} is done. Here's a practice round.`);
-  const picks=(daily?nmDay(mode,dayIndex()):shuf([...LISTS.keys()]).slice(0,7)).map(i=>nmPrep(LISTS[i]));
-  begin(mode,daily?`${M.name} · today`:`${M.name} · practice`);
+  if(!opt.practice&&S.nm[mode][today()]) return nmToday(mode);
+  const daily=!opt.practice, gid=daily?mode:mode+"u";
+  const idx=daily?nmDay(mode,dayIndex()):shuf([...LISTS.keys()]).slice(0,7), picks=idx.map(i=>nmPrep(LISTS[i]));
+  begin(gid,daily?`${M.name} · today`:`Unlimited ${M.name}`);
   let i=0, res=[], m=0, locked=false, deadline=0, tmr=0;
   const TIME=25000;
   function scene(){ const f=Math.min(1,m/700);
@@ -1190,23 +1210,16 @@ function startNm(mode,opt={}){
   function reveal(it){ if(locked) return; locked=true; clearTimeout(tmr); cancelAnimationFrame(GS.raf); $('ginfo').textContent=""; const L=picks[i];
     const ti=it?nmTierIx(mode,it.r,L.N):-1, [pts,lab,why,em]=it?T[ti]:[0,"Time's up","No answer this time","⬛"];
     if(it) good(); else bad();
-    const m0=m; m+=pts; res.push({L,it,pts,em,lab,ti});
+    const m0=m; m+=pts; res.push({L,it,pts,em,lab,ti,k:idx[i]});
     stage.innerHTML=`<div class="nmwrap">${scene()}<div class="nmcard"><div class="nmno">Prompt ${i+1} of 7</div><div class="nmq">${esc(L.p)}</div>
       <div class="nmres ${it?"ok":"no"} t${ti}"><b>${it?esc(nmCap(it.show)):"No answer"}</b><span>${em} ${esc(lab)}${it?` · ${esc(why)}`:""}</span><em>+${pts}</em></div>
       <button class="btn go wide" id="nmnext">${i<6?"Next prompt":"See results"}</button></div></div>`;
     __b.nm={mode,list:L,i,pts};
     if(it){ const d=stage.querySelector(".nmdepth b"); if(d&&!reduceMotion){ const t0=performance.now(), g=GS; const run=()=>{ if(GS!==g) return; const k=Math.min(1,(performance.now()-t0)/700); d.innerHTML=Math.round(m0+(m-m0)*k)+"<small> / 700</small>"; if(k<1) requestAnimationFrame(run); }; run(); } }
     $('nmnext').onclick=()=>{ i++; if(i<7) ask(); else done_(); }; }
-  /* every answer on the list, grouped by tier, best tier first; yours is highlighted */
-  function nmAll(L,it,open){ const g=T.map(()=>[]);
-    const order=mode==="dive"?[...L.items].reverse():L.items; order.forEach(x=>g[nmTierIx(mode,x.r,L.N)].push(x));
-    return `<details class="nmall"${open?" open":""}><summary>See all ${L.N} answers</summary>${g.map((xs,ti)=>xs.length?`<div class="nmgrp"><h5>${T[ti][3]} ${esc(T[ti][1])} <small>${T[ti][0]} pts · ${xs.length}</small></h5><p>${xs.map(x=>`<span${x===it?' class="me"':""}>${esc(nmCap(x.show))}</span>`).join("")}</p></div>`:"").join("")}</details>`; }
   function done_(){ const em=res.map(r=>r.em).join("");
-    if(daily){ S.nm[mode][today()]={m,e:em}; const ks=Object.keys(S.nm[mode]).sort(); ks.slice(0,-60).forEach(k=>delete S.nm[mode][k]); save(); }
-    const share=`${M.name} ${M.ic} ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})}\n${em}\n${m} / 700 · ${M.zone(m)}`;
-    const html=`<section class="card"><h3>Your answers</h3><p class="muted nmtip">Tap a prompt to see every answer.</p><div class="nmlist">${res.map(r=>`<details class="nmrow"><summary><span>${r.em}</span><p>${esc(r.L.p)}<b>${r.it?esc(nmCap(r.it.show)):"No answer"}</b><small>${esc(r.lab)}</small></p><em>+${r.pts}</em><i class="nmchev">›</i></summary>${nmAll(r.L,r.it,true).replace('<details class="nmall" open><summary>See all '+r.L.N+' answers</summary>','<div class="nmall">').replace(/<\/details>$/,"</div>")}</details>`).join("")}</div></section>`;
-    finish(mode,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · practice round"}`, share, html, practice:true});
-    document.querySelectorAll(".nmrow").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open) document.querySelectorAll(".nmrow[open]").forEach(o=>{ if(o!==d) o.open=false; }); })); }
+    if(daily){ S.nm[mode][today()]={m,e:em,a:res.map(r=>[r.k,r.it?r.it.r:-1])}; const ks=Object.keys(S.nm[mode]).sort(); ks.slice(0,-60).forEach(k=>delete S.nm[mode][k]); save(); }
+    finish(gid,m,{sub:`${M.zone(m)}${daily?" · today's prompts":" · unlimited round"}`, share:nmShareText(mode,m,em), html:nmResultsHtml(mode,res), nextG:mode+"u", nextLabel:daily?`Play unlimited ${M.name}`:"Play again", after:nmWireRows}); }
   ask();
 }
 
@@ -1297,13 +1310,17 @@ function finish(game,v,o={}){
   ${o.share?`<div class="sharerow"><button class="btn go" id="shareB">Share result</button><button class="btn" id="copyB">Copy</button></div>`:""}
   ${o.archive?`<button class="btn wide" data-act="arch">More puzzles</button>`:`<button class="btn ${WK&&wkNext?"":"go"} wide" data-act="${o.practice?"nmp":"play"}" data-g="${o.nextG||game}">${o.nextLabel||(o.practice?"Practice round":o.daily?"Practice another":"Play again")}</button>`}
   <button class="btn ghost wide" data-act="home">Home</button>`);
-  if(o.share){ $('shareB').onclick=()=>shareText(o.share,$('shareB'));
-    $('copyB').onclick=async()=>{ const t=o.share+"\n"+location.origin+location.pathname, b=$('copyB');
-      try{ await navigator.clipboard.writeText(t); b.textContent="Copied!"; good(); setTimeout(()=>{ if(b.isConnected) b.textContent="Copy"; },1800); }
-      catch(e){ if(!document.querySelector(".sharetxt")) b.parentNode.insertAdjacentHTML("afterend",`<textarea class="sharetxt" readonly rows="5">${esc(t)}</textarea>`); const ta=document.querySelector(".sharetxt"); ta.focus(); ta.select(); } }; }
+  if(o.share) wireShare(o.share);
+  if(o.after) o.after();
   if(o.archive) setTimeout(confetti,150); else if(WK&&wkDone&&game===WK){ setTimeout(confetti,150); toast("Workout complete!"); } else if(r.better&&r.prev!=null) setTimeout(confetti,150);
   WK=null;
 }
+
+function wireShare(text){ $('shareB').onclick=()=>shareText(text,$('shareB'));
+  $('copyB').onclick=async()=>{ const t=text+"\n"+location.origin+location.pathname, b=$('copyB');
+    try{ await navigator.clipboard.writeText(t); b.textContent="Copied!"; good(); setTimeout(()=>{ if(b.isConnected) b.textContent="Copy"; },1800); }
+    catch(e){ if(!document.querySelector(".sharetxt")) b.parentNode.insertAdjacentHTML("afterend",`<textarea class="sharetxt" readonly rows="5">${esc(t)}</textarea>`); const ta=document.querySelector(".sharetxt"); ta.focus(); ta.select(); } }; }
+const SHARE_ROW=`<div class="sharerow"><button class="btn go" id="shareB">Share result</button><button class="btn" id="copyB">Copy</button></div>`;
 
 /* ================= HOME ================= */
 function bar(title,back="home"){ return `<div class="bar"><button class="x" data-act="${back}" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M13.5 4.5 7 11l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">${esc(title)}</div></div>`; }
@@ -1333,13 +1350,12 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();
   if(a==="pmini") return startMini({id:+b.dataset.id});
   if(a==="pgrp") return startGroups({id:+b.dataset.id});
-  if(a==="nmp") return startNm(b.dataset.g,{practice:true});
   if(a==="play"){ WK=null; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
   if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
   if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
