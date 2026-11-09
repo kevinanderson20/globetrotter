@@ -378,7 +378,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .cinlist button.on{background:color-mix(in srgb,var(--geo) 14%,var(--surface))}
 /* maps */
 .gmap{width:100%;height:auto;display:block;border-radius:14px;background:color-mix(in srgb,#5aa9e6 20%,var(--surface))}
-.gmap path,.gmap circle{stroke:var(--surface);stroke-width:var(--sw);stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.gmap path,.gmap circle{stroke:var(--surface);stroke-width:1px;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .gmap .g-land{fill:color-mix(in srgb,var(--ink-3) 30%,var(--surface))}
 .gmap .g-ghost{fill:color-mix(in srgb,var(--ink-3) 18%,var(--surface));stroke:color-mix(in srgb,var(--ink-3) 55%,var(--surface));stroke-width:.8px}
 .gmap .g-hit{fill:var(--good)}
@@ -410,6 +410,13 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tvhead{font-size:17px;text-align:center;color:var(--ink-2)}
 .tvhead b{font-family:var(--f-display);font-weight:800}.tva{color:#2f7de1}.tvb{color:#e2483d}
 .tvmap .gmap{max-height:42vh;object-fit:contain}
+.gzoom{position:relative;border-radius:14px;overflow:hidden}
+.gzoom .gmap{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.gzoom .gmap:active{cursor:grabbing}
+.gzbtns{position:absolute;right:8px;top:8px;display:grid;gap:6px}
+.gzbtns button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 88%,transparent);color:var(--ink);font:800 20px/1 var(--f-body);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.gzbtns button[data-z="reset"]{font-size:17px;opacity:.5;pointer-events:none}
+.gzoom.zoomed .gzbtns button[data-z="reset"]{opacity:1;pointer-events:auto}
 .tvbar{display:flex;justify-content:space-between;align-items:center;font-weight:800;color:var(--ink-2)}
 .btn.sm{min-height:38px;padding:6px 12px;font-size:15px;width:auto}
 .tvinit{text-align:center;font-weight:700;color:var(--ink-2)}

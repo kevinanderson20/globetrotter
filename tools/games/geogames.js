@@ -47,9 +47,47 @@ function geoBox(ids,pad=.18,minW=220){ let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   let w=Math.max(x1-x0,minW), h=Math.max(y1-y0,minW*.62); const cx=(x0+x1)/2, cy=(y0+y1)/2;
   if(w/h<1.25) w=h*1.25; else h=w/1.25; w*=1+pad*2; h*=1+pad*2; return [cx-w/2,cy-h/2,w,h]; }
 function geoPathEl(c,cls,extra=""){ return c.wp?`<path class="${cls}" d="${c.wp}" ${extra}/>`:`<circle class="${cls}" cx="${c.cp[0]}" cy="${c.cp[1]}" r="3" ${extra}/>`; }
-function geoMapSVG(box,layers){ const [x,y,w,h]=box, sw=(w/400).toFixed(2);
+function geoMapSVG(box,layers,vb){ const [x,y,w,h]=box, v=vb||box;
   const inView=c=>{ const b=c.bb; return b[2]>=x&&b[0]<=x+w&&b[3]>=y&&b[1]<=y+h; };
-  return `<svg class="gmap" viewBox="${x.toFixed(0)} ${y.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" style="--sw:${sw}">${layers(inView)}</svg>`; }
+  return `<svg class="gmap" viewBox="${v.map(n=>n.toFixed(1)).join(" ")}">${layers(inView)}</svg>`; }
+/* a map you can zoom: pinch or scroll to zoom, drag to pan, double-tap to zoom in, buttons for +, − and reset.
+   `base` is the starting view; `state` (optional) keeps the view across re-renders so a guess doesn't reset your zoom. */
+function geoZoomable(base,layers,state){ const pad=[base[0]-base[2],base[1]-base[3],base[2]*3,base[3]*3]; // draw a wider area so panning/zooming out shows more
+  const v=state&&state.v?state.v:base.slice();
+  return `<div class="gzoom" data-base="${base.join(" ")}">${geoMapSVG(pad,layers,v)}<div class="gzbtns"><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="reset" aria-label="Reset view">⟲</button></div></div>`; }
+function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").forEach(wrap=>{ if(wrap._z) return; wrap._z=1;
+  const svg=wrap.querySelector("svg"), base=wrap.dataset.base.split(" ").map(Number), ar=base[3]/base[2];
+  let v=svg.getAttribute("viewBox").split(" ").map(Number);
+  const minW=Math.max(24,base[2]/14), maxW=base[2]*2.6;
+  const apply=()=>{ svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" ")); if(state) state.v=v.slice(); wrap.classList.toggle("zoomed",Math.abs(v[2]-base[2])>1||Math.abs(v[0]-base[0])>1||Math.abs(v[1]-base[1])>1); };
+  const toMap=(cx,cy)=>{ const r=svg.getBoundingClientRect(); return [v[0]+(cx-r.left)/r.width*v[2], v[1]+(cy-r.top)/r.height*v[3]]; };
+  const zoomAt=(f,mx,my)=>{ const w=Math.min(maxW,Math.max(minW,v[2]*f)), k=w/v[2]; v=[mx-(mx-v[0])*k, my-(my-v[1])*k, w, w*ar]; apply(); };
+  const centre=()=>[v[0]+v[2]/2,v[1]+v[3]/2];
+  let anim=0; const animTo=(t)=>{ cancelAnimationFrame(anim); const s0=v.slice(), t0=performance.now();
+    const step=()=>{ const k=Math.min(1,(performance.now()-t0)/260), e=1-(1-k)**3; v=s0.map((a,i)=>a+(t[i]-a)*e); apply(); if(k<1) anim=requestAnimationFrame(step); }; step(); };
+  wrap.querySelector(".gzbtns").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const [cx,cy]=centre();
+    if(b.dataset.z==="reset") return animTo(base.slice());
+    const w=Math.min(maxW,Math.max(minW,v[2]*(b.dataset.z==="in"?.6:1/.6))); animTo([cx-w/2,cy-w*ar/2,w,w*ar]); });
+  svg.addEventListener("wheel",e=>{ e.preventDefault(); const [mx,my]=toMap(e.clientX,e.clientY); zoomAt(Math.exp(e.deltaY*.0018),mx,my); },{passive:false});
+  const pts=new Map(); let last=null, pinch=null, tapT=0, tapXY=null, moved=0;
+  svg.addEventListener("pointerdown",e=>{ svg.setPointerCapture(e.pointerId); pts.set(e.pointerId,[e.clientX,e.clientY]); moved=0;
+    if(pts.size===2){ const [a,b]=[...pts.values()]; pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),w:v[2],m:toMap((a[0]+b[0])/2,(a[1]+b[1])/2),v:v.slice()}; }
+    last=[e.clientX,e.clientY]; });
+  svg.addEventListener("pointermove",e=>{ if(!pts.has(e.pointerId)) return; pts.set(e.pointerId,[e.clientX,e.clientY]);
+    const r=svg.getBoundingClientRect();
+    if(pts.size>=2&&pinch){ const [a,b]=[...pts.values()], d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(d<10) return;
+      const w=Math.min(maxW,Math.max(minW,pinch.w*pinch.d/d)), mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      // keep the map point under the fingers' midpoint fixed
+      v=[pinch.m[0]-(mid[0]-r.left)/r.width*w, pinch.m[1]-(mid[1]-r.top)/r.height*w*ar, w, w*ar]; moved=9; apply(); return; }
+    if(pts.size===1&&last){ const dx=e.clientX-last[0], dy=e.clientY-last[1]; moved+=Math.abs(dx)+Math.abs(dy); last=[e.clientX,e.clientY];
+      v[0]-=dx/r.width*v[2]; v[1]-=dy/r.height*v[3]; apply(); } });
+  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=null;
+    if(pts.size===1){ last=[...pts.values()][0]; return; }
+    if(pts.size===0&&moved<8){ const now=performance.now(); // double-tap zooms in where you tapped
+      if(now-tapT<320&&tapXY&&Math.hypot(e.clientX-tapXY[0],e.clientY-tapXY[1])<30){ const [mx,my]=toMap(e.clientX,e.clientY), w=Math.max(minW,v[2]*.5); animTo([mx-w/2,my-w*ar/2,w,w*ar]); tapT=0; }
+      else { tapT=now; tapXY=[e.clientX,e.clientY]; } } };
+  svg.addEventListener("pointerup",up); svg.addEventListener("pointercancel",up);
+  apply(); }); }
 
 /* ---------------- WORLDLE ---------------- */
 /* six guesses at a country's silhouette; each miss shows the distance, the direction and how close it was */
@@ -151,17 +189,17 @@ async function startTravle(opt={}){
   __b.tv=st;
   const free=()=>new Set([st.a,st.b,...st.g]);
   let over=false;
-  const baseBox=geoBox([st.a,st.b,...tvPathCountries(st.a,st.b,new Set([st.a,st.b]))],.22,160);
+  const baseBox=geoBox([st.a,st.b,...tvPathCountries(st.a,st.b,new Set([st.a,st.b]))],.22,160), zoomState={};
   function render(msg){ const fr=free(), need=tvNeed(st.a,st.b,fr), left=st.max-st.g.length;
     const col={}; st.g.forEach((id,i)=>col[id]=st.e[i]==="✅"||st.e[i]==="🟩"?"g-ok":st.e[i]==="🟧"?"g-near":"g-far");
     const next=!over&&(st.hints.next||st.hints.init)?tvPathCountries(st.a,st.b,fr)[0]:null;
-    const map=geoMapSVG(baseBox,inView=>{ let s="";
+    const map=geoZoomable(baseBox,inView=>{ let s="";
       if(st.hints.outlines||over) s+=GEO.list.filter(inView).filter(c=>!fr.has(c.id)).map(c=>geoPathEl(c,"g-ghost")).join("");
       if(next&&st.hints.next) s+=geoPathEl(GEO.by[next],"g-next");
       s+=st.g.map(id=>geoPathEl(GEO.by[id],col[id])).join("");
       if(over&&!st.won) s+=tvPathCountries(st.a,st.b,fr).map(id=>geoPathEl(GEO.by[id],"g-miss")).join("");
       s+=geoPathEl(A,"g-start")+geoPathEl(B,"g-end");
-      return s; });
+      return s; },zoomState);
     stage.innerHTML=`<div class="tv">
       <div class="tvhead">Travel from <b class="tva">${esc(A.n)}</b> to <b class="tvb">${esc(B.n)}</b></div>
       <div class="tvmap">${map}</div>
@@ -172,6 +210,7 @@ async function startTravle(opt={}){
       ${over?"":`<div id="tvin"></div>`}
       ${over&&!st.won?`<div class="tvmsg">One shortest route: ${esc([st.a,...tvPathCountries(st.a,st.b,new Set([st.a,st.b])),st.b].map(id=>GEO.by[id].n).join(" → "))}</div>`:""}
     </div>`;
+    geoZoomInit(stage,zoomState);
     if(!over){ geoInput($('tvin'),{placeholder:"Type a country",skip:()=>free(),onPick:guess});
       $('tvhint').onclick=hintMenu; }
     __b.tvNeed=need; }
@@ -192,11 +231,11 @@ async function startTravle(opt={}){
     if(st.g.length>=st.max){ over=true; st.won=0; return done(); }
     if(daily) save(); render(); }
   function done(){ st.over=1; if(daily) save(); render(); if(st.won) setTimeout(confetti,250);
-    later(()=>finish(gid,st.won?st.score:99,{sub:st.won?`${A.n} → ${B.n} · ${st.g.length} guesses (best possible ${st.n})${st.h?` · ${st.h} hint${st.h>1?"s":""}`:""}`:`${A.n} → ${B.n} · didn't make it`, share:tvShare(st,daily), html:tvMapCard(st)+tvRouteCard(st), nextG:"travleu", nextLabel:daily?"Play unlimited Travle":"Play again"}),2200); }
+    later(()=>finish(gid,st.won?st.score:99,{sub:st.won?`${A.n} → ${B.n} · ${st.g.length} guesses (best possible ${st.n})${st.h?` · ${st.h} hint${st.h>1?"s":""}`:""}`:`${A.n} → ${B.n} · didn't make it`, share:tvShare(st,daily), html:tvMapCard(st)+tvRouteCard(st), nextG:"travleu", nextLabel:daily?"Play unlimited Travle":"Play again", after:()=>geoZoomInit(document)}),2200); }
   if(st.over){ over=true; } render();
 }
 function tvMapCard(st){ const col={}; st.g.forEach((id,i)=>col[id]=st.e[i]==="✅"||st.e[i]==="🟩"?"g-ok":st.e[i]==="🟧"?"g-near":"g-far");
-  return `<section class="card"><div class="tvmap">${geoMapSVG(geoBox([st.a,st.b,...st.g.filter((id,i)=>st.e[i]!=="🟥")],.18,160),inView=>GEO.list.filter(inView).filter(c=>c.id!==st.a&&c.id!==st.b&&!col[c.id]).map(c=>geoPathEl(c,"g-ghost")).join("")+st.g.map(id=>geoPathEl(GEO.by[id],col[id])).join("")+geoPathEl(GEO.by[st.a],"g-start")+geoPathEl(GEO.by[st.b],"g-end"))}</div></section>`; }
+  return `<section class="card"><div class="tvmap">${geoZoomable(geoBox([st.a,st.b,...st.g.filter((id,i)=>st.e[i]!=="🟥")],.18,160),inView=>GEO.list.filter(inView).filter(c=>c.id!==st.a&&c.id!==st.b&&!col[c.id]).map(c=>geoPathEl(c,"g-ghost")).join("")+st.g.map(id=>geoPathEl(GEO.by[id],col[id])).join("")+geoPathEl(GEO.by[st.a],"g-start")+geoPathEl(GEO.by[st.b],"g-end"))}</div></section>`; }
 function tvRouteCard(st){ const best=[st.a,...tvPathCountries(st.a,st.b,new Set([st.a,st.b])),st.b].map(id=>GEO.by[id].n);
   return `<section class="card"><h3>Your route</h3><div class="tvlist">${st.g.map((id,i)=>`<span class="tvg">${st.e[i]} ${esc(GEO.by[id].n)}</span>`).join("")}</div><p class="muted" style="margin-top:10px">One shortest route (${st.n} in between): ${esc(best.join(" → "))}</p></section>`; }
 function tvResults(){ const st=S.tv[today()];
@@ -208,4 +247,4 @@ function tvResults(){ const st=S.tv[today()];
   ${SHARE_ROW}
   <button class="btn wide" data-act="play" data-g="travleu">Play unlimited Travle</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
-  wireShare(tvShare(st,true)); }
+  wireShare(tvShare(st,true)); geoZoomInit(document); }
