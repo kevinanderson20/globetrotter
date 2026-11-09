@@ -247,7 +247,7 @@ function home(){
   const sample=S.ops.map(o=>{ const p=genP(o,S.lv); return `<span style="color:var(${OPS[o].c})">${esc(ptext(p))}</span>`; }).join(" · ");
   show(`
   <div class="brand">${IC.logo}<h1>Math</h1>
-    <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="./" aria-current="page">Math</a><a href="../games/">Games</a></nav></div>
+    <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="./" aria-current="page">Math</a><a href="../games/">Games</a><a href="../test3/">Test 3</a></nav></div>
   <section class="rank"><div class="badge">${rk.i+1}</div><b>${esc(rk.name)}</b>
     <div class="xpbar"><i style="width:${Math.max(3,rk.frac*100)}%"></i></div>
     <div class="sub">${rk.next?`${rk.need} XP to ${esc(rk.next)}`:"Top rank reached"} · ${S.solved} solved</div></section>
@@ -591,7 +591,7 @@ async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v8"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v11"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });
