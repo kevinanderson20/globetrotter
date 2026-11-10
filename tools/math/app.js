@@ -591,7 +591,7 @@ async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v13"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v14"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });

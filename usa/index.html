@@ -1920,7 +1920,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.11.09-1958";
+const APP_VERSION="2026.11.09-2008";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
@@ -1930,7 +1930,7 @@ async function checkUpdate(){
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v13"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v14"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==="visible") checkUpdate(); });

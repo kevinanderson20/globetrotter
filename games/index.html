@@ -502,6 +502,8 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .mthead{display:grid;justify-items:center;gap:2px}.mthead span{font-size:12.5px;font-weight:800;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}.mthead b{font-family:var(--f-display);font-size:26px;font-weight:800}
 .mtmap .gmap{max-height:52vh}
 .gmap .mtpin{fill:#e2483d;stroke:#fff;stroke-width:2px}
+.gmap .mtcity{fill:#fff;stroke:#1fa25c;stroke-width:3px;vector-effect:non-scaling-stroke}
+.mthead em{font-style:normal;font-size:15px;font-weight:700;color:var(--ink-2);margin-top:-2px}
 .gmap .mtline{stroke:#e2483d;stroke-width:2px;stroke-dasharray:5 4;vector-effect:non-scaling-stroke}
 .mtres{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:800}.mtres span{color:var(--good);font-family:var(--f-display);font-size:18px}
 .mtlist{display:grid;gap:6px}.mtlist div{display:grid;grid-template-columns:minmax(0,1fr) auto 56px;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:6px 0;font-size:15px}.mtlist span{color:var(--ink-2)}.mtlist em{font-style:normal;font-weight:800;text-align:right;font-family:var(--f-display)}
@@ -934,7 +936,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.09-1958";
+const APP_VERSION="2026.11.09-2008";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -970,7 +972,7 @@ const GAMES={
  queensu:{cat:"unl", col:"--log", ic:"👑", name:"Unlimited Queens", desc:"Any board from the bank.", hi:false, fmt:v=>fmtT(v)},
  timelineu:{cat:"unl", col:"--spd", ic:"📅", name:"Unlimited Timeline", desc:"A fresh deck of events.", hi:true, fmt:v=>`${v}/7`},
  msu:{cat:"unl", col:"--log", ic:"💣", name:"Unlimited Minesweeper", desc:"Easy, medium or hard. Never a forced guess.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
- maptapu:{cat:"unl", col:"--geo", ic:"📍", name:"Unlimited Map Tap", desc:"Five random countries to find.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
+ maptapu:{cat:"unl", col:"--geo", ic:"📍", name:"Unlimited Map Tap", desc:"Five random cities to find.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  stateleu:{cat:"unl", col:"--geo", ic:"🇺🇸", name:"Unlimited Statele", desc:"A random state outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
  globleu:{cat:"unl", col:"--geo", ic:"🌍", name:"Unlimited Globle", desc:"A random mystery country every round.", hi:false, fmt:v=>v>=999?"✗":`${v} guess${v===1?"":"es"}`},
  nbrsu:{cat:"unl", col:"--geo", ic:"🧱", name:"Unlimited Neighbors", desc:"Five random countries. Name every border.", hi:true, fmt:v=>`${v}%`},
@@ -987,7 +989,7 @@ const GAMES={
  queens:{cat:"daily", col:"--log", ic:"👑", name:"Queens", desc:"One queen per row, column and color.", hi:false, fmt:v=>fmtT(v)},
  timeline:{cat:"daily", col:"--spd", ic:"📅", name:"Timeline", desc:"Put the events in order.", hi:true, fmt:v=>`${v}/7`},
  mines:{cat:"daily", col:"--log", ic:"💣", name:"Minesweeper", desc:"The same no-guess board for everyone.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
- maptap:{cat:"daily", col:"--geo", ic:"📍", name:"Map Tap", desc:"Tap where five countries are.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
+ maptap:{cat:"daily", col:"--geo", ic:"📍", name:"Map Tap", desc:"Tap where five cities are.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  statele:{cat:"daily", col:"--geo", ic:"🇺🇸", name:"Statele", desc:"Guess the US state from its outline.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
  dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"An easy 6×6 with pencil notes. One new puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
@@ -2798,70 +2800,65 @@ function msResults(){ const st=S.ms[today()];
   wireShare(msShare(st,"medium",true)); }
 
 /* ---------------- MAP TAP ---------------- */
-/* five countries, one at a time: tap where it is on a blank world map. Inside it is 1,000 points; otherwise points
-   fall off with the distance from your tap to the country's nearest border. */
+/* five cities, one at a time ("Lyon, France"): tap where it is on a blank world map. Within 20 km is 1,000 points;
+   after that the score falls off with the distance from your tap to the city. Cities: GeoNames (tools/build-cities.mjs). */
 const MT_R=5;
+let CT=null, CT_P=null;
+function citiesLoad(){ if(CT) return Promise.resolve(CT); if(CT_P) return CT_P;
+  CT_P=Promise.all([geoLoad(),fetch("cities.json?v=1").then(r=>{ if(!r.ok) throw 0; return r.json(); })]).then(([g,d])=>{ const list=[];
+    Object.entries(d).forEach(([id,cs])=>cs.forEach(([n,lon,lat,pop])=>{ if(GEO.by[id]) list.push({id,n,ll:[lon,lat],pop}); })); return CT={list}; }).catch(e=>{ CT_P=null; throw e; });
+  return CT_P; }
+const mtFwd=([lon,lat])=>{ const W=GEO.W, k=W/(2*Math.PI), r=Math.PI/180; return [W/2+k*lon*r, W/2*0.95-k*Math.log(Math.tan(Math.PI/4+lat*r/2))]; };
 const mtInv=(x,y)=>{ const W=GEO.W, k=W/(2*Math.PI); return [(x-W/2)/k*180/Math.PI, (2*Math.atan(Math.exp((W/2*0.95-y)/k))-Math.PI/2)*180/Math.PI]; }; // undo the map's Mercator projection
-const MT_POLY={};
-function mtPolys(id){ if(MT_POLY[id]) return MT_POLY[id]; const c=GEO.by[id], out=[];
-  if(c.wp) c.wp.split("M").filter(Boolean).forEach(seg=>{ out.push(seg.replace(/Z/g,"").split("L").map(p=>p.split(",").map(Number))); });
-  else out.push([c.cp]);
-  return MT_POLY[id]=out; }
-function mtInside(id,x,y){ let ins=false; for(const P of mtPolys(id)){ if(P.length<3) continue; for(let i=0,j=P.length-1;i<P.length;j=i++){ const [xi,yi]=P[i],[xj,yj]=P[j]; if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) ins=!ins; } } return ins; }
-function mtDist(id,x,y){ if(mtInside(id,x,y)) return 0; const t=mtInv(x,y); let best=Infinity, bp=null;
-  for(const P of mtPolys(id)) for(let i=0;i<P.length;i++){ const a=P[i], b=P[(i+1)%P.length];
-    // nearest point on each edge, in map space, then the true distance on the globe
-    const dx=b[0]-a[0], dy=b[1]-a[1], L=dx*dx+dy*dy, u=L?Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/L)):0, px=a[0]+u*dx, py=a[1]+u*dy;
-    const d=KM(t,mtInv(px,py)); if(d<best){ best=d; bp=[px,py]; } }
-  return best===Infinity?KM(t,GEO.by[id].ll):best; }
-function mtNearest(id,x,y){ let best=Infinity, bp=GEO.by[id].cp; const t=mtInv(x,y);
-  for(const P of mtPolys(id)) for(let i=0;i<P.length;i++){ const a=P[i], b=P[(i+1)%P.length], dx=b[0]-a[0], dy=b[1]-a[1], L=dx*dx+dy*dy, u=L?Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/L)):0, px=a[0]+u*dx, py=a[1]+u*dy, d=KM(t,mtInv(px,py)); if(d<best){ best=d; bp=[px,py]; } }
-  return bp; }
-const mtPts=d=>d<=0?1000:Math.max(0,Math.round(1000*Math.exp(-d/900)));
+const mtPts=d=>d<=20?1000:Math.max(0,Math.round(1000*Math.exp(-(d-20)/550)));
 const mtNum=()=>dayIndex()+1;
-function mtPick(rnd){ const pool=(min,max)=>shuf(GEO.list.filter(c=>c.km2>=min&&c.km2<max&&c.wp).map(c=>c.id).sort(),rnd);
-  const tiers=[pool(400000,1e9),pool(120000,400000),pool(40000,120000),pool(10000,40000),pool(700,10000)], out=[];
-  tiers.forEach(t=>{ const id=t.find(x=>!out.includes(x)); if(id) out.push(id); }); return out; }
+const mtLabel=q=>`${q.n}, ${GEO.by[q.id].n}`;
+function mtPick(rnd){ const tiers=[[5e6,1e9],[1.5e6,5e6],[5e5,1.5e6],[1.5e5,5e5],[0,1.5e5]], out=[], used=new Set();
+  tiers.forEach(([lo,hi])=>{ const pool=shuf(CT.list.filter(c=>c.pop>=lo&&c.pop<hi).sort((a,b)=>(a.id+a.n).localeCompare(b.id+b.n)),rnd);
+    const c=pool.find(x=>!used.has(x.id)); if(c){ used.add(c.id); out.push({id:c.id,n:c.n,ll:c.ll}); } });
+  return out; }
 function mtStatus(){ S.mt=S.mt||{}; const d=S.mt[today()]; return d&&d.over?`Today's done · ${d.r.reduce((a,x)=>a+x.p,0).toLocaleString()}`:d&&d.r&&d.r.length?`Today's #${mtNum()} · round ${d.r.length+1} of ${MT_R}`:`Today's #${mtNum()} is ready`; }
 function mtShare(st,daily){ const tot=st.r.reduce((a,x)=>a+x.p,0); return `📍 Map Tap ${daily?"#"+mtNum():"(unlimited)"}\n${tot.toLocaleString()} / 5,000\n${st.r.map(x=>x.p>=1000?"🎯":x.p>=700?"🟩":x.p>=400?"🟨":x.p>=150?"🟧":"🟥").join("")}`; }
 async function startMapTap(opt={}){
   const daily=!opt.unlimited, gid=daily?"maptap":"maptapu";
   begin(gid,daily?`Map Tap #${mtNum()}`:"Unlimited Map Tap"); stage.className="gstage scroll"; geoLoading();
-  try{ await geoLoad(); }catch(e){ return geoFail(); }
+  try{ await citiesLoad(); }catch(e){ return geoFail(); }
   if(!GS||GS.game!==gid) return;
   S.mt=S.mt||{}; const key=today();
-  if(daily&&S.mt[key]&&S.mt[key].over){ end(); return mtResults(); }
-  let st; if(daily&&S.mt[key]) st=S.mt[key]; else { st={q:mtPick(daily?seeded("globetrotter-maptap-v1-"+key):Math.random),r:[]}; if(daily){ S.mt[key]=st; save(); } }
+  if(daily&&S.mt[key]&&S.mt[key].over&&S.mt[key].v===2){ end(); return mtResults(); }
+  let st; if(daily&&S.mt[key]&&S.mt[key].v===2) st=S.mt[key]; else { st={v:2,q:mtPick(daily?seeded("globetrotter-maptap-v2-"+key):Math.random),r:[]}; if(daily){ S.mt[key]=st; save(); } }
   __b.mt=st;
   const world=geoBox(GEO.list.map(c=>c.id),.02,200); let zoom={}, pin=null, shown=null;
   const persist=()=>{ if(daily) save(); };
-  function render(){ const i=st.r.length, id=st.q[i], c=GEO.by[id], tot=st.r.reduce((a,x)=>a+x.p,0);
+  const pinR=()=>((zoom.v||world)[2]/70).toFixed(2);
+  function render(){ const i=st.r.length, q=st.q[Math.min(i,st.q.length-1)], tot=st.r.reduce((a,x)=>a+x.p,0);
     $('ginfo').textContent=`${tot.toLocaleString()} pts`;
-    const map=geoZoomable(world,inView=>GEO.list.filter(inView).map(x=>shown&&x.id===shown.id?geoPathEl(x,shown.p>=1000?"g-hit":"g-reveal"):geoPathEl(x,"g-land")).join("")+
-      (shown?`<line class="mtline" x1="${shown.x}" y1="${shown.y}" x2="${shown.nx}" y2="${shown.ny}"/>`:"")+
-      (pin?`<circle class="mtpin" cx="${pin[0]}" cy="${pin[1]}" r="${((zoom.v||world)[2]/70).toFixed(2)}"/>`:""),zoom);
-    stage.innerHTML=`<div class="tv mt"><div class="mthead"><span>Round ${Math.min(i+1,MT_R)} of ${MT_R}</span><b>${shown?esc(GEO.by[shown.id].n):esc(c.n)}</b></div>
+    const map=geoZoomable(world,inView=>GEO.list.filter(inView).map(x=>shown&&x.id===shown.q.id?geoPathEl(x,"g-reveal"):geoPathEl(x,"g-land")).join("")+
+      (shown?`<line class="mtline" x1="${shown.x}" y1="${shown.y}" x2="${shown.c[0]}" y2="${shown.c[1]}"/><circle class="mtcity" cx="${shown.c[0]}" cy="${shown.c[1]}" r="${pinR()}"/>`:"")+
+      (pin?`<circle class="mtpin" cx="${pin[0]}" cy="${pin[1]}" r="${pinR()}"/>`:""),zoom);
+    const lab=mtLabel(shown?shown.q:q);
+    stage.innerHTML=`<div class="tv mt"><div class="mthead"><span>Round ${Math.min(i+(shown?0:1),MT_R)} of ${MT_R}</span><b>${esc(lab.split(", ")[0])}</b><em>${esc(lab.split(", ").slice(1).join(", "))}</em></div>
       <div class="tvmap mtmap">${map}</div>
-      ${shown?`<div class="mtres"><b>${shown.p>=1000?"🎯 Bullseye!":shown.d<=0?"Inside!":`${Math.round(shown.d).toLocaleString()} km away`}</b><span>+${shown.p} points</span></div><button class="btn go wide" id="mtnext">${st.r.length<MT_R?"Next country":"See results"}</button>`
-        :`<p class="muted center">${pin?"Zoom in to adjust, or lock it in.":"Tap the map where you think it is. Pinch or use + to zoom."}</p><button class="btn go wide" id="mtlock" ${pin?"":"disabled"}>Lock it in</button>`}</div>`;
-    zoom.onTap=shown?null:((x,y)=>{ pin=[x,y]; const svg=stage.querySelector(".gmap"); let c0=svg.querySelector(".mtpin"); if(!c0){ c0=document.createElementNS("http://www.w3.org/2000/svg","circle"); c0.setAttribute("class","mtpin"); svg.appendChild(c0); } c0.setAttribute("r",((zoom.v||world)[2]/70).toFixed(2)); c0.setAttribute("cx",x); c0.setAttribute("cy",y); $('mtlock').disabled=false; });
+      ${shown?`<div class="mtres"><b>${shown.p>=1000?"🎯 Bullseye!":`${Math.round(shown.d).toLocaleString()} km away`}</b><span>+${shown.p} points</span></div><button class="btn go wide" id="mtnext">${st.r.length<MT_R?"Next city":"See results"}</button>`
+        :`<p class="muted center">${pin?"Zoom in to adjust, or lock it in.":"Tap the map where you think the city is. Pinch or use + to zoom."}</p><button class="btn go wide" id="mtlock" ${pin?"":"disabled"}>Lock it in</button>`}</div>`;
+    zoom.onTap=shown?null:((x,y)=>{ pin=[x,y]; const svg=stage.querySelector(".gmap"); let c0=svg.querySelector(".mtpin"); if(!c0){ c0=document.createElementNS("http://www.w3.org/2000/svg","circle"); c0.setAttribute("class","mtpin"); svg.appendChild(c0); } c0.setAttribute("r",pinR()); c0.setAttribute("cx",x); c0.setAttribute("cy",y); $('mtlock').disabled=false; });
     geoZoomInit(stage,zoom);
     if(shown) $('mtnext').onclick=()=>{ shown=null; pin=null; zoom={}; if(st.r.length>=MT_R) return done(); render(); };
-    else $('mtlock').onclick=()=>{ if(!pin) return; const d=mtDist(id,pin[0],pin[1]), p=mtPts(d), nb=d>0?mtNearest(id,pin[0],pin[1]):pin;
-      st.r.push({id,d:Math.round(d),p}); persist(); shown={id,d,p,x:pin[0],y:pin[1],nx:nb[0],ny:nb[1]}; p>=700?good():p<150?bad():tone(520,.08,"sine",.05); if(p>=1000) setTimeout(confetti,100);
-      // frame the tap and the country together
-      const b=GEO.by[id].bb, x0=Math.min(b[0],pin[0]), y0=Math.min(b[1],pin[1]), x1=Math.max(b[2],pin[0]), y1=Math.max(b[3],pin[1]); let w=Math.max(x1-x0,60)*1.6; const ar=world[3]/world[2]; let h=w*ar; if((y1-y0)*1.6>h){ h=(y1-y0)*1.6; w=h/ar; }
+    else $('mtlock').onclick=()=>{ if(!pin) return; const d=KM(mtInv(pin[0],pin[1]),q.ll), p=mtPts(d), c=mtFwd(q.ll);
+      st.r.push({id:q.id,n:q.n,d:Math.round(d),p}); persist(); shown={q,d,p,x:pin[0],y:pin[1],c}; p>=700?good():p<150?bad():tone(520,.08,"sine",.05); if(p>=1000) setTimeout(confetti,100);
+      // frame the tap and the city together
+      const x0=Math.min(c[0],pin[0]), y0=Math.min(c[1],pin[1]), x1=Math.max(c[0],pin[0]), y1=Math.max(c[1],pin[1]); let w=Math.max(x1-x0,50)*1.8; const ar=world[3]/world[2]; let h=w*ar; if((y1-y0)*1.8>h){ h=(y1-y0)*1.8; w=h/ar; }
       zoom.v=[(x0+x1)/2-w/2,(y0+y1)/2-h/2,w,h]; render(); }; }
   function done(){ st.over=1; persist(); const tot=st.r.reduce((a,x)=>a+x.p,0); if(tot>=4000) setTimeout(confetti,200);
-    finish(gid,tot,{sub:st.r.map(x=>`${GEO.by[x.id].n} ${x.p}`).join(" · "), share:mtShare(st,daily), html:mtCard(st), nextG:"maptapu", nextLabel:daily?"Play unlimited Map Tap":"Play again"}); }
+    finish(gid,tot,{sub:st.r.map(x=>`${x.n} ${x.p}`).join(" · "), share:mtShare(st,daily), html:mtCard(st), nextG:"maptapu", nextLabel:daily?"Play unlimited Map Tap":"Play again"}); }
   if(st.r.length>=MT_R) return done();
   render();
 }
-function mtCard(st){ return `<section class="card"><h3>Your taps</h3><div class="mtlist">${st.r.map(x=>`<div><b>${esc(GEO.by[x.id].n)}</b><span>${x.d<=0?"Inside":Math.round(x.d).toLocaleString()+" km"}</span><em>${x.p}</em></div>`).join("")}</div></section>`; }
+function mtCard(st){ return `<section class="card"><h3>Your taps</h3><div class="mtlist">${st.r.map(x=>`<div><b>${esc(x.n?`${x.n}, ${GEO.by[x.id].n}`:GEO.by[x.id].n)}</b><span>${x.d<=20?"Spot on":Math.round(x.d).toLocaleString()+" km"}</span><em>${x.p}</em></div>`).join("")}</div></section>`; }
 function mtResults(){ const st=S.mt[today()], tot=st.r.reduce((a,x)=>a+x.p,0);
   show(`${bar("Map Tap")}
   <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Map Tap #${mtNum()}</div>
-    <div class="big">${tot.toLocaleString()}</div><p class="muted">out of 5,000</p><p class="cheer" style="color:var(--ink-2)">New countries tomorrow</p></section>
+    <div class="big">${tot.toLocaleString()}</div><p class="muted">out of 5,000</p><p class="cheer" style="color:var(--ink-2)">New cities tomorrow</p></section>
   ${mtCard(st)}
   ${SHARE_ROW}
   <button class="btn wide" data-act="play" data-g="maptapu">Play unlimited Map Tap</button>
@@ -3067,7 +3064,7 @@ function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null
   if(game==="msu"){ const k="msu:"+(S.msLvl||"easy"); return {v:S.best[k],h:S.hist[k]}; }
   if(game==="lights"){ const k=`lights:${S.lit}`; return {v:S.best[k],h:S.hist[k]}; } return {v:S.best[game],h:S.hist[game]}; }
 /* ---------- home rows: icon, name, a short tagline, and one clear status on the right ---------- */
-const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",mines:"No-guess, same board for all",maptap:"Find 5 countries on a map",statele:"Name the state outline",msu:"Easy, medium or hard",maptapu:"Random countries",stateleu:"Random states",nbrs:"Name every border",dsudoku:"An easy 6×6",
+const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",mines:"No-guess, same board for all",maptap:"Find 5 cities on a map",statele:"Name the state outline",msu:"Easy, medium or hard",maptapu:"Random cities",stateleu:"Random states",nbrs:"Name every border",dsudoku:"An easy 6×6",
   seq:"Repeat the pattern",num:"Remember the digits",match:"Find all 8 pairs",react:"Tap on green",stroop:"The ink, not the word",schulte:"Tap 1 to 25 in order",count:"Hit the target number",sudoku:"6×6, easy to hard",lights:"Turn every light off",
   strandsu:"Any board you like",worldleu:"Random outlines",travleu:"Random routes",globleu:"Random mystery countries",nbrsu:"Random countries",diveu:"Fresh prompts",climbu:"Fresh prompts"};
 function dailyStat(k){ try{ return dailyStat0(k); }catch(e){ console.error(e); return {st:"new"}; } }
@@ -3138,7 +3135,7 @@ async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v13"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v14"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });

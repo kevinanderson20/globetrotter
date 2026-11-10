@@ -1,6 +1,6 @@
 /* ================= 640 TEST 3 APP ================= */
 const APP_VERSION="dev";
-const SW_CACHE="globetrotter-v13";
+const SW_CACHE="globetrotter-v14";
 const LS="globetrotter.test3.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');

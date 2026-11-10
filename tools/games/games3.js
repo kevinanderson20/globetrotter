@@ -99,70 +99,65 @@ function msResults(){ const st=S.ms[today()];
   wireShare(msShare(st,"medium",true)); }
 
 /* ---------------- MAP TAP ---------------- */
-/* five countries, one at a time: tap where it is on a blank world map. Inside it is 1,000 points; otherwise points
-   fall off with the distance from your tap to the country's nearest border. */
+/* five cities, one at a time ("Lyon, France"): tap where it is on a blank world map. Within 20 km is 1,000 points;
+   after that the score falls off with the distance from your tap to the city. Cities: GeoNames (tools/build-cities.mjs). */
 const MT_R=5;
+let CT=null, CT_P=null;
+function citiesLoad(){ if(CT) return Promise.resolve(CT); if(CT_P) return CT_P;
+  CT_P=Promise.all([geoLoad(),fetch("cities.json?v=1").then(r=>{ if(!r.ok) throw 0; return r.json(); })]).then(([g,d])=>{ const list=[];
+    Object.entries(d).forEach(([id,cs])=>cs.forEach(([n,lon,lat,pop])=>{ if(GEO.by[id]) list.push({id,n,ll:[lon,lat],pop}); })); return CT={list}; }).catch(e=>{ CT_P=null; throw e; });
+  return CT_P; }
+const mtFwd=([lon,lat])=>{ const W=GEO.W, k=W/(2*Math.PI), r=Math.PI/180; return [W/2+k*lon*r, W/2*0.95-k*Math.log(Math.tan(Math.PI/4+lat*r/2))]; };
 const mtInv=(x,y)=>{ const W=GEO.W, k=W/(2*Math.PI); return [(x-W/2)/k*180/Math.PI, (2*Math.atan(Math.exp((W/2*0.95-y)/k))-Math.PI/2)*180/Math.PI]; }; // undo the map's Mercator projection
-const MT_POLY={};
-function mtPolys(id){ if(MT_POLY[id]) return MT_POLY[id]; const c=GEO.by[id], out=[];
-  if(c.wp) c.wp.split("M").filter(Boolean).forEach(seg=>{ out.push(seg.replace(/Z/g,"").split("L").map(p=>p.split(",").map(Number))); });
-  else out.push([c.cp]);
-  return MT_POLY[id]=out; }
-function mtInside(id,x,y){ let ins=false; for(const P of mtPolys(id)){ if(P.length<3) continue; for(let i=0,j=P.length-1;i<P.length;j=i++){ const [xi,yi]=P[i],[xj,yj]=P[j]; if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) ins=!ins; } } return ins; }
-function mtDist(id,x,y){ if(mtInside(id,x,y)) return 0; const t=mtInv(x,y); let best=Infinity, bp=null;
-  for(const P of mtPolys(id)) for(let i=0;i<P.length;i++){ const a=P[i], b=P[(i+1)%P.length];
-    // nearest point on each edge, in map space, then the true distance on the globe
-    const dx=b[0]-a[0], dy=b[1]-a[1], L=dx*dx+dy*dy, u=L?Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/L)):0, px=a[0]+u*dx, py=a[1]+u*dy;
-    const d=KM(t,mtInv(px,py)); if(d<best){ best=d; bp=[px,py]; } }
-  return best===Infinity?KM(t,GEO.by[id].ll):best; }
-function mtNearest(id,x,y){ let best=Infinity, bp=GEO.by[id].cp; const t=mtInv(x,y);
-  for(const P of mtPolys(id)) for(let i=0;i<P.length;i++){ const a=P[i], b=P[(i+1)%P.length], dx=b[0]-a[0], dy=b[1]-a[1], L=dx*dx+dy*dy, u=L?Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/L)):0, px=a[0]+u*dx, py=a[1]+u*dy, d=KM(t,mtInv(px,py)); if(d<best){ best=d; bp=[px,py]; } }
-  return bp; }
-const mtPts=d=>d<=0?1000:Math.max(0,Math.round(1000*Math.exp(-d/900)));
+const mtPts=d=>d<=20?1000:Math.max(0,Math.round(1000*Math.exp(-(d-20)/550)));
 const mtNum=()=>dayIndex()+1;
-function mtPick(rnd){ const pool=(min,max)=>shuf(GEO.list.filter(c=>c.km2>=min&&c.km2<max&&c.wp).map(c=>c.id).sort(),rnd);
-  const tiers=[pool(400000,1e9),pool(120000,400000),pool(40000,120000),pool(10000,40000),pool(700,10000)], out=[];
-  tiers.forEach(t=>{ const id=t.find(x=>!out.includes(x)); if(id) out.push(id); }); return out; }
+const mtLabel=q=>`${q.n}, ${GEO.by[q.id].n}`;
+function mtPick(rnd){ const tiers=[[5e6,1e9],[1.5e6,5e6],[5e5,1.5e6],[1.5e5,5e5],[0,1.5e5]], out=[], used=new Set();
+  tiers.forEach(([lo,hi])=>{ const pool=shuf(CT.list.filter(c=>c.pop>=lo&&c.pop<hi).sort((a,b)=>(a.id+a.n).localeCompare(b.id+b.n)),rnd);
+    const c=pool.find(x=>!used.has(x.id)); if(c){ used.add(c.id); out.push({id:c.id,n:c.n,ll:c.ll}); } });
+  return out; }
 function mtStatus(){ S.mt=S.mt||{}; const d=S.mt[today()]; return d&&d.over?`Today's done · ${d.r.reduce((a,x)=>a+x.p,0).toLocaleString()}`:d&&d.r&&d.r.length?`Today's #${mtNum()} · round ${d.r.length+1} of ${MT_R}`:`Today's #${mtNum()} is ready`; }
 function mtShare(st,daily){ const tot=st.r.reduce((a,x)=>a+x.p,0); return `📍 Map Tap ${daily?"#"+mtNum():"(unlimited)"}\n${tot.toLocaleString()} / 5,000\n${st.r.map(x=>x.p>=1000?"🎯":x.p>=700?"🟩":x.p>=400?"🟨":x.p>=150?"🟧":"🟥").join("")}`; }
 async function startMapTap(opt={}){
   const daily=!opt.unlimited, gid=daily?"maptap":"maptapu";
   begin(gid,daily?`Map Tap #${mtNum()}`:"Unlimited Map Tap"); stage.className="gstage scroll"; geoLoading();
-  try{ await geoLoad(); }catch(e){ return geoFail(); }
+  try{ await citiesLoad(); }catch(e){ return geoFail(); }
   if(!GS||GS.game!==gid) return;
   S.mt=S.mt||{}; const key=today();
-  if(daily&&S.mt[key]&&S.mt[key].over){ end(); return mtResults(); }
-  let st; if(daily&&S.mt[key]) st=S.mt[key]; else { st={q:mtPick(daily?seeded("globetrotter-maptap-v1-"+key):Math.random),r:[]}; if(daily){ S.mt[key]=st; save(); } }
+  if(daily&&S.mt[key]&&S.mt[key].over&&S.mt[key].v===2){ end(); return mtResults(); }
+  let st; if(daily&&S.mt[key]&&S.mt[key].v===2) st=S.mt[key]; else { st={v:2,q:mtPick(daily?seeded("globetrotter-maptap-v2-"+key):Math.random),r:[]}; if(daily){ S.mt[key]=st; save(); } }
   __b.mt=st;
   const world=geoBox(GEO.list.map(c=>c.id),.02,200); let zoom={}, pin=null, shown=null;
   const persist=()=>{ if(daily) save(); };
-  function render(){ const i=st.r.length, id=st.q[i], c=GEO.by[id], tot=st.r.reduce((a,x)=>a+x.p,0);
+  const pinR=()=>((zoom.v||world)[2]/70).toFixed(2);
+  function render(){ const i=st.r.length, q=st.q[Math.min(i,st.q.length-1)], tot=st.r.reduce((a,x)=>a+x.p,0);
     $('ginfo').textContent=`${tot.toLocaleString()} pts`;
-    const map=geoZoomable(world,inView=>GEO.list.filter(inView).map(x=>shown&&x.id===shown.id?geoPathEl(x,shown.p>=1000?"g-hit":"g-reveal"):geoPathEl(x,"g-land")).join("")+
-      (shown?`<line class="mtline" x1="${shown.x}" y1="${shown.y}" x2="${shown.nx}" y2="${shown.ny}"/>`:"")+
-      (pin?`<circle class="mtpin" cx="${pin[0]}" cy="${pin[1]}" r="${((zoom.v||world)[2]/70).toFixed(2)}"/>`:""),zoom);
-    stage.innerHTML=`<div class="tv mt"><div class="mthead"><span>Round ${Math.min(i+1,MT_R)} of ${MT_R}</span><b>${shown?esc(GEO.by[shown.id].n):esc(c.n)}</b></div>
+    const map=geoZoomable(world,inView=>GEO.list.filter(inView).map(x=>shown&&x.id===shown.q.id?geoPathEl(x,"g-reveal"):geoPathEl(x,"g-land")).join("")+
+      (shown?`<line class="mtline" x1="${shown.x}" y1="${shown.y}" x2="${shown.c[0]}" y2="${shown.c[1]}"/><circle class="mtcity" cx="${shown.c[0]}" cy="${shown.c[1]}" r="${pinR()}"/>`:"")+
+      (pin?`<circle class="mtpin" cx="${pin[0]}" cy="${pin[1]}" r="${pinR()}"/>`:""),zoom);
+    const lab=mtLabel(shown?shown.q:q);
+    stage.innerHTML=`<div class="tv mt"><div class="mthead"><span>Round ${Math.min(i+(shown?0:1),MT_R)} of ${MT_R}</span><b>${esc(lab.split(", ")[0])}</b><em>${esc(lab.split(", ").slice(1).join(", "))}</em></div>
       <div class="tvmap mtmap">${map}</div>
-      ${shown?`<div class="mtres"><b>${shown.p>=1000?"🎯 Bullseye!":shown.d<=0?"Inside!":`${Math.round(shown.d).toLocaleString()} km away`}</b><span>+${shown.p} points</span></div><button class="btn go wide" id="mtnext">${st.r.length<MT_R?"Next country":"See results"}</button>`
-        :`<p class="muted center">${pin?"Zoom in to adjust, or lock it in.":"Tap the map where you think it is. Pinch or use + to zoom."}</p><button class="btn go wide" id="mtlock" ${pin?"":"disabled"}>Lock it in</button>`}</div>`;
-    zoom.onTap=shown?null:((x,y)=>{ pin=[x,y]; const svg=stage.querySelector(".gmap"); let c0=svg.querySelector(".mtpin"); if(!c0){ c0=document.createElementNS("http://www.w3.org/2000/svg","circle"); c0.setAttribute("class","mtpin"); svg.appendChild(c0); } c0.setAttribute("r",((zoom.v||world)[2]/70).toFixed(2)); c0.setAttribute("cx",x); c0.setAttribute("cy",y); $('mtlock').disabled=false; });
+      ${shown?`<div class="mtres"><b>${shown.p>=1000?"🎯 Bullseye!":`${Math.round(shown.d).toLocaleString()} km away`}</b><span>+${shown.p} points</span></div><button class="btn go wide" id="mtnext">${st.r.length<MT_R?"Next city":"See results"}</button>`
+        :`<p class="muted center">${pin?"Zoom in to adjust, or lock it in.":"Tap the map where you think the city is. Pinch or use + to zoom."}</p><button class="btn go wide" id="mtlock" ${pin?"":"disabled"}>Lock it in</button>`}</div>`;
+    zoom.onTap=shown?null:((x,y)=>{ pin=[x,y]; const svg=stage.querySelector(".gmap"); let c0=svg.querySelector(".mtpin"); if(!c0){ c0=document.createElementNS("http://www.w3.org/2000/svg","circle"); c0.setAttribute("class","mtpin"); svg.appendChild(c0); } c0.setAttribute("r",pinR()); c0.setAttribute("cx",x); c0.setAttribute("cy",y); $('mtlock').disabled=false; });
     geoZoomInit(stage,zoom);
     if(shown) $('mtnext').onclick=()=>{ shown=null; pin=null; zoom={}; if(st.r.length>=MT_R) return done(); render(); };
-    else $('mtlock').onclick=()=>{ if(!pin) return; const d=mtDist(id,pin[0],pin[1]), p=mtPts(d), nb=d>0?mtNearest(id,pin[0],pin[1]):pin;
-      st.r.push({id,d:Math.round(d),p}); persist(); shown={id,d,p,x:pin[0],y:pin[1],nx:nb[0],ny:nb[1]}; p>=700?good():p<150?bad():tone(520,.08,"sine",.05); if(p>=1000) setTimeout(confetti,100);
-      // frame the tap and the country together
-      const b=GEO.by[id].bb, x0=Math.min(b[0],pin[0]), y0=Math.min(b[1],pin[1]), x1=Math.max(b[2],pin[0]), y1=Math.max(b[3],pin[1]); let w=Math.max(x1-x0,60)*1.6; const ar=world[3]/world[2]; let h=w*ar; if((y1-y0)*1.6>h){ h=(y1-y0)*1.6; w=h/ar; }
+    else $('mtlock').onclick=()=>{ if(!pin) return; const d=KM(mtInv(pin[0],pin[1]),q.ll), p=mtPts(d), c=mtFwd(q.ll);
+      st.r.push({id:q.id,n:q.n,d:Math.round(d),p}); persist(); shown={q,d,p,x:pin[0],y:pin[1],c}; p>=700?good():p<150?bad():tone(520,.08,"sine",.05); if(p>=1000) setTimeout(confetti,100);
+      // frame the tap and the city together
+      const x0=Math.min(c[0],pin[0]), y0=Math.min(c[1],pin[1]), x1=Math.max(c[0],pin[0]), y1=Math.max(c[1],pin[1]); let w=Math.max(x1-x0,50)*1.8; const ar=world[3]/world[2]; let h=w*ar; if((y1-y0)*1.8>h){ h=(y1-y0)*1.8; w=h/ar; }
       zoom.v=[(x0+x1)/2-w/2,(y0+y1)/2-h/2,w,h]; render(); }; }
   function done(){ st.over=1; persist(); const tot=st.r.reduce((a,x)=>a+x.p,0); if(tot>=4000) setTimeout(confetti,200);
-    finish(gid,tot,{sub:st.r.map(x=>`${GEO.by[x.id].n} ${x.p}`).join(" · "), share:mtShare(st,daily), html:mtCard(st), nextG:"maptapu", nextLabel:daily?"Play unlimited Map Tap":"Play again"}); }
+    finish(gid,tot,{sub:st.r.map(x=>`${x.n} ${x.p}`).join(" · "), share:mtShare(st,daily), html:mtCard(st), nextG:"maptapu", nextLabel:daily?"Play unlimited Map Tap":"Play again"}); }
   if(st.r.length>=MT_R) return done();
   render();
 }
-function mtCard(st){ return `<section class="card"><h3>Your taps</h3><div class="mtlist">${st.r.map(x=>`<div><b>${esc(GEO.by[x.id].n)}</b><span>${x.d<=0?"Inside":Math.round(x.d).toLocaleString()+" km"}</span><em>${x.p}</em></div>`).join("")}</div></section>`; }
+function mtCard(st){ return `<section class="card"><h3>Your taps</h3><div class="mtlist">${st.r.map(x=>`<div><b>${esc(x.n?`${x.n}, ${GEO.by[x.id].n}`:GEO.by[x.id].n)}</b><span>${x.d<=20?"Spot on":Math.round(x.d).toLocaleString()+" km"}</span><em>${x.p}</em></div>`).join("")}</div></section>`; }
 function mtResults(){ const st=S.mt[today()], tot=st.r.reduce((a,x)=>a+x.p,0);
   show(`${bar("Map Tap")}
   <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Map Tap #${mtNum()}</div>
-    <div class="big">${tot.toLocaleString()}</div><p class="muted">out of 5,000</p><p class="cheer" style="color:var(--ink-2)">New countries tomorrow</p></section>
+    <div class="big">${tot.toLocaleString()}</div><p class="muted">out of 5,000</p><p class="cheer" style="color:var(--ink-2)">New cities tomorrow</p></section>
   ${mtCard(st)}
   ${SHARE_ROW}
   <button class="btn wide" data-act="play" data-g="maptapu">Play unlimited Map Tap</button>
