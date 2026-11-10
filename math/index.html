@@ -224,9 +224,106 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .chainex{background:var(--surface-2);border-radius:12px;padding:10px 12px;font-variant-numeric:tabular-nums;text-align:center;font-weight:600}
 .kv{grid-template-columns:repeat(3,1fr)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ==PREMIUM== */
+/* The premium finish shared by every tab (built from tools/premium.css by tools/build_editions.py; the Games tab has its own).
+   Soft depth instead of chunky 3-D edges, hairline borders, glass bars, refined buttons and an iOS-style tab switcher. */
+:root{--elev1:0 1px 2px rgba(16,35,58,.06),0 6px 18px -10px rgba(16,35,58,.22);--elev2:0 2px 4px rgba(16,35,58,.06),0 16px 36px -16px rgba(16,35,58,.32);--hair:rgba(16,35,58,.09);--glass:rgba(255,255,255,.74);--ease:cubic-bezier(.2,.8,.2,1);
+  --bg-grad:radial-gradient(1200px 600px at 12% -10%,#d9ecff 0%,transparent 60%),radial-gradient(900px 500px at 110% 10%,#ece3ff 0%,transparent 55%),linear-gradient(#eef5fb,#e9f1f8)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--elev1:0 1px 0 rgba(255,255,255,.04) inset,0 8px 24px -12px rgba(0,0,0,.7);--elev2:0 1px 0 rgba(255,255,255,.05) inset,0 18px 44px -18px rgba(0,0,0,.85);--hair:rgba(255,255,255,.07);--glass:rgba(13,25,37,.74);
+  --bg-grad:radial-gradient(1100px 600px at 10% -15%,#16314d 0%,transparent 60%),radial-gradient(900px 520px at 110% 0%,#24204a 0%,transparent 55%),linear-gradient(#08121c,#0a1520)}}
+:root[data-theme="dark"]{--elev1:0 1px 0 rgba(255,255,255,.04) inset,0 8px 24px -12px rgba(0,0,0,.7);--elev2:0 1px 0 rgba(255,255,255,.05) inset,0 18px 44px -18px rgba(0,0,0,.85);--hair:rgba(255,255,255,.07);--glass:rgba(13,25,37,.74);
+  --bg-grad:radial-gradient(1100px 600px at 10% -15%,#16314d 0%,transparent 60%),radial-gradient(900px 520px at 110% 0%,#24204a 0%,transparent 55%),linear-gradient(#08121c,#0a1520)}
+
+/* ---------- every tab ---------- */
+.pg-app,.pg-world .home{background:var(--bg-grad) fixed,var(--bg);background-color:var(--bg)}
+h1,h2,h3{letter-spacing:-.02em}
+.brand h1{font-size:30px;letter-spacing:-.03em}
+.tabs{background:color-mix(in srgb,var(--ink) 7%,transparent);border:0;box-shadow:inset 0 0 0 1px var(--hair)}
+.tabs a{transition:background .2s,color .2s}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12),0 3px 8px -2px rgba(0,0,0,.12)}
+.btn{background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 86%,#fff),var(--ink));box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 8px 18px -10px color-mix(in srgb,var(--ink) 80%,transparent);transition:transform .12s var(--ease),filter .15s;letter-spacing:-.01em}
+.btn:active{transform:scale(.97);box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 4px 10px -6px color-mix(in srgb,var(--ink) 80%,transparent);filter:brightness(.96)}
+.btn.go{background:linear-gradient(180deg,color-mix(in srgb,var(--good) 80%,#fff),var(--good));box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 10px 22px -10px color-mix(in srgb,var(--good) 85%,transparent)}
+.btn.ghost{background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--hair);box-shadow:var(--elev1);color:var(--ink-2)}
+.btn[disabled]{opacity:.45;filter:saturate(.6)}
+.card,.tile,.chip,.trick,.mcard,.hcard,.histbtn,.hempty{border:1px solid var(--hair);box-shadow:var(--elev1)}
+.card{border-radius:22px}
+.tile{border-radius:20px;transition:transform .12s var(--ease)}
+.tile:active{transform:scale(.98)}
+.chip{background:color-mix(in srgb,var(--surface) 85%,transparent)}
+.toast{background:color-mix(in srgb,var(--ink) 88%,transparent)!important;color:var(--surface)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 30px -10px rgba(0,0,0,.45)}
+.update{border-radius:16px;box-shadow:0 16px 36px -12px rgba(0,0,0,.45)}
+
+/* ---------- Math and Test 3 ---------- */
+.pg-app .mode{box-shadow:0 18px 36px -20px color-mix(in srgb,var(--cc) 95%,transparent),inset 0 1px 0 rgba(255,255,255,.25);background:radial-gradient(120% 140% at 100% 0%,rgba(255,255,255,.24) 0%,transparent 45%),linear-gradient(150deg,color-mix(in srgb,var(--cc) 82%,#fff),var(--cc) 55%,color-mix(in srgb,var(--cc) 80%,#000));transition:transform .15s var(--ease)}
+.pg-app .mode:active{transform:scale(.98);box-shadow:0 10px 24px -16px color-mix(in srgb,var(--cc) 95%,transparent)}
+.pg-app .mode i{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pg-app .bar{background:var(--glass);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--hair)}
+.pg-app .bar .x{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.pg-app .card.center{border:0;color:#fff;background:radial-gradient(120% 100% at 100% 0%,rgba(255,255,255,.22) 0%,transparent 50%),linear-gradient(150deg,color-mix(in srgb,var(--c,var(--good)) 82%,#fff),var(--c,var(--good)) 45%,color-mix(in srgb,var(--c,var(--good)) 70%,#000));box-shadow:0 24px 48px -24px color-mix(in srgb,var(--c,var(--good)) 90%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
+.pg-app .card.center .big{color:#fff!important;text-shadow:0 4px 18px rgba(0,0,0,.18)}
+.pg-app .card.center p,.pg-app .card.center .muted,.pg-app .card.center .eyebrow,.pg-app .card.center .cheer{color:rgba(255,255,255,.92)!important}
+/* Test 3 */
+.pg-t3 .hero{border:0;color:#fff;background:radial-gradient(120% 120% at 100% 0%,rgba(124,92,255,.55) 0%,transparent 55%),radial-gradient(90% 120% at 0% 100%,rgba(23,190,170,.45) 0%,transparent 60%),linear-gradient(140deg,#16213f,#0d1a2c);box-shadow:0 24px 50px -24px rgba(22,33,63,.75),inset 0 1px 0 rgba(255,255,255,.12)}
+.pg-t3 .hero h2{color:#fff}.pg-t3 .hero p{color:rgba(255,255,255,.82)}.pg-t3 .hero .eyebrow{color:rgba(255,255,255,.65)}
+.pg-t3 .hero .stat{background:rgba(255,255,255,.1);border:0;box-shadow:none}.pg-t3 .hero .stat span{color:rgba(255,255,255,.7)}.pg-t3 .hero .stat b{color:#fff}
+.pg-t3 .hero .tpl{border:0;background:linear-gradient(150deg,color-mix(in srgb,var(--c) 80%,#fff),var(--c));box-shadow:0 10px 22px -12px var(--c)}
+.pg-t3 .hero .tpl b,.pg-t3 .hero .tpl span{color:#fff}
+.pg-t3 .btn.got{background:linear-gradient(180deg,color-mix(in srgb,var(--good) 80%,#fff),var(--good));box-shadow:0 10px 22px -10px color-mix(in srgb,var(--good) 85%,transparent)}
+.pg-t3 .btn.learn{border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);box-shadow:var(--elev1);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.pg-t3 .opt{border:1px solid var(--hair);box-shadow:var(--elev1);border-radius:16px;transition:transform .12s var(--ease),background .2s}
+.pg-t3 .opt:active{transform:scale(.985)}
+.pg-t3 .flip{border:1px solid var(--hair);box-shadow:var(--elev2);border-radius:26px}
+.pg-t3 .deck,.pg-t3 .part,.pg-t3 .setup,.pg-t3 .step{border:1px solid var(--hair);box-shadow:var(--elev1)}
+.pg-t3 .model{border:1px solid color-mix(in srgb,var(--m-learn) 25%,transparent);box-shadow:var(--elev1)}
+/* Math */
+.pg-math .rank{border:1px solid var(--hair);box-shadow:var(--elev1)}
+.pg-math .choices button{border:1px solid var(--hair);box-shadow:var(--elev1);border-bottom-width:1px;transition:transform .1s var(--ease)}
+.pg-math .choices button:active{transform:scale(.97)}
+.pg-math .op,.pg-math .lv,.pg-math .seg2 button,.pg-math .seg3 button{border:1px solid var(--hair);box-shadow:var(--elev1)}
+
+.pg-math .play{background:var(--bg-grad),var(--bg);background-color:var(--bg)}
+.pg-math .countdown{background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:24px}
+.pg-math .ptop .x{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.pg-math .ptop .meter{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.pg-math .ptop .meter i{background:linear-gradient(90deg,var(--good),color-mix(in srgb,var(--good) 55%,#7be0ff))}
+.pg-math .pad button{box-shadow:var(--elev1);border:1px solid var(--hair);background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 94%,var(--ink)));transition:transform .08s var(--ease)}
+.pg-math .pad button:active,.pg-math .pad button.down{transform:scale(.95);box-shadow:none}
+.pg-math .ans{border:1px solid var(--hair);box-shadow:var(--elev2);border-radius:22px}
+
+/* ---------- World, USA, Earth ---------- */
+.pg-world .next{box-shadow:0 22px 44px -22px color-mix(in srgb,var(--cc,var(--c-eu)) 95%,transparent),inset 0 1px 0 rgba(255,255,255,.25);background:radial-gradient(120% 140% at 100% 0%,rgba(255,255,255,.24) 0%,transparent 45%),linear-gradient(150deg,color-mix(in srgb,var(--cc,var(--c-eu)) 82%,#fff),var(--cc,var(--c-eu)) 55%,color-mix(in srgb,var(--cc,var(--c-eu)) 78%,#000));border-radius:26px;transition:transform .15s var(--ease)}
+.pg-world .next:active{transform:scale(.985);box-shadow:0 12px 26px -18px color-mix(in srgb,var(--cc,var(--c-eu)) 95%,transparent)}
+.pg-world .next .go{border-radius:999px;box-shadow:0 10px 22px -10px rgba(0,0,0,.45)}
+.pg-world .daily{background:radial-gradient(120% 120% at 100% 0%,rgba(124,92,255,.55) 0%,transparent 55%),radial-gradient(90% 120% at 0% 100%,rgba(23,190,170,.45) 0%,transparent 60%),linear-gradient(140deg,#16213f,#0d1a2c);color:#fff;border-radius:26px;box-shadow:0 22px 46px -22px rgba(22,33,63,.75),inset 0 1px 0 rgba(255,255,255,.12);transition:transform .15s var(--ease)}
+.pg-world .daily:active{transform:scale(.985)}
+.pg-world .daily .dgo{border-radius:999px;box-shadow:0 10px 22px -10px rgba(0,0,0,.5)}
+.pg-world .daily .ddots i{background:rgba(255,255,255,.22)}
+.pg-world .tile .dot{background:linear-gradient(145deg,color-mix(in srgb,var(--c-eu) 18%,var(--surface)),var(--surface-2));box-shadow:inset 0 0 0 1px var(--hair)}
+.pg-world .cbtn{border:1px solid var(--hair);border-left:5px solid var(--cc);box-shadow:var(--elev1);border-radius:18px;transition:transform .12s var(--ease)}
+.pg-world .cbtn:active{transform:scale(.98)}
+.pg-world .mode{border:1px solid var(--hair);border-bottom-width:1px;box-shadow:var(--elev1);background:var(--surface);border-radius:16px}
+.pg-world .cpick{border-width:1.5px;box-shadow:var(--elev2);border-radius:22px}
+.pg-world .cchip{border:1px solid var(--hair);box-shadow:var(--elev1)}
+.pg-world .pbar{background:var(--glass);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--hair)}
+.pg-world .pbar .x{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.pg-world .steps{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.pg-world .steps i{background:linear-gradient(90deg,var(--good),color-mix(in srgb,var(--good) 55%,#7be0ff))}
+.pg-world .xp{background:linear-gradient(180deg,color-mix(in srgb,var(--sun) 75%,#fff),var(--sun));box-shadow:0 6px 14px -8px color-mix(in srgb,var(--sun) 90%,transparent)}
+.pg-world .panel{background:var(--glass);backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);border-top:1px solid var(--hair);border-radius:24px 24px 0 0;box-shadow:0 -12px 32px -18px rgba(0,0,0,.35)}
+.pg-world .wbtn{border-width:1px;border-bottom-width:1px;border-color:color-mix(in srgb,var(--wc) 55%,transparent);box-shadow:var(--elev1);border-radius:16px;transition:transform .1s var(--ease)}
+.pg-world .wbtn:active{transform:scale(.97);border-bottom-width:1px;margin-top:0}
+.pg-world .nbform input{border:1px solid var(--hair);box-shadow:var(--elev1);border-radius:16px;transition:box-shadow .2s}
+.pg-world .nbform input:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--cc,var(--c-eu)) 22%,transparent),var(--elev1)}
+.pg-world .combo{background:linear-gradient(180deg,color-mix(in srgb,var(--sun) 75%,#fff),var(--sun));box-shadow:0 10px 22px -10px color-mix(in srgb,var(--sun) 90%,transparent)}
+.pg-world .result .nums b{font-size:28px;letter-spacing:-.02em}
+.pg-world .stop .node{box-shadow:var(--elev1)}
+.pg-world .ib{border:1px solid var(--hair);box-shadow:var(--elev1);border-radius:12px}
+.pg-world .maptoast{box-shadow:var(--elev2);border:1px solid var(--hair);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+/* ==/PREMIUM== */
 </style>
 </head>
-<body>
+<body class="pg-app pg-math">
 <button class="update" id="updBtn" hidden>A new version is ready. Tap to update.</button>
 <main class="wrap" id="app"></main>
 <section class="play" id="play" hidden aria-label="Math round">
@@ -322,7 +419,7 @@ const GT_BK=(()=>{
 })();
 /* ==/BACKUP== */
 /* ================= MATH: rapid-fire mental arithmetic ================= */
-const APP_VERSION="2026.11.09-2008";
+const APP_VERSION="2026.11.09-2014";
 const LS="globetrotter.math.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');

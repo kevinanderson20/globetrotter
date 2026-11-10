@@ -17,6 +17,12 @@ json.dump({"v": VERSION}, open('version.json', 'w'))
 _bk = open('tools/backup.js', encoding='utf-8').read().strip()
 _a = _src.index('/* ==BACKUP== */'); _b = _src.index('/* ==/BACKUP== */', _a) + len('/* ==/BACKUP== */')
 _src = _src[:_a] + _bk + _src[_b:]
+# the shared premium styles live in tools/premium.css; copy them into the World source (and the Math and Test 3 pages below)
+_pm = open('tools/premium.css', encoding='utf-8').read().strip()
+def with_premium(s):
+    a = s.index('/* ==PREMIUM== */'); b = s.index('/* ==/PREMIUM== */', a) + len('/* ==/PREMIUM== */')
+    return s[:a] + _pm + s[b:]
+_src = with_premium(_src)
 open('index.html', 'w', encoding='utf-8').write(_src)
 SRC = _src
 
@@ -134,7 +140,7 @@ build('earth', 'Globetrotter Earth',
 
 # ---------------- Math (rapid-fire mental arithmetic, not a map edition) ----------------
 # Assembled from tools/math/: page.html is the shell and styles, app.js the game.
-page = open('tools/math/page.html', encoding='utf-8').read()
+page = with_premium(open('tools/math/page.html', encoding='utf-8').read())
 code = rep(open('tools/math/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('math', exist_ok=True)
@@ -158,7 +164,7 @@ print('games/index.html', len(page), VERSION)
 # ---------------- 640 Test 3 (a study tutor for BUAN 640, Test 3) ----------------
 # Assembled from tools/test3/: page.html is the shell and styles; content.js holds every card, question and table.
 T3 = 'tools/test3/'
-page = open(T3 + 'page.html', encoding='utf-8').read()
+page = with_premium(open(T3 + 'page.html', encoding='utf-8').read())
 for mark, fname in (('/*CONTENT*/', 'content.js'), ('/*PROBLEMS*/', 'problems.js'), ('/*VIZ*/', 'viz.js'), ('/*APP*/', 'app.js')):
     code = open(T3 + fname, encoding='utf-8').read()
     if fname == 'app.js':
