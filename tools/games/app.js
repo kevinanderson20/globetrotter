@@ -677,7 +677,10 @@ function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="
     <div class="herochips">${st?`<span>🔥 ${st}-day streak</span>`:""}<span>${S.plays} played</span></div>
 </div>
     <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="--c0:${C.toFixed(1)};stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
+/* coming back from a game puts you where you were on the list, without replaying the entrance */
+let HOME_Y=null;
 function home(){
+  const backTo=HOME_Y; HOME_Y=null; if(backTo!=null) QUIET=true;
   const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
   show(`
   <div class="brand">${LOGO}<h1>Games</h1>
@@ -698,6 +701,7 @@ function home(){
     <div>Version ${esc(APP_VERSION)}</div>
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
+  if(backTo!=null){ window.scrollTo(0,backTo); requestAnimationFrame(()=>window.scrollTo(0,backTo)); }
 }
 const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),flagle:()=>startFlagle(),flagleu:()=>startFlagle({unlimited:true}),hilo:()=>startHiLo(),hilou:()=>startHiLo({unlimited:true}),queens:()=>startQueens(),queensu:()=>startQueens({unlimited:true}),timeline:()=>startTimeline(),mines:()=>startMines(),msu:()=>startMines({unlimited:true}),maptap:()=>startMapTap(),maptapu:()=>startMapTap({unlimited:true}),statele:()=>startStatele(),stateleu:()=>startStatele({unlimited:true}),timelineu:()=>startTimeline({unlimited:true}),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
@@ -705,8 +709,8 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="arch") return archive();
   if(a==="pmini") return startMini({id:+b.dataset.id});
   if(a==="pgrp") return startGroups({id:+b.dataset.id});
-  if(a==="play"){ WK=null; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
-  if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
+  if(a==="play"){ WK=null; if(app.querySelector(".hero")) HOME_Y=window.scrollY; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
+  if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; if(app.querySelector(".hero")) HOME_Y=window.scrollY; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
   if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
   if(a==="lit"){ S.lit=+b.dataset.v; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
   if(a==="sound"){ S.sound=!S.sound; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
