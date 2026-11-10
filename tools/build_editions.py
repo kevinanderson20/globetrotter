@@ -147,6 +147,7 @@ code = rep(open('tools/games/app.js', encoding='utf-8').read(), 'const APP_VERSI
 code = rep(code, '/*PUZZLES*/', open('tools/games/puzzles.js', encoding='utf-8').read(), 1)
 code = rep(code, '/*LISTS*/', open('tools/games/lists.js', encoding='utf-8').read(), 1)  # answer lists for Deep dive and Sky climb  # the crossword and Groups puzzles live in their own file
 code = rep(code, '/*GEOGAMES*/', open('tools/games/geogames.js', encoding='utf-8').read(), 1)  # Worldle and Travle
+code = rep(code, '/*GAMES3*/', open('tools/games/games3.js', encoding='utf-8').read(), 1)  # Minesweeper, Map Tap, Statele
 code = rep(code, '/*NEWGAMES*/', open('tools/games/newgames.js', encoding='utf-8').read().replace('/*QUEENS_DATA*/', open('tools/games/queens.js', encoding='utf-8').read()).replace('/*TIMELINE_DATA*/', open('tools/games/timeline.js', encoding='utf-8').read()), 1)  # Flagle, Higher or Lower, Queens, Timeline
 code = rep(code, '/*STRANDSGAME*/', open('tools/games/strandsgame.js', encoding='utf-8').read().replace('/*STRANDS_DATA*/', open('tools/games/strands.js', encoding='utf-8').read()), 1)  # Strands
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)

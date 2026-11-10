@@ -8,29 +8,29 @@ function geoLoad(){ if(GEO) return Promise.resolve(GEO); if(GEO_P) return GEO_P;
     const ix={}; d.c.forEach((c,i)=>ix[c.id]=i); GEO={W:d.w,list:d.c,by,ix,md:d.md||null}; return GEO; }).catch(e=>{ GEO_P=null; throw e; });
   return GEO_P; }
 const geoNorm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/&/g,"and").replace(/^the\s+/,"").replace(/[^a-z]/g,"");
-function geoFind(text){ const q=geoNorm(text); if(!q) return null; return GEO.list.find(c=>c.keys.includes(q))||null; }
-function geoMatches(text,skip){ const raw=String(text).trim().toLowerCase(); if(!raw) return [];
+function geoFind(text,list){ const q=geoNorm(text); if(!q) return null; return (list||GEO.list).find(c=>c.keys.includes(q))||null; }
+function geoMatches(text,skip,list){ const raw=String(text).trim().toLowerCase(); if(!raw) return [];
   const q=geoNorm(raw), words=c=>c.n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().split(/[^a-z]+/);
-  const scored=[]; GEO.list.forEach(c=>{ if(skip&&skip.has(c.id)) return; let sc=9;
+  const scored=[]; (list||GEO.list).forEach(c=>{ if(skip&&skip.has(c.id)) return; let sc=9;
     if(c.keys.includes(q)) sc=0; else if(geoNorm(c.n).startsWith(q)) sc=1; else if(words(c).some(w=>w.startsWith(q))) sc=2; else if(c.keys.some(k=>k.startsWith(q))) sc=3; else if(q.length>=3&&geoNorm(c.n).includes(q)) sc=4;
     if(sc<9) scored.push([sc,c]); });
   return scored.sort((a,b)=>a[0]-b[0]||a[1].n.localeCompare(b[1].n)).slice(0,6).map(x=>x[1]); }
 /* a country-name box with suggestions, like the real games: type, tap a suggestion or press Enter */
-function geoInput(box,{placeholder,skip,onPick,btn="Guess"}){
+function geoInput(box,{placeholder,skip,onPick,btn="Guess",list:pool}){
   box.innerHTML=`<form class="cin" autocomplete="off"><div class="cinwrap"><input type="text" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="${esc(placeholder)}" aria-label="${esc(placeholder)}"><div class="cinlist" role="listbox" hidden></div></div><button class="btn go" type="submit">${esc(btn)}</button></form>`;
   const f=box.querySelector("form"), inp=f.querySelector("input"), list=f.querySelector(".cinlist"); let opts=[], hi=0;
-  const draw=()=>{ opts=geoMatches(inp.value,skip()); hi=0;
+  const draw=()=>{ opts=geoMatches(inp.value,skip(),pool); hi=0;
     list.hidden=!opts.length||!inp.value.trim(); list.innerHTML=opts.map((c,i)=>`<button type="button" role="option" data-i="${i}" class="${i===hi?"on":""}">${esc(c.n)}</button>`).join(""); };
   inp.addEventListener("input",draw);
   inp.addEventListener("keydown",e=>{ if(list.hidden) return; if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); hi=(hi+(e.key==="ArrowDown"?1:opts.length-1))%opts.length; [...list.children].forEach((b,i)=>b.classList.toggle("on",i===hi)); } if(e.key==="Escape") list.hidden=true; });
   list.addEventListener("pointerdown",e=>{ const b=e.target.closest("button"); if(!b) return; e.preventDefault(); pick(opts[+b.dataset.i]); });
-  f.onsubmit=e=>{ e.preventDefault(); const exact=geoFind(inp.value);
+  f.onsubmit=e=>{ e.preventDefault(); const exact=geoFind(inp.value,pool);
     if(exact) return pick(exact,inp.value);
     if(!list.hidden&&opts.length===1) return pick(opts[0]);
     if(!list.hidden&&opts.length&&document.activeElement===inp&&list.querySelector(".on")&&hi>0) return pick(opts[hi]);
     if(opts.length){ toast("Tap the country you mean from the list"); return; }
     pick(null,inp.value); };
-  function pick(c,typed){ if(!c){ if(String(typed||"").trim()){ bad(); toast("Not a country on the list. Pick one from the suggestions."); } return; }
+  function pick(c,typed){ if(!c){ if(String(typed||"").trim()){ bad(); toast(pool?"Not on the list. Pick one from the suggestions.":"Not a country on the list. Pick one from the suggestions."); } return; }
     if(onPick(c)!==false){ inp.value=""; list.hidden=true; } }
   setTimeout(()=>{ try{ inp.focus({preventScroll:true}); }catch(e){} },80);
   return {focus:()=>inp.focus(), el:inp}; }
@@ -85,6 +85,7 @@ function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").fo
       v[0]-=dx/r.width*v[2]; v[1]-=dy/r.height*v[3]; apply(); } });
   const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=null;
     if(pts.size===1){ last=[...pts.values()][0]; return; }
+    if(pts.size===0&&moved<8&&state&&state.onTap){ const [mx,my]=toMap(e.clientX,e.clientY); state.onTap(mx,my); return; }
     if(pts.size===0&&moved<8){ const now=performance.now(); // double-tap zooms in where you tapped
       if(now-tapT<320&&tapXY&&Math.hypot(e.clientX-tapXY[0],e.clientY-tapXY[1])<30){ const [mx,my]=toMap(e.clientX,e.clientY), w=Math.max(minW,v[2]*.5); animTo([mx-w/2,my-w*ar/2,w,w*ar]); tapT=0; }
       else { tapT=now; tapXY=[e.clientX,e.clientY]; } } };

@@ -35,6 +35,9 @@ const GAMES={
  hilou:{cat:"unl", col:"--geo", ic:"📈", name:"Unlimited Higher or Lower", desc:"Random countries, as long a run as you can.", hi:true, fmt:v=>`${v} in a row`},
  queensu:{cat:"unl", col:"--log", ic:"👑", name:"Unlimited Queens", desc:"Any board from the bank.", hi:false, fmt:v=>fmtT(v)},
  timelineu:{cat:"unl", col:"--spd", ic:"📅", name:"Unlimited Timeline", desc:"A fresh deck of events.", hi:true, fmt:v=>`${v}/7`},
+ msu:{cat:"unl", col:"--log", ic:"💣", name:"Unlimited Minesweeper", desc:"Easy, medium or hard. Never a forced guess.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
+ maptapu:{cat:"unl", col:"--geo", ic:"📍", name:"Unlimited Map Tap", desc:"Five random countries to find.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
+ stateleu:{cat:"unl", col:"--geo", ic:"🇺🇸", name:"Unlimited Statele", desc:"A random state outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
  globleu:{cat:"unl", col:"--geo", ic:"🌍", name:"Unlimited Globle", desc:"A random mystery country every round.", hi:false, fmt:v=>v>=999?"✗":`${v} guess${v===1?"":"es"}`},
  nbrsu:{cat:"unl", col:"--geo", ic:"🧱", name:"Unlimited Neighbors", desc:"Five random countries. Name every border.", hi:true, fmt:v=>`${v}%`},
  travleu:{cat:"unl", col:"--geo", ic:"🧭", name:"Unlimited Travle", desc:"A random pair of countries every round.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
@@ -49,6 +52,9 @@ const GAMES={
  hilo:{cat:"daily", col:"--geo", ic:"📈", name:"Higher or Lower", desc:"Which country has more people?", hi:true, fmt:v=>`${v} in a row`},
  queens:{cat:"daily", col:"--log", ic:"👑", name:"Queens", desc:"One queen per row, column and color.", hi:false, fmt:v=>fmtT(v)},
  timeline:{cat:"daily", col:"--spd", ic:"📅", name:"Timeline", desc:"Put the events in order.", hi:true, fmt:v=>`${v}/7`},
+ mines:{cat:"daily", col:"--log", ic:"💣", name:"Minesweeper", desc:"The same no-guess board for everyone.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
+ maptap:{cat:"daily", col:"--geo", ic:"📍", name:"Map Tap", desc:"Tap where five countries are.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
+ statele:{cat:"daily", col:"--geo", ic:"🇺🇸", name:"Statele", desc:"Guess the US state from its outline.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
  dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"An easy 6×6 with pencil notes. One new puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
@@ -601,6 +607,7 @@ function startDSudoku(){
 
 /*GEOGAMES*/
 /*NEWGAMES*/
+/*GAMES3*/
 /*STRANDSGAME*/
 /* ================= RESULTS ================= */
 function spark(hist,hi){ if(!hist||hist.length<2) return ""; const v=hist.slice(-12).map(h=>h.v), mx=Math.max(...v), mn=Math.min(...v), sp=(mx-mn)||1;
@@ -642,13 +649,14 @@ function bar(title,back="home"){ return `<div class="bar"><button class="x" data
 function show(html){ app.innerHTML=html; window.scrollTo(0,0); }
 const LOGO='<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M13 10.5a4 4 0 0 0-4 4 3.6 3.6 0 0 0 .6 2 4 4 0 0 0 1.4 6.4 4 4 0 0 0 7 1.6V11.6a3.5 3.5 0 0 0-5-1.1Z" fill="var(--mem)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 10.5a4 4 0 0 1 4 4 3.6 3.6 0 0 1-.6 2 4 4 0 0 1-1.4 6.4 4 4 0 0 1-7 1.6V11.6a3.5 3.5 0 0 1 5-1.1Z" fill="var(--log)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null?"sudoku:daily":`sudoku:${S.sud}`; return {v:S.best[k],h:S.hist[k]}; }
+  if(game==="msu"){ const k="msu:"+(S.msLvl||"easy"); return {v:S.best[k],h:S.hist[k]}; }
   if(game==="lights"){ const k=`lights:${S.lit}`; return {v:S.best[k],h:S.hist[k]}; } return {v:S.best[game],h:S.hist[game]}; }
 /* ---------- home rows: icon, name, a short tagline, and one clear status on the right ---------- */
-const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",nbrs:"Name every border",dsudoku:"An easy 6×6",
+const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",mines:"No-guess, same board for all",maptap:"Find 5 countries on a map",statele:"Name the state outline",msu:"Easy, medium or hard",maptapu:"Random countries",stateleu:"Random states",nbrs:"Name every border",dsudoku:"An easy 6×6",
   seq:"Repeat the pattern",num:"Remember the digits",match:"Find all 8 pairs",react:"Tap on green",stroop:"The ink, not the word",schulte:"Tap 1 to 25 in order",count:"Hit the target number",sudoku:"6×6, easy to hard",lights:"Turn every light off",
   strandsu:"Any board you like",worldleu:"Random outlines",travleu:"Random routes",globleu:"Random mystery countries",nbrsu:"Random countries",diveu:"Fresh prompts",climbu:"Fresh prompts"};
 function dailyStat(k){ try{ return dailyStat0(k); }catch(e){ console.error(e); return {st:"new"}; } }
-function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():k==="flagle"?flStatus():k==="hilo"?hlStatus():k==="queens"?qnStatus():k==="timeline"?tlStatus():nmStatus(k);
+function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():k==="flagle"?flStatus():k==="hilo"?hlStatus():k==="queens"?qnStatus():k==="timeline"?tlStatus():k==="mines"?msStatus():k==="maptap"?mtStatus():k==="statele"?sbStatus():nmStatus(k);
   if(/^Today's done/.test(raw)){ let r=(raw.split(" · ")[1]||"done").replace(/ \/ 700$/,"").replace(/ named$/,"").replace(/ guess(es)?$/,"").replace(/^gave up$|^missed it$|^didn't make it$/,"✗");
     if(/^\d+$/.test(r)&&k==="globle") r=r+(r==="1"?" guess":" guesses");
     return {st:"done", r:r.charAt(0).toUpperCase()+r.slice(1)}; }
@@ -680,7 +688,7 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),flagle:()=>startFlagle(),flagleu:()=>startFlagle({unlimited:true}),hilo:()=>startHiLo(),hilou:()=>startHiLo({unlimited:true}),queens:()=>startQueens(),queensu:()=>startQueens({unlimited:true}),timeline:()=>startTimeline(),timelineu:()=>startTimeline({unlimited:true}),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),flagle:()=>startFlagle(),flagleu:()=>startFlagle({unlimited:true}),hilo:()=>startHiLo(),hilou:()=>startHiLo({unlimited:true}),queens:()=>startQueens(),queensu:()=>startQueens({unlimited:true}),timeline:()=>startTimeline(),mines:()=>startMines(),msu:()=>startMines({unlimited:true}),maptap:()=>startMapTap(),maptapu:()=>startMapTap({unlimited:true}),statele:()=>startStatele(),stateleu:()=>startStatele({unlimited:true}),timelineu:()=>startTimeline({unlimited:true}),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();
@@ -707,7 +715,7 @@ async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v12"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v13"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });
