@@ -100,7 +100,7 @@ function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.inner
 
 /* ---------- game shell: timers are tracked so quitting always cleans up ---------- */
 let GS=null; window.__b={}; // read by automated tests
-function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
+function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; const gg=GAMES[game]; play.style.setProperty("--gc",gg?`var(${gg.col||"--"+gg.cat})`:"var(--good)"); $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
   play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage";
   // the first screen of a game rises in once; later re-renders stay still
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ stage.classList.add("enter"); setTimeout(()=>stage.classList.remove("enter"),700); })); return GS; }
@@ -668,14 +668,22 @@ function gameRow(k,g,col){ const c=g.col||col; let right;
   if(g.cat==="daily"){ const d=dailyStat(k); right=d.st==="done"?`<span class="gr done"><i>✓</i>${esc(d.r)}</span>`:d.st==="go"?`<span class="gr go">Resume</span>`:`<span class="gr new">Play</span>`; }
   else { let bv=null; try{ const b=bestOf(k); if(b.v!=null) bv=g.fmt(b.v); }catch(e){} right=bv!=null?`<span class="gr best"><small>Best</small>${esc(bv)}</span>`:`<span class="gr chev" aria-hidden="true">›</span>`; }
   return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${g.ic}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
+/* the "Today" card at the top: date, a ring for today's daily games, streak, and the next game to play */
+function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="daily"), done=daily.filter(([k])=>dailyStat(k).st==="done").length, n=daily.length, p=done/n;
+  const next=daily.find(([k])=>dailyStat(k).st!=="done"), st=dayStreak(), R=34, C=2*Math.PI*R;
+  const d=new Date(), date=d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+  return `<section class="hero"><div class="herotxt"><span class="herodate">${esc(date)}</span><h2>${done===n?"All done today":done?"Keep it going":"Today's games"}</h2>
+    <div class="herochips">${st?`<span>🔥 ${st}-day streak</span>`:""}<span>${S.plays} played</span></div>
+</div>
+    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
 function home(){
   const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
   show(`
   <div class="brand">${LOGO}<h1>Games</h1>
     <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="./" aria-current="page">Games</a><a href="../test3/">Test 3</a></nav></div>
+  ${heroCard()}
   <button class="workout" data-act="wk"><b>${wdone===3?"Workout done ✓":"Daily workout"}</b><span>${wdone===3?`Nice. ${st}-day streak. Replay any game below.`:"Three games, about four minutes: memory, speed, logic."}</span>
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
-  ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>{ const list=Object.entries(GAMES).filter(([k,g])=>g.cat===c), dn=c==="daily"?list.filter(([k])=>dailyStat(k).st==="done").length:0;
     return `<section class="sec"><div class="sech"><h2>${name}</h2>${c==="daily"?`<span class="dcount${dn===list.length?" all":""}">${dn===list.length?"All done ✓":`${dn} of ${list.length} done`}</span>`:`<span>${sub}</span>`}</div>${c==="daily"?`<div class="dprog"><i style="width:${Math.round(dn/list.length*100)}%"></i></div>`:""}<div class="glist">${list.map(([k,g])=>gameRow(k,g,col)).join("")}</div></section>`; }).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
@@ -713,7 +721,7 @@ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==
 /* ---------- offline + updates (shared with the other tabs) ---------- */
 if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")) navigator.serviceWorker.register("../sw.js").catch(()=>{});
 async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
-  try{ const r=await fetch("../version.json",{cache:"no-store"}); if(!r.ok) return; const v=(await r.json()).v; if(v&&v!==APP_VERSION) $('updBtn').hidden=false; }catch(e){} }
+  try{ const r=await fetch("../version.json",{cache:"no-store"}); if(!r.ok) return; const v=(await r.json()).v; if(v&&v!==APP_VERSION){ if(play.hidden&&!sessionStorage.getItem("gt-auto-upd-"+v)){ sessionStorage.setItem("gt-auto-upd-"+v,"1"); $('updBtn').click(); } else $('updBtn').hidden=false; } }catch(e){} }
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
