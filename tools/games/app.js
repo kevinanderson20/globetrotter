@@ -634,6 +634,20 @@ function show(html){ app.innerHTML=html; window.scrollTo(0,0); }
 const LOGO='<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M13 10.5a4 4 0 0 0-4 4 3.6 3.6 0 0 0 .6 2 4 4 0 0 0 1.4 6.4 4 4 0 0 0 7 1.6V11.6a3.5 3.5 0 0 0-5-1.1Z" fill="var(--mem)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 10.5a4 4 0 0 1 4 4 3.6 3.6 0 0 1-.6 2 4 4 0 0 1-1.4 6.4 4 4 0 0 1-7 1.6V11.6a3.5 3.5 0 0 1 5-1.1Z" fill="var(--log)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null?"sudoku:daily":`sudoku:${S.sud}`; return {v:S.best[k],h:S.hist[k]}; }
   if(game==="lights"){ const k=`lights:${S.lit}`; return {v:S.best[k],h:S.hist[k]}; } return {v:S.best[game],h:S.hist[game]}; }
+/* ---------- home rows: icon, name, a short tagline, and one clear status on the right ---------- */
+const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",nbrs:"Name every border",dsudoku:"An easy 6×6",
+  seq:"Repeat the pattern",num:"Remember the digits",match:"Find all 8 pairs",react:"Tap on green",stroop:"The ink, not the word",schulte:"Tap 1 to 25 in order",count:"Hit the target number",sudoku:"6×6, easy to hard",lights:"Turn every light off",
+  strandsu:"Any board you like",worldleu:"Random outlines",travleu:"Random routes",globleu:"Random mystery countries",nbrsu:"Random countries",diveu:"Fresh prompts",climbu:"Fresh prompts"};
+function dailyStat(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():nmStatus(k);
+  if(/^Today's done/.test(raw)){ let r=(raw.split(" · ")[1]||"done").replace(/ \/ 700$/,"").replace(/ named$/,"").replace(/ guess(es)?$/,"").replace(/^gave up$|^missed it$|^didn't make it$/,"✗");
+    if(/^\d+$/.test(r)&&k==="globle") r=r+(r==="1"?" guess":" guesses");
+    return {st:"done", r:r.charAt(0).toUpperCase()+r.slice(1)}; }
+  if(/in progress|guessed|found|round \d|so far/.test(raw)) return {st:"go"};
+  return {st:"new"}; }
+function gameRow(k,g,col){ const c=g.col||col; let right;
+  if(g.cat==="daily"){ const d=dailyStat(k); right=d.st==="done"?`<span class="gr done"><i>✓</i>${esc(d.r)}</span>`:d.st==="go"?`<span class="gr go">Resume</span>`:`<span class="gr new">Play</span>`; }
+  else { const b=bestOf(k); right=b.v!=null?`<span class="gr best"><small>Best</small>${esc(g.fmt(b.v))}</span>`:`<span class="gr chev" aria-hidden="true">›</span>`; }
+  return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${g.ic}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
 function home(){
   const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
   show(`
@@ -642,8 +656,8 @@ function home(){
   <button class="workout" data-act="wk"><b>${wdone===3?"Workout done ✓":"Daily workout"}</b><span>${wdone===3?`Nice. ${st}-day streak. Replay any game below.`:"Three games, about four minutes: memory, speed, logic."}</span>
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
-  ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+  ${CATS.map(([c,name,sub,col])=>{ const list=Object.entries(GAMES).filter(([k,g])=>g.cat===c), dn=c==="daily"?list.filter(([k])=>dailyStat(k).st==="done").length:0;
+    return `<section class="sec"><div class="sech"><h2>${name}</h2>${c==="daily"?`<span class="dcount${dn===list.length?" all":""}">${dn===list.length?"All done ✓":`${dn} of ${list.length} done`}</span>`:`<span>${sub}</span>`}</div><div class="glist">${list.map(([k,g])=>gameRow(k,g,col)).join("")}</div></section>`; }).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
