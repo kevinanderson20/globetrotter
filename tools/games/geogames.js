@@ -248,3 +248,143 @@ function tvResults(){ const st=S.tv[today()];
   <button class="btn wide" data-act="play" data-g="travleu">Play unlimited Travle</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
   wireShare(tvShare(st,true)); geoZoomInit(document); }
+
+/* ---------------- GLOBLE ---------------- */
+/* find the mystery country: every guess lights up on the map, hotter the closer its border is to the mystery country's border.
+   Unlimited guesses; the score is how many it took. Moved here from the World tab's "Mystery country". */
+let GB_ROT=null, GB_POOL=null;
+const gbPool=()=>GB_POOL||(GB_POOL=GEO.list.filter(c=>c.km2>=1000).map(c=>c.id).sort());
+const gbDaily=()=>{ if(!GB_ROT) GB_ROT=shuf(gbPool().slice(),seeded("globetrotter-globle-v1")); const n=GB_ROT.length; let id=GB_ROT[((dayIndex()%n)+n)%n];
+  if(id===wlDaily()) id=GB_ROT[(((dayIndex()+1)%n)+n)%n]; return id; };  // never the same country as today's Worldle
+const gbNum=()=>dayIndex()+1;
+/* Globle's palette: pale far away, deep red when touching */
+const GB_STOPS=[[0,[122,14,24]],[250,[190,30,38]],[1000,[232,80,47]],[2500,[247,146,72]],[5000,[252,200,120]],[9000,[255,240,200]]];
+function gbHeat(d){ if(d<=0) return "rgb(122,14,24)"; for(let i=1;i<GB_STOPS.length;i++){ const [d1,c1]=GB_STOPS[i], [d0,c0]=GB_STOPS[i-1];
+    if(d<=d1){ const k=(d-d0)/(d1-d0); return `rgb(${c0.map((v,j)=>Math.round(v+(c1[j]-v)*k)).join(",")})`; } } return "rgb(255,240,200)"; }
+const gbSq=d=>d<=0?"🟥":d<1000?"🟧":d<3000?"🟨":"⬜";
+let GB_WORLD=null;
+const gbWorld=()=>GB_WORLD||(GB_WORLD=geoBox(GEO.list.map(c=>c.id),.02,200));
+function gbStatus(){ S.gb=S.gb||{}; const d=S.gb[today()]; return d&&d.over?(d.won?`Today's done · ${d.g.length} guess${d.g.length===1?"":"es"}`:"Today's done · gave up"):d&&d.g.length?`Today's #${gbNum()} · ${d.g.length} guessed`:`Today's #${gbNum()} is ready`; }
+function gbShare(st,daily){ const t=st.t, sq=st.g.map(id=>id===t?"🟩":gbSq(geoGap(id,t)));
+  const rows=[]; for(let i=0;i<sq.length;i+=10) rows.push(sq.slice(i,i+10).join(""));
+  return `🌎 Globle ${daily?"#"+gbNum():"(unlimited)"} 🌍\n${st.won?`${st.g.length} guess${st.g.length===1?"":"es"}`:"Gave up"}\n${rows.join("\n")}`; }
+function gbMap(st,over,zoom){ const t=st.t, gs=new Set(st.g);
+  return geoZoomable(gbWorld(),inView=>GEO.list.filter(inView).map(c=>{
+    if(c.id===t&&(over||gs.has(t))) return geoPathEl(c,st.won?"g-hit":"g-reveal");
+    if(gs.has(c.id)) return geoPathEl(c,"g-heat",`style="fill:${gbHeat(geoGap(c.id,t))}"`);
+    return geoPathEl(c,"g-land"); }).join(""),zoom); }
+function gbListHtml(st){ const t=st.t, rows=st.g.filter(id=>id!==t).map(id=>({id,d:geoGap(id,t)})).sort((a,b)=>a.d-b.d);
+  return rows.length?`<div class="gblist">${rows.map(r=>`<span><i style="background:${gbHeat(r.d)}"></i><b>${esc(GEO.by[r.id].n)}</b><em class="wldist" role="button" tabindex="0">${r.d<=0?"Borders it":wlUnit(r.d)}</em></span>`).join("")}</div>`:""; }
+async function startGloble(opt={}){
+  const daily=!opt.unlimited, gid=daily?"globle":"globleu";
+  begin(gid,daily?`Globle #${gbNum()}`:"Unlimited Globle"); stage.className="gstage scroll"; geoLoading();
+  try{ await geoLoad(); }catch(e){ return geoFail(); }
+  if(!GS||GS.game!==gid) return;
+  S.gb=S.gb||{}; const key=today();
+  if(daily&&S.gb[key]&&S.gb[key].over){ end(); return gbResults(); }
+  let st;
+  if(daily) st=S.gb[key]=S.gb[key]&&S.gb[key].t===gbDaily()?S.gb[key]:{t:gbDaily(),g:[]};
+  else { const pool=gbPool().filter(id=>id!==S.gbLast); st={t:pool[Math.floor(Math.random()*pool.length)],g:[]}; S.gbLast=st.t; save(); }
+  __b.gb=st;
+  const T=GEO.by[st.t], zoom={}; let over=false, msg="";
+  function render(){ const best=st.g.filter(id=>id!==st.t).map(id=>({id,d:geoGap(id,st.t)})).sort((a,b)=>a.d-b.d)[0];
+    stage.innerHTML=`<div class="tv gb">
+      <div class="tvhead">${over?(st.won?`It was <b class="gbwin">${esc(T.n)}</b>`:`It was <b>${esc(T.n)}</b>`):best?`Closest: <b>${esc(GEO.by[best.id].n)}</b> · ${best.d<=0?"borders it":wlUnit(best.d)}`:"Find the mystery country"}</div>
+      <div class="tvmap">${gbMap(st,over,zoom)}</div>
+      <div class="tvbar"><span>${st.g.length} guess${st.g.length===1?"":"es"}</span>${over?"":`<button class="btn ghost sm" id="gbgive">Give up</button>`}</div>
+      ${msg?`<div class="tvmsg">${msg}</div>`:st.g.length?"":`<div class="tvmsg">Guess any country. The hotter the color, the closer its border is to the mystery country. Pinch or use + to zoom.</div>`}
+      ${over?"":`<div id="gbin"></div>`}
+      ${gbListHtml(st)}</div>`;
+    geoZoomInit(stage,zoom);
+    stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
+    if(!over){ geoInput($('gbin'),{placeholder:"Type a country",skip:()=>new Set(st.g),onPick:guess});
+      $('gbgive').onclick=()=>{ const b=$('gbgive'); if(!b.dataset.sure){ b.dataset.sure=1; b.textContent="Tap again to reveal"; return; } over=true; done(false); }; } }
+  function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }
+    const prev=st.g.filter(id=>id!==st.t).reduce((m,id)=>Math.min(m,geoGap(id,st.t)),Infinity);
+    st.g.push(c.id); if(daily) save();
+    if(c.id===st.t){ over=true; good(); return done(true); }
+    const d=geoGap(c.id,st.t);
+    if(d<prev){ good(); msg=d<=0?`<b>${esc(c.n)}</b> borders the mystery country!`:`<b>${esc(c.n)}</b> is ${wlUnit(d)} away. Warmer: your closest yet.`; }
+    else { bad(); msg=`<b>${esc(c.n)}</b> is ${d<=0?"a neighbor too":wlUnit(d)+" away"}. Colder than your best.`; }
+    render(); }
+  function done(won){ st.over=1; st.won=won?1:0; if(daily) save(); msg=""; render();
+    if(won) setTimeout(confetti,250); else toast(`It was ${T.n}`);
+    later(()=>finish(gid,won?st.g.length:999,{sub:won?`${T.n} in ${st.g.length} guess${st.g.length===1?"":"es"}`:`Gave up · it was ${T.n}`, noRecord:!won, share:gbShare(st,daily), html:gbCard(st), nextG:"globleu", nextLabel:daily?"Play unlimited Globle":"Play again", after:()=>geoZoomInit(document)}),won?1600:1900); }
+  if(st.g.includes(st.t)){ over=true; st.won=1; } render();
+}
+function gbCard(st){ const T=GEO.by[st.t], box=geoBox([st.t,...T.b],.3,170);
+  return `<section class="card"><h3>${esc(T.n)}</h3><div class="tvmap">${geoZoomable(box,inView=>GEO.list.filter(inView).map(c=>c.id===st.t?geoPathEl(c,st.won?"g-hit":"g-reveal"):st.g.includes(c.id)?geoPathEl(c,"g-heat",`style="fill:${gbHeat(geoGap(c.id,st.t))}"`):geoPathEl(c,"g-land")).join(""))}</div>
+    <p class="muted" style="margin-top:8px">${esc(T.c)} · ${Math.round(T.km2).toLocaleString()} km²${T.b.length?` · borders ${T.b.map(id=>esc(GEO.by[id].n)).join(", ")}`:" · no land borders"}</p>${gbListHtml(st)}</section>`; }
+function gbResults(){ const st=S.gb[today()], T=GEO.by[st.t];
+  show(`${bar("Globle")}
+  <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Globle #${gbNum()}</div>
+    <div class="big">${st.won?st.g.length:"✗"}</div><p class="muted">${st.won?`Found ${esc(T.n)} in ${st.g.length} guess${st.g.length===1?"":"es"}`:`It was ${esc(T.n)}`}</p><p class="cheer" style="color:var(--ink-2)">New mystery country tomorrow</p></section>
+  ${gbCard(st)}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="globleu">Play unlimited Globle</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(gbShare(st,true)); geoZoomInit(document); }
+
+/* ---------------- NEIGHBORS ---------------- */
+/* five countries; name every country each one borders. Score = share of borders named. Moved here from the World tab. */
+const NB_R=5;
+function nbPick(rnd){ const pool=GEO.list.filter(c=>c.b.length>=2&&c.b.length<=10).map(c=>c.id).sort(), order=shuf(pool,rnd), out=[], conts=new Set();
+  for(const id of order){ if(out.length>=NB_R) break; const c=GEO.by[id].c; if(conts.has(c)&&out.length<4) continue; conts.add(c); out.push(id); }
+  for(const id of order) if(out.length<NB_R&&!out.includes(id)) out.push(id);
+  return out; }
+const nbNum=()=>dayIndex()+1;
+const nbScore=st=>{ let got=0,tot=0; st.r.forEach(r=>{ got+=r.got.length; tot+=GEO.by[r.x].b.length; }); return {got,tot,pct:tot?Math.round(got/tot*100):0,wrong:st.r.reduce((s,r)=>s+r.bad.length,0)}; };
+function nbStatus(){ S.nbd=S.nbd||{}; const d=S.nbd[today()]; if(d&&d.over){ const s=nbScore(d); return `Today's done · ${s.pct}% named`; } return d&&d.r.some(r=>r.got.length||r.done)?`Today's #${nbNum()} · round ${Math.min(NB_R,d.i+1)} of ${NB_R}`:`Today's #${nbNum()} is ready`; }
+function nbShare(st,daily){ const s=nbScore(st);
+  return `Globetrotter Neighbors ${daily?"#"+nbNum():"(unlimited)"}\n${s.got}/${s.tot} borders · ${s.wrong} wrong\n${st.r.map((r,i)=>`${i+1}️⃣ ${"🟩".repeat(r.got.length)}${"🟨".repeat(GEO.by[r.x].b.length-r.got.length)}${r.bad.length?" "+"❌".repeat(Math.min(5,r.bad.length)):""}`).join("\n")}`; }
+async function startNeighbors(opt={}){
+  const daily=!opt.unlimited, gid=daily?"nbrs":"nbrsu";
+  begin(gid,daily?`Neighbors #${nbNum()}`:"Unlimited Neighbors"); stage.className="gstage scroll"; geoLoading();
+  try{ await geoLoad(); }catch(e){ return geoFail(); }
+  if(!GS||GS.game!==gid) return;
+  S.nbd=S.nbd||{}; const key=today();
+  if(daily&&S.nbd[key]&&S.nbd[key].over){ end(); return nbResults(); }
+  let st;
+  if(daily&&S.nbd[key]) st=S.nbd[key];
+  else { st={i:0,r:nbPick(daily?seeded("globetrotter-neighbors-v1-"+key):Math.random).map(x=>({x,got:[],bad:[],done:0}))}; if(daily){ S.nbd[key]=st; save(); } }
+  __b.nb=st;
+  let msg="", zoom={};
+  const persist=()=>{ if(daily) save(); };
+  function render(){ const r=st.r[st.i], X=GEO.by[r.x], nb=X.b, got=new Set(r.got), bads=new Set(r.bad), shown=r.done;
+    const box=geoBox([r.x,...nb],.22,150);
+    const map=geoZoomable(box,inView=>GEO.list.filter(inView).map(c=>c.id===r.x?geoPathEl(c,"g-start"):got.has(c.id)?geoPathEl(c,"g-ok"):shown&&nb.includes(c.id)?geoPathEl(c,"g-reveal"):bads.has(c.id)?geoPathEl(c,"g-far"):geoPathEl(c,"g-ghost")).join(""),zoom);
+    stage.innerHTML=`<div class="tv nb">
+      <div class="nbround">${st.r.map((q,k)=>`<i class="${k<st.i||q.done?"d":""} ${k===st.i?"on":""}"></i>`).join("")}<span>Round ${st.i+1} of ${NB_R}</span></div>
+      <div class="tvhead">Name every country that borders <b class="tva">${esc(X.n)}</b></div>
+      <div class="tvmap">${map}</div>
+      <div class="nbslots">${nb.map((x,k)=>`<i class="${k<r.got.length?"ok":shown?"rev":""}"></i>`).join("")}<span>${r.got.length} of ${nb.length}</span></div>
+      ${msg?`<div class="tvmsg">${msg}</div>`:""}
+      <div class="tvlist">${r.got.map(id=>`<span class="tvg nbok">${esc(GEO.by[id].n)}</span>`).join("")}${shown?nb.filter(id=>!got.has(id)).map(id=>`<span class="tvg nbrev">${esc(GEO.by[id].n)}</span>`).join(""):""}${r.bad.map(id=>`<span class="tvg nbbad">✗ ${esc(GEO.by[id].n)}</span>`).join("")}</div>
+      ${shown?`<button class="btn go wide" id="nbnext">${st.i+1<NB_R?"Next country":"See results"}</button>`:`<div id="nbin"></div><button class="btn ghost wide" id="nbgive">Show the rest</button>`}</div>`;
+    geoZoomInit(stage,zoom);
+    if(shown){ $('nbnext').onclick=()=>{ if(st.i+1<NB_R){ st.i++; msg=""; zoom={}; persist(); render(); window.scrollTo(0,0); } else done(); }; return; }
+    geoInput($('nbin'),{placeholder:"Type a neighbor",skip:()=>new Set([r.x,...r.got,...r.bad]),onPick:guess});
+    $('nbgive').onclick=()=>{ r.done=1; msg=`${nb.length-r.got.length} to remember, shown in yellow.`; persist(); render(); }; }
+  function guess(c){ const r=st.r[st.i], X=GEO.by[r.x];
+    if(c.id===r.x){ toast(`That's ${X.n} itself`); return false; }
+    if(X.b.includes(c.id)){ r.got.push(c.id); good();
+      if(r.got.length===X.b.length){ r.done=1; msg=r.bad.length?"All named!":"All named, no wrong guesses!"; if(!r.bad.length) setTimeout(confetti,150); }
+      else msg=`<b>${esc(c.n)}</b>. ${X.b.length-r.got.length} to go.`; }
+    else { r.bad.push(c.id); bad(); msg=`<b>${esc(c.n)}</b> doesn't border ${esc(X.n)}.`; }
+    persist(); render(); }
+  function done(){ st.over=1; persist(); const s=nbScore(st);
+    if(s.pct===100) setTimeout(confetti,200);
+    finish(gid,s.pct,{sub:`${s.got} of ${s.tot} borders named · ${s.wrong} wrong guess${s.wrong===1?"":"es"}`, share:nbShare(st,daily), html:nbCard(st), nextG:"nbrsu", nextLabel:daily?"Play unlimited Neighbors":"Play again"}); }
+  render();
+}
+function nbCard(st){ return `<section class="card"><h3>The borders</h3><div class="nbsum">${st.r.map(r=>{ const X=GEO.by[r.x], got=new Set(r.got);
+    return `<div><b>${esc(X.n)}</b> <span class="muted">${r.got.length}/${X.b.length}${r.bad.length?` · ${r.bad.length} wrong`:""}</span><div class="tvlist">${X.b.map(id=>`<span class="tvg ${got.has(id)?"nbok":"nbrev"}">${esc(GEO.by[id].n)}</span>`).join("")}</div></div>`; }).join("")}</div></section>`; }
+function nbResults(){ const st=S.nbd[today()], s=nbScore(st);
+  show(`${bar("Neighbors")}
+  <section class="card center" style="--c:var(--geo)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Today's Neighbors #${nbNum()}</div>
+    <div class="big">${s.pct}%</div><p class="muted">${s.got} of ${s.tot} borders named · ${s.wrong} wrong</p><p class="cheer" style="color:var(--ink-2)">Five new countries tomorrow</p></section>
+  ${nbCard(st)}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="nbrsu">Play unlimited Neighbors</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(nbShare(st,true)); }

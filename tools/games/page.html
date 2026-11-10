@@ -422,6 +422,24 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .tvinit{text-align:center;font-weight:700;color:var(--ink-2)}
 .tvmsg{text-align:center;font-size:14px;color:var(--ink-2)}
 .tvlist{display:flex;flex-wrap:wrap;gap:6px}
+.gmap .g-heat{stroke:color-mix(in srgb,#7a0e18 45%,var(--surface))}
+.gmap .g-reveal{fill:var(--sun);stroke:var(--ink);stroke-width:1.4px}
+.gbwin{color:var(--good)}
+.gblist{display:grid;gap:5px}
+.gblist span{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:15px}
+.gblist i{width:16px;height:16px;border-radius:5px;border:1px solid color-mix(in srgb,var(--ink) 20%,transparent)}
+.gblist b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gblist em{font-style:normal;font-weight:700;color:var(--ink-2);cursor:pointer;font-variant-numeric:tabular-nums}
+.nbround{display:flex;align-items:center;gap:6px;justify-content:center;font-size:13px;font-weight:700;color:var(--ink-3)}
+.nbround i{width:10px;height:10px;border-radius:50%;background:var(--line)}.nbround i.d{background:var(--geo)}.nbround i.on{outline:2px solid var(--geo);outline-offset:1px}
+.nbround span{margin-left:4px}
+.nbslots{display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center}
+.nbslots i{width:22px;height:8px;border-radius:5px;background:var(--line)}.nbslots i.ok{background:#3fbf6b}.nbslots i.rev{background:var(--sun)}
+.nbslots span{font-size:13px;font-weight:800;color:var(--ink-2);margin-left:4px}
+.tvg.nbok{background:color-mix(in srgb,#3fbf6b 22%,var(--surface));border-color:color-mix(in srgb,#3fbf6b 50%,var(--line))}
+.tvg.nbrev{background:color-mix(in srgb,var(--sun) 25%,var(--surface));border-color:color-mix(in srgb,var(--sun) 55%,var(--line))}
+.tvg.nbbad{color:var(--ink-3);text-decoration:line-through}
+.nbsum{display:grid;gap:12px}.nbsum .tvlist{margin-top:6px}
 .tvg{background:var(--surface);border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px;border:1px solid var(--line)}
 .tvhints{position:absolute;inset:auto 0 0 0;background:var(--surface);border-radius:18px;box-shadow:0 -10px 40px rgba(0,0,0,.3);padding:16px;display:grid;gap:8px;z-index:6}
 .tvhints p{margin:0;font-size:14px;color:var(--ink-2);text-align:center}

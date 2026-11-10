@@ -31,12 +31,16 @@ const GAMES={
  climb:{cat:"daily", col:"--nm", ic:"🎈", name:"Reverse Krillion", desc:"Name the answer most people would. Common answers score more.", hi:true, fmt:v=>`${v} / 700`},
  strandsu:{cat:"unl", col:"--wd", ic:"🧵", name:"Unlimited Strands", desc:"Play any of the Strands boards, as many as you like.", hi:false, fmt:v=>v===0?"Perfect":`${v} hint${v>1?"s":""}`},
  worldleu:{cat:"unl", col:"--geo", ic:"🗺️", name:"Unlimited Worldle", desc:"A random country outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
+ globleu:{cat:"unl", col:"--geo", ic:"🌍", name:"Unlimited Globle", desc:"A random mystery country every round.", hi:false, fmt:v=>v>=999?"✗":`${v} guess${v===1?"":"es"}`},
+ nbrsu:{cat:"unl", col:"--geo", ic:"🧱", name:"Unlimited Neighbors", desc:"Five random countries. Name every border.", hi:true, fmt:v=>`${v}%`},
  travleu:{cat:"unl", col:"--geo", ic:"🧭", name:"Unlimited Travle", desc:"A random pair of countries every round.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
  diveu:{cat:"unl", col:"--nm", ic:"🦐", name:"Unlimited Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
  climbu:{cat:"unl", col:"--nm", ic:"🎈", name:"Unlimited Reverse Krillion", desc:"Fresh random prompts, as many rounds as you like.", hi:true, fmt:v=>`${v} / 700`},
  strands:{cat:"daily", col:"--wd", ic:"🧵", name:"Strands", desc:"Find the hidden theme words on a 6×8 board. One spangram crosses it end to end.", hi:false, fmt:v=>v===0?"Perfect":`${v} hint${v>1?"s":""}`},
  worldle:{cat:"daily", col:"--geo", ic:"🗺️", name:"Worldle", desc:"Guess the country from its outline. Six tries, with distance and direction hints.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
  travle:{cat:"daily", col:"--geo", ic:"🧭", name:"Travle", desc:"Connect two countries through the countries in between, in as few guesses as you can.", hi:false, fmt:v=>v>=99?"✗":v===0?"Perfect":`+${v}`},
+ globle:{cat:"daily", col:"--geo", ic:"🌍", name:"Globle", desc:"Find the mystery country. Every guess glows hotter the closer it is.", hi:false, fmt:v=>v>=999?"✗":`${v} guess${v===1?"":"es"}`},
+ nbrs:{cat:"daily", col:"--geo", ic:"🧱", name:"Neighbors", desc:"Five countries. Name every country each one borders.", hi:true, fmt:v=>`${v}%`},
  dsudoku:{cat:"daily", col:"--log", ic:"🔢", name:"Daily sudoku", desc:"An easy 6×6 with pencil notes. One new puzzle a day.", hi:false, fmt:v=>fmtT(v)},
  lights:{cat:"log", ic:"💡", name:"Lights out", desc:"Each tap flips a light and its neighbors. Turn them all off.", hi:false, fmt:v=>fmtT(v)}
 };
@@ -639,7 +643,7 @@ function home(){
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>`<section class="sec"><div class="sech"><h2>${name}</h2><span>${sub}</span></div><div class="games">${Object.entries(GAMES).filter(([k,g])=>g.cat===c).map(([k,g])=>{ const b=bestOf(k);
-    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
+    return `<button class="game" style="--c:var(${g.col||col})" data-act="play" data-g="${k}"><span class="ic">${g.ic}</span><b>${esc(g.name)}</b><span>${esc(g.desc)}</span><span class="rec">${g.cat==="daily"?esc(k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():nmStatus(k))+(b.v!=null&&k!=="mini"&&k!=="groups"?` · best ${esc(g.fmt(b.v))}`:""):b.v!=null?`Best ${esc(g.fmt(b.v))}`:"Not played"}${g.cat==="daily"?"":spark(b.h,g.hi)}</span></button>`; }).join("")}</div></section>`).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
@@ -652,7 +656,7 @@ function home(){
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
 }
-const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();

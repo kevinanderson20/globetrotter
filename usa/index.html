@@ -333,9 +333,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="duo trio">
     <button class="tile" id="exploreBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11.8 6.2-1.6 4-4 1.6 1.6-4z" fill="currentColor"/></svg></span><b>Explore</b><span>Tap to see names</span></button>
     <button class="tile" id="reviewBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.5M3 3v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Review</b><span id="reviewSub">After a lesson</span></button>
-    <button class="tile" id="nbBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="6" y="6" width="6" height="6" rx="1" fill="currentColor"/><path d="M2 3h3M2 3v3M16 3h-3M16 3v3M2 15h3M2 15v-3M16 15h-3M16 15v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Neighbors</b><span id="nbSub">Name the borders</span></button>
-    <button class="tile" id="chainBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span><b>Chain</b><span id="chainSub">Find the route</span></button>
-    <button class="tile wide" id="mysBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.6 7a2.4 2.4 0 1 1 3.4 2.2c-.6.3-1 .8-1 1.4v.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="13.4" r="1.1" fill="currentColor"/></svg></span><b>Mystery state</b><span id="mysSub">Hot or cold: find today's mystery</span></button>
+    <button class="tile wide" id="chainBtn"><span class="dot"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="6" width="7" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span><b>Chain</b><span id="chainSub">Find the route</span></button>
   </div>
   <div class="chall">
     <div class="sechead"><div><h3 class="sech">Challenges</h3><p class="secp">Every state in a region, once each, against the clock.</p></div><button class="histbtn" id="histBtn"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 13V3M2 13h12M5 10l3-3 2 2 4-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>History</button></div>
@@ -535,9 +533,7 @@ function renderHome(){
   }
   const rb=$('reviewBtn'); rb.disabled=L<4;
   $('reviewSub').textContent= L<4 ? "After a lesson" : (due? `${due} ready` : "Mixed practice");
-  const nbB=S.nb.best; $('nbSub').textContent= nbB ? `Best ${nbB.c}/${nbB.n}` : "Name the borders";
   const chN=(S.chain&&S.chain.hist||[]).filter(h=>h.solved).length; $('chainSub').textContent= chN ? `${chN} route${chN===1?"":"s"} solved` : "Find the route";
-  { const d=S.mys.daily[today()]; $('mysSub').textContent=d&&d.done?(d.won?`Today's found in ${d.g.length}. Tap for a practice round.`:"Tap for a practice round."):d&&d.g.length?`Today's mystery: ${d.g.length} guess${d.g.length===1?"":"es"} so far`:"Hot or cold: find today's mystery"; }
   renderDailyCard(); drawMastery();
   const box=$('conts'); box.innerHTML="";
   CONTS.forEach(c=>{
@@ -652,8 +648,7 @@ const OLDBK="GLOBEUSA1:";
 GT_BK.ui($('backup'),{beforeBackup:save, legacy:code=>{ if(!/^GLOBEUSA1:/.test(code)) return false;
   try{ const o=dec(code.slice(OLDBK.length)); if(!o||!o.packs||!o.cards) return false;
     S=Object.assign({packs:{},cards:{},xp:0,day:{last:"",streak:0},open:"West",ch:{},stats:{},daily:{},nb:{},mys:{daily:{},prac:{n:0,w:0,tg:0},last:null}},o); save(); renderHome(); return true; }catch(e){ return false; } }});
-$('exploreBtn').onclick=()=>startExplore(); $('mBtn').onclick=()=>startExplore({mastery:true}); $('nbBtn').onclick=()=>startNeighbors(); $('chainBtn').onclick=()=>startChain();
-$('mysBtn').onclick=()=>{ const d=S.mys.daily[today()]; startMystery(!(d&&d.done)); };
+$('exploreBtn').onclick=()=>startExplore(); $('mBtn').onclick=()=>startExplore({mastery:true}); $('chainBtn').onclick=()=>startChain();
 $('reviewBtn').onclick=()=>startReview();
 
 /* ================= map engine ================= */
@@ -1925,7 +1920,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.11.09-1749";
+const APP_VERSION="2026.11.09-1841";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
