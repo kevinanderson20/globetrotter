@@ -36,6 +36,7 @@ async function startFlagle(opt={}){
     stage.innerHTML=`<div class="wl fl">${flBoard(t,st,over)}${over?`<div class="flname">${esc(t.n)}</div>`:""}
       <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="flin"></div></div>`;
+    revealRow(st.g.length);
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('flin'),{placeholder:"Which country's flag?",skip:()=>new Set(st.g),onPick:guess}); }
   function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }

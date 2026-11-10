@@ -37,7 +37,7 @@ function buzz(ok,streak=true){ snd(ok?"ok":"no"); try{ navigator.vibrate&&naviga
   flash(); if(!streak) return; STK++;
   if(STK===3) toast("3 in a row!"); else if(STK===5) toast("5 in a row. You're on fire!"); else if(STK%10===0) toast(`${STK} in a row. Unstoppable!`); }
 function flash(){ const f=$('flash'); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
-function toast(t){ const el=$('toast'); el.textContent=t; el.classList.remove("on"); void el.offsetWidth; el.classList.add("on"); }
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),1500); } // a transition, so a quick second toast retargets
 const praise=()=>pick(["Right!","Exactly.","Nailed it.","Yes!","Correct.","Spot on."]);
 function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.innerHTML="";
   const cols=["var(--good)","var(--sun)","var(--m-learn)","var(--t3)","var(--t2)","var(--t1)"];

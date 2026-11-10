@@ -19,9 +19,13 @@ _a = _src.index('/* ==BACKUP== */'); _b = _src.index('/* ==/BACKUP== */', _a) + 
 _src = _src[:_a] + _bk + _src[_b:]
 # the shared premium styles live in tools/premium.css; copy them into the World source (and the Math and Test 3 pages below)
 _pm = open('tools/premium.css', encoding='utf-8').read().strip()
+_mo = open('tools/motion.css', encoding='utf-8').read().strip()
+def with_motion(s):
+    a = s.index('/* ==MOTION== */'); b = s.index('/* ==/MOTION== */', a) + len('/* ==/MOTION== */')
+    return s[:a] + _mo + s[b:]
 def with_premium(s):
     a = s.index('/* ==PREMIUM== */'); b = s.index('/* ==/PREMIUM== */', a) + len('/* ==/PREMIUM== */')
-    return s[:a] + _pm + s[b:]
+    return with_motion(s[:a] + _pm + s[b:])
 _src = with_premium(_src)
 open('index.html', 'w', encoding='utf-8').write(_src)
 SRC = _src
@@ -148,7 +152,7 @@ open('math/index.html', 'w', encoding='utf-8').write(page)
 print('math/index.html', len(page), VERSION)
 
 # ---------------- Games (memory, speed and logic games; first called Brain) ----------------
-page = open('tools/games/page.html', encoding='utf-8').read()
+page = with_motion(open('tools/games/page.html', encoding='utf-8').read())
 code = rep(open('tools/games/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
 code = rep(code, '/*PUZZLES*/', open('tools/games/puzzles.js', encoding='utf-8').read(), 1)
 code = rep(code, '/*LISTS*/', open('tools/games/lists.js', encoding='utf-8').read(), 1)  # answer lists for Deep dive and Sky climb  # the crossword and Groups puzzles live in their own file

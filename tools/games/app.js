@@ -87,7 +87,7 @@ function snd(kind){ if(!S.sound) return;
     const o=actx.createOscillator(), g=actx.createGain(); o.connect(g); g.connect(actx.destination); o.type="triangle"; o.frequency.setValueAtTime(196,t); o.frequency.exponentialRampToValueAtTime(130,t+.15);
     g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.11,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.start(t); o.stop(t+.24); }catch(e){} }
 function flash(bad){ const f=$('flash'); f.classList.toggle("bad",!!bad); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
-function toast(t){ const el=$('toast'); el.textContent=t; el.classList.remove("on"); void el.offsetWidth; el.classList.add("on"); }
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),1500); } // a transition, so a quick second toast retargets
 const good=()=>{ snd("ok"); flash(); try{ navigator.vibrate&&navigator.vibrate(10); }catch(e){} };
 const bad=()=>{ snd("no"); flash(true); try{ navigator.vibrate&&navigator.vibrate([20,40,20]); }catch(e){} };
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -100,8 +100,8 @@ function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.inner
 
 /* ---------- game shell: timers are tracked so quitting always cleans up ---------- */
 let GS=null; window.__b={}; // read by automated tests
-function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; const gg=GAMES[game]; play.style.setProperty("--gc",gg?`var(${gg.col||"--"+gg.cat})`:"var(--good)"); $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
-  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage";
+function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; if(typeof REVEALED!=="undefined") REVEALED=-1; const gg=GAMES[game]; play.style.setProperty("--gc",gg?`var(${gg.col||"--"+gg.cat})`:"var(--good)"); $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
+  play.hidden=false; play.classList.remove("opening"); void play.offsetWidth; play.classList.add("opening"); setTimeout(()=>play.classList.remove("opening"),320); document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage";
   // the first screen of a game rises in once; later re-renders stay still
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ stage.classList.add("enter"); setTimeout(()=>stage.classList.remove("enter"),700); })); return GS; }
 const later=(fn,ms)=>{ const g=GS; const id=setTimeout(()=>{ if(GS===g) fn(); },ms); g&&g.timers.push(id); return id; };
@@ -648,7 +648,8 @@ const SHARE_ROW=`<div class="sharerow"><button class="btn go" id="shareB">Share 
 
 /* ================= HOME ================= */
 function bar(title,back="home"){ return `<div class="bar"><button class="x" data-act="${back}" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M13.5 4.5 7 11l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">${esc(title)}</div></div>`; }
-function show(html){ app.innerHTML=html; window.scrollTo(0,0); app.classList.remove("enter"); void app.offsetWidth; app.classList.add("enter"); clearTimeout(show.t); show.t=setTimeout(()=>app.classList.remove("enter"),700); }
+let QUIET=false; // set for re-renders of the same screen (settings toggles), which should not replay the entrance
+function show(html){ app.innerHTML=html; window.scrollTo(0,0); app.classList.remove("enter"); if(QUIET){ QUIET=false; return; } void app.offsetWidth; app.classList.add("enter"); clearTimeout(show.t); show.t=setTimeout(()=>app.classList.remove("enter"),900); }
 const LOGO='<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M13 10.5a4 4 0 0 0-4 4 3.6 3.6 0 0 0 .6 2 4 4 0 0 0 1.4 6.4 4 4 0 0 0 7 1.6V11.6a3.5 3.5 0 0 0-5-1.1Z" fill="var(--mem)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 10.5a4 4 0 0 1 4 4 3.6 3.6 0 0 1-.6 2 4 4 0 0 1-1.4 6.4 4 4 0 0 1-7 1.6V11.6a3.5 3.5 0 0 1 5-1.1Z" fill="var(--log)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null?"sudoku:daily":`sudoku:${S.sud}`; return {v:S.best[k],h:S.hist[k]}; }
   if(game==="msu"){ const k="msu:"+(S.msLvl||"easy"); return {v:S.best[k],h:S.hist[k]}; }
@@ -675,7 +676,7 @@ function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="
   return `<section class="hero"><div class="herotxt"><span class="herodate">${esc(date)}</span><h2>${done===n?"All done today":done?"Keep it going":"Today's games"}</h2>
     <div class="herochips">${st?`<span>🔥 ${st}-day streak</span>`:""}<span>${S.plays} played</span></div>
 </div>
-    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
+    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="--c0:${C.toFixed(1)};stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
 function home(){
   const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
   show(`
@@ -706,9 +707,9 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="pgrp") return startGroups({id:+b.dataset.id});
   if(a==="play"){ WK=null; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
   if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
-  if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
-  if(a==="lit"){ S.lit=+b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
-  if(a==="sound"){ S.sound=!S.sound; save(); return home(); }
+  if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
+  if(a==="lit"){ S.lit=+b.dataset.v; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
+  if(a==="sound"){ S.sound=!S.sound; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
   if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; S.nmPts=1; save(); return home(); }
 });
 document.addEventListener("keydown",e=>{ if(play.hidden) return; if(e.key==="Escape"){ end(); home(); return; }

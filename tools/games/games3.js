@@ -58,10 +58,12 @@ function startMines(opt={}){
   const cells=[...stage.querySelectorAll(".mc")];
   function draw(boom){ let flags=0;
     cells.forEach((el,i)=>{ const o=st.open[i], f=st.flag[i]; if(f) flags++;
-      el.className="mc"+(o?" o":"")+(f&&!o?" f":"")+(o&&num&&num[i]?" n"+num[i]:"")+(over&&st.mine&&st.mine[i]&&!f?" mine":"")+(boom===i?" boom":"")+(over&&f&&st.mine&&!st.mine[i]?" wrongf":"")+(!started&&daily&&i===st.start?" start":"");
+      el.className="mc"+(el.classList.contains("rv")?" rv":"")+(o?" o":"")+(f&&!o?" f":"")+(o&&num&&num[i]?" n"+num[i]:"")+(over&&st.mine&&st.mine[i]&&!f?" mine":"")+(boom===i?" boom":"")+(over&&f&&st.mine&&!st.mine[i]?" wrongf":"")+(!started&&daily&&i===st.start?" start":"");
       el.textContent=o?(num[i]||""):f?"🚩":over&&st.mine&&st.mine[i]?"💣":(!started&&daily&&i===st.start?"●":""); });
     $('msleft').textContent=`💣 ${M-flags}`; }
-  function reveal(i){ const stack=[i]; while(stack.length){ const k=stack.pop(); if(st.open[k]||st.flag[k]) continue; st.open[k]=1; if(num[k]===0) for(const j of NB[k]) if(!st.open[j]) stack.push(j); } }
+  function reveal(i){ const stack=[i], r0=Math.floor(i/C), c0=i%C; while(stack.length){ const k=stack.pop(); if(st.open[k]||st.flag[k]) continue; st.open[k]=1;
+      const el=cells[k], d=Math.max(Math.abs(Math.floor(k/C)-r0),Math.abs(k%C-c0)); el.style.setProperty("--d",Math.min(d*22,260)+"ms"); el.classList.add("rv"); setTimeout(()=>el.classList.remove("rv"),600);
+      if(num[k]===0) for(const j of NB[k]) if(!st.open[j]) stack.push(j); } }
   function first(i){ if(!st.mine){ const b=msMake(lv,Math.random,i); st.mine=b.mine; st.start=i; calcNum(); } started=true; clock(); GS.t0-=st.ms||0; }
   function act(i,forceFlag){ if(over) return;
     if(!started){ if(daily&&i!==st.start){ toast("Start on the ● square"); return; } first(i); }
@@ -197,6 +199,7 @@ async function startStatele(opt={}){
       <div class="wlshape ${over?(rows.some(r=>r.hit)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery state outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
       <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="sbin"></div></div>`;
+    revealRow(st.g.length);
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('sbin'),{placeholder:"Which state?",skip:()=>new Set(st.g),onPick:guess,list:US.list}); }
   function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }

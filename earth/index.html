@@ -411,6 +411,91 @@ h1,h2,h3{letter-spacing:-.02em}
 .pg-world .ib{border:1px solid var(--hair);box-shadow:var(--elev1);border-radius:12px}
 .pg-world .maptoast{box-shadow:var(--elev2);border:1px solid var(--hair);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 /* ==/PREMIUM== */
+/* ==MOTION== */
+/* Motion for every tab (tools/motion.css, copied in by tools/build_editions.py).
+   Rules: animate transform and opacity only; strong ease-out for anything entering; under 300 ms for UI;
+   press feedback on everything tappable; nothing grows from scale(0); frequent actions stay instant;
+   toasts use transitions so a second toast retargets instead of restarting; reduced motion keeps fades only. */
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--ease-drawer:cubic-bezier(.32,.72,0,1);--ease:var(--ease-out)}
+
+/* moving between tabs: a quick cross-fade instead of a white flash (browsers that support it) */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:vt-out 160ms var(--ease-out) both}
+::view-transition-new(root){animation:vt-in 240ms var(--ease-out) both}
+@keyframes vt-out{to{opacity:0}}
+@keyframes vt-in{from{opacity:0;transform:translateY(6px)}}
+
+/* press feedback: everything tappable sinks a little, 160 ms */
+.btn,.tile,.grow,.cbtn,.wbtn,.opt,.deck,.mode,.next,.daily,.hero,.heroplay,.workout,.mslv,.tlslot,.flopts .btn,.choices button,.seg button,.seg2 button,.seg3 button,.op,.lv,.cchip,.chip,.histbtn,.ib,.zbtn,.simp,.tpl,.hlbtns .btn,.gzbtns button,.cinlist button,.msmode{transition:transform 160ms var(--ease-out),opacity 160ms var(--ease-out),background-color 200ms ease,box-shadow 200ms ease}
+.btn:active,.tile:active,.cbtn:active,.wbtn:active,.opt:not([disabled]):active,.deck:active,.mode:active,.next:active,.daily:active,.heroplay:active,.workout:active,.mslv:active,.tlslot:active,.choices button:active,.seg button:active,.seg2 button:active,.seg3 button:active,.op:active,.lv:active,.cchip:active,.histbtn:active,.ib:active,.zbtn:active,.simp:active,.tpl:active,.gzbtns button:active,.msmode:active{transform:scale(.97)}
+.grow:active{transform:scale(.985)}
+.hero:active{transform:none}
+/* keypads and game cells are pressed hundreds of times: instant, tiny feedback only */
+.pad button,.kb button,.dspad button,.ckeys button,.mc,.qc,.xc,.cell{transition:transform 90ms var(--ease-out)}
+.pad button:active,.kb button:active,.dspad button:active,.ckeys button:active,.mc:active,.cell:active{transform:scale(.95)}
+@media (hover:hover) and (pointer:fine){
+  .grow:hover,.tile:hover,.cbtn:hover,.opt:not([disabled]):hover,.deck:hover,.mslv:hover{background-color:color-mix(in srgb,var(--ink) 3%,var(--surface))}
+}
+
+/* toasts: transitions, so a quick second toast retargets instead of jumping */
+.toast{animation:none!important;opacity:0;transform:translateX(-50%) translateY(-10px) scale(.96);transition:opacity 180ms var(--ease-out),transform 260ms var(--ease-out)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+
+/* screens: the first view rises in once, children 40 ms apart */
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+@keyframes fadein{from{opacity:0}}
+.wrap.enter>*,.gstage.enter>*{animation:rise 280ms var(--ease-out) both}
+.wrap.enter>*:nth-child(2){animation-delay:40ms}.wrap.enter>*:nth-child(3){animation-delay:80ms}.wrap.enter>*:nth-child(4){animation-delay:120ms}.wrap.enter>*:nth-child(5){animation-delay:160ms}.wrap.enter>*:nth-child(n+6){animation-delay:200ms}
+.gstage.enter>*>*{animation:rise 280ms var(--ease-out) both}
+.gstage.enter>*>*:nth-child(2){animation-delay:40ms}.gstage.enter>*>*:nth-child(3){animation-delay:80ms}.gstage.enter>*>*:nth-child(4){animation-delay:120ms}.gstage.enter>*>*:nth-child(n+5){animation-delay:160ms}
+/* home lists cascade in on first view */
+.wrap.enter .glist>.grow{animation:rise 260ms var(--ease-out) both}
+.wrap.enter .glist>.grow:nth-child(2){animation-delay:30ms}.wrap.enter .glist>.grow:nth-child(3){animation-delay:60ms}.wrap.enter .glist>.grow:nth-child(4){animation-delay:90ms}.wrap.enter .glist>.grow:nth-child(5){animation-delay:120ms}.wrap.enter .glist>.grow:nth-child(6){animation-delay:150ms}.wrap.enter .glist>.grow:nth-child(n+7){animation-delay:180ms}
+/* World / USA / Earth home comes back with the same cascade */
+.pg-world .home:not([hidden])>*{animation:rise 280ms var(--ease-out) both}
+.pg-world .home:not([hidden])>*:nth-child(2){animation-delay:40ms}.pg-world .home:not([hidden])>*:nth-child(3){animation-delay:80ms}.pg-world .home:not([hidden])>*:nth-child(4){animation-delay:120ms}.pg-world .home:not([hidden])>*:nth-child(n+5){animation-delay:160ms}
+
+/* a game opening: the play screen settles in (closing stays instant, faster than opening) */
+@keyframes playin{from{opacity:0;transform:translateY(10px) scale(.985)}}
+.gplay.opening,.pg-math .play.opening{animation:playin 260ms var(--ease-out) both}
+
+/* bottom sheets (z table, t table, calculator): an iOS drawer curve */
+@keyframes sheetup{from{transform:translateY(100%)}}
+.sheet:not([hidden]){animation:fadein 200ms var(--ease-out) both}
+.sheet:not([hidden]) .in{animation:sheetup 340ms var(--ease-drawer) both}
+
+/* results: the score lands, the rest follows */
+@keyframes land{from{opacity:0;transform:scale(.9)}}
+.card.center .big{animation:land 320ms var(--ease-out) 60ms both}
+/* feedback blocks and model answers appear instead of teleporting */
+.fb,.model,.simple,.flbonus,.mtres,.tlcur,.tvmsg{animation:rise 220ms var(--ease-out) both}
+
+/* guess rows (Worldle, Flagle, Statele): the newest row's tiles flip in left to right */
+@keyframes tilein{from{opacity:0;transform:translateY(6px) scale(.96)}}
+.wlrow.reveal>*{animation:tilein 280ms var(--ease-out) both}
+.wlrow.reveal>*:nth-child(2){animation-delay:70ms}.wlrow.reveal>*:nth-child(3){animation-delay:140ms}.wlrow.reveal>*:nth-child(4){animation-delay:210ms}
+/* Higher or Lower: the next challenger slides up */
+.hl .hlb{animation:rise 260ms var(--ease-out) both}
+/* small pops for placing things */
+@keyframes pop{from{opacity:0;transform:scale(.8)}}
+.qc.qq,.mc.f{animation:pop 180ms var(--ease-out) both}
+.mc.o.rv{animation:pop 220ms var(--ease-out) var(--d,0ms) both}
+.gmap .mtpin{transform-box:fill-box;transform-origin:center;animation:pop 200ms var(--ease-out) both}
+.gmap .mtcity{transform-box:fill-box;transform-origin:center;animation:pop 240ms var(--ease-out) 120ms both}
+.tlcard.ok,.tlcard.no{animation:pop 240ms var(--ease-out) both}
+.gr.done i{animation:pop 260ms var(--ease-out) both}
+/* the Today ring fills in on first view */
+@keyframes ringfill{from{stroke-dashoffset:var(--c0)}}
+.wrap.enter .ring .rfg{animation:ringfill 700ms var(--ease-out) 150ms both}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:150ms!important;animation-delay:0ms!important;transition-duration:120ms!important}
+  .wrap.enter>*,.gstage.enter>*,.gstage.enter>*>*,.wrap.enter .glist>.grow,.pg-world .home:not([hidden])>*,.fb,.model,.simple,.hl .hlb,.wlrow.reveal>*,.card.center .big,.gplay.opening{animation-name:fadein!important}
+  .sheet:not([hidden]) .in{animation:none!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+  .btn:active,.tile:active,.grow:active,.mode:active,.next:active{transform:none!important}
+}
+/* ==/MOTION== */
 </style>
 
 <section class="screen home" id="home">
@@ -2018,7 +2103,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.11.09-2014";
+const APP_VERSION="2026.11.09-2042";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;

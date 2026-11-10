@@ -92,6 +92,9 @@ function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").fo
   svg.addEventListener("pointerup",up); svg.addEventListener("pointercancel",up);
   apply(); }); }
 
+/* the newest guess row flips in; re-renders (unit toggle, resume) leave older rows still */
+let REVEALED=-1;
+function revealRow(n){ if(n===REVEALED||!n) return; REVEALED=n; const rows=stage.querySelectorAll(".wlrow:not(.empty)"); const r=rows[n-1]; if(r) r.classList.add("reveal"); }
 /* ---------------- WORLDLE ---------------- */
 /* six guesses at a country's silhouette; each miss shows the distance, the direction and how close it was */
 let WL_ROT=null;
@@ -126,6 +129,7 @@ async function startWorldle(opt={}){
       <div class="wlshape ${over?(rows.some(r=>r.hit)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery country outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
       <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="wlin"></div></div>`;
+    revealRow(st.g.length);
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('wlin'),{placeholder:"Country, territory…",skip:()=>new Set(st.g),onPick:guess}); }
   function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }

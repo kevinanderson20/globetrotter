@@ -729,12 +729,6 @@ h1,h2,h3{letter-spacing:-.02em}
 .gtop .info:empty{background:none;padding:0}
 .gstage{padding-top:12px}
 /* entrance: the first view of every game rises in once */
-.gstage.enter>*{animation:enter .45s var(--ease) both}
-.gstage.enter>*>*{animation:enter .5s var(--ease) both}
-.gstage.enter>*>*:nth-child(2){animation-delay:.04s}.gstage.enter>*>*:nth-child(3){animation-delay:.08s}.gstage.enter>*>*:nth-child(4){animation-delay:.12s}.gstage.enter>*>*:nth-child(5){animation-delay:.16s}
-@keyframes enter{from{opacity:0;transform:translateY(10px) scale(.985)}}
-.wrap.enter>*{animation:enter .45s var(--ease) both}
-.wrap.enter>*:nth-child(2){animation-delay:.03s}.wrap.enter>*:nth-child(3){animation-delay:.06s}.wrap.enter>*:nth-child(4){animation-delay:.09s}.wrap.enter>*:nth-child(5){animation-delay:.12s}.wrap.enter>*:nth-child(6){animation-delay:.15s}
 /* inputs */
 .cin input{height:54px;border:1px solid var(--hair);border-radius:16px;box-shadow:var(--elev1);background:var(--surface);transition:box-shadow .2s,border-color .2s}
 .cin input:focus{border-color:color-mix(in srgb,var(--geo) 60%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--geo) 22%,transparent),var(--elev1)}
@@ -746,8 +740,6 @@ h1,h2,h3{letter-spacing:-.02em}
 .wlrow b{line-height:42px;font-size:15.5px}
 .wlrow.empty>*{background:color-mix(in srgb,var(--surface) 40%,transparent);box-shadow:inset 0 0 0 1px var(--hair)}
 .wlrow.hit>*{background:linear-gradient(180deg,color-mix(in srgb,var(--good) 30%,var(--surface)),color-mix(in srgb,var(--good) 20%,var(--surface)))}
-.wlrow:not(.empty):has(+ .wlrow.empty),.gstage .wlrow:not(.empty):last-child{animation:rowin .4s var(--ease) both}
-@keyframes rowin{from{opacity:0;transform:translateY(-4px)}}
 .wlshape{border-radius:24px;background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--geo) 8%,var(--surface)),var(--surface))}
 .wlshape path{fill:var(--ink)}
 .flbox{border-radius:18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.45),0 0 0 1px var(--hair)}
@@ -757,8 +749,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .gzbtns button{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 /* results */
 .card.center{position:relative;overflow:hidden;padding:22px 16px 20px;background:radial-gradient(90% 70% at 50% 0%,color-mix(in srgb,var(--c,var(--good)) 16%,var(--surface)) 0%,var(--surface) 70%)}
-.card.center .big{font-size:clamp(46px,15vw,68px);letter-spacing:-.03em;background:linear-gradient(180deg,color-mix(in srgb,var(--c,var(--ink)) 75%,#fff),var(--c,var(--ink)));-webkit-background-clip:text;background-clip:text;color:transparent;animation:pop2 .6s var(--ease) both}
-@keyframes pop2{from{transform:scale(.7);opacity:0}}
+.card.center .big{font-size:clamp(46px,15vw,68px);letter-spacing:-.03em;background:linear-gradient(180deg,color-mix(in srgb,var(--c,var(--ink)) 75%,#fff),var(--c,var(--ink)));-webkit-background-clip:text;background-clip:text;color:transparent;}
 .cheer{letter-spacing:-.01em}
 /* toast */
 .toast{background:color-mix(in srgb,var(--ink) 88%,transparent);color:var(--surface);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 30px -10px rgba(0,0,0,.45);font-size:16px;padding:11px 20px}
@@ -831,6 +822,91 @@ h1,h2,h3{letter-spacing:-.02em}
 .gplay::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(80% 40% at 50% 0%,color-mix(in srgb,var(--gc,var(--good)) 16%,transparent),transparent 70%)}
 .gplay>*{position:relative}
 .sech h2{font-size:23px}
+/* ==MOTION== */
+/* Motion for every tab (tools/motion.css, copied in by tools/build_editions.py).
+   Rules: animate transform and opacity only; strong ease-out for anything entering; under 300 ms for UI;
+   press feedback on everything tappable; nothing grows from scale(0); frequent actions stay instant;
+   toasts use transitions so a second toast retargets instead of restarting; reduced motion keeps fades only. */
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--ease-drawer:cubic-bezier(.32,.72,0,1);--ease:var(--ease-out)}
+
+/* moving between tabs: a quick cross-fade instead of a white flash (browsers that support it) */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:vt-out 160ms var(--ease-out) both}
+::view-transition-new(root){animation:vt-in 240ms var(--ease-out) both}
+@keyframes vt-out{to{opacity:0}}
+@keyframes vt-in{from{opacity:0;transform:translateY(6px)}}
+
+/* press feedback: everything tappable sinks a little, 160 ms */
+.btn,.tile,.grow,.cbtn,.wbtn,.opt,.deck,.mode,.next,.daily,.hero,.heroplay,.workout,.mslv,.tlslot,.flopts .btn,.choices button,.seg button,.seg2 button,.seg3 button,.op,.lv,.cchip,.chip,.histbtn,.ib,.zbtn,.simp,.tpl,.hlbtns .btn,.gzbtns button,.cinlist button,.msmode{transition:transform 160ms var(--ease-out),opacity 160ms var(--ease-out),background-color 200ms ease,box-shadow 200ms ease}
+.btn:active,.tile:active,.cbtn:active,.wbtn:active,.opt:not([disabled]):active,.deck:active,.mode:active,.next:active,.daily:active,.heroplay:active,.workout:active,.mslv:active,.tlslot:active,.choices button:active,.seg button:active,.seg2 button:active,.seg3 button:active,.op:active,.lv:active,.cchip:active,.histbtn:active,.ib:active,.zbtn:active,.simp:active,.tpl:active,.gzbtns button:active,.msmode:active{transform:scale(.97)}
+.grow:active{transform:scale(.985)}
+.hero:active{transform:none}
+/* keypads and game cells are pressed hundreds of times: instant, tiny feedback only */
+.pad button,.kb button,.dspad button,.ckeys button,.mc,.qc,.xc,.cell{transition:transform 90ms var(--ease-out)}
+.pad button:active,.kb button:active,.dspad button:active,.ckeys button:active,.mc:active,.cell:active{transform:scale(.95)}
+@media (hover:hover) and (pointer:fine){
+  .grow:hover,.tile:hover,.cbtn:hover,.opt:not([disabled]):hover,.deck:hover,.mslv:hover{background-color:color-mix(in srgb,var(--ink) 3%,var(--surface))}
+}
+
+/* toasts: transitions, so a quick second toast retargets instead of jumping */
+.toast{animation:none!important;opacity:0;transform:translateX(-50%) translateY(-10px) scale(.96);transition:opacity 180ms var(--ease-out),transform 260ms var(--ease-out)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+
+/* screens: the first view rises in once, children 40 ms apart */
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+@keyframes fadein{from{opacity:0}}
+.wrap.enter>*,.gstage.enter>*{animation:rise 280ms var(--ease-out) both}
+.wrap.enter>*:nth-child(2){animation-delay:40ms}.wrap.enter>*:nth-child(3){animation-delay:80ms}.wrap.enter>*:nth-child(4){animation-delay:120ms}.wrap.enter>*:nth-child(5){animation-delay:160ms}.wrap.enter>*:nth-child(n+6){animation-delay:200ms}
+.gstage.enter>*>*{animation:rise 280ms var(--ease-out) both}
+.gstage.enter>*>*:nth-child(2){animation-delay:40ms}.gstage.enter>*>*:nth-child(3){animation-delay:80ms}.gstage.enter>*>*:nth-child(4){animation-delay:120ms}.gstage.enter>*>*:nth-child(n+5){animation-delay:160ms}
+/* home lists cascade in on first view */
+.wrap.enter .glist>.grow{animation:rise 260ms var(--ease-out) both}
+.wrap.enter .glist>.grow:nth-child(2){animation-delay:30ms}.wrap.enter .glist>.grow:nth-child(3){animation-delay:60ms}.wrap.enter .glist>.grow:nth-child(4){animation-delay:90ms}.wrap.enter .glist>.grow:nth-child(5){animation-delay:120ms}.wrap.enter .glist>.grow:nth-child(6){animation-delay:150ms}.wrap.enter .glist>.grow:nth-child(n+7){animation-delay:180ms}
+/* World / USA / Earth home comes back with the same cascade */
+.pg-world .home:not([hidden])>*{animation:rise 280ms var(--ease-out) both}
+.pg-world .home:not([hidden])>*:nth-child(2){animation-delay:40ms}.pg-world .home:not([hidden])>*:nth-child(3){animation-delay:80ms}.pg-world .home:not([hidden])>*:nth-child(4){animation-delay:120ms}.pg-world .home:not([hidden])>*:nth-child(n+5){animation-delay:160ms}
+
+/* a game opening: the play screen settles in (closing stays instant, faster than opening) */
+@keyframes playin{from{opacity:0;transform:translateY(10px) scale(.985)}}
+.gplay.opening,.pg-math .play.opening{animation:playin 260ms var(--ease-out) both}
+
+/* bottom sheets (z table, t table, calculator): an iOS drawer curve */
+@keyframes sheetup{from{transform:translateY(100%)}}
+.sheet:not([hidden]){animation:fadein 200ms var(--ease-out) both}
+.sheet:not([hidden]) .in{animation:sheetup 340ms var(--ease-drawer) both}
+
+/* results: the score lands, the rest follows */
+@keyframes land{from{opacity:0;transform:scale(.9)}}
+.card.center .big{animation:land 320ms var(--ease-out) 60ms both}
+/* feedback blocks and model answers appear instead of teleporting */
+.fb,.model,.simple,.flbonus,.mtres,.tlcur,.tvmsg{animation:rise 220ms var(--ease-out) both}
+
+/* guess rows (Worldle, Flagle, Statele): the newest row's tiles flip in left to right */
+@keyframes tilein{from{opacity:0;transform:translateY(6px) scale(.96)}}
+.wlrow.reveal>*{animation:tilein 280ms var(--ease-out) both}
+.wlrow.reveal>*:nth-child(2){animation-delay:70ms}.wlrow.reveal>*:nth-child(3){animation-delay:140ms}.wlrow.reveal>*:nth-child(4){animation-delay:210ms}
+/* Higher or Lower: the next challenger slides up */
+.hl .hlb{animation:rise 260ms var(--ease-out) both}
+/* small pops for placing things */
+@keyframes pop{from{opacity:0;transform:scale(.8)}}
+.qc.qq,.mc.f{animation:pop 180ms var(--ease-out) both}
+.mc.o.rv{animation:pop 220ms var(--ease-out) var(--d,0ms) both}
+.gmap .mtpin{transform-box:fill-box;transform-origin:center;animation:pop 200ms var(--ease-out) both}
+.gmap .mtcity{transform-box:fill-box;transform-origin:center;animation:pop 240ms var(--ease-out) 120ms both}
+.tlcard.ok,.tlcard.no{animation:pop 240ms var(--ease-out) both}
+.gr.done i{animation:pop 260ms var(--ease-out) both}
+/* the Today ring fills in on first view */
+@keyframes ringfill{from{stroke-dashoffset:var(--c0)}}
+.wrap.enter .ring .rfg{animation:ringfill 700ms var(--ease-out) 150ms both}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:150ms!important;animation-delay:0ms!important;transition-duration:120ms!important}
+  .wrap.enter>*,.gstage.enter>*,.gstage.enter>*>*,.wrap.enter .glist>.grow,.pg-world .home:not([hidden])>*,.fb,.model,.simple,.hl .hlb,.wlrow.reveal>*,.card.center .big,.gplay.opening{animation-name:fadein!important}
+  .sheet:not([hidden]) .in{animation:none!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
+  .btn:active,.tile:active,.grow:active,.mode:active,.next:active{transform:none!important}
+}
+/* ==/MOTION== */
 </style>
 </head>
 <body>
@@ -936,7 +1012,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.09-2014";
+const APP_VERSION="2026.11.09-2042";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -1023,7 +1099,7 @@ function snd(kind){ if(!S.sound) return;
     const o=actx.createOscillator(), g=actx.createGain(); o.connect(g); g.connect(actx.destination); o.type="triangle"; o.frequency.setValueAtTime(196,t); o.frequency.exponentialRampToValueAtTime(130,t+.15);
     g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.11,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.start(t); o.stop(t+.24); }catch(e){} }
 function flash(bad){ const f=$('flash'); f.classList.toggle("bad",!!bad); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
-function toast(t){ const el=$('toast'); el.textContent=t; el.classList.remove("on"); void el.offsetWidth; el.classList.add("on"); }
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),1500); } // a transition, so a quick second toast retargets
 const good=()=>{ snd("ok"); flash(); try{ navigator.vibrate&&navigator.vibrate(10); }catch(e){} };
 const bad=()=>{ snd("no"); flash(true); try{ navigator.vibrate&&navigator.vibrate([20,40,20]); }catch(e){} };
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1036,8 +1112,8 @@ function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.inner
 
 /* ---------- game shell: timers are tracked so quitting always cleans up ---------- */
 let GS=null; window.__b={}; // read by automated tests
-function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; const gg=GAMES[game]; play.style.setProperty("--gc",gg?`var(${gg.col||"--"+gg.cat})`:"var(--good)"); $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
-  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage";
+function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; if(typeof REVEALED!=="undefined") REVEALED=-1; const gg=GAMES[game]; play.style.setProperty("--gc",gg?`var(${gg.col||"--"+gg.cat})`:"var(--good)"); $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
+  play.hidden=false; play.classList.remove("opening"); void play.offsetWidth; play.classList.add("opening"); setTimeout(()=>play.classList.remove("opening"),320); document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage";
   // the first screen of a game rises in once; later re-renders stay still
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ stage.classList.add("enter"); setTimeout(()=>stage.classList.remove("enter"),700); })); return GS; }
 const later=(fn,ms)=>{ const g=GS; const id=setTimeout(()=>{ if(GS===g) fn(); },ms); g&&g.timers.push(id); return id; };
@@ -1796,6 +1872,9 @@ function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").fo
   svg.addEventListener("pointerup",up); svg.addEventListener("pointercancel",up);
   apply(); }); }
 
+/* the newest guess row flips in; re-renders (unit toggle, resume) leave older rows still */
+let REVEALED=-1;
+function revealRow(n){ if(n===REVEALED||!n) return; REVEALED=n; const rows=stage.querySelectorAll(".wlrow:not(.empty)"); const r=rows[n-1]; if(r) r.classList.add("reveal"); }
 /* ---------------- WORLDLE ---------------- */
 /* six guesses at a country's silhouette; each miss shows the distance, the direction and how close it was */
 let WL_ROT=null;
@@ -1830,6 +1909,7 @@ async function startWorldle(opt={}){
       <div class="wlshape ${over?(rows.some(r=>r.hit)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery country outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
       <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="wlin"></div></div>`;
+    revealRow(st.g.length);
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('wlin'),{placeholder:"Country, territory…",skip:()=>new Set(st.g),onPick:guess}); }
   function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }
@@ -2134,6 +2214,7 @@ async function startFlagle(opt={}){
     stage.innerHTML=`<div class="wl fl">${flBoard(t,st,over)}${over?`<div class="flname">${esc(t.n)}</div>`:""}
       <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="flin"></div></div>`;
+    revealRow(st.g.length);
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('flin'),{placeholder:"Which country's flag?",skip:()=>new Set(st.g),onPick:guess}); }
   function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }
@@ -2759,10 +2840,12 @@ function startMines(opt={}){
   const cells=[...stage.querySelectorAll(".mc")];
   function draw(boom){ let flags=0;
     cells.forEach((el,i)=>{ const o=st.open[i], f=st.flag[i]; if(f) flags++;
-      el.className="mc"+(o?" o":"")+(f&&!o?" f":"")+(o&&num&&num[i]?" n"+num[i]:"")+(over&&st.mine&&st.mine[i]&&!f?" mine":"")+(boom===i?" boom":"")+(over&&f&&st.mine&&!st.mine[i]?" wrongf":"")+(!started&&daily&&i===st.start?" start":"");
+      el.className="mc"+(el.classList.contains("rv")?" rv":"")+(o?" o":"")+(f&&!o?" f":"")+(o&&num&&num[i]?" n"+num[i]:"")+(over&&st.mine&&st.mine[i]&&!f?" mine":"")+(boom===i?" boom":"")+(over&&f&&st.mine&&!st.mine[i]?" wrongf":"")+(!started&&daily&&i===st.start?" start":"");
       el.textContent=o?(num[i]||""):f?"🚩":over&&st.mine&&st.mine[i]?"💣":(!started&&daily&&i===st.start?"●":""); });
     $('msleft').textContent=`💣 ${M-flags}`; }
-  function reveal(i){ const stack=[i]; while(stack.length){ const k=stack.pop(); if(st.open[k]||st.flag[k]) continue; st.open[k]=1; if(num[k]===0) for(const j of NB[k]) if(!st.open[j]) stack.push(j); } }
+  function reveal(i){ const stack=[i], r0=Math.floor(i/C), c0=i%C; while(stack.length){ const k=stack.pop(); if(st.open[k]||st.flag[k]) continue; st.open[k]=1;
+      const el=cells[k], d=Math.max(Math.abs(Math.floor(k/C)-r0),Math.abs(k%C-c0)); el.style.setProperty("--d",Math.min(d*22,260)+"ms"); el.classList.add("rv"); setTimeout(()=>el.classList.remove("rv"),600);
+      if(num[k]===0) for(const j of NB[k]) if(!st.open[j]) stack.push(j); } }
   function first(i){ if(!st.mine){ const b=msMake(lv,Math.random,i); st.mine=b.mine; st.start=i; calcNum(); } started=true; clock(); GS.t0-=st.ms||0; }
   function act(i,forceFlag){ if(over) return;
     if(!started){ if(daily&&i!==st.start){ toast("Start on the ● square"); return; } first(i); }
@@ -2898,6 +2981,7 @@ async function startStatele(opt={}){
       <div class="wlshape ${over?(rows.some(r=>r.hit)?"won":"lost"):""}"><svg viewBox="0 0 400 400" aria-label="Mystery state outline"><path d="${t.sh}"/></svg>${over?`<div class="wlname">${esc(t.n)}</div>`:""}</div>
       <div class="wlrows">${[0,1,2,3,4,5].map(i=>{ const r=rows[i]; return r?wlRowHtml(r,true):`<div class="wlrow empty"><b></b><span></span><span></span><span></span></div>`; }).join("")}</div>
       <div id="sbin"></div></div>`;
+    revealRow(st.g.length);
     stage.querySelectorAll(".wldist").forEach(el=>el.onclick=()=>{ S.wlMi=!S.wlMi; save(); render(); });
     if(!over) geoInput($('sbin'),{placeholder:"Which state?",skip:()=>new Set(st.g),onPick:guess,list:US.list}); }
   function guess(c){ if(over) return false; if(st.g.includes(c.id)){ toast("Already guessed!"); return false; }
@@ -3058,7 +3142,8 @@ const SHARE_ROW=`<div class="sharerow"><button class="btn go" id="shareB">Share 
 
 /* ================= HOME ================= */
 function bar(title,back="home"){ return `<div class="bar"><button class="x" data-act="${back}" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M13.5 4.5 7 11l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">${esc(title)}</div></div>`; }
-function show(html){ app.innerHTML=html; window.scrollTo(0,0); app.classList.remove("enter"); void app.offsetWidth; app.classList.add("enter"); clearTimeout(show.t); show.t=setTimeout(()=>app.classList.remove("enter"),700); }
+let QUIET=false; // set for re-renders of the same screen (settings toggles), which should not replay the entrance
+function show(html){ app.innerHTML=html; window.scrollTo(0,0); app.classList.remove("enter"); if(QUIET){ QUIET=false; return; } void app.offsetWidth; app.classList.add("enter"); clearTimeout(show.t); show.t=setTimeout(()=>app.classList.remove("enter"),900); }
 const LOGO='<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M13 10.5a4 4 0 0 0-4 4 3.6 3.6 0 0 0 .6 2 4 4 0 0 0 1.4 6.4 4 4 0 0 0 7 1.6V11.6a3.5 3.5 0 0 0-5-1.1Z" fill="var(--mem)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 10.5a4 4 0 0 1 4 4 3.6 3.6 0 0 1-.6 2 4 4 0 0 1-1.4 6.4 4 4 0 0 1-7 1.6V11.6a3.5 3.5 0 0 1 5-1.1Z" fill="var(--log)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null?"sudoku:daily":`sudoku:${S.sud}`; return {v:S.best[k],h:S.hist[k]}; }
   if(game==="msu"){ const k="msu:"+(S.msLvl||"easy"); return {v:S.best[k],h:S.hist[k]}; }
@@ -3085,7 +3170,7 @@ function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="
   return `<section class="hero"><div class="herotxt"><span class="herodate">${esc(date)}</span><h2>${done===n?"All done today":done?"Keep it going":"Today's games"}</h2>
     <div class="herochips">${st?`<span>🔥 ${st}-day streak</span>`:""}<span>${S.plays} played</span></div>
 </div>
-    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
+    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="--c0:${C.toFixed(1)};stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
 function home(){
   const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
   show(`
@@ -3116,9 +3201,9 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b)
   if(a==="pgrp") return startGroups({id:+b.dataset.id});
   if(a==="play"){ WK=null; return STARTERS[b.dataset.g](b.dataset.daily?{daily:true}:{}); }
   if(a==="wk"){ const w=S.work[today()]||{}, nx=WORKOUT.find(x=>w[x]==null); if(!nx) return; WK=nx; return STARTERS[nx](nx==="sudoku"?{daily:true}:{}); }
-  if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
-  if(a==="lit"){ S.lit=+b.dataset.v; save(); const y=scrollY; home(); scrollTo(0,y); return; }
-  if(a==="sound"){ S.sound=!S.sound; save(); return home(); }
+  if(a==="sud"){ S.sud=b.dataset.v; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
+  if(a==="lit"){ S.lit=+b.dataset.v; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
+  if(a==="sound"){ S.sound=!S.sound; save(); const y=scrollY; QUIET=true; home(); scrollTo(0,y); return; }
   if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase all Games progress"; return; } const s0=S.sound; S=FRESH(); S.sound=s0; S.nmPts=1; save(); return home(); }
 });
 document.addEventListener("keydown",e=>{ if(play.hidden) return; if(e.key==="Escape"){ end(); home(); return; }

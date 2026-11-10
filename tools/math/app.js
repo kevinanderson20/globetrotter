@@ -223,7 +223,7 @@ function snd(kind){ if(!S.sound) return;
     g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.11,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+.22); o.start(t); o.stop(t+.24);
   }catch(e){} }
 function flash(bad){ const f=$('flash'); f.classList.toggle("bad",!!bad); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
-function toast(t){ const el=$('toast'); el.textContent=t; el.classList.remove("on"); void el.offsetWidth; el.classList.add("on"); }
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),1500); } // a transition, so a quick second toast retargets
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
 function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.innerHTML="";
   const cols=["var(--good)","var(--sun)","var(--sub)","var(--hot)","var(--mul)","var(--div)"];
@@ -378,7 +378,7 @@ function start(mode,opt={}){
   if(mode==="chain"){ const c=S.chain; G.list=[...Array(5)].map(()=>genChain(c.len,!!c.hard)); G.speed=[2400,1600,1050][c.speed]; }
   if(mode==="estimate"){ G.list=[...Array(12)].map(()=>genEst()); }
   if(mode==="sprint"){ G.trace=[]; G.gkey=sprintKey(); G.ghost=S.ghost[G.gkey]||null; }
-  document.body.classList.add("playing"); play.hidden=false;
+  document.body.classList.add("playing"); play.hidden=false; play.classList.remove("opening"); void play.offsetWidth; play.classList.add("opening"); setTimeout(()=>play.classList.remove("opening"),320);
   const est=mode==="estimate"; $('pad').hidden=est; $('ans').hidden=est; $('choices').hidden=!est; $('choices').innerHTML="";
   $('ghost').hidden=!(mode==="sprint"&&G.ghost); $('ghost').textContent=""; $('ghost').className="ghost";
   $('hearts').hidden=mode!=="survival"; $('score').hidden=!(mode==="sprint"||mode==="survival"||mode==="estimate");
