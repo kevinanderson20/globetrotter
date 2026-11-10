@@ -30,6 +30,7 @@ function msMake(lv,rnd,start){ const {c:C,r:R,m:M}=MS_LV[lv], N=C*R;
     if(msSolvable(C,R,mine,s)) return {C,R,M,mine,start:s}; }
   return null; }
 const msNum=()=>dayIndex()+1;
+const MS_FLAG=UIC("flagfill","msi"), MS_MINE=`<svg class="msi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.2" fill="currentColor"/><path d="M12 2.8v3.4M12 17.8v3.4M2.8 12h3.4M17.8 12h3.4M5.5 5.5l2.4 2.4M16.1 16.1l2.4 2.4M5.5 18.5l2.4-2.4M16.1 7.9l2.4-2.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="10" cy="10" r="1.6" fill="#fff" opacity=".85"/></svg>`;
 function msStatus(){ S.ms=S.ms||{}; const d=S.ms[today()]; return d&&d.over?(d.won?`Today's done · ${fmtT(d.t)}`:"Today's done · 💥"):d&&d.open&&d.open.some(Boolean)?`Today's #${msNum()} · in progress`:`Today's #${msNum()} is ready`; }
 function msShare(st,lv,daily){ return `💣 Minesweeper ${daily?"#"+msNum():"(unlimited)"} · ${MS_LV[lv].name}\n${st.won?`✅ Cleared in ${fmtT(st.t)}`:"💥 Boom"}`; }
 function msChooser(){ begin("msu","Unlimited Minesweeper"); stage.className="gstage scroll";
@@ -52,15 +53,15 @@ function startMines(opt={}){
   if(st.mine) calcNum();
   __b.ms={st,lv};
   const persist=()=>{ st.ms=started?elapsed():0; if(daily) save(); };
-  stage.innerHTML=`<div class="ms"><div class="msbar"><span id="msleft">💣 ${M}</span><button class="msmode" id="msmode" aria-pressed="false"><span>⛏️ Dig</span><span>🚩 Flag</span></button></div>
+  stage.innerHTML=`<div class="ms"><div class="msbar"><span id="msleft">${UIC("mine")} ${M}</span><button class="msmode" id="msmode" aria-pressed="false"><span>${UIC("pick")} Dig</span><span>${UIC("flagfill")} Flag</span></button></div>
     <div class="msboard" id="msb" style="--c:${C};--r:${R}">${[...Array(N)].map((_,i)=>`<button class="mc" data-i="${i}"></button>`).join("")}</div>
-    <p class="muted center msrules">${daily?"Start on the square marked ●. ":"Tap anywhere to start. "}Tap ⛏️/🚩 to switch, or press and hold a square to flag it. Tap a number whose flags are all placed to clear around it.</p></div>`;
+    <p class="muted center msrules">${daily?"Start on the square marked ●. ":"Tap anywhere to start. "}Tap Dig or Flag to switch, or press and hold a square to flag it. Tap a number whose flags are all placed to clear around it.</p></div>`;
   const cells=[...stage.querySelectorAll(".mc")];
   function draw(boom){ let flags=0;
     cells.forEach((el,i)=>{ const o=st.open[i], f=st.flag[i]; if(f) flags++;
       el.className="mc"+(el.classList.contains("rv")?" rv":"")+(o?" o":"")+(f&&!o?" f":"")+(o&&num&&num[i]?" n"+num[i]:"")+(over&&st.mine&&st.mine[i]&&!f?" mine":"")+(boom===i?" boom":"")+(over&&f&&st.mine&&!st.mine[i]?" wrongf":"")+(!started&&daily&&i===st.start?" start":"");
-      el.textContent=o?(num[i]||""):f?"🚩":over&&st.mine&&st.mine[i]?"💣":(!started&&daily&&i===st.start?"●":""); });
-    $('msleft').textContent=`💣 ${M-flags}`; }
+      const v=o?(num[i]||""):f?"F":over&&st.mine&&st.mine[i]?"M":(!started&&daily&&i===st.start?"●":""); if(el.dataset.v!==String(v)){ el.dataset.v=v; if(v==="F") el.innerHTML=MS_FLAG; else if(v==="M") el.innerHTML=MS_MINE; else el.textContent=v; } });
+    $('msleft').innerHTML=`${UIC("mine")} ${M-flags}`; }
   function reveal(i){ const stack=[i], r0=Math.floor(i/C), c0=i%C; while(stack.length){ const k=stack.pop(); if(st.open[k]||st.flag[k]) continue; st.open[k]=1;
       const el=cells[k], d=Math.max(Math.abs(Math.floor(k/C)-r0),Math.abs(k%C-c0)); el.style.setProperty("--d",Math.min(d*22,260)+"ms"); el.classList.add("rv"); setTimeout(()=>el.classList.remove("rv"),600);
       if(num[k]===0) for(const j of NB[k]) if(!st.open[j]) stack.push(j); } }

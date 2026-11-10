@@ -109,7 +109,7 @@ const wlUnit=d=>S.wlMi?`${Math.round(d*0.621371).toLocaleString()} mi`:`${Math.r
 function wlRow(t,gid){ const g=GEO.by[gid]; if(gid===t.id) return {id:gid,n:g.n,hit:1,d:0,a:"🎉",p:100};
   const d=geoGap(gid,t.id), deg=BEARING(g.ll,t.ll); return {id:gid,n:g.n,d,deg,a:ARROWS[Math.round(deg/45)%8],p:wlProx(d)}; }
 /* one guess row: name, border-to-border distance, an arrow at the exact compass angle, closeness */
-function wlRowHtml(r,click){ return `<div class="wlrow ${r.hit?"hit":""}"><b>${esc(r.n)}</b><span class="wldist"${click?' role="button" tabindex="0"':""}>${r.hit?"":r.d===0?"Borders it":wlUnit(r.d)}</span><span class="wlarr">${r.hit?"🎉":`<svg viewBox="0 0 24 24" style="transform:rotate(${Math.round(r.deg)}deg)" aria-label="Direction ${Math.round(r.deg)} degrees"><path d="M12 2.5 19 12h-4.6v9.5H9.6V12H5z"/></svg>`}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`; }
+function wlRowHtml(r,click){ return `<div class="wlrow ${r.hit?"hit":""}"><b>${esc(r.n)}</b><span class="wldist"${click?' role="button" tabindex="0"':""}>${r.hit?"":r.d===0?"Borders it":wlUnit(r.d)}</span><span class="wlarr">${r.hit?UIC("check","wlok"):`<svg viewBox="0 0 24 24" style="transform:rotate(${Math.round(r.deg)}deg)" aria-label="Direction ${Math.round(r.deg)} degrees"><path d="M12 2.5 19 12h-4.6v9.5H9.6V12H5z"/></svg>`}</span><span class="wlpct" style="--p:${r.p}%">${r.p}%</span></div>`; }
 function wlStatus(){ S.wl=S.wl||{}; const d=S.wl[today()]; return d&&d.over?(d.won?`Today's done · ${d.g.length}/6`:"Today's done · missed it"):d&&d.g.length?`Today's #${wlNum()} · ${d.g.length}/6 guessed`:`Today's #${wlNum()} is ready`; }
 function wlShare(t,rows,won,daily){ const best=Math.max(...rows.map(r=>r.p));
   return `#Worldle ${daily?"#"+wlNum():"(unlimited)"} ${won?rows.length:"X"}/6 (${best}%)\n${rows.map(r=>r.hit?"🟩🟩🟩🟩🟩🎉":wlSquares(r.p)+r.a).join("\n")}`; }
@@ -210,7 +210,7 @@ async function startTravle(opt={}){
     stage.innerHTML=`<div class="tv">
       <div class="tvhead">Travel from <b class="tva">${esc(A.n)}</b> to <b class="tvb">${esc(B.n)}</b></div>
       <div class="tvmap">${map}</div>
-      <div class="tvbar"><span>${over?(st.won?(st.score===0?"Perfect route!":`Made it · +${st.score}`):"Out of guesses"):`${left} guess${left===1?"":"es"} left`}</span>${over?"":`<button class="btn ghost sm" id="tvhint">💡 Hint${st.h?` (${st.h})`:""}</button>`}</div>
+      <div class="tvbar"><span>${over?(st.won?(st.score===0?"Perfect route!":`Made it · +${st.score}`):"Out of guesses"):`${left} guess${left===1?"":"es"} left`}</span>${over?"":`<button class="btn ghost sm" id="tvhint">${UIC("bulb")} Hint${st.h?` (${st.h})`:""}</button>`}</div>
       ${next&&st.hints.init?`<div class="tvinit">Next country starts with <b>${esc(GEO.by[next].n[0])}</b></div>`:""}
       ${msg?`<div class="tvmsg">${msg}</div>`:""}
       <div class="tvlist">${st.g.map((id,i)=>`<span class="tvg ${col[id]}">${st.e[i]} ${esc(GEO.by[id].n)}</span>`).join("")}</div>

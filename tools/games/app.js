@@ -302,6 +302,7 @@ function startLights(){
     if(!on.some(Boolean)){ good(); later(()=>finish("lights",elapsed(),{key, sub:`${moves} moves (best possible: ${presses} or fewer).`}),700); } });
 }
 
+/*GLYPHS*/
 /*PUZZLES*/
 
 /* ================= WORD PUZZLES: mini crossword and groups ================= */
@@ -668,15 +669,15 @@ function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="ds
 function gameRow(k,g,col){ const c=g.col||col; let right;
   if(g.cat==="daily"){ const d=dailyStat(k); right=d.st==="done"?`<span class="gr done"><i>✓</i>${esc(d.r)}</span>`:d.st==="go"?`<span class="gr go">Resume</span>`:`<span class="gr new">Play</span>`; }
   else { let bv=null; try{ const b=bestOf(k); if(b.v!=null) bv=g.fmt(b.v); }catch(e){} right=bv!=null?`<span class="gr best"><small>Best</small>${esc(bv)}</span>`:`<span class="gr chev" aria-hidden="true">›</span>`; }
-  return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${g.ic}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
+  return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${GLYPH[k]||g.ic}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
 /* the "Today" card at the top: date, a ring for today's daily games, streak, and the next game to play */
 function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="daily"), done=daily.filter(([k])=>dailyStat(k).st==="done").length, n=daily.length, p=done/n;
   const next=daily.find(([k])=>dailyStat(k).st!=="done"), st=dayStreak(), R=34, C=2*Math.PI*R;
   const d=new Date(), date=d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
   return `<section class="hero"><div class="herotxt"><span class="herodate">${esc(date)}</span><h2>${done===n?"All done today":done?"Keep it going":"Today's games"}</h2>
-    <div class="herochips">${st?`<span>🔥 ${st}-day streak</span>`:""}<span>${S.plays} played</span></div>
+    <div class="herochips">${st?`<span>${UIC("fire")} ${st}-day streak</span>`:""}<span>${S.plays} played</span></div>
 </div>
-    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="--c0:${C.toFixed(1)};stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span>${next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
+    <div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="rbg"/><circle cx="40" cy="40" r="${R}" class="rfg" style="--c0:${C.toFixed(1)};stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-p)).toFixed(1)}"/></svg><b>${done}<small>OF ${n}</small></b></div>${next?`<button class="heroplay" data-act="play" data-g="${next[0]}"><span class="hgl">${GLYPH[next[0]]||next[1].ic}</span>${dailyStat(next[0]).st==="go"?"Resume":"Play"} ${esc(next[1].name)}</button>`:`<span class="herodone">Come back tomorrow for new puzzles</span>`}</section>`; }
 /* coming back from a game puts you where you were on the list, without replaying the entrance */
 let HOME_Y=null;
 function home(){
@@ -687,7 +688,7 @@ function home(){
     <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="./" aria-current="page">Games</a><a href="../test3/">Test 3</a></nav></div>
   ${heroCard()}
   <button class="workout" data-act="wk"><b>${wdone===3?"Workout done ✓":"Daily workout"}</b><span>${wdone===3?`Nice. ${st}-day streak. Replay any game below.`:"Three games, about four minutes: memory, speed, logic."}</span>
-    <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
+    <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GLYPH[x]||GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${CATS.map(([c,name,sub,col])=>{ const list=Object.entries(GAMES).filter(([k,g])=>g.cat===c), dn=c==="daily"?list.filter(([k])=>dailyStat(k).st==="done").length:0;
     return `<section class="sec"><div class="sech"><h2>${name}</h2>${c==="daily"?`<span class="dcount${dn===list.length?" all":""}">${dn===list.length?"All done ✓":`${dn} of ${list.length} done`}</span>`:`<span>${sub}</span>`}</div>${c==="daily"?`<div class="dprog"><i style="width:${Math.round(dn/list.length*100)}%"></i></div>`:""}<div class="glist">${list.map(([k,g])=>gameRow(k,g,col)).join("")}</div></section>`; }).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>

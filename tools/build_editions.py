@@ -20,9 +20,15 @@ _src = _src[:_a] + _bk + _src[_b:]
 # the shared premium styles live in tools/premium.css; copy them into the World source (and the Math and Test 3 pages below)
 _pm = open('tools/premium.css', encoding='utf-8').read().strip()
 _mo = open('tools/motion.css', encoding='utf-8').read().strip()
-def with_motion(s):
-    a = s.index('/* ==MOTION== */'); b = s.index('/* ==/MOTION== */', a) + len('/* ==/MOTION== */')
-    return s[:a] + _mo + s[b:]
+_na = open('tools/native.css', encoding='utf-8').read().strip()
+_tb = open('tools/tabbar.js', encoding='utf-8').read().strip()
+def _swap(s, start, end, new):
+    a = s.index(start); b = s.index(end, a) + len(end)
+    return s[:a] + new + s[b:]
+def with_motion(s):  # motion, the native finish and the tab bar, shared by every tab
+    s = _swap(s, '/* ==MOTION== */', '/* ==/MOTION== */', _mo)
+    s = _swap(s, '/* ==NATIVE== */', '/* ==/NATIVE== */', _na)
+    return _swap(s, '/* ==TABBAR== */', '/* ==/TABBAR== */', _tb)
 def with_premium(s):
     a = s.index('/* ==PREMIUM== */'); b = s.index('/* ==/PREMIUM== */', a) + len('/* ==/PREMIUM== */')
     return with_motion(s[:a] + _pm + s[b:])
@@ -54,7 +60,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     for el in ("lo",):   # editions ship one map; the World edition also has map-hi.json
         s = sub_json(s, el, data_map)
     s = sub_json(s, "meta", data_meta)
-    k = s.rindex('<script>'); head, app = s[:k], s[k:]   # never touch the d3 library text
+    k = s.rindex('<script>', 0, s.index('<script>/* ==TABBAR')); head, app = s[:k], s[k:]   # never touch the d3 library text
     # page shell
     head = rep(head, '<title>Globetrotter</title>', f'<title>{title}</title>', 1)
     for icon in ('icon-180.png', 'icon-192.png', 'manifest.webmanifest'):
@@ -152,8 +158,9 @@ open('math/index.html', 'w', encoding='utf-8').write(page)
 print('math/index.html', len(page), VERSION)
 
 # ---------------- Games (memory, speed and logic games; first called Brain) ----------------
-page = with_motion(open('tools/games/page.html', encoding='utf-8').read())
+page = with_premium(open('tools/games/page.html', encoding='utf-8').read())
 code = rep(open('tools/games/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
+code = rep(code, '/*GLYPHS*/', open('tools/games/glyphs.js', encoding='utf-8').read() + '\n' + open('tools/games/icons.js', encoding='utf-8').read(), 1)  # game icons
 code = rep(code, '/*PUZZLES*/', open('tools/games/puzzles.js', encoding='utf-8').read(), 1)
 code = rep(code, '/*LISTS*/', open('tools/games/lists.js', encoding='utf-8').read(), 1)  # answer lists for Deep dive and Sky climb  # the crossword and Groups puzzles live in their own file
 code = rep(code, '/*GEOGAMES*/', open('tools/games/geogames.js', encoding='utf-8').read(), 1)  # Worldle and Travle

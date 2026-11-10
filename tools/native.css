@@ -1,0 +1,99 @@
+/* ==NATIVE== */
+/* The native finish: iOS system colors and type, a translucent bottom tab bar, large titles, inset grouped lists.
+   Shared by every tab (tools/native.css, copied in by tools/build_editions.py after the premium and motion layers). */
+:root{
+  --bg:#f2f2f7; --surface:#ffffff; --surface-2:#f2f2f7; --line:rgba(60,60,67,.16);
+  --ink:#1c1c1e; --ink-2:#6c6c70; --ink-3:#8e8e93;
+  --good:#28b04f; --bad:#ff3b30; --sun:#ffb800; --tint:#007aff;
+  --hair:rgba(60,60,67,.13); --glass:rgba(249,249,251,.82);
+  --elev1:0 .5px 0 rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.05);
+  --elev2:0 1px 2px rgba(0,0,0,.05),0 12px 32px -14px rgba(0,0,0,.22);
+  --bg-grad:none;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Figtree","Inter",system-ui,sans-serif;
+  --f-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Figtree","Inter",system-ui,sans-serif;
+  --f-round:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#1c1c1e; --surface-2:#2c2c2e; --line:rgba(84,84,88,.55);
+  --ink:#ffffff; --ink-2:#aeaeb2; --ink-3:#8e8e93;
+  --good:#30d158; --bad:#ff453a; --sun:#ffd60a; --tint:#0a84ff;
+  --hair:rgba(255,255,255,.09); --glass:rgba(22,22,24,.78);
+  --elev1:none; --elev2:0 18px 40px -18px rgba(0,0,0,.9);
+  --bg-grad:none}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1c1c1e; --surface-2:#2c2c2e; --line:rgba(84,84,88,.55);
+  --ink:#ffffff; --ink-2:#aeaeb2; --ink-3:#8e8e93;
+  --good:#30d158; --bad:#ff453a; --sun:#ffd60a; --tint:#0a84ff;
+  --hair:rgba(255,255,255,.09); --glass:rgba(22,22,24,.78);
+  --elev1:none; --elev2:0 18px 40px -18px rgba(0,0,0,.9); --bg-grad:none}
+html,body,.pg-app,.pg-world .home,.gplay,.pg-math .play{background:var(--bg)!important}
+body{font-family:var(--f-body);-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+h1,h2,h3,b{letter-spacing:-.02em}
+
+/* large title: no logo, iOS size and tracking; the old pill tabs give way to the tab bar */
+.brand>svg,.brand>.logo{display:none}
+.brand h1{font-family:var(--f-display);font-size:34px;font-weight:800;letter-spacing:-.035em;line-height:1.1}
+.brand .tabs,nav.tabs{display:none!important}
+.has-tabbar .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+.has-tabbar.pg-world .home{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+
+/* the tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:15;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding:7px max(6px,env(safe-area-inset-right,0px)) calc(5px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));
+  background:var(--glass);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-top:.5px solid var(--line)}
+.tabbar a{display:grid;justify-items:center;gap:3px;text-decoration:none;color:var(--ink-3);font:600 10.5px/1.15 var(--f-body);letter-spacing:.005em;-webkit-tap-highlight-color:transparent;padding:2px 0;transition:transform 120ms var(--ease-out,ease-out)}
+.tabbar a:active{transform:scale(.92)}
+.tabbar svg{width:27px;height:27px;display:block}
+.tabbar a[aria-current="page"]{color:var(--tint)}
+.tabbar a[aria-current="page"] .o{display:none}.tabbar a:not([aria-current="page"]) .f{display:none}
+.playing .tabbar,.pg-world:has(#home[hidden]) .tabbar{display:none}
+@media (prefers-reduced-transparency: reduce){.tabbar{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}}
+
+/* numbers in the rounded face, like Fitness */
+.big,.ring b,.fillcount,.xp,.stat b,.rank .badge,.mode i,.gr,.cbar,.result .nums b,.hlpop,.timer,.gtop .info,.bignum,.score,.pts,.tly{font-family:var(--f-round)!important}
+
+/* surfaces: flat cards on the grouped background, no web-y shadows */
+.card,.tile,.glist,.trick,.mcard,.hcard,.hempty,.chip,.histbtn,.deck,.part,.setup,.step,.mslv,.tlcard,.hlc,.cbtn,.wlshape,.flbonus,.mtres,.rank,.choices button,.opt,.cchip{box-shadow:var(--elev1)!important;border-color:var(--hair)!important}
+.card,.glist{border-radius:20px}
+.tile{border-radius:18px}
+
+/* buttons: iOS filled style */
+.btn{background:var(--ink)!important;color:var(--surface)!important;box-shadow:none!important;border-radius:14px;font-family:var(--f-body);font-weight:700;letter-spacing:-.01em}
+.btn.go{background:var(--good)!important;color:#fff!important}
+.btn.ghost{background:color-mix(in srgb,var(--ink) 6%,transparent)!important;color:var(--ink)!important;border:0!important}
+.gplay .btn.go,.gplay .cin .btn{background:var(--gc,var(--good))!important;color:#fff!important}
+.flopts .btn{background:var(--surface)!important;color:var(--ink)!important;border:1px solid var(--hair)!important}
+.flopts .btn.right{background:var(--good)!important;color:#fff!important}.flopts .btn.wrong{background:var(--bad)!important;color:#fff!important}
+.hlup{background:var(--good)!important;color:#fff!important}.hldn{background:var(--bad)!important;color:#fff!important}
+.heroplay{font-family:var(--f-body)!important}
+
+/* glass bars: lighter and quieter */
+.gtop,.pg-app .bar,.pg-world .pbar{background:var(--glass)!important;border-bottom:.5px solid var(--line)!important}
+.gtop::after{opacity:.55}
+.gplay::before{opacity:.6}
+
+/* section headers like iOS grouped lists */
+.sech h2{font-size:22px;font-weight:700;letter-spacing:-.025em}
+.sech span{color:var(--ink-3)}
+
+/* game icons: white glyphs on the game's color, an iOS-style squircle */
+.gi{border-radius:11px;color:#fff;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 78%,#fff),var(--c))!important;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.08)!important}
+.gi svg{width:25px;height:25px;display:block}
+.grow{min-height:64px}
+.gr.new{background:var(--tint)!important;color:#fff!important;font-family:var(--f-body)!important;font-weight:700;padding:6px 16px;font-size:14px;box-shadow:none!important}
+.gr.go{border-color:var(--tint)!important;color:var(--tint)!important;font-family:var(--f-body)!important;font-weight:700}
+.gr.done{font-weight:600}
+.gr.done i{background:var(--good)!important;box-shadow:none!important}
+.gr.chev{font-family:var(--f-body)!important;color:#c7c7cc}
+
+/* the Today card and workout: keep their color, drop the heavy glow */
+.hero{box-shadow:0 14px 34px -20px rgba(22,33,63,.7)!important}
+.workout{box-shadow:0 14px 30px -20px color-mix(in srgb,var(--mem) 80%,transparent)!important}
+.dprog i{background:var(--good)!important}
+
+/* inputs */
+.cin input,.nbform input{border-radius:12px!important;background:var(--surface)!important;font-family:var(--f-body)!important}
+.cin input:focus,.nbform input:focus{border-color:var(--tint)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--tint) 25%,transparent)!important}
+
+/* segmented controls */
+.msmode,.seg,.seg2,.seg3{border-radius:10px}
+/* ==/NATIVE== */

@@ -134,6 +134,7 @@ let QN_ROT=null;
 const qnDailyIx=()=>{ if(!QN_ROT) QN_ROT=shuf([...QUEENS.keys()],seeded("globetrotter-queens-v1")); const n=QN_ROT.length; return QN_ROT[((dayIndex()%n)+n)%n]; };
 const qnNum=()=>dayIndex()+1;
 function qnStatus(){ S.qn=S.qn||{}; const d=S.qn[today()]; return d&&d.done?`Today's done · ${fmtT(d.t)}`:d&&d.m&&d.m.some(Boolean)?`Today's #${qnNum()} · in progress`:`Today's #${qnNum()} is ready`; }
+const QN_CROWN=`<svg class="qcr" viewBox="0 0 24 24" aria-label="queen"><path d="M3.5 8l4.3 4.2L12 5l4.2 7.2L20.5 8l-1.8 10.5H5.3z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 function qnShare(P,t,h,daily){ return `👑 Queens ${daily?"#"+qnNum():"(unlimited)"} · ${P[0]}×${P[0]}\n⏱️ ${fmtT(t)}${h?` · 💡 ${h} hint${h>1?"s":""}`:" · no hints"}`; }
 function startQueens(opt={}){
   const daily=!opt.unlimited, gid=daily?"queens":"queensu";
@@ -153,9 +154,9 @@ function startQueens(opt={}){
       const bt=r===0||reg[i-N]!==g, bb=r===N-1||reg[i+N]!==g, bl=c===0||reg[i-1]!==g, br=c===N-1||reg[i+1]!==g;
       const sh=[bt?"inset 0 1.5px 0 var(--qline)":"",bb?"inset 0 -1.5px 0 var(--qline)":"",bl?"inset 1.5px 0 0 var(--qline)":"",br?"inset -1.5px 0 0 var(--qline)":"","inset 0 0 0 .5px var(--qthin)"].filter(Boolean).join(",");
       return `<button class="qc" data-i="${i}" style="--q:${pal[g%pal.length]};box-shadow:${sh}"></button>`; }).join("")}</div>
-    <div class="qnbar"><button class="btn ghost sm" id="qundo">↶ Undo</button><button class="btn ghost sm" id="qclear">Clear</button><button class="btn ghost sm" id="qhint">💡 Hint</button></div>
+    <div class="qnbar"><button class="btn ghost sm" id="qundo">↶ Undo</button><button class="btn ghost sm" id="qclear">Clear</button><button class="btn ghost sm" id="qhint">${UIC("bulb")} Hint</button></div>
     <label class="qnauto"><input type="checkbox" id="qauto" ${S.qnAuto?"checked":""}> Auto-mark ✕ around queens</label>
-    <p class="muted center qnrules">One 👑 in each row, column and color. Queens can't touch, even diagonally. Tap once for ✕, twice for 👑. Drag to mark ✕.</p></div>`;
+    <p class="muted center qnrules">One queen in each row, column and color. Queens can't touch, even diagonally. Tap once for ✕, twice for a queen. Drag to mark ✕.</p></div>`;
   const cells=[...stage.querySelectorAll(".qc")];
   function conflicts(){ const q=st.m.map((v,i)=>v===2?i:-1).filter(i=>i>=0), bad=new Set();
     for(let a=0;a<q.length;a++) for(let b=a+1;b<q.length;b++){ const x=q[a], y=q[b];
@@ -166,7 +167,7 @@ function startQueens(opt={}){
   function draw(){ const {q,bad}=conflicts(), au=auto();
     // a row, column or region with two queens gets every square striped red, like the real game
     const badUnits=new Set(); q.forEach(x=>q.forEach(y=>{ if(x<y){ if(R(x)===R(y)) badUnits.add("r"+R(x)); if(C(x)===C(y)) badUnits.add("c"+C(x)); if(reg[x]===reg[y]) badUnits.add("g"+reg[x]); } }));
-    cells.forEach((el,i)=>{ const v=st.m[i]; el.textContent=v===2?"👑":v===1||(v===0&&au.has(i))?"✕":"";
+    cells.forEach((el,i)=>{ const v=st.m[i]; { const t=v===2?"Q":v===1||(v===0&&au.has(i))?"✕":""; if(el.dataset.v!==t){ el.dataset.v=t; if(t==="Q") el.innerHTML=QN_CROWN; else el.textContent=t; } }
       el.classList.toggle("qx",v===1); el.classList.toggle("qax",v===0&&au.has(i)); el.classList.toggle("qq",v===2); el.classList.toggle("bad",bad.has(i));
       el.classList.toggle("stripe",badUnits.has("r"+R(i))||badUnits.has("c"+C(i))||badUnits.has("g"+reg[i])); });
     if(q.length===N&&!bad.size&&!won){ won=true; win(); } }
@@ -224,7 +225,7 @@ function startTimeline(opt={}){
   const persist=()=>{ if(daily) save(); };
   let busy=false, flash=null;
   function render(){ const cur=st.i<st.d.length&&st.lives>0?TL[st.d[st.i]]:null;
-    $('ginfo').textContent=`${"❤️".repeat(st.lives)}${"🤍".repeat(TL_LIVES-st.lives)}`;
+    $('ginfo').innerHTML=`<span class="tlh" role="img" aria-label="${st.lives} lives left">${Array.from({length:TL_LIVES},(_,k)=>`<svg viewBox="0 0 24 24" class="${k<st.lives?"on":""}" aria-hidden="true"><path d="M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z"/></svg>`).join("")}</span>`;
     const line=st.line.map(k=>TL[k]);
     stage.innerHTML=`<div class="tl">
       ${cur?`<div class="tlcur"><span class="tlcat">${esc(cur[2])}</span><b>${esc(cur[1])}</b><small>Card ${st.i} of ${TL_N-1} · tap where it goes</small></div>`:""}
