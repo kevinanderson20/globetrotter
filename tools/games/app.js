@@ -101,7 +101,9 @@ function confetti(){ if(reduceMotion) return; const box=$('confetti'); box.inner
 /* ---------- game shell: timers are tracked so quitting always cleans up ---------- */
 let GS=null; window.__b={}; // read by automated tests
 function begin(game,title){ end(); GS={game, timers:[], raf:0, t0:0}; $('gttl').textContent=title||GAMES[game].name; $('ginfo').textContent=""; $('gpill').hidden=true;
-  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage"; return GS; }
+  play.hidden=false; document.body.classList.add("playing"); stage.innerHTML=""; stage.className="gstage";
+  // the first screen of a game rises in once; later re-renders stay still
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ stage.classList.add("enter"); setTimeout(()=>stage.classList.remove("enter"),700); })); return GS; }
 const later=(fn,ms)=>{ const g=GS; const id=setTimeout(()=>{ if(GS===g) fn(); },ms); g&&g.timers.push(id); return id; };
 function clock(fmt=ms=>fmtT(ms)){ const g=GS; g.t0=performance.now(); const step=()=>{ if(GS!==g) return; $('ginfo').textContent=fmt(performance.now()-g.t0); g.raf=requestAnimationFrame(step); }; g.raf=requestAnimationFrame(step); }
 const elapsed=()=>Math.round(performance.now()-GS.t0);
@@ -646,7 +648,7 @@ const SHARE_ROW=`<div class="sharerow"><button class="btn go" id="shareB">Share 
 
 /* ================= HOME ================= */
 function bar(title,back="home"){ return `<div class="bar"><button class="x" data-act="${back}" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M13.5 4.5 7 11l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">${esc(title)}</div></div>`; }
-function show(html){ app.innerHTML=html; window.scrollTo(0,0); }
+function show(html){ app.innerHTML=html; window.scrollTo(0,0); app.classList.remove("enter"); void app.offsetWidth; app.classList.add("enter"); clearTimeout(show.t); show.t=setTimeout(()=>app.classList.remove("enter"),700); }
 const LOGO='<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M13 10.5a4 4 0 0 0-4 4 3.6 3.6 0 0 0 .6 2 4 4 0 0 0 1.4 6.4 4 4 0 0 0 7 1.6V11.6a3.5 3.5 0 0 0-5-1.1Z" fill="var(--mem)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 10.5a4 4 0 0 1 4 4 3.6 3.6 0 0 1-.6 2 4 4 0 0 1-1.4 6.4 4 4 0 0 1-7 1.6V11.6a3.5 3.5 0 0 1 5-1.1Z" fill="var(--log)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null?"sudoku:daily":`sudoku:${S.sud}`; return {v:S.best[k],h:S.hist[k]}; }
   if(game==="msu"){ const k="msu:"+(S.msLvl||"easy"); return {v:S.best[k],h:S.hist[k]}; }
@@ -675,7 +677,7 @@ function home(){
     <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${st?`<div class="chips"><span class="chip hot">${st}-day streak</span><span class="chip">${S.plays} games played</span></div>`:""}
   ${CATS.map(([c,name,sub,col])=>{ const list=Object.entries(GAMES).filter(([k,g])=>g.cat===c), dn=c==="daily"?list.filter(([k])=>dailyStat(k).st==="done").length:0;
-    return `<section class="sec"><div class="sech"><h2>${name}</h2>${c==="daily"?`<span class="dcount${dn===list.length?" all":""}">${dn===list.length?"All done ✓":`${dn} of ${list.length} done`}</span>`:`<span>${sub}</span>`}</div><div class="glist">${list.map(([k,g])=>gameRow(k,g,col)).join("")}</div></section>`; }).join("")}
+    return `<section class="sec"><div class="sech"><h2>${name}</h2>${c==="daily"?`<span class="dcount${dn===list.length?" all":""}">${dn===list.length?"All done ✓":`${dn} of ${list.length} done`}</span>`:`<span>${sub}</span>`}</div>${c==="daily"?`<div class="dprog"><i style="width:${Math.round(dn/list.length*100)}%"></i></div>`:""}<div class="glist">${list.map(([k,g])=>gameRow(k,g,col)).join("")}</div></section>`; }).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
   <section class="card"><h3>Options</h3>
     <div class="sech"><span>Mini sudoku</span></div><div class="levels">${["easy","medium","hard"].map(d=>`<button data-act="sud" data-v="${d}" aria-pressed="${S.sud===d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>

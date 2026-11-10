@@ -675,6 +675,122 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .arch button.today{box-shadow:0 0 0 2.5px var(--wd)}
 .sharetxt{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:8px;font:14px var(--f-body);background:var(--surface);color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ================= PREMIUM LAYER =================
+   One finish for every game: soft depth instead of chunky 3-D edges, hairline borders, glass bars,
+   refined buttons and controls, smooth entrances. Gameplay styles above stay as they are; this only restyles. */
+:root{--elev1:0 1px 2px rgba(16,35,58,.06),0 6px 18px -10px rgba(16,35,58,.22);--elev2:0 2px 4px rgba(16,35,58,.06),0 16px 36px -16px rgba(16,35,58,.32);--hair:rgba(16,35,58,.09);--glass:rgba(255,255,255,.72);--ease:cubic-bezier(.2,.8,.2,1);
+  --bg-grad:radial-gradient(1200px 600px at 12% -10%,#d9ecff 0%,transparent 60%),radial-gradient(900px 500px at 110% 10%,#ece3ff 0%,transparent 55%),linear-gradient(#eef5fb,#e9f1f8)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--elev1:0 1px 0 rgba(255,255,255,.04) inset,0 8px 24px -12px rgba(0,0,0,.7);--elev2:0 1px 0 rgba(255,255,255,.05) inset,0 18px 44px -18px rgba(0,0,0,.85);--hair:rgba(255,255,255,.07);--glass:rgba(13,25,37,.72);
+  --bg-grad:radial-gradient(1100px 600px at 10% -15%,#16314d 0%,transparent 60%),radial-gradient(900px 520px at 110% 0%,#24204a 0%,transparent 55%),linear-gradient(#08121c,#0a1520)}}
+:root[data-theme="dark"]{--elev1:0 1px 0 rgba(255,255,255,.04) inset,0 8px 24px -12px rgba(0,0,0,.7);--elev2:0 1px 0 rgba(255,255,255,.05) inset,0 18px 44px -18px rgba(0,0,0,.85);--hair:rgba(255,255,255,.07);--glass:rgba(13,25,37,.72);
+  --bg-grad:radial-gradient(1100px 600px at 10% -15%,#16314d 0%,transparent 60%),radial-gradient(900px 520px at 110% 0%,#24204a 0%,transparent 55%),linear-gradient(#08121c,#0a1520)}
+body{background:var(--bg-grad) fixed,var(--bg);background-color:var(--bg)}
+.gplay{background:var(--bg-grad) fixed,var(--bg);background-color:var(--bg)}
+h1,h2,h3{letter-spacing:-.02em}
+/* surfaces */
+.card,.glist,.tile,.trick,.wlshape,.hlc,.tlcard,.mslv,.flbonus,.mtres,.dgrid .tile{border:1px solid var(--hair);box-shadow:var(--elev1)}
+.card,.glist{border-radius:22px}
+/* header + tabs: an iOS-style segmented control */
+.brand h1{font-size:30px;letter-spacing:-.03em}
+.tabs{background:color-mix(in srgb,var(--ink) 7%,transparent);border:0;padding:3px;box-shadow:inset 0 0 0 1px var(--hair)}
+.tabs a{color:var(--ink-2);transition:background .2s,color .2s}
+.tabs a[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12),0 3px 8px -2px rgba(0,0,0,.12)}
+/* buttons: soft depth, a gentle press */
+.btn{box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 6px 16px -8px color-mix(in srgb,var(--ink) 70%,transparent);transition:transform .12s var(--ease),filter .15s,box-shadow .15s;letter-spacing:-.01em;background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 88%,#fff),var(--ink))}
+.btn:active{transform:scale(.97);filter:brightness(.96)}
+.btn.go{background:linear-gradient(180deg,color-mix(in srgb,var(--good) 82%,#fff),var(--good));box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 10px 22px -10px color-mix(in srgb,var(--good) 85%,transparent)}
+.btn.ghost{background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--hair);box-shadow:var(--elev1);color:var(--ink-2)}
+.btn[disabled]{opacity:.45;filter:saturate(.6)}
+/* home rows */
+.glist{background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.grow{padding:12px 14px;transition:background .15s}
+.grow+.grow::before{background:var(--hair);left:70px}
+.gi{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,color-mix(in srgb,var(--c) 28%,var(--surface)),color-mix(in srgb,var(--c) 10%,var(--surface)));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,transparent),0 4px 10px -6px color-mix(in srgb,var(--c) 70%,transparent)}
+.gt b{font-size:16.5px;letter-spacing:-.015em}
+.gr.new{background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 85%,#fff),var(--ink));box-shadow:0 4px 10px -5px color-mix(in srgb,var(--ink) 70%,transparent);padding:7px 16px}
+.gr.done{color:var(--ink);font-size:14.5px}
+.gr.done i{background:linear-gradient(145deg,color-mix(in srgb,var(--good) 80%,#fff),var(--good));box-shadow:0 3px 8px -3px color-mix(in srgb,var(--good) 80%,transparent)}
+.sech h2{font-size:22px;letter-spacing:-.025em}
+.sech{padding:0 4px}
+.dprog{height:5px;border-radius:9px;background:color-mix(in srgb,var(--ink) 8%,transparent);overflow:hidden;margin:-2px 4px 2px}
+.dprog i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--good),color-mix(in srgb,var(--good) 60%,#7be0ff));transition:width .6s var(--ease)}
+.workout{box-shadow:0 18px 40px -18px color-mix(in srgb,var(--mem) 80%,transparent),inset 0 1px 0 rgba(255,255,255,.25);background:radial-gradient(120% 140% at 100% 0%,rgba(255,255,255,.22) 0%,transparent 45%),linear-gradient(135deg,var(--mem),var(--log));transition:transform .15s var(--ease)}
+.workout:active{transform:scale(.985)}
+.workout .steps3 span{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.chip{background:color-mix(in srgb,var(--surface) 80%,transparent);box-shadow:inset 0 0 0 1px var(--hair)}
+/* in-game top bar: glass */
+.gtop{position:relative;margin:0 -12px;padding:0 10px;min-height:52px;background:var(--glass);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--hair)}
+.gtop .x{width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.gtop .ttl{text-align:center;font-size:17px;letter-spacing:-.02em;padding-right:6px}
+.gtop .info{min-width:38px;text-align:right;background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:999px;padding:5px 11px;font-size:14px;color:var(--ink)}
+.gtop .info:empty{background:none;padding:0}
+.gstage{padding-top:12px}
+/* entrance: the first view of every game rises in once */
+.gstage.enter>*{animation:enter .45s var(--ease) both}
+.gstage.enter>*>*{animation:enter .5s var(--ease) both}
+.gstage.enter>*>*:nth-child(2){animation-delay:.04s}.gstage.enter>*>*:nth-child(3){animation-delay:.08s}.gstage.enter>*>*:nth-child(4){animation-delay:.12s}.gstage.enter>*>*:nth-child(5){animation-delay:.16s}
+@keyframes enter{from{opacity:0;transform:translateY(10px) scale(.985)}}
+.wrap.enter>*{animation:enter .45s var(--ease) both}
+.wrap.enter>*:nth-child(2){animation-delay:.03s}.wrap.enter>*:nth-child(3){animation-delay:.06s}.wrap.enter>*:nth-child(4){animation-delay:.09s}.wrap.enter>*:nth-child(5){animation-delay:.12s}.wrap.enter>*:nth-child(6){animation-delay:.15s}
+/* inputs */
+.cin input{height:54px;border:1px solid var(--hair);border-radius:16px;box-shadow:var(--elev1);background:var(--surface);transition:box-shadow .2s,border-color .2s}
+.cin input:focus{border-color:color-mix(in srgb,var(--geo) 60%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--geo) 22%,transparent),var(--elev1)}
+.cin .btn{min-height:54px;border-radius:16px}
+.cinlist{border:1px solid var(--hair);border-radius:16px;box-shadow:var(--elev2);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+/* guess rows (Worldle, Flagle, Statele) */
+.wlrows{gap:6px}
+.wlrow>*{border-radius:12px;min-height:42px;box-shadow:inset 0 0 0 1px var(--hair);background:var(--surface)}
+.wlrow b{line-height:42px;font-size:15.5px}
+.wlrow.empty>*{background:color-mix(in srgb,var(--surface) 40%,transparent);box-shadow:inset 0 0 0 1px var(--hair)}
+.wlrow.hit>*{background:linear-gradient(180deg,color-mix(in srgb,var(--good) 30%,var(--surface)),color-mix(in srgb,var(--good) 20%,var(--surface)))}
+.wlrow:not(.empty):has(+ .wlrow.empty),.gstage .wlrow:not(.empty):last-child{animation:rowin .4s var(--ease) both}
+@keyframes rowin{from{opacity:0;transform:translateY(-4px)}}
+.wlshape{border-radius:24px;background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--geo) 8%,var(--surface)),var(--surface))}
+.wlshape path{fill:var(--ink)}
+.flbox{border-radius:18px;box-shadow:0 20px 40px -20px rgba(0,0,0,.45),0 0 0 1px var(--hair)}
+.fltiles i{background:linear-gradient(145deg,color-mix(in srgb,var(--ink-3) 30%,var(--surface)),color-mix(in srgb,var(--ink-3) 45%,var(--surface)));outline:2px solid var(--surface)}
+/* maps */
+.gmap{border-radius:18px;box-shadow:inset 0 0 0 1px var(--hair)}
+.gzbtns button{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+/* results */
+.card.center{position:relative;overflow:hidden;padding:22px 16px 20px;background:radial-gradient(90% 70% at 50% 0%,color-mix(in srgb,var(--c,var(--good)) 16%,var(--surface)) 0%,var(--surface) 70%)}
+.card.center .big{font-size:clamp(46px,15vw,68px);letter-spacing:-.03em;background:linear-gradient(180deg,color-mix(in srgb,var(--c,var(--ink)) 75%,#fff),var(--c,var(--ink)));-webkit-background-clip:text;background-clip:text;color:transparent;animation:pop2 .6s var(--ease) both}
+@keyframes pop2{from{transform:scale(.7);opacity:0}}
+.cheer{letter-spacing:-.01em}
+/* toast */
+.toast{background:color-mix(in srgb,var(--ink) 88%,transparent);color:var(--surface);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 30px -10px rgba(0,0,0,.45);font-size:16px;padding:11px 20px}
+/* per-game polish */
+.hlc{border-radius:22px;padding:16px;background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 92%,var(--bg)))}
+.hlflag{border-radius:10px;box-shadow:0 8px 18px -8px rgba(0,0,0,.45),0 0 0 1px var(--hair)}
+.hlbtns .btn{border-radius:18px;min-height:60px}
+.hlup{background:linear-gradient(180deg,#3fcf86,#1fa25c)!important;box-shadow:0 12px 24px -12px #1fa25c!important}
+.hldn{background:linear-gradient(180deg,#ff7a6b,#e2483d)!important;box-shadow:0 12px 24px -12px #e2483d!important}
+.hlvs{background:var(--surface);box-shadow:var(--elev1);border:1px solid var(--hair)}
+.tlcur{background:linear-gradient(160deg,color-mix(in srgb,var(--ink) 92%,#5b6bff),var(--ink));box-shadow:0 18px 36px -16px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);border-radius:22px}
+.tlcard{border-radius:16px}
+.tlslot{border-radius:14px;border-width:1.5px;transition:background .15s,transform .12s}
+.tlslot:active{transform:scale(.98)}
+.qnboard{border-radius:14px;box-shadow:0 20px 40px -22px rgba(0,0,0,.55)}
+.qc{transition:filter .12s}
+.qc:active{filter:brightness(.92)}
+.msboard{border-radius:16px;box-shadow:0 18px 38px -22px rgba(0,0,0,.55);padding:3px;gap:3px}
+.mc{border-radius:7px;background:linear-gradient(180deg,color-mix(in srgb,var(--log) 62%,#fff),color-mix(in srgb,var(--log) 70%,var(--surface)));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.12);transition:transform .08s}
+.mc:active{transform:scale(.94)}
+.mc.o{background:var(--surface);box-shadow:inset 0 0 0 1px var(--hair)}
+.mc.f{background:linear-gradient(180deg,color-mix(in srgb,var(--log) 40%,#fff),color-mix(in srgb,var(--log) 48%,var(--surface)))}
+.mc.start{background:linear-gradient(180deg,#3fcf86,#1fa25c)}
+.msmode{background:color-mix(in srgb,var(--ink) 7%,transparent);border:0;box-shadow:inset 0 0 0 1px var(--hair)}
+.msmode[aria-pressed="false"] span:first-child,.msmode[aria-pressed="true"] span:last-child{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.15),0 3px 8px -2px rgba(0,0,0,.15)}
+.mslv{border-radius:20px;transition:transform .12s var(--ease)}
+.mslv:active{transform:scale(.98)}
+.flopts .btn{background:var(--surface);color:var(--ink);border:1px solid var(--hair);box-shadow:var(--elev1)}
+.mthead b{font-size:30px;letter-spacing:-.03em}
+.nbround i.on{outline-color:var(--geo)}
+.tvg{border:1px solid var(--hair);box-shadow:var(--elev1);border-radius:12px}
+.gblist span{border:1px solid var(--hair);box-shadow:var(--elev1);border-radius:14px}
+.sharerow .btn{border-radius:18px}
+@media (prefers-reduced-motion:reduce){.gstage.enter>*,.gstage.enter>*>*,.wrap.enter>*,.wlrow,.card.center .big{animation:none!important}}
 </style>
 </head>
 <body>
