@@ -322,7 +322,7 @@ const GT_BK=(()=>{
 })();
 /* ==/BACKUP== */
 /* ================= MATH: rapid-fire mental arithmetic ================= */
-const APP_VERSION="2026.11.09-1908";
+const APP_VERSION="2026.11.09-1920";
 const LS="globetrotter.math.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -914,7 +914,7 @@ async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
-    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v11"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
+    if(fresh.ok&&window.caches){ const c=await caches.open("globetrotter-v12"); await c.put(new URL(location.pathname,location.href).href,fresh); } }catch(e){}
   location.reload(); };
 setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });
