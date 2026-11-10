@@ -520,6 +520,19 @@ hr{border:0;height:.5px;background:var(--sep)}
 .pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
 .pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
 .pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
 /* ==MOTION== */
 /* Motion for every tab (tools/motion.css, copied in by tools/build_editions.py).
    Rules: animate transform and opacity only; strong ease-out for anything entering; under 300 ms for UI;
@@ -597,12 +610,128 @@ hr{border:0;height:.5px;background:var(--sep)}
 @keyframes ringfill{from{stroke-dashoffset:var(--c0)}}
 .wrap.enter .ring .rfg{animation:ringfill 700ms var(--ease-out) 150ms both}
 
+
+/* ================= MOTION 2: springs, depth and continuity ================= */
+:root{--ease-spring:cubic-bezier(.3,1.25,.5,1);--ease-snap:cubic-bezier(.25,1.2,.45,1)}
+@supports (transition-timing-function:linear(0,1)){:root{
+  --ease-spring:linear(0,.006,.025 2.8%,.101 6.1%,.539 18.9%,.721 25.3%,.849 31.5%,.937 38.1%,.968 41.8%,.991 45.7%,1.006 50.1%,1.015 55%,1.017 63.9%,1.001 85.9%,1);
+  --ease-snap:linear(0,.02 1.8%,.09 4%,.48 13%,.74 19.6%,.9 26%,1.03 34.8%,1.07 41.2%,1.08 47.5%,1.04 61%,.99 78%,1)}}
+
+/* press and release: down fast, back with a little spring */
+.btn,.tile,.grow,.cbtn,.wbtn,.opt,.deck,.mode,.next,.daily,.heroplay,.mslv,.tlslot,.flopts .btn,.choices button,.op,.lv,.chip,.histbtn,.ib,.zbtn,.simp,.tpl,.hlbtns .btn,.gzbtns button,.cinlist button,.tabbar a,.x,.gr,.levels button,.seg button,.seg2 button,.seg3 button{transition:transform 460ms var(--ease-spring),background-color 200ms ease,color 200ms ease,box-shadow 200ms ease,opacity 200ms ease}
+.btn:active,.tile:active,.cbtn:active,.wbtn:active,.opt:not([disabled]):active,.deck:active,.mode:active,.next:active,.daily:active,.heroplay:active,.mslv:active,.tlslot:active,.choices button:active,.op:active,.lv:active,.chip:active,.histbtn:active,.ib:active,.zbtn:active,.simp:active,.tpl:active,.gzbtns button:active,.cinlist button:active,.x:active{transform:scale(.96);transition:transform 90ms var(--ease-out),background-color 90ms ease}
+.grow:active{transform:scale(.975);transition:transform 90ms var(--ease-out),background-color 90ms ease;background-color:color-mix(in srgb,var(--ink) 5%,var(--surface))!important}
+.grow:active .gi{transform:scale(.92)}
+.gi{transition:transform 460ms var(--ease-spring)}
+
+/* the tab bar stays put while the page under it changes */
+.tabbar{view-transition-name:tabbar}
+::view-transition-old(tabbar),::view-transition-new(tabbar){animation:none;mix-blend-mode:normal}
+::view-transition-group(tabbar){animation:none}
+body .tabbar a{transition:transform 460ms var(--ease-spring),color 200ms ease}
+body .tabbar a:active{transform:scale(.86);transition:transform 90ms var(--ease-out)}
+.tabbar a svg{transition:transform 460ms var(--ease-spring)}
+@keyframes tabpop{0%{transform:scale(.72)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+.tabbar.arrived a[aria-current="page"] svg{animation:tabpop 520ms var(--ease-out) 60ms both}
+.tabbar a span{transition:color 200ms ease}
+
+/* the compact title that takes over when the large title scrolls away */
+.navc{position:fixed;left:0;right:0;top:0;z-index:14;height:calc(44px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;place-items:center;pointer-events:none;
+  background:var(--glass,rgba(249,249,251,.82));backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:.5px solid var(--line);
+  opacity:0;transition:opacity 220ms var(--ease-out)}
+.navc span{font:600 17px/1 var(--f-body,-apple-system,system-ui,sans-serif);letter-spacing:-.02em;color:var(--ink);transform:translateY(6px);opacity:0;transition:transform 320ms var(--ease-out),opacity 220ms var(--ease-out)}
+.navc.on{opacity:1}.navc.on span{transform:none;opacity:1}
+.playing .navc,.pg-world:has(#home[hidden]) .navc{display:none}
+
+/* opening a game or lesson: it grows out of the spot you tapped */
+@keyframes zoomopen{from{opacity:0;transform:scale(.88);border-radius:28px}to{opacity:1;transform:none;border-radius:0}}
+.gplay.opening,.pg-math .play.opening{transform-origin:var(--tapx,50%) var(--tapy,50%);animation:zoomopen 380ms var(--ease-drawer) both}
+.pg-world #play:not([hidden]){transform-origin:var(--tapx,50%) var(--tapy,50%);animation:zoomopen 380ms var(--ease-drawer) both}
+.pg-world #home:not([hidden]){animation:fadein 220ms var(--ease-out) both}
+
+/* sections rise in as they come into view */
+.sr{opacity:0;transform:translateY(22px) scale(.985)}
+.sr.in{opacity:1;transform:none;transition:opacity 420ms var(--ease-out),transform 620ms var(--ease-drawer)}
+
+/* segmented controls: one thumb slides between options */
+.hasthumb{position:relative;isolation:isolate}
+.segthumb{position:absolute;left:0;top:0;z-index:-1;border-radius:8px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);pointer-events:none;
+  transition:transform 420ms var(--ease-spring),width 420ms var(--ease-spring),height 300ms var(--ease-out)}
+:root body .hasthumb.hasthumb>button[aria-pressed="true"]{background:transparent!important;box-shadow:none!important}
+.hasthumb>button{position:relative;transition:color 200ms ease,transform 460ms var(--ease-spring)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .segthumb{background:#636366}}
+:root[data-theme="dark"] .segthumb{background:#636366}
+.msmode{position:relative;isolation:isolate}
+body .msmode::before{content:"";position:absolute;z-index:-1;top:2px;bottom:2px;left:2px;width:calc(50% - 3px);border-radius:8px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12);transition:transform 420ms var(--ease-spring)}
+body .msmode[aria-pressed="true"]::before{transform:translateX(calc(100% + 2px))}
+:root body .msmode.msmode span{flex:1;justify-content:center;background:transparent!important;box-shadow:none!important;transition:color 200ms ease}
+:root body .msmode[aria-pressed="false"] span:last-child,:root body .msmode[aria-pressed="true"] span:first-child{color:var(--ink-3)!important}
+
+/* answers: right springs up, wrong shakes */
+@keyframes okpop{0%{transform:scale(1)}35%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes noshake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(2px)}}
+.fb-ok{animation:okpop 420ms var(--ease-spring) both!important}
+.fb-no{animation:noshake 420ms var(--ease-out) both!important}
+.btn.right,.hlc.ok,.cell.ok,.nmres.ok,.pg-math .ans.ok{animation:okpop 440ms var(--ease-spring) both}
+.btn.wrong,.hlc.no,.cell.no,.nmres.no,.xc.wrong,.pg-math .ans.no{animation:noshake 420ms var(--ease-out) both}
+
+/* the success flash glows in from the edges instead of a flat tint */
+.flash.on{animation-timing-function:var(--ease-out)!important}
+
+/* progress fills grow from empty on first view */
+@keyframes growx{from{transform:scaleX(0)}}
+.dprog i,.pg-math .rank .bar i,.pg-math .xpbar i{transform-origin:left center;animation:growx 900ms var(--ease-drawer) 200ms both}
+.dprog i{transition:width 700ms var(--ease-drawer)}
+
+/* the Today card: the play button breathes once to point you at it, chips follow the title */
+.herochips span{animation:rise 380ms var(--ease-out) both}
+.herochips span:nth-child(2){animation-delay:70ms}
+.wrap.enter .heroplay{animation:rise 420ms var(--ease-out) 160ms both}
+.hgl{transition:transform 460ms var(--ease-spring)}.heroplay:active .hgl{transform:scale(.85) rotate(-6deg)}
+.ring b{animation:land 520ms var(--ease-spring) 120ms both}
+
+/* home rows: icons land a beat after their rows */
+.wrap.enter .glist>.grow .gi{animation:iconin 520ms var(--ease-spring) both;animation-delay:inherit}
+@keyframes iconin{from{opacity:0;transform:scale(.6) rotate(-8deg)}}
+.wrap.enter .glist>.grow:nth-child(1) .gi{animation-delay:60ms}.wrap.enter .glist>.grow:nth-child(2) .gi{animation-delay:90ms}.wrap.enter .glist>.grow:nth-child(3) .gi{animation-delay:120ms}.wrap.enter .glist>.grow:nth-child(4) .gi{animation-delay:150ms}.wrap.enter .glist>.grow:nth-child(5) .gi{animation-delay:180ms}.wrap.enter .glist>.grow:nth-child(n+6) .gi{animation-delay:210ms}
+.sr.in .grow .gi{animation:iconin 520ms var(--ease-spring) both}
+.sr.in .grow:nth-child(2) .gi{animation-delay:40ms}.sr.in .grow:nth-child(3) .gi{animation-delay:80ms}.sr.in .grow:nth-child(4) .gi{animation-delay:120ms}.sr.in .grow:nth-child(5) .gi{animation-delay:160ms}.sr.in .grow:nth-child(n+6) .gi{animation-delay:200ms}
+.gr.done i{animation:pop 420ms var(--ease-spring) both}
+
+/* results: the card lifts in, the score lands with a spring, then the rest */
+.gstage.enter .card.center,.wrap.enter .card.center{animation:resultin 520ms var(--ease-drawer) both}
+@keyframes resultin{from{opacity:0;transform:translateY(24px) scale(.96)}}
+.card.center .big{animation:land 560ms var(--ease-spring) 140ms both}
+.card.center .cheer{animation:rise 360ms var(--ease-out) 320ms both}
+.sharerow{animation:rise 360ms var(--ease-out) 380ms both}
+
+/* World / USA / Earth: lesson cards and the map breathe in */
+.pg-world .next .go{transition:transform 460ms var(--ease-spring)}
+.pg-world .next svg.deco{animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* closing a game: home settles back in under you */
+@keyframes homeback{from{opacity:.4;transform:scale(.965)}}
+.wrap.back{animation:homeback 360ms var(--ease-drawer) both}
+
+/* game screens: the top bar slides down, the stage follows */
+@keyframes bardown{from{opacity:0;transform:translateY(-8px)}}
+.gplay.opening .gtop{animation:bardown 320ms var(--ease-out) 80ms both}
+
+/* the game boards settle in cell by cell */
+.gplay.opening .msboard,.gplay.opening .qboard,.gplay.opening .board,.gplay.opening .grid{animation:boardin 520ms var(--ease-spring) 120ms both}
+@keyframes boardin{from{opacity:0;transform:scale(.94)}}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:150ms!important;animation-delay:0ms!important;transition-duration:120ms!important}
   .wrap.enter>*,.gstage.enter>*,.gstage.enter>*>*,.wrap.enter .glist>.grow,.pg-world .home:not([hidden])>*,.fb,.model,.simple,.hl .hlb,.wlrow.reveal>*,.card.center .big,.gplay.opening{animation-name:fadein!important}
   .sheet:not([hidden]) .in{animation:none!important}
   ::view-transition-old(root),::view-transition-new(root){animation:none!important}
   .btn:active,.tile:active,.grow:active,.mode:active,.next:active{transform:none!important}
+  .gplay.opening,.pg-math .play.opening,.pg-world #play:not([hidden]),.wrap.back,.card.center,.card.center .big,.gi,.ring b,.herochips span,.heroplay{animation-name:fadein!important}
+  .fb-ok,.fb-no,.btn.right,.btn.wrong,.hlc.ok,.hlc.no,.tabbar.arrived a svg,.pg-world .next svg.deco{animation:none!important}
+  .sr{opacity:1;transform:none}
+  .segthumb,.msmode::before{transition:none}
 }
 /* ==/MOTION== */
 /* ==NATIVE== */
@@ -802,7 +931,7 @@ const GT_BK=(()=>{
 })();
 /* ==/BACKUP== */
 /* ================= MATH: rapid-fire mental arithmetic ================= */
-const APP_VERSION="2026.11.09-2200";
+const APP_VERSION="2026.11.09-2222";
 const LS="globetrotter.math.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -1426,6 +1555,72 @@ home();
   const nav=document.createElement("nav"); nav.className="tabbar"; nav.setAttribute("aria-label","Tabs");
   nav.innerHTML=T.map(([k,n,ic])=>`<a href="${root}${k?k+"/":""}"${k===cur?' aria-current="page"':""}>${ic}<span>${n}</span></a>`).join("");
   document.body.appendChild(nav); document.body.classList.add("has-tabbar");
+})();
+/* ================= SHELL MOTION =================
+   Shared by every tab: a compact title that fades into a top bar once the large title scrolls away,
+   haptic taps, numbers that count up, sections that rise in as you scroll, sliding segmented controls,
+   and games and lessons that open from the spot you tapped. */
+(function(){
+  const D=document, B=D.body, RM=matchMedia("(prefers-reduced-motion: reduce)");
+  /* where the last tap landed, so opening screens can grow out of it */
+  D.addEventListener("pointerdown",e=>{ const r=D.documentElement.style; r.setProperty("--tapx",e.clientX+"px"); r.setProperty("--tapy",e.clientY+"px"); },{capture:true,passive:true});
+
+  /* haptics: a real tick on iPhone (iOS 18 switch trick), a short buzz on Android */
+  const hl=D.createElement("label"), hi=D.createElement("input"); hi.type="checkbox"; hi.setAttribute("switch",""); hi.tabIndex=-1;
+  hl.setAttribute("aria-hidden","true"); hl.style.cssText="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9px;top:0";
+  hl.appendChild(hi); B.appendChild(hl); hl.addEventListener("click",e=>e.stopPropagation());
+  const haptic=()=>{ try{ if(navigator.vibrate&&!/iP(hone|ad|od)/.test(navigator.userAgent)) navigator.vibrate(8); else hl.click(); }catch(e){} };
+  window.GT_HAPTIC=haptic;
+  let lastTap=null, lastAt=0;
+  D.addEventListener("pointerdown",e=>{ lastTap=e.target.closest("button,[role=button],a,.mc,.qc,.cell,.tile"); lastAt=performance.now(); },{capture:true,passive:true});
+  /* answer feedback: the thing you tapped springs on a right answer and shakes on a wrong one */
+  function react(kind){ if(RM.matches||!lastTap||!lastTap.isConnected||performance.now()-lastAt>700) return; if(lastTap.closest(".tabbar,.pad,.kb,.dspad,.ckeys,.msboard,.qboard")) return;
+    const el=lastTap, c=kind==="no"?"fb-no":"fb-ok"; el.classList.remove("fb-ok","fb-no"); void el.offsetWidth; el.classList.add(c); setTimeout(()=>el.classList.remove(c),520); }
+  if(typeof window.snd==="function"){ const o=window.snd; window.snd=function(k){ haptic(); if(k==="ok"||k==="no") react(k); return o.apply(this,arguments); }; }
+
+  /* tab bar: a tick on tap, and the tab you land on gives a small bounce */
+  const tb=D.querySelector(".tabbar");
+  if(tb){ tb.addEventListener("click",e=>{ const a=e.target.closest("a"); if(!a) return; haptic(); try{ sessionStorage.setItem("gt-tab-pop","1"); }catch(x){} if(a.getAttribute("aria-current")==="page"){ e.preventDefault(); scrollTo({top:0,behavior:RM.matches?"auto":"smooth"}); } });
+    try{ if(sessionStorage.getItem("gt-tab-pop")){ sessionStorage.removeItem("gt-tab-pop"); tb.classList.add("arrived"); } }catch(x){} }
+
+  /* compact title bar */
+  const nb=D.createElement("div"); nb.className="navc"; nb.setAttribute("aria-hidden","true"); nb.innerHTML="<span></span>"; B.appendChild(nb);
+  let h1=null; const io=new IntersectionObserver(es=>{ for(const e of es) if(e.target===h1) nb.classList.toggle("on",!e.isIntersecting&&e.boundingClientRect.top<60); },{rootMargin:"-56px 0px 0px 0px"});
+  function bindTitle(){ const h=[...D.querySelectorAll(".brand h1")].find(x=>x.offsetParent!==null&&!x.closest("[hidden]")); if(h===h1) return; if(h1) io.unobserve(h1); h1=h||null; nb.classList.remove("on"); if(h1){ nb.firstChild.textContent=h1.textContent.trim(); io.observe(h1); } }
+
+  /* numbers count up when they first appear */
+  const CNT=".card.center .big,.ring b,.stat b,.mtres span";
+  function countUp(el){ if(RM.matches||el.dataset.counted) return; el.dataset.counted="1";
+    const tn=[...el.childNodes].find(n=>n.nodeType===3&&/\d/.test(n.data)); if(!tn) return;
+    const m=tn.data.match(/^(\D*?)(\d{1,3}(?:,\d{3})+|\d+)(.*)$/s); if(!m||/^[:.]\d/.test(m[3])||/\d$/.test(m[1])) return;
+    const to=+m[2].replace(/,/g,""); if(!(to>=2)||to>1e7) return; const comma=m[2].includes(",")||to>=10000, fmt=v=>comma?v.toLocaleString("en-US"):String(v);
+    const t0=performance.now(), dur=Math.min(900,420+to*12);
+    const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); tn.data=m[1]+fmt(Math.round(to*e))+m[3]; if(k<1&&tn.isConnected) requestAnimationFrame(step); };
+    tn.data=m[1]+fmt(0)+m[3]; requestAnimationFrame(step); }
+
+  /* sections below the fold rise in as they scroll into view */
+  const SR=".sec,.card,.mode,.tile,.deck,.trick,.glist,.cbtn,.mcard,.hcard,.part,.step";
+  const sio=new IntersectionObserver(es=>{ for(const e of es) if(e.isIntersecting){ e.target.classList.add("in"); sio.unobserve(e.target); } },{rootMargin:"0px 0px -6% 0px"});
+  function reveal(root){ if(RM.matches) return; const vh=innerHeight;
+    root.querySelectorAll(SR).forEach(el=>{ if(el.dataset.sr||el.closest(".sr:not(.in)")||el.closest(".gplay,.play:not(.home),.sheet")) return; el.dataset.sr="1"; const r=el.getBoundingClientRect(); if(!r.height||r.top<vh-10) return; el.classList.add("sr"); sio.observe(el); }); }
+
+  /* segmented controls: a thumb that slides to the chosen option, even across re-renders */
+  const SEG=".levels,.seg,.seg2,.seg3", last=new Map();
+  function segKey(c){ const b=c.querySelector("button"); return (b&&(b.dataset.act||b.dataset.k||b.dataset.v||b.textContent)||"")+"|"+c.className; }
+  function segs(root){ root.querySelectorAll(SEG).forEach(c=>{ const on=c.querySelector('button[aria-pressed="true"]'); if(!on) return;
+      let th=c.querySelector(":scope>.segthumb"); const key=segKey(c), fresh=!th;
+      if(fresh){ th=D.createElement("i"); th.className="segthumb"; th.setAttribute("aria-hidden","true"); c.prepend(th); c.classList.add("hasthumb"); }
+      const x=on.offsetLeft, y=on.offsetTop, w=on.offsetWidth, h=on.offsetHeight, prev=last.get(key);
+      if(fresh&&prev&&!RM.matches&&(prev.x!==x||prev.w!==w)){ th.style.transition="none"; th.style.transform=`translate(${prev.x}px,${prev.y}px)`; th.style.width=prev.w+"px"; th.style.height=prev.h+"px"; void th.offsetWidth; th.style.transition=""; }
+      th.style.transform=`translate(${x}px,${y}px)`; th.style.width=w+"px"; th.style.height=h+"px"; last.set(key,{x,y,w,h}); }); }
+
+  /* watch every re-render */
+  let q=0, added=[];
+  function flush(){ q=0; bindTitle(); const roots=added.splice(0); for(const n of roots){ if(!n.isConnected) continue; reveal(n); n.querySelectorAll&&n.querySelectorAll(CNT).forEach(el=>{ if(el.offsetParent!==null) countUp(el); }); if(n.matches&&n.matches(CNT)) countUp(n); } segs(D); }
+  new MutationObserver(ms=>{ for(const m of ms){ if(m.type==="childList") m.addedNodes.forEach(n=>{ if(n.nodeType===1) added.push(n); }); else if(m.target.nodeType===1) added.push(m.target); } if(!q) q=requestAnimationFrame(flush); })
+    .observe(B,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","aria-pressed"]});
+  added.push(B); flush();
+  addEventListener("resize",()=>segs(D));
 })();
 /* ==/TABBAR== */</script>
 </body>

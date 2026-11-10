@@ -75,11 +75,127 @@
 @keyframes ringfill{from{stroke-dashoffset:var(--c0)}}
 .wrap.enter .ring .rfg{animation:ringfill 700ms var(--ease-out) 150ms both}
 
+
+/* ================= MOTION 2: springs, depth and continuity ================= */
+:root{--ease-spring:cubic-bezier(.3,1.25,.5,1);--ease-snap:cubic-bezier(.25,1.2,.45,1)}
+@supports (transition-timing-function:linear(0,1)){:root{
+  --ease-spring:linear(0,.006,.025 2.8%,.101 6.1%,.539 18.9%,.721 25.3%,.849 31.5%,.937 38.1%,.968 41.8%,.991 45.7%,1.006 50.1%,1.015 55%,1.017 63.9%,1.001 85.9%,1);
+  --ease-snap:linear(0,.02 1.8%,.09 4%,.48 13%,.74 19.6%,.9 26%,1.03 34.8%,1.07 41.2%,1.08 47.5%,1.04 61%,.99 78%,1)}}
+
+/* press and release: down fast, back with a little spring */
+.btn,.tile,.grow,.cbtn,.wbtn,.opt,.deck,.mode,.next,.daily,.heroplay,.mslv,.tlslot,.flopts .btn,.choices button,.op,.lv,.chip,.histbtn,.ib,.zbtn,.simp,.tpl,.hlbtns .btn,.gzbtns button,.cinlist button,.tabbar a,.x,.gr,.levels button,.seg button,.seg2 button,.seg3 button{transition:transform 460ms var(--ease-spring),background-color 200ms ease,color 200ms ease,box-shadow 200ms ease,opacity 200ms ease}
+.btn:active,.tile:active,.cbtn:active,.wbtn:active,.opt:not([disabled]):active,.deck:active,.mode:active,.next:active,.daily:active,.heroplay:active,.mslv:active,.tlslot:active,.choices button:active,.op:active,.lv:active,.chip:active,.histbtn:active,.ib:active,.zbtn:active,.simp:active,.tpl:active,.gzbtns button:active,.cinlist button:active,.x:active{transform:scale(.96);transition:transform 90ms var(--ease-out),background-color 90ms ease}
+.grow:active{transform:scale(.975);transition:transform 90ms var(--ease-out),background-color 90ms ease;background-color:color-mix(in srgb,var(--ink) 5%,var(--surface))!important}
+.grow:active .gi{transform:scale(.92)}
+.gi{transition:transform 460ms var(--ease-spring)}
+
+/* the tab bar stays put while the page under it changes */
+.tabbar{view-transition-name:tabbar}
+::view-transition-old(tabbar),::view-transition-new(tabbar){animation:none;mix-blend-mode:normal}
+::view-transition-group(tabbar){animation:none}
+body .tabbar a{transition:transform 460ms var(--ease-spring),color 200ms ease}
+body .tabbar a:active{transform:scale(.86);transition:transform 90ms var(--ease-out)}
+.tabbar a svg{transition:transform 460ms var(--ease-spring)}
+@keyframes tabpop{0%{transform:scale(.72)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+.tabbar.arrived a[aria-current="page"] svg{animation:tabpop 520ms var(--ease-out) 60ms both}
+.tabbar a span{transition:color 200ms ease}
+
+/* the compact title that takes over when the large title scrolls away */
+.navc{position:fixed;left:0;right:0;top:0;z-index:14;height:calc(44px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;place-items:center;pointer-events:none;
+  background:var(--glass,rgba(249,249,251,.82));backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:.5px solid var(--line);
+  opacity:0;transition:opacity 220ms var(--ease-out)}
+.navc span{font:600 17px/1 var(--f-body,-apple-system,system-ui,sans-serif);letter-spacing:-.02em;color:var(--ink);transform:translateY(6px);opacity:0;transition:transform 320ms var(--ease-out),opacity 220ms var(--ease-out)}
+.navc.on{opacity:1}.navc.on span{transform:none;opacity:1}
+.playing .navc,.pg-world:has(#home[hidden]) .navc{display:none}
+
+/* opening a game or lesson: it grows out of the spot you tapped */
+@keyframes zoomopen{from{opacity:0;transform:scale(.88);border-radius:28px}to{opacity:1;transform:none;border-radius:0}}
+.gplay.opening,.pg-math .play.opening{transform-origin:var(--tapx,50%) var(--tapy,50%);animation:zoomopen 380ms var(--ease-drawer) both}
+.pg-world #play:not([hidden]){transform-origin:var(--tapx,50%) var(--tapy,50%);animation:zoomopen 380ms var(--ease-drawer) both}
+.pg-world #home:not([hidden]){animation:fadein 220ms var(--ease-out) both}
+
+/* sections rise in as they come into view */
+.sr{opacity:0;transform:translateY(22px) scale(.985)}
+.sr.in{opacity:1;transform:none;transition:opacity 420ms var(--ease-out),transform 620ms var(--ease-drawer)}
+
+/* segmented controls: one thumb slides between options */
+.hasthumb{position:relative;isolation:isolate}
+.segthumb{position:absolute;left:0;top:0;z-index:-1;border-radius:8px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);pointer-events:none;
+  transition:transform 420ms var(--ease-spring),width 420ms var(--ease-spring),height 300ms var(--ease-out)}
+:root body .hasthumb.hasthumb>button[aria-pressed="true"]{background:transparent!important;box-shadow:none!important}
+.hasthumb>button{position:relative;transition:color 200ms ease,transform 460ms var(--ease-spring)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .segthumb{background:#636366}}
+:root[data-theme="dark"] .segthumb{background:#636366}
+.msmode{position:relative;isolation:isolate}
+body .msmode::before{content:"";position:absolute;z-index:-1;top:2px;bottom:2px;left:2px;width:calc(50% - 3px);border-radius:8px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12);transition:transform 420ms var(--ease-spring)}
+body .msmode[aria-pressed="true"]::before{transform:translateX(calc(100% + 2px))}
+:root body .msmode.msmode span{flex:1;justify-content:center;background:transparent!important;box-shadow:none!important;transition:color 200ms ease}
+:root body .msmode[aria-pressed="false"] span:last-child,:root body .msmode[aria-pressed="true"] span:first-child{color:var(--ink-3)!important}
+
+/* answers: right springs up, wrong shakes */
+@keyframes okpop{0%{transform:scale(1)}35%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes noshake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(2px)}}
+.fb-ok{animation:okpop 420ms var(--ease-spring) both!important}
+.fb-no{animation:noshake 420ms var(--ease-out) both!important}
+.btn.right,.hlc.ok,.cell.ok,.nmres.ok,.pg-math .ans.ok{animation:okpop 440ms var(--ease-spring) both}
+.btn.wrong,.hlc.no,.cell.no,.nmres.no,.xc.wrong,.pg-math .ans.no{animation:noshake 420ms var(--ease-out) both}
+
+/* the success flash glows in from the edges instead of a flat tint */
+.flash.on{animation-timing-function:var(--ease-out)!important}
+
+/* progress fills grow from empty on first view */
+@keyframes growx{from{transform:scaleX(0)}}
+.dprog i,.pg-math .rank .bar i,.pg-math .xpbar i{transform-origin:left center;animation:growx 900ms var(--ease-drawer) 200ms both}
+.dprog i{transition:width 700ms var(--ease-drawer)}
+
+/* the Today card: the play button breathes once to point you at it, chips follow the title */
+.herochips span{animation:rise 380ms var(--ease-out) both}
+.herochips span:nth-child(2){animation-delay:70ms}
+.wrap.enter .heroplay{animation:rise 420ms var(--ease-out) 160ms both}
+.hgl{transition:transform 460ms var(--ease-spring)}.heroplay:active .hgl{transform:scale(.85) rotate(-6deg)}
+.ring b{animation:land 520ms var(--ease-spring) 120ms both}
+
+/* home rows: icons land a beat after their rows */
+.wrap.enter .glist>.grow .gi{animation:iconin 520ms var(--ease-spring) both;animation-delay:inherit}
+@keyframes iconin{from{opacity:0;transform:scale(.6) rotate(-8deg)}}
+.wrap.enter .glist>.grow:nth-child(1) .gi{animation-delay:60ms}.wrap.enter .glist>.grow:nth-child(2) .gi{animation-delay:90ms}.wrap.enter .glist>.grow:nth-child(3) .gi{animation-delay:120ms}.wrap.enter .glist>.grow:nth-child(4) .gi{animation-delay:150ms}.wrap.enter .glist>.grow:nth-child(5) .gi{animation-delay:180ms}.wrap.enter .glist>.grow:nth-child(n+6) .gi{animation-delay:210ms}
+.sr.in .grow .gi{animation:iconin 520ms var(--ease-spring) both}
+.sr.in .grow:nth-child(2) .gi{animation-delay:40ms}.sr.in .grow:nth-child(3) .gi{animation-delay:80ms}.sr.in .grow:nth-child(4) .gi{animation-delay:120ms}.sr.in .grow:nth-child(5) .gi{animation-delay:160ms}.sr.in .grow:nth-child(n+6) .gi{animation-delay:200ms}
+.gr.done i{animation:pop 420ms var(--ease-spring) both}
+
+/* results: the card lifts in, the score lands with a spring, then the rest */
+.gstage.enter .card.center,.wrap.enter .card.center{animation:resultin 520ms var(--ease-drawer) both}
+@keyframes resultin{from{opacity:0;transform:translateY(24px) scale(.96)}}
+.card.center .big{animation:land 560ms var(--ease-spring) 140ms both}
+.card.center .cheer{animation:rise 360ms var(--ease-out) 320ms both}
+.sharerow{animation:rise 360ms var(--ease-out) 380ms both}
+
+/* World / USA / Earth: lesson cards and the map breathe in */
+.pg-world .next .go{transition:transform 460ms var(--ease-spring)}
+.pg-world .next svg.deco{animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* closing a game: home settles back in under you */
+@keyframes homeback{from{opacity:.4;transform:scale(.965)}}
+.wrap.back{animation:homeback 360ms var(--ease-drawer) both}
+
+/* game screens: the top bar slides down, the stage follows */
+@keyframes bardown{from{opacity:0;transform:translateY(-8px)}}
+.gplay.opening .gtop{animation:bardown 320ms var(--ease-out) 80ms both}
+
+/* the game boards settle in cell by cell */
+.gplay.opening .msboard,.gplay.opening .qboard,.gplay.opening .board,.gplay.opening .grid{animation:boardin 520ms var(--ease-spring) 120ms both}
+@keyframes boardin{from{opacity:0;transform:scale(.94)}}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:150ms!important;animation-delay:0ms!important;transition-duration:120ms!important}
   .wrap.enter>*,.gstage.enter>*,.gstage.enter>*>*,.wrap.enter .glist>.grow,.pg-world .home:not([hidden])>*,.fb,.model,.simple,.hl .hlb,.wlrow.reveal>*,.card.center .big,.gplay.opening{animation-name:fadein!important}
   .sheet:not([hidden]) .in{animation:none!important}
   ::view-transition-old(root),::view-transition-new(root){animation:none!important}
   .btn:active,.tile:active,.grow:active,.mode:active,.next:active{transform:none!important}
+  .gplay.opening,.pg-math .play.opening,.pg-world #play:not([hidden]),.wrap.back,.card.center,.card.center .big,.gi,.ring b,.herochips span,.heroplay{animation-name:fadein!important}
+  .fb-ok,.fb-no,.btn.right,.btn.wrong,.hlc.ok,.hlc.no,.tabbar.arrived a svg,.pg-world .next svg.deco{animation:none!important}
+  .sr{opacity:1;transform:none}
+  .segthumb,.msmode::before{transition:none}
 }
 /* ==/MOTION== */

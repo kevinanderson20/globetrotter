@@ -22,4 +22,70 @@
   nav.innerHTML=T.map(([k,n,ic])=>`<a href="${root}${k?k+"/":""}"${k===cur?' aria-current="page"':""}>${ic}<span>${n}</span></a>`).join("");
   document.body.appendChild(nav); document.body.classList.add("has-tabbar");
 })();
+/* ================= SHELL MOTION =================
+   Shared by every tab: a compact title that fades into a top bar once the large title scrolls away,
+   haptic taps, numbers that count up, sections that rise in as you scroll, sliding segmented controls,
+   and games and lessons that open from the spot you tapped. */
+(function(){
+  const D=document, B=D.body, RM=matchMedia("(prefers-reduced-motion: reduce)");
+  /* where the last tap landed, so opening screens can grow out of it */
+  D.addEventListener("pointerdown",e=>{ const r=D.documentElement.style; r.setProperty("--tapx",e.clientX+"px"); r.setProperty("--tapy",e.clientY+"px"); },{capture:true,passive:true});
+
+  /* haptics: a real tick on iPhone (iOS 18 switch trick), a short buzz on Android */
+  const hl=D.createElement("label"), hi=D.createElement("input"); hi.type="checkbox"; hi.setAttribute("switch",""); hi.tabIndex=-1;
+  hl.setAttribute("aria-hidden","true"); hl.style.cssText="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9px;top:0";
+  hl.appendChild(hi); B.appendChild(hl); hl.addEventListener("click",e=>e.stopPropagation());
+  const haptic=()=>{ try{ if(navigator.vibrate&&!/iP(hone|ad|od)/.test(navigator.userAgent)) navigator.vibrate(8); else hl.click(); }catch(e){} };
+  window.GT_HAPTIC=haptic;
+  let lastTap=null, lastAt=0;
+  D.addEventListener("pointerdown",e=>{ lastTap=e.target.closest("button,[role=button],a,.mc,.qc,.cell,.tile"); lastAt=performance.now(); },{capture:true,passive:true});
+  /* answer feedback: the thing you tapped springs on a right answer and shakes on a wrong one */
+  function react(kind){ if(RM.matches||!lastTap||!lastTap.isConnected||performance.now()-lastAt>700) return; if(lastTap.closest(".tabbar,.pad,.kb,.dspad,.ckeys,.msboard,.qboard")) return;
+    const el=lastTap, c=kind==="no"?"fb-no":"fb-ok"; el.classList.remove("fb-ok","fb-no"); void el.offsetWidth; el.classList.add(c); setTimeout(()=>el.classList.remove(c),520); }
+  if(typeof window.snd==="function"){ const o=window.snd; window.snd=function(k){ haptic(); if(k==="ok"||k==="no") react(k); return o.apply(this,arguments); }; }
+
+  /* tab bar: a tick on tap, and the tab you land on gives a small bounce */
+  const tb=D.querySelector(".tabbar");
+  if(tb){ tb.addEventListener("click",e=>{ const a=e.target.closest("a"); if(!a) return; haptic(); try{ sessionStorage.setItem("gt-tab-pop","1"); }catch(x){} if(a.getAttribute("aria-current")==="page"){ e.preventDefault(); scrollTo({top:0,behavior:RM.matches?"auto":"smooth"}); } });
+    try{ if(sessionStorage.getItem("gt-tab-pop")){ sessionStorage.removeItem("gt-tab-pop"); tb.classList.add("arrived"); } }catch(x){} }
+
+  /* compact title bar */
+  const nb=D.createElement("div"); nb.className="navc"; nb.setAttribute("aria-hidden","true"); nb.innerHTML="<span></span>"; B.appendChild(nb);
+  let h1=null; const io=new IntersectionObserver(es=>{ for(const e of es) if(e.target===h1) nb.classList.toggle("on",!e.isIntersecting&&e.boundingClientRect.top<60); },{rootMargin:"-56px 0px 0px 0px"});
+  function bindTitle(){ const h=[...D.querySelectorAll(".brand h1")].find(x=>x.offsetParent!==null&&!x.closest("[hidden]")); if(h===h1) return; if(h1) io.unobserve(h1); h1=h||null; nb.classList.remove("on"); if(h1){ nb.firstChild.textContent=h1.textContent.trim(); io.observe(h1); } }
+
+  /* numbers count up when they first appear */
+  const CNT=".card.center .big,.ring b,.stat b,.mtres span";
+  function countUp(el){ if(RM.matches||el.dataset.counted) return; el.dataset.counted="1";
+    const tn=[...el.childNodes].find(n=>n.nodeType===3&&/\d/.test(n.data)); if(!tn) return;
+    const m=tn.data.match(/^(\D*?)(\d{1,3}(?:,\d{3})+|\d+)(.*)$/s); if(!m||/^[:.]\d/.test(m[3])||/\d$/.test(m[1])) return;
+    const to=+m[2].replace(/,/g,""); if(!(to>=2)||to>1e7) return; const comma=m[2].includes(",")||to>=10000, fmt=v=>comma?v.toLocaleString("en-US"):String(v);
+    const t0=performance.now(), dur=Math.min(900,420+to*12);
+    const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); tn.data=m[1]+fmt(Math.round(to*e))+m[3]; if(k<1&&tn.isConnected) requestAnimationFrame(step); };
+    tn.data=m[1]+fmt(0)+m[3]; requestAnimationFrame(step); }
+
+  /* sections below the fold rise in as they scroll into view */
+  const SR=".sec,.card,.mode,.tile,.deck,.trick,.glist,.cbtn,.mcard,.hcard,.part,.step";
+  const sio=new IntersectionObserver(es=>{ for(const e of es) if(e.isIntersecting){ e.target.classList.add("in"); sio.unobserve(e.target); } },{rootMargin:"0px 0px -6% 0px"});
+  function reveal(root){ if(RM.matches) return; const vh=innerHeight;
+    root.querySelectorAll(SR).forEach(el=>{ if(el.dataset.sr||el.closest(".sr:not(.in)")||el.closest(".gplay,.play:not(.home),.sheet")) return; el.dataset.sr="1"; const r=el.getBoundingClientRect(); if(!r.height||r.top<vh-10) return; el.classList.add("sr"); sio.observe(el); }); }
+
+  /* segmented controls: a thumb that slides to the chosen option, even across re-renders */
+  const SEG=".levels,.seg,.seg2,.seg3", last=new Map();
+  function segKey(c){ const b=c.querySelector("button"); return (b&&(b.dataset.act||b.dataset.k||b.dataset.v||b.textContent)||"")+"|"+c.className; }
+  function segs(root){ root.querySelectorAll(SEG).forEach(c=>{ const on=c.querySelector('button[aria-pressed="true"]'); if(!on) return;
+      let th=c.querySelector(":scope>.segthumb"); const key=segKey(c), fresh=!th;
+      if(fresh){ th=D.createElement("i"); th.className="segthumb"; th.setAttribute("aria-hidden","true"); c.prepend(th); c.classList.add("hasthumb"); }
+      const x=on.offsetLeft, y=on.offsetTop, w=on.offsetWidth, h=on.offsetHeight, prev=last.get(key);
+      if(fresh&&prev&&!RM.matches&&(prev.x!==x||prev.w!==w)){ th.style.transition="none"; th.style.transform=`translate(${prev.x}px,${prev.y}px)`; th.style.width=prev.w+"px"; th.style.height=prev.h+"px"; void th.offsetWidth; th.style.transition=""; }
+      th.style.transform=`translate(${x}px,${y}px)`; th.style.width=w+"px"; th.style.height=h+"px"; last.set(key,{x,y,w,h}); }); }
+
+  /* watch every re-render */
+  let q=0, added=[];
+  function flush(){ q=0; bindTitle(); const roots=added.splice(0); for(const n of roots){ if(!n.isConnected) continue; reveal(n); n.querySelectorAll&&n.querySelectorAll(CNT).forEach(el=>{ if(el.offsetParent!==null) countUp(el); }); if(n.matches&&n.matches(CNT)) countUp(n); } segs(D); }
+  new MutationObserver(ms=>{ for(const m of ms){ if(m.type==="childList") m.addedNodes.forEach(n=>{ if(n.nodeType===1) added.push(n); }); else if(m.target.nodeType===1) added.push(m.target); } if(!q) q=requestAnimationFrame(flush); })
+    .observe(B,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","aria-pressed"]});
+  added.push(B); flush();
+  addEventListener("resize",()=>segs(D));
+})();
 /* ==/TABBAR== */

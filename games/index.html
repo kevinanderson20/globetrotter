@@ -202,7 +202,6 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .gr.chev{color:var(--ink-3);font-size:24px;font-weight:600;padding-right:2px}
 .games{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .game{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:12px 12px 10px;text-align:left;display:grid;gap:3px;min-width:0;position:relative;overflow:hidden}
-.game::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--c)}
 .game .ic{font-size:22px;line-height:1}
 .game b{font-family:var(--f-display);font-size:16px;font-weight:800}
 .game span{font-size:12px;color:var(--ink-2);line-height:1.3}
@@ -993,6 +992,19 @@ hr{border:0;height:.5px;background:var(--sep)}
 .pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
 .pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
 .pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
 /* ==MOTION== */
 /* Motion for every tab (tools/motion.css, copied in by tools/build_editions.py).
    Rules: animate transform and opacity only; strong ease-out for anything entering; under 300 ms for UI;
@@ -1070,12 +1082,128 @@ hr{border:0;height:.5px;background:var(--sep)}
 @keyframes ringfill{from{stroke-dashoffset:var(--c0)}}
 .wrap.enter .ring .rfg{animation:ringfill 700ms var(--ease-out) 150ms both}
 
+
+/* ================= MOTION 2: springs, depth and continuity ================= */
+:root{--ease-spring:cubic-bezier(.3,1.25,.5,1);--ease-snap:cubic-bezier(.25,1.2,.45,1)}
+@supports (transition-timing-function:linear(0,1)){:root{
+  --ease-spring:linear(0,.006,.025 2.8%,.101 6.1%,.539 18.9%,.721 25.3%,.849 31.5%,.937 38.1%,.968 41.8%,.991 45.7%,1.006 50.1%,1.015 55%,1.017 63.9%,1.001 85.9%,1);
+  --ease-snap:linear(0,.02 1.8%,.09 4%,.48 13%,.74 19.6%,.9 26%,1.03 34.8%,1.07 41.2%,1.08 47.5%,1.04 61%,.99 78%,1)}}
+
+/* press and release: down fast, back with a little spring */
+.btn,.tile,.grow,.cbtn,.wbtn,.opt,.deck,.mode,.next,.daily,.heroplay,.mslv,.tlslot,.flopts .btn,.choices button,.op,.lv,.chip,.histbtn,.ib,.zbtn,.simp,.tpl,.hlbtns .btn,.gzbtns button,.cinlist button,.tabbar a,.x,.gr,.levels button,.seg button,.seg2 button,.seg3 button{transition:transform 460ms var(--ease-spring),background-color 200ms ease,color 200ms ease,box-shadow 200ms ease,opacity 200ms ease}
+.btn:active,.tile:active,.cbtn:active,.wbtn:active,.opt:not([disabled]):active,.deck:active,.mode:active,.next:active,.daily:active,.heroplay:active,.mslv:active,.tlslot:active,.choices button:active,.op:active,.lv:active,.chip:active,.histbtn:active,.ib:active,.zbtn:active,.simp:active,.tpl:active,.gzbtns button:active,.cinlist button:active,.x:active{transform:scale(.96);transition:transform 90ms var(--ease-out),background-color 90ms ease}
+.grow:active{transform:scale(.975);transition:transform 90ms var(--ease-out),background-color 90ms ease;background-color:color-mix(in srgb,var(--ink) 5%,var(--surface))!important}
+.grow:active .gi{transform:scale(.92)}
+.gi{transition:transform 460ms var(--ease-spring)}
+
+/* the tab bar stays put while the page under it changes */
+.tabbar{view-transition-name:tabbar}
+::view-transition-old(tabbar),::view-transition-new(tabbar){animation:none;mix-blend-mode:normal}
+::view-transition-group(tabbar){animation:none}
+body .tabbar a{transition:transform 460ms var(--ease-spring),color 200ms ease}
+body .tabbar a:active{transform:scale(.86);transition:transform 90ms var(--ease-out)}
+.tabbar a svg{transition:transform 460ms var(--ease-spring)}
+@keyframes tabpop{0%{transform:scale(.72)}55%{transform:scale(1.12)}100%{transform:scale(1)}}
+.tabbar.arrived a[aria-current="page"] svg{animation:tabpop 520ms var(--ease-out) 60ms both}
+.tabbar a span{transition:color 200ms ease}
+
+/* the compact title that takes over when the large title scrolls away */
+.navc{position:fixed;left:0;right:0;top:0;z-index:14;height:calc(44px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;place-items:center;pointer-events:none;
+  background:var(--glass,rgba(249,249,251,.82));backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:.5px solid var(--line);
+  opacity:0;transition:opacity 220ms var(--ease-out)}
+.navc span{font:600 17px/1 var(--f-body,-apple-system,system-ui,sans-serif);letter-spacing:-.02em;color:var(--ink);transform:translateY(6px);opacity:0;transition:transform 320ms var(--ease-out),opacity 220ms var(--ease-out)}
+.navc.on{opacity:1}.navc.on span{transform:none;opacity:1}
+.playing .navc,.pg-world:has(#home[hidden]) .navc{display:none}
+
+/* opening a game or lesson: it grows out of the spot you tapped */
+@keyframes zoomopen{from{opacity:0;transform:scale(.88);border-radius:28px}to{opacity:1;transform:none;border-radius:0}}
+.gplay.opening,.pg-math .play.opening{transform-origin:var(--tapx,50%) var(--tapy,50%);animation:zoomopen 380ms var(--ease-drawer) both}
+.pg-world #play:not([hidden]){transform-origin:var(--tapx,50%) var(--tapy,50%);animation:zoomopen 380ms var(--ease-drawer) both}
+.pg-world #home:not([hidden]){animation:fadein 220ms var(--ease-out) both}
+
+/* sections rise in as they come into view */
+.sr{opacity:0;transform:translateY(22px) scale(.985)}
+.sr.in{opacity:1;transform:none;transition:opacity 420ms var(--ease-out),transform 620ms var(--ease-drawer)}
+
+/* segmented controls: one thumb slides between options */
+.hasthumb{position:relative;isolation:isolate}
+.segthumb{position:absolute;left:0;top:0;z-index:-1;border-radius:8px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);pointer-events:none;
+  transition:transform 420ms var(--ease-spring),width 420ms var(--ease-spring),height 300ms var(--ease-out)}
+:root body .hasthumb.hasthumb>button[aria-pressed="true"]{background:transparent!important;box-shadow:none!important}
+.hasthumb>button{position:relative;transition:color 200ms ease,transform 460ms var(--ease-spring)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .segthumb{background:#636366}}
+:root[data-theme="dark"] .segthumb{background:#636366}
+.msmode{position:relative;isolation:isolate}
+body .msmode::before{content:"";position:absolute;z-index:-1;top:2px;bottom:2px;left:2px;width:calc(50% - 3px);border-radius:8px;background:var(--surface);box-shadow:0 3px 8px rgba(0,0,0,.12);transition:transform 420ms var(--ease-spring)}
+body .msmode[aria-pressed="true"]::before{transform:translateX(calc(100% + 2px))}
+:root body .msmode.msmode span{flex:1;justify-content:center;background:transparent!important;box-shadow:none!important;transition:color 200ms ease}
+:root body .msmode[aria-pressed="false"] span:last-child,:root body .msmode[aria-pressed="true"] span:first-child{color:var(--ink-3)!important}
+
+/* answers: right springs up, wrong shakes */
+@keyframes okpop{0%{transform:scale(1)}35%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes noshake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(2px)}}
+.fb-ok{animation:okpop 420ms var(--ease-spring) both!important}
+.fb-no{animation:noshake 420ms var(--ease-out) both!important}
+.btn.right,.hlc.ok,.cell.ok,.nmres.ok,.pg-math .ans.ok{animation:okpop 440ms var(--ease-spring) both}
+.btn.wrong,.hlc.no,.cell.no,.nmres.no,.xc.wrong,.pg-math .ans.no{animation:noshake 420ms var(--ease-out) both}
+
+/* the success flash glows in from the edges instead of a flat tint */
+.flash.on{animation-timing-function:var(--ease-out)!important}
+
+/* progress fills grow from empty on first view */
+@keyframes growx{from{transform:scaleX(0)}}
+.dprog i,.pg-math .rank .bar i,.pg-math .xpbar i{transform-origin:left center;animation:growx 900ms var(--ease-drawer) 200ms both}
+.dprog i{transition:width 700ms var(--ease-drawer)}
+
+/* the Today card: the play button breathes once to point you at it, chips follow the title */
+.herochips span{animation:rise 380ms var(--ease-out) both}
+.herochips span:nth-child(2){animation-delay:70ms}
+.wrap.enter .heroplay{animation:rise 420ms var(--ease-out) 160ms both}
+.hgl{transition:transform 460ms var(--ease-spring)}.heroplay:active .hgl{transform:scale(.85) rotate(-6deg)}
+.ring b{animation:land 520ms var(--ease-spring) 120ms both}
+
+/* home rows: icons land a beat after their rows */
+.wrap.enter .glist>.grow .gi{animation:iconin 520ms var(--ease-spring) both;animation-delay:inherit}
+@keyframes iconin{from{opacity:0;transform:scale(.6) rotate(-8deg)}}
+.wrap.enter .glist>.grow:nth-child(1) .gi{animation-delay:60ms}.wrap.enter .glist>.grow:nth-child(2) .gi{animation-delay:90ms}.wrap.enter .glist>.grow:nth-child(3) .gi{animation-delay:120ms}.wrap.enter .glist>.grow:nth-child(4) .gi{animation-delay:150ms}.wrap.enter .glist>.grow:nth-child(5) .gi{animation-delay:180ms}.wrap.enter .glist>.grow:nth-child(n+6) .gi{animation-delay:210ms}
+.sr.in .grow .gi{animation:iconin 520ms var(--ease-spring) both}
+.sr.in .grow:nth-child(2) .gi{animation-delay:40ms}.sr.in .grow:nth-child(3) .gi{animation-delay:80ms}.sr.in .grow:nth-child(4) .gi{animation-delay:120ms}.sr.in .grow:nth-child(5) .gi{animation-delay:160ms}.sr.in .grow:nth-child(n+6) .gi{animation-delay:200ms}
+.gr.done i{animation:pop 420ms var(--ease-spring) both}
+
+/* results: the card lifts in, the score lands with a spring, then the rest */
+.gstage.enter .card.center,.wrap.enter .card.center{animation:resultin 520ms var(--ease-drawer) both}
+@keyframes resultin{from{opacity:0;transform:translateY(24px) scale(.96)}}
+.card.center .big{animation:land 560ms var(--ease-spring) 140ms both}
+.card.center .cheer{animation:rise 360ms var(--ease-out) 320ms both}
+.sharerow{animation:rise 360ms var(--ease-out) 380ms both}
+
+/* World / USA / Earth: lesson cards and the map breathe in */
+.pg-world .next .go{transition:transform 460ms var(--ease-spring)}
+.pg-world .next svg.deco{animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* closing a game: home settles back in under you */
+@keyframes homeback{from{opacity:.4;transform:scale(.965)}}
+.wrap.back{animation:homeback 360ms var(--ease-drawer) both}
+
+/* game screens: the top bar slides down, the stage follows */
+@keyframes bardown{from{opacity:0;transform:translateY(-8px)}}
+.gplay.opening .gtop{animation:bardown 320ms var(--ease-out) 80ms both}
+
+/* the game boards settle in cell by cell */
+.gplay.opening .msboard,.gplay.opening .qboard,.gplay.opening .board,.gplay.opening .grid{animation:boardin 520ms var(--ease-spring) 120ms both}
+@keyframes boardin{from{opacity:0;transform:scale(.94)}}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:150ms!important;animation-delay:0ms!important;transition-duration:120ms!important}
   .wrap.enter>*,.gstage.enter>*,.gstage.enter>*>*,.wrap.enter .glist>.grow,.pg-world .home:not([hidden])>*,.fb,.model,.simple,.hl .hlb,.wlrow.reveal>*,.card.center .big,.gplay.opening{animation-name:fadein!important}
   .sheet:not([hidden]) .in{animation:none!important}
   ::view-transition-old(root),::view-transition-new(root){animation:none!important}
   .btn:active,.tile:active,.grow:active,.mode:active,.next:active{transform:none!important}
+  .gplay.opening,.pg-math .play.opening,.pg-world #play:not([hidden]),.wrap.back,.card.center,.card.center .big,.gi,.ring b,.herochips span,.heroplay{animation-name:fadein!important}
+  .fb-ok,.fb-no,.btn.right,.btn.wrong,.hlc.ok,.hlc.no,.tabbar.arrived a svg,.pg-world .next svg.deco{animation:none!important}
+  .sr{opacity:1;transform:none}
+  .segthumb,.msmode::before{transition:none}
 }
 /* ==/MOTION== */
 /* ==NATIVE== */
@@ -1282,7 +1410,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.09-2200";
+const APP_VERSION="2026.11.09-2222";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -1584,37 +1712,99 @@ function startLights(){
     if(!on.some(Boolean)){ good(); later(()=>finish("lights",elapsed(),{key, sub:`${moves} moves (best possible: ${presses} or fewer).`}),700); } });
 }
 
-/* ================= GAME ICONS: one line glyph per game, drawn on the game's color ================= */
-const GL=(p,extra="")=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${extra}>${p}</svg>`;
+/* ================= GAME ICONS =================
+   Each game gets its own app icon: a colored gradient tile with layered art on top (white, tinted and accent shapes),
+   48×48, drawn by hand. The gradient sits on the svg itself, so no ids are shared between copies of an icon. */
+const GICO=(a,b,art)=>`<svg class="gico" viewBox="0 0 48 48" aria-hidden="true" style="background:linear-gradient(160deg,${a},${b})">${art}</svg>`;
+const GW="#fff", GW7="rgba(255,255,255,.72)", GW4="rgba(255,255,255,.42)", GW2="rgba(255,255,255,.22)", GSH="rgba(0,0,30,.18)";
 const GLYPH_BASE={
-  mini:GL('<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16"/><rect x="14.7" y="4" width="5.3" height="5.3" fill="currentColor" stroke="none"/><rect x="4" y="14.7" width="5.3" height="5.3" fill="currentColor" stroke="none"/>'),
-  groups:GL('<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="2" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="2"/>'),
-  dive:GL('<path d="M6.5 4.5h11L21 9l-9 11L3 9z"/><path d="M3 9h18M9.5 4.5 8 9l4 11 4-11-1.5-4.5"/>'),
-  climb:GL('<circle cx="12" cy="7.5" r="3"/><circle cx="5.5" cy="10" r="2.2"/><circle cx="18.5" cy="10" r="2.2"/><path d="M6.5 20a5.5 5.5 0 0 1 11 0M2 19a3.6 3.6 0 0 1 5-3.3M22 19a3.6 3.6 0 0 0-5-3.3"/>'),
-  strands:GL('<circle cx="5" cy="6" r="1.6" fill="currentColor"/><circle cx="12" cy="6" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="18.5" r="1.6" fill="currentColor"/><circle cx="5" cy="18.5" r="1.6"/><path d="M5 6h7v6h7v6.5"/>'),
-  worldle:GL('<path d="M6 5.5 10.5 4l3 2 4.5-.5 1.5 4-2 3 1.5 4.5-4 3.5-3-1.5-3.5 1-2.5-4 1-3.5L5 10z" fill="currentColor" fill-opacity=".25"/>'),
-  travle:GL('<circle cx="5.5" cy="18" r="2.5"/><circle cx="18.5" cy="6" r="2.5" fill="currentColor"/><path d="M7.5 16.5c3-1 2-5 5-6s3.5-1.5 4-2.6" stroke-dasharray="2.4 2.6"/>'),
-  globle:GL('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/>'),
-  nbrs:GL('<path d="M12 3.5 16 6v4.5L12 13 8 10.5V6z" fill="currentColor"/><path d="M8 10.5 4 13v4.5L8 20l4-2.5V13M12 13l4-2.5 4 2.5v4.5L16 20l-4-2.5"/>'),
-  flagle:GL('<path d="M5 21V4"/><path d="M5 4.5h12.5l-2.2 3.8 2.2 3.7H5" fill="currentColor" fill-opacity=".3"/>'),
-  hilo:GL('<path d="M8 19V5M4.5 8.5 8 5l3.5 3.5"/><path d="M16 5v14M12.5 15.5 16 19l3.5-3.5"/>'),
-  queens:GL('<path d="M4 17.5 3 7.5l5 4 4-6.5 4 6.5 5-4-1 10z" fill="currentColor" fill-opacity=".25"/><path d="M4.5 20.5h15"/>'),
-  timeline:GL('<path d="M3 12h18"/><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2" fill="currentColor"/><path d="M6 6.5v3M12 14.5v3M18 6.5v3"/>'),
-  mines:GL('<circle cx="11" cy="13.5" r="6.5" fill="currentColor" fill-opacity=".25"/><path d="M15.6 8.9 18 6.5M17 4.5l2.5 2.5M19.5 3.5v1.5M21 6h-1.5"/><circle cx="8.8" cy="11.3" r="1.2" fill="currentColor" stroke="none"/>'),
-  maptap:GL('<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/>'),
-  statele:GL('<path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="currentColor" fill-opacity=".25"/>'),
-  dsudoku:GL('<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M12 4v16M4 12h16"/><path d="M7 7.6h1.6v2.9M14.8 15.2c.4-.6 1.3-.8 1.9-.4.7.5.6 1.4 0 2l-1.9 1.9h2.4" stroke-width="1.5"/>'),
-  seq:GL('<circle cx="6" cy="6" r="1.7"/><circle cx="12" cy="6" r="1.7"/><circle cx="18" cy="6" r="1.7" fill="currentColor"/><circle cx="6" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7"/><circle cx="18" cy="12" r="1.7"/><circle cx="6" cy="18" r="1.7"/><circle cx="12" cy="18" r="1.7" fill="currentColor"/><circle cx="18" cy="18" r="1.7"/>'),
-  num:GL('<path d="M5 8.5 7 7v10M10.5 9a2 2 0 0 1 4 0c0 1.5-1.5 2.5-4 5.5v2.5h4.5M17 7.5h3l-2 3.2a2.4 2.4 0 1 1-1.4 4.6"/>'),
-  match:GL('<rect x="3.5" y="5" width="9" height="13" rx="2" transform="rotate(-8 8 11.5)"/><rect x="11.5" y="6" width="9" height="13" rx="2" fill="currentColor" fill-opacity=".3" transform="rotate(8 16 12.5)"/>'),
-  react:GL('<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" fill="currentColor" fill-opacity=".25"/>'),
-  stroop:GL('<path d="M12 3.5s6 6.3 6 10.5a6 6 0 0 1-12 0c0-4.2 6-10.5 6-10.5z"/><path d="M9.5 14.5a2.6 2.6 0 0 0 2.5 2.6"/>'),
-  schulte:GL('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>'),
-  count:GL('<rect x="5" y="3.5" width="14" height="17" rx="3"/><rect x="8" y="6.5" width="8" height="3.5" rx="1"/><path d="M8.5 13.5h.01M12 13.5h.01M15.5 13.5h.01M8.5 17h.01M12 17h.01M15.5 17h.01" stroke-width="2.6"/>'),
-  sudoku:GL('<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>'),
-  lights:GL('<path d="M9 17.5h6M10 20.5h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5.9 1.2.9 2v.2h5.4v-.2c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z" fill="currentColor" fill-opacity=".25"/>')
+  /* Mini crossword: a white grid with two black squares and a letter */
+  mini:GICO("#5b9bff","#2b5fe0",`<rect x="10" y="11" width="28" height="28" rx="5" fill="${GSH}"/><rect x="10" y="9" width="28" height="28" rx="5" fill="${GW}"/>
+    <path d="M19.3 9v28M28.7 9v28M10 18.3h28M10 27.7h28" stroke="#c9d6f5" stroke-width="1.4"/>
+    <path d="M28.7 9H33a5 5 0 0 1 5 5v4.3h-9.3zM10 27.7h9.3V37H15a5 5 0 0 1-5-5z" fill="#1d2f6b"/>
+    <text x="14.65" y="16.4" font-size="7.5" font-weight="800" text-anchor="middle" fill="#2b5fe0" font-family="-apple-system,system-ui,sans-serif">A</text>`),
+  /* Connections: four colored tiles */
+  groups:GICO("#a77dff","#6a3ce0",`<g fill="${GSH}"><rect x="9" y="11" width="14" height="14" rx="4"/><rect x="25" y="11" width="14" height="14" rx="4"/><rect x="9" y="27" width="14" height="14" rx="4"/><rect x="25" y="27" width="14" height="14" rx="4"/></g>
+    <rect x="9" y="9" width="14" height="14" rx="4" fill="#ffd54a"/><rect x="25" y="9" width="14" height="14" rx="4" fill="#7ee08f"/><rect x="9" y="25" width="14" height="14" rx="4" fill="#78bcff"/><rect x="25" y="25" width="14" height="14" rx="4" fill="#ff93bd"/>`),
+  /* Krillion: a gem sinking past bubbles */
+  dive:GICO("#32c7ea","#0a63b0",`<circle cx="12" cy="13" r="2.4" fill="${GW4}"/><circle cx="16.5" cy="8.5" r="1.4" fill="${GW4}"/><circle cx="37" cy="36" r="1.8" fill="${GW4}"/>
+    <path d="M17 13h14l6 8-13 16-13-16z" fill="${GW}"/><path d="M11 21h26L24 37z" fill="#bfeaff"/><path d="M17 13l3.5 8L24 13l3.5 8L31 13" fill="none" stroke="#8fd5f5" stroke-width="1.3" stroke-linejoin="round"/><path d="M20.5 21 24 37l3.5-16" fill="none" stroke="#8fd5f5" stroke-width="1.3"/>`),
+  /* Reverse Krillion: peaks with a flag on the summit */
+  climb:GICO("#ffb547","#f0601e",`<path d="M4 40 17 20l6 9 6-11 15 22z" fill="${GW7}"/><path d="M4 40 17 20l13 20z" fill="${GW}"/><path d="M17 20l-3.4 5.2 2 1.4 1.4-1.2 1.6 1.4 1.6-1.2z" fill="#ffd8a8"/>
+    <path d="M29 18V7" stroke="${GW}" stroke-width="2" stroke-linecap="round"/><path d="M29.6 7.4h8l-2.2 3 2.2 3h-8z" fill="#c73c0c"/>`),
+  /* Strands: letters joined into a snake */
+  strands:GICO("#ffd75e","#f29c00",`<path d="M13 13h11v11h11v11" fill="none" stroke="${GW}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="13" cy="13" r="5" fill="${GW}"/><circle cx="24" cy="13" r="5" fill="${GW}"/><circle cx="24" cy="24" r="5" fill="${GW}"/><circle cx="35" cy="24" r="5" fill="${GW}"/><circle cx="35" cy="35" r="5" fill="#2f7bf5"/><circle cx="13" cy="35" r="4" fill="${GW4}"/>`),
+  /* Worldle: a country outline on a faint grid */
+  worldle:GICO("#3edc9c","#0b9467",`<path d="M8 16h32M8 24h32M8 32h32M16 8v32M24 8v32M32 8v32" stroke="${GW2}" stroke-width="1"/>
+    <path d="M14 11.5l7.5 2.5 4-3 6.5 3.2 2.6 6.3-2.4 3.6 3.4 4.6-4.4 6.3-6.2-1-3.3 4.2-5-3.2-.8-6-4.3-3.4 1.5-6.4z" fill="${GSH}" stroke="${GSH}" stroke-width="2" stroke-linejoin="round" transform="translate(0 1.6)"/>
+    <path d="M14 11.5l7.5 2.5 4-3 6.5 3.2 2.6 6.3-2.4 3.6 3.4 4.6-4.4 6.3-6.2-1-3.3 4.2-5-3.2-.8-6-4.3-3.4 1.5-6.4z" fill="${GW}" stroke="${GW}" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="25" cy="24" r="2.2" fill="#0b9467"/>`),
+  /* Travle: a dotted route between two pins */
+  travle:GICO("#4fe3cf","#0b8c86",`<path d="M14 33c0-8 20-4 20-14" fill="none" stroke="${GW}" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.1 5.4"/>
+    <path d="M14 39s-6-6.2-6-10.4a6 6 0 0 1 12 0C20 32.8 14 39 14 39z" fill="${GW}"/><circle cx="14" cy="28.6" r="2.3" fill="#0b8c86"/>
+    <path d="M34 25s-6-6.2-6-10.4a6 6 0 0 1 12 0C40 18.8 34 25 34 25z" fill="#ffe066"/><circle cx="34" cy="14.6" r="2.3" fill="#0b8c86"/>`),
+  /* Globle: a globe with a hot spot */
+  globle:GICO("#ff9a5c","#e2364f",`<circle cx="24" cy="25.6" r="15" fill="${GSH}"/><circle cx="24" cy="24" r="15" fill="${GW}"/>
+    <g fill="none" stroke="#ffd2c6" stroke-width="1.4"><path d="M9 24h30"/><ellipse cx="24" cy="24" rx="6.5" ry="15"/><path d="M11 16.5h26M11 31.5h26"/></g>
+    <circle cx="29" cy="29" r="9" fill="#ff6a3d" opacity=".18"/><circle cx="29" cy="29" r="6" fill="#ff6a3d" opacity=".32"/><circle cx="29" cy="29" r="3.4" fill="#f03d2a"/>`),
+  /* Neighbors: countries that share borders */
+  nbrs:GICO("#b4ec51","#4a9a0c",`<g stroke="#5aa816" stroke-width="1.6" stroke-linejoin="round"><path d="M8 9h15v11l-4 4H8z" fill="${GW}"/><path d="M23 9h17v13H29l-6-2z" fill="${GW7}"/>
+    <path d="M19 24l4-4 6 2h11v17H19z" fill="${GW4}"/><path d="M8 24h11v15H8z" fill="${GW7}"/></g><circle cx="15" cy="16" r="2.4" fill="#4a9a0c"/>`),
+  /* Flagle: a waving flag */
+  flagle:GICO("#ff7b7b","#d42424",`<path d="M13 9v31" stroke="${GW}" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M14 10c5-3 9 3 14 0s7-1 9 0v15c-2-1-4-3-9 0s-9-3-14 0z" fill="${GW}"/><path d="M14 18.2c5-3 9 3 14 0s7-1 9 0v-1c-2-1-4-3-9 0" fill="none"/>
+    <path d="M14 15c5-3 9 3 14 0s7-1 9 0v5c-2-1-4-3-9 0s-9-3-14 0z" fill="#ffb4b4"/>`),
+  /* Higher or Lower: one arrow up, one down */
+  hilo:GICO("#69aefc","#2459e6",`<path d="M17 9l9 10h-5.5v18h-7V19H8z" fill="${GW}"/><path d="M31 39l-9-10h5.5V11h7v18H40z" fill="${GW4}"/>`),
+  /* Queens: a gold crown on a board */
+  queens:GICO("#c58cff","#8b2fe0",`<g fill="${GW2}"><rect x="8" y="8" width="16" height="16" rx="3"/><rect x="24" y="24" width="16" height="16" rx="3"/></g>
+    <path d="M11 33l-2-14 8 6 7-11 7 11 8-6-2 14z" fill="#ffd54a"/><path d="M11 33h26v4H11z" fill="#f5b400"/><circle cx="24" cy="13" r="2.2" fill="#ffd54a"/><circle cx="9" cy="18.5" r="1.8" fill="#ffd54a"/><circle cx="39" cy="18.5" r="1.8" fill="#ffd54a"/>`),
+  /* Timeline: cards placed along a line */
+  timeline:GICO("#ffbe7a","#ea5a0c",`<path d="M6 30h36" stroke="${GW7}" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="7" y="13" width="10" height="12" rx="2.5" fill="${GW7}"/><rect x="19" y="9" width="10" height="16" rx="2.5" fill="${GW}"/><rect x="31" y="15" width="10" height="10" rx="2.5" fill="${GW7}"/>
+    <circle cx="12" cy="30" r="3" fill="${GW}"/><circle cx="24" cy="30" r="3.4" fill="#fff3d6" stroke="${GW}" stroke-width="1.6"/><circle cx="36" cy="30" r="3" fill="${GW}"/><path d="M21.5 14h5M21.5 18h3.5" stroke="#ea5a0c" stroke-width="1.6" stroke-linecap="round"/>`),
+  /* Minesweeper: a mine and a flag */
+  mines:GICO("#9aa8bd","#3f4a5e",`<path d="M24 8v5M24 35v5M8 24h5M35 24h5M12.7 12.7l3.5 3.5M31.8 31.8l3.5 3.5M12.7 35.3l3.5-3.5M31.8 16.2l3.5-3.5" stroke="#141a26" stroke-width="3.4" stroke-linecap="round"/>
+    <circle cx="24" cy="24" r="11" fill="#141a26"/><circle cx="20" cy="20" r="3.4" fill="${GW}" opacity=".9"/><circle cx="17.8" cy="25.5" r="1.2" fill="${GW}" opacity=".35"/>`),
+  /* Map Tap: a pin dropped on a target */
+  maptap:GICO("#ff86c3","#d0216f",`<ellipse cx="24" cy="36" rx="14" ry="5" fill="none" stroke="${GW4}" stroke-width="2"/><ellipse cx="24" cy="36" rx="7" ry="2.5" fill="none" stroke="${GW7}" stroke-width="2"/>
+    <path d="M24 36s-9-9.5-9-16a9 9 0 0 1 18 0c0 6.5-9 16-9 16z" fill="${GW}"/><circle cx="24" cy="20" r="3.6" fill="#d0216f"/>`),
+  /* Statele: a state shape with a star */
+  statele:GICO("#7fb6ff","#1c47c9",`<path d="M12 10h12v9h12l2 3-1 8-6 5-3 5-4-4-4 1-3-6-6-2-1-4h1z" fill="${GSH}" transform="translate(0 1.5)"/><path d="M12 10h12v9h12l2 3-1 8-6 5-3 5-4-4-4 1-3-6-6-2-1-4h1z" fill="${GW}"/>
+    <path d="M24 21.5l1.8 3.6 4 .6-2.9 2.8.7 4L24 30.6l-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="#ff4d4d"/>`),
+  /* Daily sudoku: a 6×6 with digits */
+  dsudoku:GICO("#45c9ff","#0369b0",`<rect x="9" y="10.5" width="30" height="30" rx="5" fill="${GSH}"/><rect x="9" y="9" width="30" height="30" rx="5" fill="${GW}"/>
+    <path d="M19 9v30M29 9v30M9 19h30M9 29h30" stroke="#b8dcf2" stroke-width="1.3"/>
+    <g font-family="-apple-system,system-ui,sans-serif" font-weight="800" font-size="8" text-anchor="middle" fill="#0369b0"><text x="14" y="17">3</text><text x="34" y="27">5</text><text x="24" y="37">1</text></g><rect x="20" y="20" width="8" height="8" rx="1.6" fill="#0369b0" opacity=".16"/>`),
+  /* Sequence memory: lit tiles */
+  seq:GICO("#ee86ff","#a11fbd",`<g fill="${GW2}">${[0,1,2].flatMap(r=>[0,1,2].map(c=>`<rect x="${9+c*10.5}" y="${9+r*10.5}" width="9" height="9" rx="2.4"/>`)).join("")}</g>
+    <rect x="9" y="9" width="9" height="9" rx="2.4" fill="${GW}"/><rect x="19.5" y="19.5" width="9" height="9" rx="2.4" fill="${GW}"/><rect x="30" y="19.5" width="9" height="9" rx="2.4" fill="${GW7}"/><rect x="30" y="30" width="9" height="9" rx="2.4" fill="${GW}"/>`),
+  /* Number memory */
+  num:GICO("#b59cff","#6a2fe0",`<rect x="7" y="14" width="34" height="20" rx="6" fill="${GW}"/><text x="24" y="29.5" font-family="-apple-system,system-ui,sans-serif" font-weight="800" font-size="14" text-anchor="middle" fill="#6a2fe0" letter-spacing="1">123</text>
+    <rect x="15" y="37" width="18" height="3" rx="1.5" fill="${GW4}"/>`),
+  /* Card match: two cards, one face up */
+  match:GICO("#ff7a95","#c3123d",`<rect x="8" y="12" width="17" height="24" rx="3.5" fill="${GW4}" transform="rotate(-10 16.5 24)"/>
+    <rect x="21" y="11" width="18" height="26" rx="3.5" fill="${GW}" transform="rotate(6 30 24)"/><path d="M30 31s-5-3-5-6.6a2.6 2.6 0 0 1 5-1 2.6 2.6 0 0 1 5 1c0 3.6-5 6.6-5 6.6z" fill="#e8264f" transform="rotate(6 30 24)"/>`),
+  /* Reaction time: a bolt */
+  react:GICO("#ffe14a","#f0a000",`<path d="M27 6 12 27h10l-3 15 17-23H26z" fill="${GSH}" transform="translate(1 1.5)"/><path d="M27 6 12 27h10l-3 15 17-23H26z" fill="${GW}"/><path d="M27 6 12 27h10l4-21z" fill="#fff7c7"/>`),
+  /* Color clash: overlapping inks */
+  stroop:GICO("#3a4458","#141a26",`<g style="mix-blend-mode:screen"><circle cx="19" cy="19.5" r="9" fill="#ff3b5c"/><circle cx="29" cy="19.5" r="9" fill="#34d058"/><circle cx="24" cy="28.5" r="9" fill="#3b82ff"/></g>`),
+  /* Number hunt: a target with numbers around */
+  schulte:GICO("#5fe6ff","#0a8bb8",`<circle cx="24" cy="24" r="14" fill="${GW}"/><circle cx="24" cy="24" r="9.5" fill="#bdefff"/><circle cx="24" cy="24" r="5" fill="${GW}"/><circle cx="24" cy="24" r="2.2" fill="#0a8bb8"/>
+    <path d="M36 12 26 22" stroke="#0a3d55" stroke-width="2.4" stroke-linecap="round"/><path d="M36 12l1-4M36 12l4-1" stroke="#0a3d55" stroke-width="2" stroke-linecap="round"/>`),
+  /* Countdown: the four operators */
+  count:GICO("#5ee38f","#109447",`<rect x="9" y="9" width="13" height="13" rx="3.5" fill="${GW}"/><rect x="26" y="9" width="13" height="13" rx="3.5" fill="${GW7}"/><rect x="9" y="26" width="13" height="13" rx="3.5" fill="${GW7}"/><rect x="26" y="26" width="13" height="13" rx="3.5" fill="${GW}"/>
+    <path d="M12.5 15.5h6M15.5 12.5v6M29.5 15.5h6M12.8 29.8l5.4 5.4M18.2 29.8l-5.4 5.4M29.5 32.5h6" stroke="#109447" stroke-width="2.2" stroke-linecap="round"/><circle cx="32.5" cy="29.6" r="1.2" fill="#109447"/><circle cx="32.5" cy="35.4" r="1.2" fill="#109447"/>`),
+  /* Mini sudoku */
+  sudoku:GICO("#9aa6ff","#4136d6",`<rect x="9" y="10.5" width="30" height="30" rx="5" fill="${GSH}"/><rect x="9" y="9" width="30" height="30" rx="5" fill="${GW}"/>
+    <path d="M24 9v30M9 19h30M9 29h30" stroke="#c5c9f5" stroke-width="1.3"/><path d="M16.5 9v30M31.5 9v30" stroke="#e4e6fb" stroke-width="1"/>
+    <g font-family="-apple-system,system-ui,sans-serif" font-weight="800" font-size="7.5" text-anchor="middle" fill="#4136d6"><text x="12.8" y="16.8">6</text><text x="28" y="26.8">2</text><text x="20.2" y="36.8">4</text><text x="35.2" y="36.8">1</text></g>`),
+  /* Lights out: a glowing bulb on a dark tile */
+  lights:GICO("#334160","#0e1424",`<circle cx="24" cy="20" r="13" fill="#ffd54a" opacity=".18"/><circle cx="24" cy="20" r="9.5" fill="#ffd54a" opacity=".25"/>
+    <path d="M24 10a8 8 0 0 0-4.8 14.4c.8.6 1.3 1.6 1.3 2.6V29h7v-2c0-1 .5-2 1.3-2.6A8 8 0 0 0 24 10z" fill="#ffe27a"/><path d="M20.5 32h7M21.5 35.5h5" stroke="#cdd6e8" stroke-width="2.2" stroke-linecap="round"/><path d="M21 15.5a4 4 0 0 1 3-1.8" stroke="${GW}" stroke-width="1.8" stroke-linecap="round" fill="none"/>`)
 };
-/* unlimited versions share their daily game's icon */
+/* unlimited versions share their daily game's icon (the row adds an infinity badge) */
 const GLYPH=Object.assign({},GLYPH_BASE,{strandsu:GLYPH_BASE.strands,worldleu:GLYPH_BASE.worldle,travleu:GLYPH_BASE.travle,globleu:GLYPH_BASE.globle,nbrsu:GLYPH_BASE.nbrs,flagleu:GLYPH_BASE.flagle,hilou:GLYPH_BASE.hilo,queensu:GLYPH_BASE.queens,timelineu:GLYPH_BASE.timeline,msu:GLYPH_BASE.mines,maptapu:GLYPH_BASE.maptap,stateleu:GLYPH_BASE.statele,diveu:GLYPH_BASE.dive,climbu:GLYPH_BASE.climb});
 
 /* ================= ICONS =================
@@ -3510,7 +3700,7 @@ function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="ds
 function gameRow(k,g,col){ const c=g.col||col; let right;
   if(g.cat==="daily"){ const d=dailyStat(k); right=d.st==="done"?`<span class="gr done"><i>✓</i>${esc(d.r)}</span>`:d.st==="go"?`<span class="gr go">Resume</span>`:`<span class="gr new">Play</span>`; }
   else { let bv=null; try{ const b=bestOf(k); if(b.v!=null) bv=g.fmt(b.v); }catch(e){} right=bv!=null?`<span class="gr best"><small>Best</small>${esc(bv)}</span>`:`<span class="gr chev" aria-hidden="true">›</span>`; }
-  return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${GLYPH[k]||g.ic}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
+  return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${GLYPH[k]||g.ic}${g.cat==="unl"?`<i class="ginf" aria-hidden="true"><svg viewBox="0 0 24 12"><path d="M6 2.5a3.5 3.5 0 1 0 0 7c3.5 0 8.5-7 12-7a3.5 3.5 0 1 1 0 7c-3.5 0-8.5-7-12-7z"/></svg></i>`:""}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
 /* the "Today" card at the top: date, a ring for today's daily games, streak, and the next game to play */
 function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="daily"), done=daily.filter(([k])=>dailyStat(k).st==="done").length, n=daily.length, p=done/n;
   const next=daily.find(([k])=>dailyStat(k).st!=="done"), st=dayStreak(), R=34, C=2*Math.PI*R;
@@ -3523,13 +3713,10 @@ function heroCard(){ const daily=Object.entries(GAMES).filter(([k,g])=>g.cat==="
 let HOME_Y=null;
 function home(){
   const backTo=HOME_Y; HOME_Y=null; if(backTo!=null) QUIET=true;
-  const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
   show(`
   <div class="brand">${LOGO}<h1>Games</h1>
     <nav class="tabs" aria-label="Edition"><a href="../">World</a><a href="../usa/">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="./" aria-current="page">Games</a><a href="../test3/">Test 3</a></nav></div>
   ${heroCard()}
-  <button class="workout" data-act="wk"><b>${wdone===3?"Workout done ✓":"Daily workout"}</b><span>${wdone===3?`Nice. ${st}-day streak. Replay any game below.`:"Three games, about four minutes: memory, speed, logic."}</span>
-    <div class="steps3">${WORKOUT.map(x=>`<span class="${w[x]!=null?"done":""}">${GLYPH[x]||GAMES[x].ic} ${x==="sudoku"?"Mini sudoku":esc(GAMES[x].name)}${w[x]!=null?` · ${esc(GAMES[x].fmt(w[x]))}`:""}</span>`).join("")}</div></button>
   ${CATS.map(([c,name,sub,col])=>{ const list=Object.entries(GAMES).filter(([k,g])=>g.cat===c), dn=c==="daily"?list.filter(([k])=>dailyStat(k).st==="done").length:0;
     return `<section class="sec"><div class="sech"><h2>${name}</h2>${c==="daily"?`<span class="dcount${dn===list.length?" all":""}">${dn===list.length?"All done ✓":`${dn} of ${list.length} done`}</span>`:`<span>${sub}</span>`}</div>${c==="daily"?`<div class="dprog"><i style="width:${Math.round(dn/list.length*100)}%"></i></div>`:""}<div class="glist">${list.map(([k,g])=>gameRow(k,g,col)).join("")}</div></section>`; }).join("")}
   <button class="btn ghost wide" data-act="arch">Puzzle archive: every crossword and Connections puzzle</button>
@@ -3543,7 +3730,7 @@ function home(){
     <div>Version ${esc(APP_VERSION)}</div>
   </div>`);
   GT_BK.ui($('bk'),{beforeBackup:save});
-  if(backTo!=null){ window.scrollTo(0,backTo); requestAnimationFrame(()=>window.scrollTo(0,backTo)); }
+  if(backTo!=null){ window.scrollTo(0,backTo); requestAnimationFrame(()=>window.scrollTo(0,backTo)); app.style.transformOrigin=`50% ${Math.round(backTo+innerHeight/2)}px`; app.classList.remove("back"); void app.offsetWidth; app.classList.add("back"); clearTimeout(home.bt); home.bt=setTimeout(()=>app.classList.remove("back"),420); }
 }
 const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),flagle:()=>startFlagle(),flagleu:()=>startFlagle({unlimited:true}),hilo:()=>startHiLo(),hilou:()=>startHiLo({unlimited:true}),queens:()=>startQueens(),queensu:()=>startQueens({unlimited:true}),timeline:()=>startTimeline(),mines:()=>startMines(),msu:()=>startMines({unlimited:true}),maptap:()=>startMapTap(),maptapu:()=>startMapTap({unlimited:true}),statele:()=>startStatele(),stateleu:()=>startStatele({unlimited:true}),timelineu:()=>startTimeline({unlimited:true}),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
@@ -3604,6 +3791,72 @@ try{ home(); }catch(e){ console.error(e); window.__rescue&&window.__rescue((e&&e
   const nav=document.createElement("nav"); nav.className="tabbar"; nav.setAttribute("aria-label","Tabs");
   nav.innerHTML=T.map(([k,n,ic])=>`<a href="${root}${k?k+"/":""}"${k===cur?' aria-current="page"':""}>${ic}<span>${n}</span></a>`).join("");
   document.body.appendChild(nav); document.body.classList.add("has-tabbar");
+})();
+/* ================= SHELL MOTION =================
+   Shared by every tab: a compact title that fades into a top bar once the large title scrolls away,
+   haptic taps, numbers that count up, sections that rise in as you scroll, sliding segmented controls,
+   and games and lessons that open from the spot you tapped. */
+(function(){
+  const D=document, B=D.body, RM=matchMedia("(prefers-reduced-motion: reduce)");
+  /* where the last tap landed, so opening screens can grow out of it */
+  D.addEventListener("pointerdown",e=>{ const r=D.documentElement.style; r.setProperty("--tapx",e.clientX+"px"); r.setProperty("--tapy",e.clientY+"px"); },{capture:true,passive:true});
+
+  /* haptics: a real tick on iPhone (iOS 18 switch trick), a short buzz on Android */
+  const hl=D.createElement("label"), hi=D.createElement("input"); hi.type="checkbox"; hi.setAttribute("switch",""); hi.tabIndex=-1;
+  hl.setAttribute("aria-hidden","true"); hl.style.cssText="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9px;top:0";
+  hl.appendChild(hi); B.appendChild(hl); hl.addEventListener("click",e=>e.stopPropagation());
+  const haptic=()=>{ try{ if(navigator.vibrate&&!/iP(hone|ad|od)/.test(navigator.userAgent)) navigator.vibrate(8); else hl.click(); }catch(e){} };
+  window.GT_HAPTIC=haptic;
+  let lastTap=null, lastAt=0;
+  D.addEventListener("pointerdown",e=>{ lastTap=e.target.closest("button,[role=button],a,.mc,.qc,.cell,.tile"); lastAt=performance.now(); },{capture:true,passive:true});
+  /* answer feedback: the thing you tapped springs on a right answer and shakes on a wrong one */
+  function react(kind){ if(RM.matches||!lastTap||!lastTap.isConnected||performance.now()-lastAt>700) return; if(lastTap.closest(".tabbar,.pad,.kb,.dspad,.ckeys,.msboard,.qboard")) return;
+    const el=lastTap, c=kind==="no"?"fb-no":"fb-ok"; el.classList.remove("fb-ok","fb-no"); void el.offsetWidth; el.classList.add(c); setTimeout(()=>el.classList.remove(c),520); }
+  if(typeof window.snd==="function"){ const o=window.snd; window.snd=function(k){ haptic(); if(k==="ok"||k==="no") react(k); return o.apply(this,arguments); }; }
+
+  /* tab bar: a tick on tap, and the tab you land on gives a small bounce */
+  const tb=D.querySelector(".tabbar");
+  if(tb){ tb.addEventListener("click",e=>{ const a=e.target.closest("a"); if(!a) return; haptic(); try{ sessionStorage.setItem("gt-tab-pop","1"); }catch(x){} if(a.getAttribute("aria-current")==="page"){ e.preventDefault(); scrollTo({top:0,behavior:RM.matches?"auto":"smooth"}); } });
+    try{ if(sessionStorage.getItem("gt-tab-pop")){ sessionStorage.removeItem("gt-tab-pop"); tb.classList.add("arrived"); } }catch(x){} }
+
+  /* compact title bar */
+  const nb=D.createElement("div"); nb.className="navc"; nb.setAttribute("aria-hidden","true"); nb.innerHTML="<span></span>"; B.appendChild(nb);
+  let h1=null; const io=new IntersectionObserver(es=>{ for(const e of es) if(e.target===h1) nb.classList.toggle("on",!e.isIntersecting&&e.boundingClientRect.top<60); },{rootMargin:"-56px 0px 0px 0px"});
+  function bindTitle(){ const h=[...D.querySelectorAll(".brand h1")].find(x=>x.offsetParent!==null&&!x.closest("[hidden]")); if(h===h1) return; if(h1) io.unobserve(h1); h1=h||null; nb.classList.remove("on"); if(h1){ nb.firstChild.textContent=h1.textContent.trim(); io.observe(h1); } }
+
+  /* numbers count up when they first appear */
+  const CNT=".card.center .big,.ring b,.stat b,.mtres span";
+  function countUp(el){ if(RM.matches||el.dataset.counted) return; el.dataset.counted="1";
+    const tn=[...el.childNodes].find(n=>n.nodeType===3&&/\d/.test(n.data)); if(!tn) return;
+    const m=tn.data.match(/^(\D*?)(\d{1,3}(?:,\d{3})+|\d+)(.*)$/s); if(!m||/^[:.]\d/.test(m[3])||/\d$/.test(m[1])) return;
+    const to=+m[2].replace(/,/g,""); if(!(to>=2)||to>1e7) return; const comma=m[2].includes(",")||to>=10000, fmt=v=>comma?v.toLocaleString("en-US"):String(v);
+    const t0=performance.now(), dur=Math.min(900,420+to*12);
+    const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); tn.data=m[1]+fmt(Math.round(to*e))+m[3]; if(k<1&&tn.isConnected) requestAnimationFrame(step); };
+    tn.data=m[1]+fmt(0)+m[3]; requestAnimationFrame(step); }
+
+  /* sections below the fold rise in as they scroll into view */
+  const SR=".sec,.card,.mode,.tile,.deck,.trick,.glist,.cbtn,.mcard,.hcard,.part,.step";
+  const sio=new IntersectionObserver(es=>{ for(const e of es) if(e.isIntersecting){ e.target.classList.add("in"); sio.unobserve(e.target); } },{rootMargin:"0px 0px -6% 0px"});
+  function reveal(root){ if(RM.matches) return; const vh=innerHeight;
+    root.querySelectorAll(SR).forEach(el=>{ if(el.dataset.sr||el.closest(".sr:not(.in)")||el.closest(".gplay,.play:not(.home),.sheet")) return; el.dataset.sr="1"; const r=el.getBoundingClientRect(); if(!r.height||r.top<vh-10) return; el.classList.add("sr"); sio.observe(el); }); }
+
+  /* segmented controls: a thumb that slides to the chosen option, even across re-renders */
+  const SEG=".levels,.seg,.seg2,.seg3", last=new Map();
+  function segKey(c){ const b=c.querySelector("button"); return (b&&(b.dataset.act||b.dataset.k||b.dataset.v||b.textContent)||"")+"|"+c.className; }
+  function segs(root){ root.querySelectorAll(SEG).forEach(c=>{ const on=c.querySelector('button[aria-pressed="true"]'); if(!on) return;
+      let th=c.querySelector(":scope>.segthumb"); const key=segKey(c), fresh=!th;
+      if(fresh){ th=D.createElement("i"); th.className="segthumb"; th.setAttribute("aria-hidden","true"); c.prepend(th); c.classList.add("hasthumb"); }
+      const x=on.offsetLeft, y=on.offsetTop, w=on.offsetWidth, h=on.offsetHeight, prev=last.get(key);
+      if(fresh&&prev&&!RM.matches&&(prev.x!==x||prev.w!==w)){ th.style.transition="none"; th.style.transform=`translate(${prev.x}px,${prev.y}px)`; th.style.width=prev.w+"px"; th.style.height=prev.h+"px"; void th.offsetWidth; th.style.transition=""; }
+      th.style.transform=`translate(${x}px,${y}px)`; th.style.width=w+"px"; th.style.height=h+"px"; last.set(key,{x,y,w,h}); }); }
+
+  /* watch every re-render */
+  let q=0, added=[];
+  function flush(){ q=0; bindTitle(); const roots=added.splice(0); for(const n of roots){ if(!n.isConnected) continue; reveal(n); n.querySelectorAll&&n.querySelectorAll(CNT).forEach(el=>{ if(el.offsetParent!==null) countUp(el); }); if(n.matches&&n.matches(CNT)) countUp(n); } segs(D); }
+  new MutationObserver(ms=>{ for(const m of ms){ if(m.type==="childList") m.addedNodes.forEach(n=>{ if(n.nodeType===1) added.push(n); }); else if(m.target.nodeType===1) added.push(m.target); } if(!q) q=requestAnimationFrame(flush); })
+    .observe(B,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden","aria-pressed"]});
+  added.push(B); flush();
+  addEventListener("resize",()=>segs(D));
 })();
 /* ==/TABBAR== */</script>
 </body>
