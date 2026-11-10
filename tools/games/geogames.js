@@ -49,7 +49,7 @@ function geoBox(ids,pad=.18,minW=220){ let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
 function geoPathEl(c,cls,extra=""){ return c.wp?`<path class="${cls}" d="${c.wp}" ${extra}/>`:`<circle class="${cls}" cx="${c.cp[0]}" cy="${c.cp[1]}" r="3" ${extra}/>`; }
 function geoMapSVG(box,layers,vb){ const [x,y,w,h]=box, v=vb||box;
   const inView=c=>{ const b=c.bb; return b[2]>=x&&b[0]<=x+w&&b[3]>=y&&b[1]<=y+h; };
-  return `<svg class="gmap" viewBox="${v.map(n=>n.toFixed(1)).join(" ")}">${layers(inView)}</svg>`; }
+  return `<svg class="gmap" data-pad="${box.map(n=>n.toFixed(1)).join(" ")}" viewBox="${v.map(n=>n.toFixed(1)).join(" ")}">${layers(inView)}</svg>`; }
 /* a map you can zoom: pinch or scroll to zoom, drag to pan, double-tap to zoom in, buttons for +, − and reset.
    `base` is the starting view; `state` (optional) keeps the view across re-renders so a guess doesn't reset your zoom. */
 function geoZoomable(base,layers,state){ const pad=[base[0]-base[2],base[1]-base[3],base[2]*3,base[3]*3]; // draw a wider area so panning/zooming out shows more
@@ -59,7 +59,9 @@ function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").fo
   const svg=wrap.querySelector("svg"), base=wrap.dataset.base.split(" ").map(Number), ar=base[3]/base[2];
   let v=svg.getAttribute("viewBox").split(" ").map(Number);
   const minW=Math.max(24,base[2]/14), maxW=base[2]*2.6;
-  const apply=()=>{ svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" ")); if(state) state.v=v.slice(); wrap.classList.toggle("zoomed",Math.abs(v[2]-base[2])>1||Math.abs(v[0]-base[0])>1||Math.abs(v[1]-base[1])>1); };
+  // never let the map slide out of view: keep at least a quarter of the starting area on screen
+  const clamp=()=>{ v[0]=Math.min(Math.max(v[0],base[0]-v[2]*.75),base[0]+base[2]-v[2]*.25); v[1]=Math.min(Math.max(v[1],base[1]-v[3]*.75),base[1]+base[3]-v[3]*.25); };
+  const apply=()=>{ clamp(); svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" ")); if(state) state.v=v.slice(); wrap.classList.toggle("zoomed",Math.abs(v[2]-base[2])>1||Math.abs(v[0]-base[0])>1||Math.abs(v[1]-base[1])>1); };
   const toMap=(cx,cy)=>{ const r=svg.getBoundingClientRect(); return [v[0]+(cx-r.left)/r.width*v[2], v[1]+(cy-r.top)/r.height*v[3]]; };
   const zoomAt=(f,mx,my)=>{ const w=Math.min(maxW,Math.max(minW,v[2]*f)), k=w/v[2]; v=[mx-(mx-v[0])*k, my-(my-v[1])*k, w, w*ar]; apply(); };
   const centre=()=>[v[0]+v[2]/2,v[1]+v[3]/2];

@@ -397,6 +397,8 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .gmap{width:100%;height:auto;display:block;border-radius:14px;background:color-mix(in srgb,#5aa9e6 20%,var(--surface))}
 .gmap path,.gmap circle{stroke:var(--surface);stroke-width:1px;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .gmap .g-land{fill:color-mix(in srgb,var(--ink-3) 30%,var(--surface))}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gmap{background:#14324d}:root:not([data-theme="light"]) .gmap .g-land{fill:#5d7489}:root:not([data-theme="light"]) .gmap .g-ghost{fill:#4a6074;stroke:#8aa1b5}:root:not([data-theme="light"]) .gmap path,:root:not([data-theme="light"]) .gmap circle{stroke:#14324d}}
+:root[data-theme="dark"] .gmap{background:#14324d}:root[data-theme="dark"] .gmap .g-land{fill:#5d7489}:root[data-theme="dark"] .gmap .g-ghost{fill:#4a6074;stroke:#8aa1b5}
 .gmap .g-ghost{fill:color-mix(in srgb,var(--ink-3) 18%,var(--surface));stroke:color-mix(in srgb,var(--ink-3) 55%,var(--surface));stroke-width:.8px}
 .gmap .g-hit{fill:var(--good)}
 .gmap .g-tried{fill:color-mix(in srgb,var(--sun) 70%,var(--surface))}
