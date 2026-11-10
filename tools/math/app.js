@@ -587,7 +587,7 @@ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==
 /* ---------- offline + updates (shared with the map editions) ---------- */
 if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")) navigator.serviceWorker.register("../sw.js").catch(()=>{});
 async function checkUpdate(){ if(!navigator.onLine||APP_VERSION==="dev") return;
-  try{ const r=await fetch("../version.json",{cache:"no-store"}); if(!r.ok) return; const v=(await r.json()).v; if(v&&v!==APP_VERSION) $('updBtn').hidden=false; }catch(e){} }
+  try{ const r=await fetch("../version.json",{cache:"no-store"}); if(!r.ok) return; const v=(await r.json()).v; if(v&&v!==APP_VERSION){ let once=false; try{ once=!!sessionStorage.getItem("gt-auto-upd-"+v); if(!once&&(!document.querySelector('.play')||document.querySelector('.play').hidden)) sessionStorage.setItem("gt-auto-upd-"+v,"1"); }catch(e){ once=true; } if(!once&&(!document.querySelector('.play')||document.querySelector('.play').hidden)) $('updBtn').click(); else $('updBtn').hidden=false; } }catch(e){} }
 $('updBtn').onclick=async()=>{ $('updBtn').textContent="Updating…";
   try{ const reg=await navigator.serviceWorker?.getRegistration(); await reg?.update();
     const fresh=await fetch(location.pathname+"?fresh="+Date.now(),{cache:"no-store"});
