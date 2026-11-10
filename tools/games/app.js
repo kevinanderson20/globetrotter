@@ -647,7 +647,8 @@ function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null
 const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",nbrs:"Name every border",dsudoku:"An easy 6×6",
   seq:"Repeat the pattern",num:"Remember the digits",match:"Find all 8 pairs",react:"Tap on green",stroop:"The ink, not the word",schulte:"Tap 1 to 25 in order",count:"Hit the target number",sudoku:"6×6, easy to hard",lights:"Turn every light off",
   strandsu:"Any board you like",worldleu:"Random outlines",travleu:"Random routes",globleu:"Random mystery countries",nbrsu:"Random countries",diveu:"Fresh prompts",climbu:"Fresh prompts"};
-function dailyStat(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():k==="flagle"?flStatus():k==="hilo"?hlStatus():k==="queens"?qnStatus():k==="timeline"?tlStatus():nmStatus(k);
+function dailyStat(k){ try{ return dailyStat0(k); }catch(e){ console.error(e); return {st:"new"}; } }
+function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():k==="flagle"?flStatus():k==="hilo"?hlStatus():k==="queens"?qnStatus():k==="timeline"?tlStatus():nmStatus(k);
   if(/^Today's done/.test(raw)){ let r=(raw.split(" · ")[1]||"done").replace(/ \/ 700$/,"").replace(/ named$/,"").replace(/ guess(es)?$/,"").replace(/^gave up$|^missed it$|^didn't make it$/,"✗");
     if(/^\d+$/.test(r)&&k==="globle") r=r+(r==="1"?" guess":" guesses");
     return {st:"done", r:r.charAt(0).toUpperCase()+r.slice(1)}; }
@@ -655,7 +656,7 @@ function dailyStat(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsu
   return {st:"new"}; }
 function gameRow(k,g,col){ const c=g.col||col; let right;
   if(g.cat==="daily"){ const d=dailyStat(k); right=d.st==="done"?`<span class="gr done"><i>✓</i>${esc(d.r)}</span>`:d.st==="go"?`<span class="gr go">Resume</span>`:`<span class="gr new">Play</span>`; }
-  else { const b=bestOf(k); right=b.v!=null?`<span class="gr best"><small>Best</small>${esc(g.fmt(b.v))}</span>`:`<span class="gr chev" aria-hidden="true">›</span>`; }
+  else { let bv=null; try{ const b=bestOf(k); if(b.v!=null) bv=g.fmt(b.v); }catch(e){} right=bv!=null?`<span class="gr best"><small>Best</small>${esc(bv)}</span>`:`<span class="gr chev" aria-hidden="true">›</span>`; }
   return `<button class="grow" style="--c:var(${c})" data-act="play" data-g="${k}"><span class="gi">${g.ic}</span><span class="gt"><b>${esc(g.name)}</b><small>${esc(TAG[k]||"")}</small></span>${right}</button>`; }
 function home(){
   const w=S.work[today()]||{}, wdone=WORKOUT.filter(x=>w[x]!=null).length, st=dayStreak();
@@ -712,4 +713,4 @@ setTimeout(checkUpdate,1500);
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&play.hidden) checkUpdate(); });
 try{ navigator.storage&&navigator.storage.persist&&navigator.storage.persist(); }catch(e){}
 
-home();
+try{ home(); }catch(e){ console.error(e); window.__rescue&&window.__rescue((e&&e.message||String(e))+(e&&e.stack?"\n"+String(e.stack).split("\n").slice(0,3).join("\n"):"")); }

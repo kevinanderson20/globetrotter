@@ -217,6 +217,11 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 /* play */
 .gplay{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding:calc(6px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));max-width:640px;margin:0 auto}
 .gplay[hidden]{display:none}
+.rescue{position:fixed;inset:0;z-index:100;background:var(--bg,#0a1520);color:var(--ink,#eaf3fa);padding:calc(40px + env(safe-area-inset-top,0px)) 20px 20px;display:flex;flex-direction:column;gap:12px;font-family:system-ui,sans-serif}
+.rescue h2{margin:0;font-size:24px}.rescue p{margin:0;font-size:16px;opacity:.85}
+.rescue pre{white-space:pre-wrap;word-break:break-word;background:rgba(127,127,127,.15);border-radius:10px;padding:10px;font-size:13px;margin:0}
+.rescue button,.rescue a{font:700 17px system-ui,sans-serif;border:0;border-radius:14px;padding:14px;background:#2e9e6a;color:#fff;text-align:center;text-decoration:none}
+.rescue a{background:rgba(127,127,127,.2);color:inherit}
 .gtop{display:flex;align-items:center;gap:8px;min-height:48px}
 .gtop .ttl{flex:1;font-family:var(--f-display);font-weight:800;font-size:17px}
 .gtop .info{font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--ink-2);font-variant-numeric:tabular-nums}
@@ -654,6 +659,22 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 <div class="flash" id="flash" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
+<script>
+/* safety net: if anything stops the Games page from starting, show what happened and a way out instead of a blank screen */
+(function(){ let shown=false, lastErr="";
+  function rescue(why){ if(shown) return; const app=document.getElementById("app"); if(app&&app.children.length&&!why) return; shown=true;
+    const box=document.createElement("div"); box.className="rescue";
+    box.innerHTML='<h2>Games hit a snag</h2><p>Something stopped this page from loading. Your progress is safe.</p>'+(lastErr?'<pre></pre>':'')+'<button id="rsReload">Reload</button><button id="rsClear">Reload a fresh copy</button><a href="../">Back to World</a>';
+    if(lastErr) box.querySelector("pre").textContent=lastErr;
+    document.body.appendChild(box);
+    box.querySelector("#rsReload").onclick=()=>location.reload();
+    box.querySelector("#rsClear").onclick=async()=>{ try{ const regs=await navigator.serviceWorker.getRegistrations(); for(const r of regs) await r.unregister(); for(const k of await caches.keys()) await caches.delete(k); }catch(e){} location.replace(location.pathname+"?fresh="+Date.now()); }; }
+  window.addEventListener("error",e=>{ lastErr=(e.message||"Error")+(e.lineno?" (line "+e.lineno+")":""); const app=document.getElementById("app"); if(!app||!app.children.length) rescue(); });
+  window.addEventListener("unhandledrejection",e=>{ lastErr=String(e.reason&&e.reason.message||e.reason); });
+  setTimeout(()=>{ const app=document.getElementById("app"); if(!app||!app.children.length) rescue(); },5000);
+  window.__rescue=why=>{ lastErr=why; rescue(true); };
+})();
+</script>
 <script>
 /*APP*/
 </script>
