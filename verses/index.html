@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Globetrotter">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Verses</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>@view-transition{navigation:auto}
+
+:root{
+  --bg:#f6f3ee; --surface:#fffdf9; --surface-2:#efeae2; --ink:#1d1a16; --ink-2:#5f584e; --ink-3:#958c80; --hair:rgba(60,45,20,.10);
+  --accent:#a8691b; --accent-soft:rgba(168,105,27,.10); --bad:#c4372c;
+  --shadow:0 1px 2px rgba(60,40,10,.05),0 6px 20px -8px rgba(60,40,10,.14);
+  --f-body:"Figtree",-apple-system,system-ui,sans-serif; --f-quote:"Newsreader","New York",ui-serif,Georgia,serif;
+  --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.3,1.25,.5,1);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#000; --surface:#1c1b19; --surface-2:#2a2825; --ink:#f4efe6; --ink-2:#b8b0a3; --ink-3:#7f786d; --hair:rgba(255,240,210,.09);
+  --accent:#e0a64f; --accent-soft:rgba(224,166,79,.13); --bad:#ff6b5e; --shadow:none; color-scheme:dark;}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--f-body);-webkit-tap-highlight-color:transparent;min-height:100vh;min-height:100dvh}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+.wrap{max-width:640px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 8px) 16px calc(env(safe-area-inset-bottom,0px) + 40px)}
+
+/* top bar: back to the app, large title, a compact title once it scrolls away */
+.nav{position:sticky;top:0;z-index:5;margin:0 -16px;padding:calc(env(safe-area-inset-top,0px) + 6px) 8px 6px;display:flex;align-items:center;min-height:44px;transition:background-color 200ms,border-color 200ms;border-bottom:.5px solid transparent}
+.nav.stuck{background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(20px);backdrop-filter:saturate(1.6) blur(20px);border-bottom-color:var(--hair)}
+.back{display:flex;align-items:center;gap:2px;color:var(--accent);font-weight:500;font-size:17px;padding:8px;border-radius:10px;text-decoration:none}
+.back svg{width:13px;height:21px}
+.navt{position:absolute;left:50%;transform:translateX(-50%);font-weight:600;font-size:17px;opacity:0;transition:opacity 180ms}
+.nav.stuck .navt{opacity:1}
+.wrap>.nav{padding-top:6px}
+h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
+.sub{color:var(--ink-2);margin:0 0 18px;font-size:15px;font-variant-numeric:tabular-nums}
+
+/* add a verse */
+.add{display:flex;gap:8px;align-items:center;background:var(--surface);border-radius:16px;padding:6px 6px 6px 16px;box-shadow:var(--shadow);border:1px solid var(--hair)}
+.add input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:17px;padding:10px 0}
+.add input::placeholder{color:var(--ink-3)}
+.addbtn{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;flex:none;transition:transform 160ms var(--ease),opacity 160ms}
+@media (prefers-color-scheme: dark){.addbtn{color:#1a1205}}
+.addbtn:active{transform:scale(.92)}
+.addbtn[disabled]{opacity:.45}
+.addbtn svg{width:20px;height:20px}
+.addbtn .spin{display:none;width:20px;height:20px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 700ms linear infinite}
+.addbtn.busy svg{display:none}.addbtn.busy .spin{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{font-size:14px;color:var(--ink-2);margin:10px 4px 0;min-height:0}
+.msg.err{color:var(--bad)}
+.manual{margin-top:10px;background:var(--surface);border-radius:16px;padding:14px;border:1px solid var(--hair);display:grid;gap:10px}
+.manual p{margin:0;font-size:14px;color:var(--ink-2)}
+.manual textarea,.notes textarea{width:100%;min-height:96px;resize:vertical;border:1px solid var(--hair);border-radius:12px;background:var(--surface-2);padding:10px 12px;font:18px/1.45 var(--f-quote);outline:none}
+.manual textarea:focus,.notes textarea:focus{border-color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{min-height:40px;padding:0 16px;border-radius:999px;font-weight:600;font-size:15px;background:var(--surface-2);color:var(--ink);transition:transform 140ms var(--ease)}
+.pill:active{transform:scale(.95)}
+.pill.go{background:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){.pill.go{color:#1a1205}}
+
+/* controls */
+.tools{display:flex;gap:8px;align-items:center;margin:22px 0 12px}
+.seg{display:flex;background:var(--surface-2);border-radius:10px;padding:2px;flex:none}
+.seg button{padding:6px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink-2);transition:background-color 160ms,color 160ms}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.find{flex:1;min-width:0;position:relative}
+.find input{width:100%;border:0;border-radius:10px;background:var(--surface-2);padding:8px 10px 8px 32px;font-size:15px;outline:none}
+.find svg{position:absolute;left:10px;top:50%;width:15px;height:15px;margin-top:-7.5px;color:var(--ink-3)}
+
+/* the tiles */
+.list{display:grid;gap:14px}
+.tile{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--hair);overflow:hidden;position:relative}
+.tile.new{animation:tilein 520ms var(--spring) both}
+@keyframes tilein{from{opacity:0;transform:translateY(-10px) scale(.97)}}
+.tile.flash{animation:flash 900ms var(--ease)}
+@keyframes flash{30%{box-shadow:0 0 0 3px var(--accent)}}
+.tile.gone{animation:tileout 260ms var(--ease) forwards}
+@keyframes tileout{to{opacity:0;transform:scale(.96)}}
+.q{padding:22px 22px 0;position:relative}
+.q::before{content:"\201C";position:absolute;left:14px;top:-6px;font:400 64px/1 var(--f-quote);color:var(--accent);opacity:.22;pointer-events:none}
+.qt{font:400 21px/1.5 var(--f-quote);margin:0;white-space:pre-line;letter-spacing:-.003em;text-wrap:pretty}
+.meta{display:flex;align-items:center;gap:6px;padding:14px 12px 12px 22px;min-width:0}
+.ref{font-weight:700;font-size:15px;color:var(--accent);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ver,.ib,.mbtn{flex:none}
+.ver{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink-3);border:1px solid var(--hair);border-radius:5px;padding:1px 5px}
+.meta .sp{flex:1}
+.ib{width:38px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--ink-3);transition:background-color 140ms,transform 140ms var(--ease)}
+.ib:active{transform:scale(.9);background:var(--surface-2)}
+.ib svg{width:20px;height:20px}
+.mbtn{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:14px;transition:transform 140ms var(--ease)}
+.mbtn:active{transform:scale(.95)}
+.mbtn svg{width:12px;height:12px;transition:transform 260ms var(--ease)}
+.tile.open .mbtn svg{transform:rotate(180deg)}
+
+/* the Meaning drop-down */
+.more{display:grid;grid-template-rows:0fr;transition:grid-template-rows 320ms var(--ease)}
+.tile.open .more{grid-template-rows:1fr}
+.more>div{overflow:hidden;min-height:0}
+.mi{border-top:1px solid var(--hair);padding:16px 22px 18px;display:grid;gap:18px}
+.sec h3{margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.sec p{margin:0 0 8px;font-size:15.5px;line-height:1.55;color:var(--ink)}
+.sec p:last-child{margin-bottom:0}
+.sec .src{font-size:12px;color:var(--ink-3);margin-top:6px}
+.ctx{font:400 17px/1.55 var(--f-quote);color:var(--ink-2)}
+.ctx sup{font:700 10px var(--f-body);color:var(--ink-3);margin-right:2px;vertical-align:.45em}
+.ctx mark{background:var(--accent-soft);color:var(--ink);border-radius:4px;padding:0 2px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.load{color:var(--ink-3);font-size:14px}
+.load i{display:block;height:12px;border-radius:6px;background:var(--surface-2);margin:8px 0;animation:pulse 1.2s ease-in-out infinite}
+.load i:nth-child(2){width:86%}.load i:nth-child(3){width:64%}
+@keyframes pulse{50%{opacity:.5}}
+.notes textarea{min-height:72px;font:16px/1.5 var(--f-body)}
+.saved{font-size:12px;color:var(--ink-3);height:14px;margin-top:4px;transition:opacity 300ms}
+.ask{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:12px;background:var(--surface-2);font-weight:600;font-size:15px;color:var(--ink);text-decoration:none;transition:transform 140ms var(--ease)}
+.ask:active{transform:scale(.97)}
+.ask svg{width:16px;height:16px;color:var(--accent)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts .pill{font-size:14px;min-height:36px;padding:0 14px}
+.acts .del{color:var(--bad)}
+
+.empty{text-align:center;padding:48px 20px;color:var(--ink-2)}
+.empty .big{font:400 22px/1.45 var(--f-quote);color:var(--ink);margin:0 0 10px}
+.empty p{margin:0;font-size:15px}
+.none{color:var(--ink-3);text-align:center;padding:24px 0;font-size:15px}
+.credit{margin:32px 4px 0;font-size:11.5px;line-height:1.5;color:var(--ink-3)}
+.credit a{color:inherit}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translate(-50%,24px);opacity:0;pointer-events:none;background:#1d1a16;color:#fff;border-radius:14px;padding:10px 10px 10px 16px;display:flex;gap:12px;align-items:center;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform 260ms var(--spring),opacity 200ms;z-index:10;max-width:calc(100% - 32px)}
+@media (prefers-color-scheme: dark){.toast{background:#3a3733}}
+.toast.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.toast button{color:#f3c27a;font-weight:700;padding:6px 8px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav" id="nav"><a class="back" href="../" aria-label="Back to Globetrotter"><svg viewBox="0 0 13 21" aria-hidden="true"><path d="M11 2 2.5 10.5 11 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Globetrotter</a><span class="navt">Verses</span></div>
+  <h1 id="ttl">Verses</h1>
+  <p class="sub" id="sub">New Living Translation</p>
+
+  <form class="add" id="add" autocomplete="off">
+    <input id="ref" type="text" inputmode="text" enterkeyhint="go" autocapitalize="words" spellcheck="false" placeholder="Add a verse, like Proverbs 14:4" aria-label="Verse reference">
+    <button class="addbtn" id="go" type="submit" aria-label="Add verse"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v13M3.5 10h13" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><span class="spin"></span></button>
+  </form>
+  <p class="msg" id="msg" role="status" aria-live="polite"></p>
+  <div id="manualBox"></div>
+
+  <div class="tools" id="tools" hidden>
+    <div class="seg" role="group" aria-label="Order"><button type="button" data-sort="new" aria-pressed="true">Newest</button><button type="button" data-sort="bible" aria-pressed="false">Bible order</button></div>
+    <label class="find"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search" aria-label="Search your verses"></label>
+  </div>
+  <div class="list" id="list"></div>
+
+  <p class="credit">Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved.<br>Study notes: <a href="https://tyndaleopenresources.com/" target="_blank" rel="noopener">Tyndale Open Study Notes</a>, © Tyndale House Publishers, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, via the Free Use Bible API.</p>
+</div>
+<div class="toast" id="toast" role="status"><span id="toastT"></span><button type="button" id="toastU">Undo</button></div>
+
+<script>
+"use strict";
+/* ================= Verses: a private list of favourite verses, kept only on this phone =================
+   Text: Tyndale's NLT API (official, no key needed for light use). Study notes: Tyndale Open Study Notes via bible.helloao.org.
+   Saved under globetrotter.verses.v1, so the app's "Back up progress" code carries them too. */
+const KEY="globetrotter.verses.v1", NLT="https://api.nlt.to/api/passages", NOTES="https://bible.helloao.org/api/c/tyndale";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* the 66 books: name, USFM code, extra spellings */
+const BOOKS=`Genesis|GEN|gn;Exodus|EXO|ex;Leviticus|LEV|lv;Numbers|NUM|nm nb;Deuteronomy|DEU|dt;Joshua|JOS|jsh;Judges|JDG|jdg jg;Ruth|RUT|rt;1 Samuel|1SA|1sm;2 Samuel|2SA|2sm;1 Kings|1KI|1kgs;2 Kings|2KI|2kgs;1 Chronicles|1CH|1chr;2 Chronicles|2CH|2chr;Ezra|EZR|;Nehemiah|NEH|;Esther|EST|;Job|JOB|jb;Psalms|PSA|ps psalm pss;Proverbs|PRO|pr prv;Ecclesiastes|ECC|eccl qoh;Song of Songs|SNG|song sos songofsolomon canticles;Isaiah|ISA|is;Jeremiah|JER|jr;Lamentations|LAM|lm;Ezekiel|EZK|ezk;Daniel|DAN|dn;Hosea|HOS|;Joel|JOL|jl;Amos|AMO|;Obadiah|OBA|ob;Jonah|JON|jnh;Micah|MIC|;Nahum|NAM|na;Habakkuk|HAB|;Zephaniah|ZEP|;Haggai|HAG|hg;Zechariah|ZEC|zc;Malachi|MAL|;Matthew|MAT|mt;Mark|MRK|mk mrk;Luke|LUK|lk;John|JHN|jn jhn;Acts|ACT|;Romans|ROM|rm;1 Corinthians|1CO|;2 Corinthians|2CO|;Galatians|GAL|;Ephesians|EPH|;Philippians|PHP|php;Colossians|COL|;1 Thessalonians|1TH|;2 Thessalonians|2TH|;1 Timothy|1TI|;2 Timothy|2TI|;Titus|TIT|;Philemon|PHM|phm philem;Hebrews|HEB|;James|JAS|jas jm;1 Peter|1PE|1pt;2 Peter|2PE|2pt;1 John|1JN|1jn;2 John|2JN|2jn;3 John|3JN|3jn;Jude|JUD|jud;Revelation|REV|rv revelations`
+  .split(";").map((s,i)=>{ const [name,code,al]=s.split("|"); return {name,code,i,key:name.toLowerCase().replace(/\s/g,""),al:(al||"").split(" ").filter(Boolean)}; });
+
+/* "proverbs 14.4", "Prov 14:4-6", "ps 23", "1 cor 13 4" → {book, c, v, v2, label} */
+function parseRef(raw){
+  let s=raw.trim().toLowerCase().replace(/[–—]/g,"-").replace(/\s+/g," ");
+  s=s.replace(/^(first|1st|i)\s+/,"1 ").replace(/^(second|2nd|ii)\s+/,"2 ").replace(/^(third|3rd|iii)\s+/,"3 ");
+  const m=s.match(/^([1-3]?\s?[a-z][a-z .]*?)\s*(\d+)(?:\s*[:.]\s*|\s+)?(\d+)?(?:\s*-\s*(\d+))?\s*$/);
+  if(!m) return null;
+  const b=m[1].replace(/[\s.]/g,""); if(b.length<2) return null;
+  const book=BOOKS.find(x=>x.key===b||x.al.includes(b))||BOOKS.find(x=>x.key.startsWith(b));
+  if(!book) return null;
+  const c=+m[2], v=m[3]?+m[3]:null, v2=m[4]&&v?+m[4]:null;
+  if(!c||c>150||(v2&&v2<v)) return null;
+  const nm=book.code==="PSA"?"Psalm":book.name;
+  return {book:book.name,code:book.code,bi:book.i,c,v,v2,label:`${nm} ${c}${v?":"+v+(v2&&v2!==v?"-"+v2:""):""}`};
+}
+
+/* storage: only on this phone */
+let S={list:[],sort:"new"};
+try{ const o=JSON.parse(localStorage.getItem(KEY)||"null"); if(o&&Array.isArray(o.list)) S=Object.assign(S,o); }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
+
+/* NLT text from Tyndale's API (HTML) → plain text with poetry line breaks */
+async function nltFetch(label){
+  const r=await fetch(`${NLT}?ref=${encodeURIComponent(label)}&version=NLT&key=TEST`);
+  if(!r.ok) throw new Error("http");
+  const doc=new DOMParser().parseFromString(await r.text(),"text/html");
+  const vs=[...doc.querySelectorAll("verse_export")];
+  if(!vs.length) throw new Error("notfound");
+  doc.querySelectorAll(".tn,.a-tn,h2,h3,h4,.psa-title,.chapter-number,.subhead").forEach(n=>n.remove());
+  doc.querySelectorAll(".sc,.red-sc").forEach(n=>n.textContent=n.textContent.toUpperCase());
+  return vs.map(ve=>{ const n=+ve.getAttribute("vn"); const vn=ve.querySelector(".vn"); if(vn) vn.remove();
+    const lines=[]; let cur="";
+    ve.childNodes.forEach(nd=>{ const isP=nd.nodeType===1&&nd.tagName==="P", t=(nd.textContent||"").replace(/\s+/g," ");
+      if(isP){ if(cur.trim()) lines.push(cur.trim()); cur=""; const cl=nd.className||""; if(t.trim()) lines.push((/^poet|selah/.test(cl)?" ":"")+t.trim()); }
+      else cur+=t; });
+    if(cur.trim()) lines.push(cur.trim());
+    return {n,lines}; });
+}
+/* poetry lines stay on their own line; prose runs together */
+const toText=vs=>{ const out=[]; vs.forEach(v=>v.lines.forEach(l=>{ const poet=l.startsWith(" "), t=l.replace(/^ /,"");
+  if(poet||!out.length||out[out.length-1].poet) out.push({t,poet}); else out[out.length-1].t+=" "+t; })); return out.map(o=>o.t).join("\n"); };
+
+/* add a verse */
+const form=$("add"), inp=$("ref"), btn=$("go"), msg=$("msg");
+form.addEventListener("submit",async e=>{
+  e.preventDefault(); if(btn.disabled) return;
+  const raw=inp.value; if(!raw.trim()) { inp.focus(); return; }
+  const p=parseRef(raw);
+  $("manualBox").innerHTML="";
+  if(!p){ say("Couldn't read that. Try a book, chapter and verse, like Proverbs 14:4.",true); return; }
+  const dup=S.list.find(x=>x.ref===p.label);
+  if(dup){ say(`${p.label} is already saved.`); inp.value=""; showTile(dup.id); return; }
+  btn.disabled=true; btn.classList.add("busy"); say("");
+  try{
+    const vs=await nltFetch(p.label); const text=toText(vs);
+    if(!text) throw new Error("notfound");
+    addVerse(p,text); inp.value=""; inp.blur();
+  }catch(err){
+    if(err.message==="notfound") say(`Couldn't find ${p.label}. Check the chapter and verse.`,true);
+    else { say(`Couldn't reach the NLT right now.`,true); manual(p); }
+  }finally{ btn.disabled=false; btn.classList.remove("busy"); }
+});
+function say(t,err){ msg.textContent=t; msg.classList.toggle("err",!!err); }
+function manual(p){
+  $("manualBox").innerHTML=`<div class="manual"><p>You can type ${esc(p.label)} in yourself and it saves the same way.</p><textarea id="mtext" aria-label="Verse text" placeholder="Without oxen a stable stays clean…"></textarea><div class="row"><button class="pill go" type="button" id="msave">Save verse</button><button class="pill" type="button" id="mcancel">Cancel</button></div></div>`;
+  $("msave").onclick=()=>{ const t=$("mtext").value.trim(); if(!t){ $("mtext").focus(); return; } addVerse(p,t); $("manualBox").innerHTML=""; say(""); inp.value=""; };
+  $("mcancel").onclick=()=>{ $("manualBox").innerHTML=""; say(""); };
+}
+function addVerse(p,text){
+  const v={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ref:p.label,book:p.book,code:p.code,bi:p.bi,c:p.c,v:p.v,v2:p.v2,text,added:Date.now(),note:""};
+  S.list.unshift(v); save(); haptic(); $("q").value=""; render(v.id);
+  requestAnimationFrame(()=>document.querySelector(`[data-id="${v.id}"]`)?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"}));
+}
+
+/* list */
+const IC={
+  chev:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2.5 4.5 3.5 3.5 3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  copy:'<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="10" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13.5 4.5v-.3a1.7 1.7 0 0 0-1.7-1.7H5.2a1.7 1.7 0 0 0-1.7 1.7v8.1a1.7 1.7 0 0 0 1.7 1.7h1.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+  spark:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c.4 3.4 2.1 5.1 5.5 5.5-3.4.4-5.1 2.1-5.5 5.5C7.6 9.1 5.9 7.4 2.5 7c3.4-.4 5.1-2.1 5.5-5.5z" fill="currentColor"/><path d="M13 11.5c.15 1.2.8 1.85 2 2-1.2.15-1.85.8-2 2-.15-1.2-.8-1.85-2-2 1.2-.15 1.85-.8 2-2z" fill="currentColor"/></svg>'
+};
+const opened=new Set();
+function render(fresh){
+  const list=$("list"), q=$("q").value.trim().toLowerCase(), n=S.list.length;
+  $("sub").textContent=n?`${n} saved · New Living Translation`:"New Living Translation";
+  $("tools").hidden=n<2;
+  document.querySelectorAll("[data-sort]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===S.sort));
+  if(!n){ list.innerHTML=`<div class="empty"><p class="big">Your favorite verses will gather here.</p><p>Type a reference above, like Proverbs 14:4 or Psalm 23.</p></div>`; return; }
+  let items=S.list.slice();
+  if(S.sort==="bible") items.sort((a,b)=>(a.bi-b.bi)||(a.c-b.c)||((a.v||0)-(b.v||0)));
+  if(q) items=items.filter(v=>(v.ref+" "+v.text+" "+(v.note||"")).toLowerCase().includes(q));
+  if(!items.length){ list.innerHTML=`<p class="none">No saved verse matches “${esc(q)}”.</p>`; return; }
+  list.innerHTML=items.map(v=>`<article class="tile${v.id===fresh?" new":""}${opened.has(v.id)?" open":""}" data-id="${v.id}">
+    <div class="q"><p class="qt">${esc(v.text)}</p></div>
+    <div class="meta"><span class="ref">${esc(v.ref)}</span><span class="ver">NLT</span><span class="sp"></span>
+      <button class="ib" type="button" data-act="copy" aria-label="Copy ${esc(v.ref)}">${IC.copy}</button>
+      <button class="mbtn" type="button" data-act="more" aria-expanded="${opened.has(v.id)}" aria-controls="m-${v.id}">Meaning ${IC.chev}</button></div>
+    <div class="more" id="m-${v.id}"><div><div class="mi" data-mi></div></div></div></article>`).join("");
+  items.forEach(v=>{ if(opened.has(v.id)) fillMore(v); });
+}
+function showTile(id){ $("q").value=""; render(); const el=document.querySelector(`[data-id="${id}"]`); if(!el) return;
+  el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"center"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+
+/* the Meaning drop-down: study note, the verses around it, your notes, ask Claude */
+function fillMore(v){
+  const box=document.querySelector(`[data-id="${v.id}"] [data-mi]`); if(!box||box.dataset.done) return; box.dataset.done=1;
+  const askQ=`Help me understand ${v.ref} (NLT): "${v.text.replace(/\n/g," ")}". Briefly explain its original context, what it means, and how I might apply it today.`;
+  box.innerHTML=`<section class="sec"><h3>Study note</h3><div data-note><div class="load"><i></i><i></i><i></i></div></div></section>
+    ${v.v?`<section class="sec"><h3>In context</h3><div data-ctx><div class="load"><i></i><i></i></div></div></section>`:""}
+    <section class="sec notes"><h3>My notes</h3><textarea data-mynote placeholder="What this verse means to you…" aria-label="My notes on ${esc(v.ref)}">${esc(v.note||"")}</textarea><div class="saved" data-saved></div></section>
+    <a class="ask" href="https://claude.ai/new?q=${encodeURIComponent(askQ)}" target="_blank" rel="noopener">${IC.spark}Go deeper with Claude</a>
+    <div class="acts"><button class="pill" type="button" data-act="share">Share</button><button class="pill del" type="button" data-act="del">Remove</button></div>`;
+  const ta=box.querySelector("[data-mynote]"), sv=box.querySelector("[data-saved]"); let t;
+  ta.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(()=>{ v.note=ta.value; save(); sv.textContent="Saved"; setTimeout(()=>sv.textContent="",1400); },400); });
+  loadNote(v,box.querySelector("[data-note]"));
+  if(v.v) loadCtx(v,box.querySelector("[data-ctx]"));
+}
+const paras=t=>String(t).split(/\n+/).map(s=>s.trim()).filter(Boolean).map(s=>`<p>${esc(s)}</p>`).join("");
+async function loadNote(v,el){
+  if(v.study!=null){ el.innerHTML=v.study?paras(v.study)+`<p class="src">Tyndale Open Study Notes</p>`:`<p class="load">There's no study note for this verse. Try “Go deeper with Claude” below.</p>`; return; }
+  try{
+    const r=await fetch(`${NOTES}/${v.code}/${v.c}.json`); if(!r.ok) throw new Error("http");
+    const j=await r.json(), items=(j.chapter&&j.chapter.content||[]).filter(x=>x.type==="verse"&&x.number);
+    const lo=v.v||1, hi=v.v2||v.v||999;
+    let pick=items.filter(x=>x.number>=lo&&x.number<=hi);
+    if(!pick.length){ const before=items.filter(x=>x.number<=lo); if(before.length) pick=[before[before.length-1]]; }
+    const txt=pick.map(x=>(x.content||[]).map(c=>typeof c==="string"?c:(c&&c.text)||"").join(" ")).join("\n").trim();
+    const intro=!v.v&&j.chapter.introduction?String(j.chapter.introduction):"";
+    v.study=(txt||intro).trim(); save();
+    loadNote(v,el);
+  }catch(e){ el.innerHTML=`<p class="load">Couldn't load the study note. Check your connection and open this again.</p>`; el.closest("[data-mi]").removeAttribute("data-done"); }
+}
+async function loadCtx(v,el){
+  if(v.ctx){ el.innerHTML=ctxHtml(v); return; }
+  try{
+    const lo=Math.max(1,v.v-2), hi=(v.v2||v.v)+2;
+    const vs=await nltFetch(`${v.code==="PSA"?"Psalm":v.book} ${v.c}:${lo}-${hi}`);
+    v.ctx=vs.map(x=>({n:x.n,t:toText([x])})); save(); el.innerHTML=ctxHtml(v);
+  }catch(e){ el.innerHTML=`<p class="load">Couldn't load the surrounding verses right now.</p>`; }
+}
+function ctxHtml(v){ const hi=v.v2||v.v;
+  return `<p class="ctx">${v.ctx.map(x=>{ const t=`<sup>${x.n}</sup>${esc(x.t.replace(/\n/g," "))}`; return x.n>=v.v&&x.n<=hi?`<mark>${t}</mark>`:t; }).join(" ")}</p><p class="src">${esc(v.code==="PSA"?"Psalm":v.book)} ${v.c}:${v.ctx[0].n}-${v.ctx[v.ctx.length-1].n}, NLT</p>`; }
+
+/* taps */
+$("list").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const tile=b.closest(".tile"), v=S.list.find(x=>x.id===tile.dataset.id); if(!v) return;
+  const act=b.dataset.act;
+  if(act==="more"){ const open=!tile.classList.contains("open"); tile.classList.toggle("open",open); b.setAttribute("aria-expanded",open);
+    if(open){ opened.add(v.id); fillMore(v); setTimeout(()=>{ const r=tile.getBoundingClientRect(); if(r.bottom>innerHeight) tile.scrollIntoView({behavior:reduce?"auto":"smooth",block:r.height>innerHeight?"start":"end"}); },330); }
+    else opened.delete(v.id); haptic(); }
+  if(act==="copy"){ try{ await navigator.clipboard.writeText(`“${v.text.replace(/\n/g," ")}” ${v.ref} NLT`); toast("Copied"); haptic(); }catch(err){ toast("Couldn't copy"); } }
+  if(act==="share"){ const text=`“${v.text.replace(/\n/g," ")}” ${v.ref} NLT`;
+    if(navigator.share){ try{ await navigator.share({text}); }catch(err){} } else { try{ await navigator.clipboard.writeText(text); toast("Copied"); }catch(err){} } }
+  if(act==="del"){ const i=S.list.indexOf(v); tile.classList.add("gone"); haptic();
+    setTimeout(()=>{ S.list.splice(i,1); opened.delete(v.id); save(); render(); toast(`Removed ${v.ref}`,()=>{ S.list.splice(Math.min(i,S.list.length),0,v); save(); render(v.id); }); },reduce?0:240); }
+});
+document.querySelectorAll("[data-sort]").forEach(b=>b.onclick=()=>{ S.sort=b.dataset.sort; save(); render(); });
+$("q").addEventListener("input",()=>render());
+
+/* undo toast */
+let tt; function toast(text,undo){ const el=$("toast"); $("toastT").textContent=text; $("toastU").hidden=!undo; $("toastU").onclick=()=>{ el.classList.remove("on"); undo&&undo(); };
+  el.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("on"),undo?5000:1600); }
+
+/* a small tick on iPhone (iOS 18+) and Android */
+const hl=(()=>{ try{ const l=document.createElement("label"); l.setAttribute("aria-hidden","true"); l.style.cssText="position:fixed;left:-99px;top:0;opacity:0;pointer-events:none"; l.innerHTML='<input type="checkbox" switch tabindex="-1">'; document.body.appendChild(l); return l; }catch(e){ return null; } })();
+function haptic(){ try{ if(navigator.vibrate) navigator.vibrate(8); else hl&&hl.click(); }catch(e){} }
+
+/* compact title once the large one scrolls away */
+const nav=$("nav"); new IntersectionObserver(([en])=>nav.classList.toggle("stuck",!en.isIntersecting),{rootMargin:"-56px 0px 0px 0px"}).observe($("ttl"));
+
+render();
+if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")) navigator.serviceWorker.register("../sw.js").catch(()=>{});
+</script>
+</body>
+</html>
