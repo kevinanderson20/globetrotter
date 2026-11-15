@@ -123,7 +123,6 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
 .load i:nth-child(2){width:86%}.load i:nth-child(3){width:64%}
 @keyframes pulse{50%{opacity:.5}}
 .notes textarea{min-height:72px;font:16px/1.5 var(--f-body)}
-.saved{font-size:12px;color:var(--ink-3);height:14px;margin-top:4px;transition:opacity 300ms}
 .acts{display:flex;gap:8px;flex-wrap:wrap;padding-top:2px}
 .acts .pill{font-size:14px;min-height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .acts .pill svg{width:14px;height:14px;color:var(--accent)}
@@ -206,14 +205,30 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
 .pk-vs input:checked~.ck{background:var(--accent);border-color:var(--accent);transform:scale(1.05)}
 .pk-vs input:checked~.ck svg{opacity:1}
 .pk-vs label.on{background:var(--accent-soft)}
-.pk-vs label.saved{opacity:.5;cursor:default}
-.pk-vs label.saved .ck{border-style:dashed}
+.pk-vs label.is-saved{opacity:.5;cursor:default}
+.pk-vs label.is-saved .ck{border-style:dashed}
 .pk-vs .tag{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--accent);text-transform:uppercase;margin-left:6px;font-family:var(--f-body)}
 .pk-foot{display:flex;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--hair);background:var(--surface)}
 .pk-foot .hint{flex:1;font-size:13.5px;color:var(--ink-3)}
 .pk-foot .pill.go[disabled]{opacity:.4}
 .pk-load{padding:14px 16px}
 .pk-err{padding:14px 16px;color:var(--ink-2);font-size:15px}
+
+.pk-join{display:flex;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--hair);font-size:14px;color:var(--ink-2);cursor:pointer}
+.pk-join[hidden]{display:none}
+.pk-join input{width:20px;height:20px;accent-color:var(--accent);margin:0;flex:none}
+.pk-list .pk-li{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-top:1px solid var(--hair);font-weight:600;font-size:16px}
+.pk-list .pk-li:first-child{border-top:0}
+.pk-list .st{font-size:13px;font-weight:600;color:var(--accent)}
+.pk-list .is-saved{opacity:.5}
+.pk-list .is-saved .st{color:var(--ink-3)}
+.pk-head .crumb:only-child{margin:0 auto;padding:6px 0}
+.star{width:32px;height:32px;margin-left:2px;display:grid;place-items:center;border-radius:10px;color:var(--ink-3);flex:none}
+.star svg{width:19px;height:19px;fill:none;transition:fill 160ms,color 160ms}
+.star[aria-pressed="true"]{color:var(--accent)}
+.star[aria-pressed="true"] svg{fill:currentColor}
+.star.pop svg{animation:starpop 420ms var(--spring)}
+@keyframes starpop{40%{transform:scale(1.35) rotate(-8deg)}}
 
 /* topics */
 .topics{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:0 16px 2px;scrollbar-width:none}
@@ -264,7 +279,7 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
   <p class="sub" id="sub">New Living Translation</p>
 
   <form class="add" id="add" autocomplete="off">
-    <input id="ref" type="text" inputmode="text" enterkeyhint="go" autocapitalize="words" spellcheck="false" placeholder="Add verses: type a book, like Proverbs" aria-label="Add verses" role="combobox" aria-expanded="false" aria-controls="pick" aria-autocomplete="list">
+    <input id="ref" type="text" inputmode="text" enterkeyhint="go" autocapitalize="words" spellcheck="false" placeholder="Type a book or paste verses" aria-label="Add verses" role="combobox" aria-expanded="false" aria-controls="pick" aria-autocomplete="list">
     <button class="addbtn" id="go" type="submit" aria-label="Add verse"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v13M3.5 10h13" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><span class="spin"></span></button>
   </form>
   <div class="pick" id="pick" hidden></div>
@@ -355,6 +370,7 @@ const toText=vs=>{ const out=[]; vs.forEach(v=>v.lines.forEach(l=>{ const poet=l
 const form=$("add"), inp=$("ref"), btn=$("go"), msg=$("msg"); let typeT;
 form.addEventListener("submit",async e=>{
   e.preventDefault(); clearTimeout(typeT); if(btn.disabled) return;
+  if(PK.mode==="list"){ addList(); return; }
   if(PK.mode==="verses"&&PK.sel.size&&CH[PK.book.code+PK.c]){ addPicked(); return; }   // otherwise (chapter didn't load) fall back to a single lookup
   const raw=inp.value; if(!raw.trim()) { inp.focus(); return; }
   const p=parseRef(raw);
@@ -388,7 +404,7 @@ function addMany(items,quiet){
 const addVerse=(p,text,quiet)=>addMany([[p,text]],quiet)[0];
 
 /* ================= the picker: type a book, tap a chapter, tick the verses you want ================= */
-const PK={mode:null,books:[],book:null,c:null,sel:new Set(),pre:null}, CH={};
+const PK={mode:null,books:[],book:null,c:null,sel:new Set(),pre:null,join:true}, CH={};
 const pick=$("pick");
 const back=lab=>`<button type="button" data-pk="back"><svg viewBox="0 0 9 14" aria-hidden="true"><path d="M7.5 1.5 2 7l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>${lab}</button>`;
 const CHECK='<svg viewBox="0 0 14 14" aria-hidden="true"><path d="m3 7.2 2.6 2.6L11 4.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -417,7 +433,7 @@ async function chapterText(b,c){
 async function pkVerses(b,c,pre){
   PK.mode="verses"; PK.book=b; PK.c=c; PK.sel.clear(); if(pre) PK.sel.add(pre);
   const head=`<div class="pk-head">${VC[b.i].length>1?back("Chapters"):back("Books")}<span class="sp"></span><span class="crumb">${esc(nm(b))} ${c}</span><span class="sp"></span><span style="width:60px"></span></div>`;
-  const foot=()=>`<div class="pk-foot"><span class="hint" data-hint>${PK.sel.size?`${PK.sel.size} selected`:"Tap the verses you want"}</span><button class="pill go" type="button" data-pk="add" ${PK.sel.size?"":"disabled"}>${PK.sel.size>1?`Add ${PK.sel.size} verses`:"Add verse"}</button></div>`;
+  const foot=()=>`<label class="pk-join" data-join ${runs().some(r=>r.length>1)?"":"hidden"}><input type="checkbox" ${PK.join?"checked":""}><span>Keep verses that sit together as one passage</span></label><div class="pk-foot"><span class="hint" data-hint>${PK.sel.size?`${PK.sel.size} selected`:"Tap the verses you want"}</span><button class="pill go" type="button" data-pk="add" ${PK.sel.size?"":"disabled"}>${PK.sel.size>1?`Add ${PK.sel.size} verses`:"Add verse"}</button></div>`;
   showPick(head+`<div class="pk-scroll"><div class="pk-load"><div class="load"><i></i><i></i><i></i></div></div></div>`+foot());
   let txt;
   try{ txt=await chapterText(b,c); }
@@ -425,34 +441,78 @@ async function pkVerses(b,c,pre){
   if(!(PK.mode==="verses"&&PK.book===b&&PK.c===c)) return;
   const nums=Object.keys(txt).map(Number).sort((x,y)=>x-y);
   pick.querySelector(".pk-scroll").innerHTML=`<div class="pk-vs" role="group" aria-label="${esc(nm(b))} ${c} verses">${nums.map(n=>{ const ref=`${nm(b)} ${c}:${n}`, saved=S.list.some(x=>x.ref===ref);
-    return `<label class="${saved?"saved":PK.sel.has(n)?"on":""}" data-n="${n}"><span class="n">${n}</span><span class="t">${esc(txt[n])}${saved?`<span class="tag">Saved</span>`:""}</span><input type="checkbox" ${saved?"disabled":""} ${PK.sel.has(n)&&!saved?"checked":""} aria-label="${esc(ref)}"><span class="ck">${CHECK}</span></label>`; }).join("")}</div>`;
-  pick.querySelector(".pk-foot").outerHTML=foot();
+    return `<label class="${saved?"is-saved":PK.sel.has(n)?"on":""}" data-n="${n}"><span class="n">${n}</span><span class="t">${esc(txt[n])}${saved?`<span class="tag">Saved</span>`:""}</span><input type="checkbox" ${saved?"disabled":""} ${PK.sel.has(n)&&!saved?"checked":""} aria-label="${esc(ref)}"><span class="ck">${CHECK}</span></label>`; }).join("")}</div>`;
+  pick.querySelector("[data-join]")?.remove(); pick.querySelector(".pk-foot").outerHTML=foot();
   if(pre) pkCenter(pick.querySelector(`[data-n="${pre}"]`));
 }
 /* bring a verse into view inside the list only (scrollIntoView would also scroll the picker box itself) */
 function pkCenter(el){ const sc=pick.querySelector(".pk-scroll"); if(!el||!sc) return; sc.scrollTop=el.offsetTop-sc.clientHeight/2+el.offsetHeight/2; pick.scrollTop=0; }
 function pkSync(){ const f=pick.querySelector(".pk-foot"); if(!f) return; const n=PK.sel.size;
-  f.querySelector("[data-hint]").textContent=n?`${n} selected`:"Tap the verses you want";
-  const b=f.querySelector("[data-pk=add]"); b.disabled=!n; b.textContent=n>1?`Add ${n} verses`:"Add verse"; }
+  const rs=runs(), joined=PK.join&&rs.some(r=>r.length>1), tiles=PK.join?rs.length:n;
+  f.querySelector("[data-hint]").textContent=n?(joined?`${n} verses · ${tiles} ${tiles>1?"tiles":"tile"}`:`${n} selected`):"Tap the verses you want";
+  const b=f.querySelector("[data-pk=add]"); b.disabled=!n; b.textContent=joined?(tiles>1?`Add ${tiles} passages`:"Add passage"):(n>1?`Add ${n} verses`:"Add verse");
+  const j=pick.querySelector("[data-join]"); if(j) j.hidden=!rs.some(r=>r.length>1); }
+/* ticked verses in runs of neighbours: [4],[16,17] */
+function runs(){ const n=[...PK.sel].sort((x,y)=>x-y), out=[]; n.forEach(x=>{ const r=out[out.length-1]; if(r&&x===r[r.length-1]+1) r.push(x); else out.push([x]); }); return out; }
+const joinText=ts=>ts.some(t=>t.includes("\n"))?ts.join("\n"):ts.join(" ");
 function addPicked(){
   const b=PK.book, c=PK.c, txt=CH[b.code+c]||{};
-  const items=[...PK.sel].sort((x,y)=>x-y).filter(n=>txt[n]&&!S.list.some(x=>x.ref===`${nm(b)} ${c}:${n}`)).map(n=>[{book:b.name,code:b.code,bi:b.i,c,v:n,v2:null,label:`${nm(b)} ${c}:${n}`},txt[n]]);
+  const groups=PK.join?runs():[...PK.sel].sort((x,y)=>x-y).map(n=>[n]);
+  const items=groups.map(g=>g.filter(n=>txt[n])).filter(g=>g.length).map(g=>{ const v=g[0], v2=g.length>1?g[g.length-1]:null, label=`${nm(b)} ${c}:${v}${v2?"-"+v2:""}`;
+    return [{book:b.name,code:b.code,bi:b.i,c,v,v2,label},joinText(g.map(n=>txt[n]))]; }).filter(([p])=>!S.list.some(x=>x.ref===p.label));
   if(!items.length) return;
   addMany(items); closePick(); inp.value=""; inp.blur(); say("");
-  toast(items.length>1?`Added ${items.length} verses`:`Added ${items[0][0].label}`);
+  toast(items.length>1?`Added ${items.length} ${PK.join&&items.some(i=>i[0].v2)?"passages":"verses"}`:`Added ${items[0][0].label}`);
 }
 /* as you type: books, then the chapter, then that chapter's verses */
 inp.addEventListener("input",()=>{ clearTimeout(typeT); say(""); $("manualBox").innerHTML=""; typeT=setTimeout(onType,120); });
+inp.addEventListener("paste",e=>{ const t=(e.clipboardData||window.clipboardData)?.getData("text")||""; if(/\n/.test(t.trim())){ e.preventDefault(); inp.value=t.trim().split(/\s*\n+\s*/).join("; "); clearTimeout(typeT); onType(); } });
 inp.addEventListener("focus",()=>{ if(inp.value.trim()&&pick.hidden) onType(); });
+/* a pasted or typed list: "Prov 3:5-6, 4:23; Phil 4:13" — the book (and chapter) carry forward */
+function parseList(raw){
+  const out=[], bad=[]; let ctx=null;
+  raw.split(/\s*(?:[;,\n]|\band\b)\s*/i).map(t=>t.trim()).filter(Boolean).forEach(t=>{
+    let p=parseRef(t), m;
+    if(!p&&ctx&&(m=t.match(/^(\d+)\s*[:.]\s*(\d+)(?:\s*[-–]\s*(\d+))?$/))){ const c=+m[1],v=+m[2],v2=m[3]?+m[3]:null; p=mk(ctx,c,v,v2); }
+    else if(!p&&ctx&&(m=t.match(/^(\d+)(?:\s*[-–]\s*(\d+))?$/))){ p=ctx.v?mk(ctx,ctx.c,+m[1],m[2]?+m[2]:null):mk(ctx,+m[1],null,null); }
+    if(p&&p.c<=VC[p.bi].length&&(!p.v||p.v<=VC[p.bi][p.c-1])){ out.push(p); ctx=p; } else bad.push(t);
+  });
+  return {out:out.filter((p,i)=>out.findIndex(q=>q.label===p.label)===i),bad};
+}
+function mk(b,c,v,v2){ const book=BOOKS[b.bi]; if(v2&&v2<=v) v2=null; return {book:book.name,code:book.code,bi:book.i,c,v,v2,label:`${nm(book)} ${c}${v?":"+v+(v2?"-"+v2:""):""}`}; }
+function pkList(list){
+  PK.mode="list"; PK.list=list.out;
+  const fresh=list.out.filter(p=>!S.list.some(x=>x.ref===p.label));
+  showPick(`<div class="pk-head"><span class="crumb">Add these verses</span></div><div class="pk-scroll pk-list">${list.out.map(p=>{ const saved=S.list.some(x=>x.ref===p.label);
+      return `<div class="pk-li${saved?" is-saved":""}" data-ref="${esc(p.label)}"><span>${esc(p.label)}</span><span class="st">${saved?"Saved":p.v?"":"whole chapter"}</span></div>`; }).join("")}
+    ${list.bad.length?`<p class="pk-err">Couldn't read: ${list.bad.map(b=>`“${esc(b)}”`).join(", ")}</p>`:""}</div>
+    <div class="pk-foot"><span class="hint" data-hint>${fresh.length} new</span><button class="pill go" type="button" data-pk="addlist" ${fresh.length?"":"disabled"}>${fresh.length>1?`Add ${fresh.length} verses`:"Add verse"}</button></div>`);
+}
+async function addList(){
+  const todo=(PK.list||[]).filter(p=>!S.list.some(x=>x.ref===p.label)); if(!todo.length) return;
+  const btnA=pick.querySelector("[data-pk=addlist]"); if(btnA){ btnA.disabled=true; }
+  const hint=pick.querySelector("[data-hint]"), done=[], failed=[];
+  for(let i=0;i<todo.length;i+=4){
+    if(hint) hint.textContent=`Adding ${Math.min(i+4,todo.length)} of ${todo.length}…`;
+    const got=await Promise.all(todo.slice(i,i+4).map(p=>nltFetch(p.label).then(vs=>[p,toText(vs)]).catch(()=>[p,null])));
+    got.forEach(([p,t])=>{ if(t){ done.push([p,t]); const row=pick.querySelector(`[data-ref="${CSS.escape(p.label)}"] .st`); if(row) row.textContent="Added"; } else failed.push(p.label); });
+  }
+  if(done.length) addMany(done);
+  if(failed.length){ say(`Couldn't add ${failed.join(", ")}. Check your connection and try again.`,true); inp.value=failed.join(", "); onType(); }
+  else { closePick(); inp.value=""; inp.blur(); say(""); }
+  if(done.length) toast(done.length>1?`Added ${done.length} verses`:`Added ${done[0][0].label}`);
+}
+
 function onType(){
   const raw=inp.value.trim().toLowerCase().replace(/[–—]/g,"-").replace(/\s+/g," ");
   if(!raw){ closePick(); return; }
+  if(/[;,]|\band\b/.test(raw)){ const list=parseList(inp.value); if(list.out.length>=1&&(list.out.length+list.bad.length)>=2){ pkList(list); return; } }
   const m=raw.match(/^([1-3]?\s?[a-z][a-z .]*?)\s*(?:(\d+)(?:\s*[:.\s]\s*(\d+))?(?:\s*-\s*\d+)?)?\s*$/)||raw.match(/^((?:first|second|third|1st|2nd|3rd|i{1,3})\s+[a-z][a-z .]*?)\s*(?:(\d+)(?:\s*[:.\s]\s*(\d+))?)?\s*$/);
   if(!m){ closePick(); return; }
   const books=findBooks(m[1]);
   if(!books.length){ showPick(`<p class="pk-err">No book matches “${esc(inp.value.trim())}”.</p>`); PK.mode="none"; return; }
   const c=m[2]?+m[2]:null, v=m[3]?+m[3]:null, b=books[0];
-  if(c&&c<=VC[b.i].length){ if(!(PK.mode==="verses"&&PK.book===b&&PK.c===c)) pkVerses(b,c,v&&v<=VC[b.i][c-1]?v:null); else if(v){ PK.sel.add(v); const l=pick.querySelector(`[data-n="${v}"]`); if(l&&!l.classList.contains("saved")){ l.classList.add("on"); l.querySelector("input").checked=true; pkCenter(l); } pkSync(); } return; }
+  if(c&&c<=VC[b.i].length){ if(!(PK.mode==="verses"&&PK.book===b&&PK.c===c)) pkVerses(b,c,v&&v<=VC[b.i][c-1]?v:null); else if(v){ PK.sel.add(v); const l=pick.querySelector(`[data-n="${v}"]`); if(l&&!l.classList.contains("is-saved")){ l.classList.add("on"); l.querySelector("input").checked=true; pkCenter(l); } pkSync(); } return; }
   if(c){ showPick(`<p class="pk-err">${esc(b.name)} has ${VC[b.i].length} chapters.</p>`); PK.mode="none"; return; }
   if(books.length===1&&raw.replace(/[\s.]/g,"")===b.key) return pkChapters(b);
   pkBooks(books);
@@ -463,10 +523,12 @@ pick.addEventListener("click",e=>{
   if(k==="book") pkChapters(BOOKS[+t.dataset.b]);
   if(k==="ch") pkVerses(PK.book,+t.dataset.c);
   if(k==="add") addPicked();
+  if(k==="addlist") addList();
   if(k==="back"){ if(PK.mode==="verses"&&VC[PK.book.i].length>1) pkChapters(PK.book); else { const l=findBooks(inp.value.replace(/\d.*$/,"").trim()); pkBooks(l.length?l:[PK.book]); } }
 });
 pick.addEventListener("change",e=>{
   const box=e.target; if(box.type!=="checkbox") return;
+  if(box.closest("[data-join]")){ PK.join=box.checked; pkSync(); return; }
   const l=box.closest("label"), n=+l.dataset.n;
   box.checked?PK.sel.add(n):PK.sel.delete(n); l.classList.toggle("on",box.checked); pkSync(); haptic();
 });
@@ -506,9 +568,12 @@ function renderTopics(){
   const el=$("topics"), counts={};
   S.list.forEach(v=>(v.topics||[]).forEach(t=>counts[t]=(counts[t]||0)+1));
   const names=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||a.localeCompare(b));
-  if(FILTER&&!counts[FILTER]) FILTER="";
+  if(FILTER&&FILTER!=="★"&&!counts[FILTER]) FILTER="";
   el.hidden=S.list.length<2||!names.length;
-  el.innerHTML=`<button type="button" data-topic="" aria-pressed="${!FILTER}">All</button>`+names.map(n=>`<button type="button" data-topic="${esc(n)}" aria-pressed="${FILTER===n}">${esc(n)}</button>`).join("");
+  const favs=S.list.filter(v=>v.fav).length;
+  if(FILTER==="★"&&!favs) FILTER="";
+  el.hidden=S.list.length<2||(!names.length&&!favs);
+  el.innerHTML=`<button type="button" data-topic="" aria-pressed="${!FILTER}">All</button>`+(favs?`<button type="button" data-topic="★" aria-pressed="${FILTER==="★"}">★ Favorites</button>`:"")+names.map(n=>`<button type="button" data-topic="${esc(n)}" aria-pressed="${FILTER===n}">${esc(n)}</button>`).join("");
 }
 $("topics").addEventListener("click",e=>{ const b=e.target.closest("[data-topic]"); if(!b) return; FILTER=b.dataset.topic; render(); });
 
@@ -525,6 +590,7 @@ const IC={
   chev:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2.5 4.5 3.5 3.5 3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   copy:'<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="10" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13.5 4.5v-.3a1.7 1.7 0 0 0-1.7-1.7H5.2a1.7 1.7 0 0 0-1.7 1.7v8.1a1.7 1.7 0 0 0 1.7 1.7h1.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
   share:'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.8v10.4M6.4 6.2 10 2.6l3.6 3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 9H5.2a1.7 1.7 0 0 0-1.7 1.7v5.6A1.7 1.7 0 0 0 5.2 18h9.6a1.7 1.7 0 0 0 1.7-1.7v-5.6A1.7 1.7 0 0 0 14.8 9h-1.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  star:'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.6l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 7.9l5-.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
   close:'<svg viewBox="0 0 18 18" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
   spark:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c.4 3.4 2.1 5.1 5.5 5.5-3.4.4-5.1 2.1-5.5 5.5C7.6 9.1 5.9 7.4 2.5 7c3.4-.4 5.1-2.1 5.5-5.5z" fill="currentColor"/><path d="M13 11.5c.15 1.2.8 1.85 2 2-1.2.15-1.85.8-2 2-.15-1.2-.8-1.85-2-2 1.2-.15 1.85-.8 2-2z" fill="currentColor"/></svg>'
 };
@@ -537,14 +603,15 @@ function render(fresh){
   if(!n){ list.innerHTML=`<div class="empty"><p class="big">Your favorite verses will gather here.</p><p>Type a reference above, like Proverbs 14:4 or Psalm 23.</p></div>`; return; }
   let items=S.list.slice();
   if(S.sort==="bible") items.sort((a,b)=>(a.bi-b.bi)||(a.c-b.c)||((a.v||0)-(b.v||0)));
-  if(FILTER) items=items.filter(v=>(v.topics||[]).includes(FILTER));
+  items.sort((a,b)=>(b.fav?1:0)-(a.fav?1:0));   // favorites stay on top, each group keeps its order
+  if(FILTER==="★") items=items.filter(v=>v.fav); else if(FILTER) items=items.filter(v=>(v.topics||[]).includes(FILTER));
   if(q) items=items.filter(v=>(v.ref+" "+v.text+" "+(v.note||"")+" "+(v.topics||[]).join(" ")).toLowerCase().includes(q));
   if(!items.length){ list.innerHTML=`<p class="none">No saved verse matches “${esc(q||FILTER)}”.</p>`; return; }
   const isNew=id=>fresh&&(fresh instanceof Set?fresh.has(id):fresh===id);
   list.innerHTML=items.map(v=>`<article class="tile${isNew(v.id)?" new":""}${opened.has(v.id)?" open":""}" data-id="${v.id}">
     <div class="q"><p class="qt">${esc(v.text)}</p></div>
     ${(v.topics||[]).length?`<div class="ttags">${v.topics.map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:""}
-    <div class="meta"><span class="ref">${esc(v.ref)}</span><span class="ver">NLT</span><span class="sp"></span>
+    <div class="meta"><span class="ref">${esc(v.ref)}</span><button class="star" type="button" data-act="fav" aria-pressed="${!!v.fav}" aria-label="${v.fav?"Remove from favorites":"Add to favorites"}">${IC.star}</button><span class="sp"></span>
       <button class="ib" type="button" data-act="share" aria-label="Share ${esc(v.ref)}">${IC.share}</button>
       <button class="mbtn" type="button" data-act="more" aria-expanded="${opened.has(v.id)}" aria-controls="m-${v.id}">Meaning ${IC.chev}</button></div>
     <div class="more" id="m-${v.id}"><div><div class="mi" data-mi></div></div></div></article>`).join("");
@@ -717,6 +784,8 @@ $("list").addEventListener("click",async e=>{
     if(open){ opened.add(v.id); fillMore(v); touchDay(); setTimeout(()=>{ const r=tile.getBoundingClientRect(); if(r.bottom>innerHeight) tile.scrollIntoView({behavior:reduce?"auto":"smooth",block:r.height>innerHeight?"start":"end"}); },330); }
     else opened.delete(v.id); haptic(); }
   if(act==="share") openShare(v);
+  if(act==="fav"){ v.fav=!v.fav; save(); haptic(); b.setAttribute("aria-pressed",v.fav); b.setAttribute("aria-label",v.fav?"Remove from favorites":"Add to favorites"); b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+    const inFav=FILTER==="★"; renderTopics(); if(inFav&&!v.fav){ tile.classList.add("gone"); setTimeout(render,240); } return; }
   if(act==="topics"){ const ed=tile.querySelector("[data-tedit]"), open=ed.hidden; ed.hidden=!open; b.setAttribute("aria-expanded",open); if(open) topicEditor(v,ed); }
   if(act==="ttoggle"){ const t=b.dataset.t, has=(v.topics||[]).includes(t); v.topics=has?v.topics.filter(x=>x!==t):[...(v.topics||[]),t]; b.setAttribute("aria-pressed",!has); save(); retag(tile,v); renderTopics(); }
   if(act==="tnew"){ const f=tile.querySelector("[data-tnewf]"); f.hidden=false; f.querySelector("input").focus(); }
@@ -788,6 +857,7 @@ let lastPick=null;
 function surprise(){
   if(S.list.length<1) return;
   let pool=S.list.filter(v=>v.id!==lastPick); if(!pool.length) pool=S.list;
+  pool=pool.flatMap(v=>v.fav?[v,v,v]:[v]);
   const v=pool[Math.floor(Math.random()*pool.length)]; lastPick=v.id; touchDay(); haptic();
   const o=$("over");
   o.innerHTML=`<button class="x" type="button" data-o="close" aria-label="Close">${IC.close}</button>
