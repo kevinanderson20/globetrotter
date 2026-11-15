@@ -1410,7 +1410,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.09-2222";
+const APP_VERSION="2026.11.14-1953";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -2378,7 +2378,9 @@ function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").fo
   // never let the map slide out of view: keep at least a quarter of the starting area on screen
   const clamp=()=>{ v[0]=Math.min(Math.max(v[0],base[0]-v[2]*.75),base[0]+base[2]-v[2]*.25); v[1]=Math.min(Math.max(v[1],base[1]-v[3]*.75),base[1]+base[3]-v[3]*.25); };
   const apply=()=>{ clamp(); svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" ")); if(state) state.v=v.slice(); wrap.classList.toggle("zoomed",Math.abs(v[2]-base[2])>1||Math.abs(v[0]-base[0])>1||Math.abs(v[1]-base[1])>1); };
-  const toMap=(cx,cy)=>{ const r=svg.getBoundingClientRect(); return [v[0]+(cx-r.left)/r.width*v[2], v[1]+(cy-r.top)/r.height*v[3]]; };
+  // the map keeps its shape inside its box (when the box is height-capped it is centred with side margins), so convert screen points through the drawn area, not the box
+  const fit=(w)=>{ const r=svg.getBoundingClientRect(), h=w*ar, s=Math.min(r.width/w,r.height/h); return {s,ox:r.left+(r.width-w*s)/2,oy:r.top+(r.height-h*s)/2}; };
+  const toMap=(cx,cy)=>{ const f=fit(v[2]); return [v[0]+(cx-f.ox)/f.s, v[1]+(cy-f.oy)/f.s]; };
   const zoomAt=(f,mx,my)=>{ const w=Math.min(maxW,Math.max(minW,v[2]*f)), k=w/v[2]; v=[mx-(mx-v[0])*k, my-(my-v[1])*k, w, w*ar]; apply(); };
   const centre=()=>[v[0]+v[2]/2,v[1]+v[3]/2];
   let anim=0; const animTo=(t)=>{ cancelAnimationFrame(anim); const s0=v.slice(), t0=performance.now();
@@ -2392,13 +2394,12 @@ function geoZoomInit(root,state){ (root||document).querySelectorAll(".gzoom").fo
     if(pts.size===2){ const [a,b]=[...pts.values()]; pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),w:v[2],m:toMap((a[0]+b[0])/2,(a[1]+b[1])/2),v:v.slice()}; }
     last=[e.clientX,e.clientY]; });
   svg.addEventListener("pointermove",e=>{ if(!pts.has(e.pointerId)) return; pts.set(e.pointerId,[e.clientX,e.clientY]);
-    const r=svg.getBoundingClientRect();
     if(pts.size>=2&&pinch){ const [a,b]=[...pts.values()], d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(d<10) return;
       const w=Math.min(maxW,Math.max(minW,pinch.w*pinch.d/d)), mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
       // keep the map point under the fingers' midpoint fixed
-      v=[pinch.m[0]-(mid[0]-r.left)/r.width*w, pinch.m[1]-(mid[1]-r.top)/r.height*w*ar, w, w*ar]; moved=9; apply(); return; }
+      const f=fit(w); v=[pinch.m[0]-(mid[0]-f.ox)/f.s, pinch.m[1]-(mid[1]-f.oy)/f.s, w, w*ar]; moved=9; apply(); return; }
     if(pts.size===1&&last){ const dx=e.clientX-last[0], dy=e.clientY-last[1]; moved+=Math.abs(dx)+Math.abs(dy); last=[e.clientX,e.clientY];
-      v[0]-=dx/r.width*v[2]; v[1]-=dy/r.height*v[3]; apply(); } });
+      const f=fit(v[2]); v[0]-=dx/f.s; v[1]-=dy/f.s; apply(); } });
   const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=null;
     if(pts.size===1){ last=[...pts.values()][0]; return; }
     if(pts.size===0&&moved<8&&state&&state.onTap){ const [mx,my]=toMap(e.clientX,e.clientY); state.onTap(mx,my); return; }

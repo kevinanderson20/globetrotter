@@ -669,6 +669,198 @@ hr{border:0;height:.5px;background:var(--sep)}
 .pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
 .pg-games .hgl .gico{width:100%;height:100%;display:block}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
+
+/* ---------- drawn icons in place of emoji ---------- */
+.pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.pg-games .workout .steps3 svg{width:15px;height:15px;display:block}
+.pg-games .herochips span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .herochips .ic{color:#ff9f0a}
+.pg-games #msleft{display:inline-flex;align-items:center;gap:6px}
+.pg-games .msmode span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .mc .msi{width:62%;height:62%;vertical-align:middle}
+.pg-games .mc.f .msi{color:var(--bad)}
+.pg-games .mc.mine .msi,.pg-games .mc.boom .msi{color:var(--ink)}
+.pg-games .mc.boom .msi{color:#fff}
+.pg-games .qcr{width:64%;height:64%;color:var(--ink);vertical-align:middle}
+.pg-games .qnbar .btn,.pg-games #tvhint{display:inline-flex;align-items:center;gap:5px}
+.pg-games .wlarr .wlok{width:22px;height:22px;color:var(--good)}
+.pg-games .tlh{display:inline-flex;gap:3px;align-items:center}
+.pg-games .tlh svg{width:17px;height:17px;fill:none;stroke:var(--ink-3);stroke-width:2}
+.pg-games .tlh svg.on{fill:var(--bad);stroke:var(--bad)}
+.pg-games .mc{place-items:center}
+.pg-games .mc .msi{display:block;margin:auto}
+.pg-games .mc.f .msi{width:58%;height:58%}
+.pg-games .mc.f .msi{width:72%;height:72%}
+@media (max-width:380px){.pg-games .gr.new,.pg-games .gr.go{padding:6px 13px!important}.pg-games .grow{gap:12px}}
+
+/* Math modes: a white line icon on the colored square */
+.pg-math .mode::after{content:"";width:44px;height:44px;grid-row:1/3;grid-column:1;background:#fff;-webkit-mask:var(--mi) center/24px no-repeat;mask:var(--mi) center/24px no-repeat}
+.pg-math .mode.sm{grid-template-columns:1fr!important;align-content:start;gap:4px!important}
+.pg-math .mode.sm::before,.pg-math .mode.sm::after{grid-row:1;grid-column:1;width:40px;height:40px;margin-bottom:8px}
+.pg-math .mode.sm b,.pg-math .mode.sm span{grid-column:1!important}
+.pg-math .mode[data-act="sprint"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%227.5%22/%3E%3Cpath d=%22M12 9.5v4l2.5 2M10 2.5h4M12 2.5V6%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="survival"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="daily"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%223.5%22 y=%225%22 width=%2217%22 height=%2215.5%22 rx=%223%22/%3E%3Cpath d=%22M3.5 10h17M8 3v4M16 3v4%22/%3E%3Cpath d=%22M8.5 14.5h2M13.5 14.5h2%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
+
+/* ---------- drawn icons in place of emoji ---------- */
+.pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.pg-games .workout .steps3 svg{width:15px;height:15px;display:block}
+.pg-games .herochips span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .herochips .ic{color:#ff9f0a}
+.pg-games #msleft{display:inline-flex;align-items:center;gap:6px}
+.pg-games .msmode span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .mc .msi{width:62%;height:62%;vertical-align:middle}
+.pg-games .mc.f .msi{color:var(--bad)}
+.pg-games .mc.mine .msi,.pg-games .mc.boom .msi{color:var(--ink)}
+.pg-games .mc.boom .msi{color:#fff}
+.pg-games .qcr{width:64%;height:64%;color:var(--ink);vertical-align:middle}
+.pg-games .qnbar .btn,.pg-games #tvhint{display:inline-flex;align-items:center;gap:5px}
+.pg-games .wlarr .wlok{width:22px;height:22px;color:var(--good)}
+.pg-games .tlh{display:inline-flex;gap:3px;align-items:center}
+.pg-games .tlh svg{width:17px;height:17px;fill:none;stroke:var(--ink-3);stroke-width:2}
+.pg-games .tlh svg.on{fill:var(--bad);stroke:var(--bad)}
+.pg-games .mc{place-items:center}
+.pg-games .mc .msi{display:block;margin:auto}
+.pg-games .mc.f .msi{width:58%;height:58%}
+.pg-games .mc.f .msi{width:72%;height:72%}
+@media (max-width:380px){.pg-games .gr.new,.pg-games .gr.go{padding:6px 13px!important}.pg-games .grow{gap:12px}}
+
+/* Math modes: a white line icon on the colored square */
+.pg-math .mode::after{content:"";width:44px;height:44px;grid-row:1/3;grid-column:1;background:#fff;-webkit-mask:var(--mi) center/24px no-repeat;mask:var(--mi) center/24px no-repeat}
+.pg-math .mode.sm{grid-template-columns:1fr!important;align-content:start;gap:4px!important}
+.pg-math .mode.sm::before,.pg-math .mode.sm::after{grid-row:1;grid-column:1;width:40px;height:40px;margin-bottom:8px}
+.pg-math .mode.sm b,.pg-math .mode.sm span{grid-column:1!important}
+.pg-math .mode[data-act="sprint"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%227.5%22/%3E%3Cpath d=%22M12 9.5v4l2.5 2M10 2.5h4M12 2.5V6%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="survival"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="daily"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%223.5%22 y=%225%22 width=%2217%22 height=%2215.5%22 rx=%223%22/%3E%3Cpath d=%22M3.5 10h17M8 3v4M16 3v4%22/%3E%3Cpath d=%22M8.5 14.5h2M13.5 14.5h2%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
+
+/* ---------- drawn icons in place of emoji ---------- */
+.pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.pg-games .workout .steps3 svg{width:15px;height:15px;display:block}
+.pg-games .herochips span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .herochips .ic{color:#ff9f0a}
+.pg-games #msleft{display:inline-flex;align-items:center;gap:6px}
+.pg-games .msmode span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .mc .msi{width:62%;height:62%;vertical-align:middle}
+.pg-games .mc.f .msi{color:var(--bad)}
+.pg-games .mc.mine .msi,.pg-games .mc.boom .msi{color:var(--ink)}
+.pg-games .mc.boom .msi{color:#fff}
+.pg-games .qcr{width:64%;height:64%;color:var(--ink);vertical-align:middle}
+.pg-games .qnbar .btn,.pg-games #tvhint{display:inline-flex;align-items:center;gap:5px}
+.pg-games .wlarr .wlok{width:22px;height:22px;color:var(--good)}
+.pg-games .tlh{display:inline-flex;gap:3px;align-items:center}
+.pg-games .tlh svg{width:17px;height:17px;fill:none;stroke:var(--ink-3);stroke-width:2}
+.pg-games .tlh svg.on{fill:var(--bad);stroke:var(--bad)}
+.pg-games .mc{place-items:center}
+.pg-games .mc .msi{display:block;margin:auto}
+.pg-games .mc.f .msi{width:58%;height:58%}
+.pg-games .mc.f .msi{width:72%;height:72%}
+@media (max-width:380px){.pg-games .gr.new,.pg-games .gr.go{padding:6px 13px!important}.pg-games .grow{gap:12px}}
+
+/* Math modes: a white line icon on the colored square */
+.pg-math .mode::after{content:"";width:44px;height:44px;grid-row:1/3;grid-column:1;background:#fff;-webkit-mask:var(--mi) center/24px no-repeat;mask:var(--mi) center/24px no-repeat}
+.pg-math .mode.sm{grid-template-columns:1fr!important;align-content:start;gap:4px!important}
+.pg-math .mode.sm::before,.pg-math .mode.sm::after{grid-row:1;grid-column:1;width:40px;height:40px;margin-bottom:8px}
+.pg-math .mode.sm b,.pg-math .mode.sm span{grid-column:1!important}
+.pg-math .mode[data-act="sprint"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%227.5%22/%3E%3Cpath d=%22M12 9.5v4l2.5 2M10 2.5h4M12 2.5V6%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="survival"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="daily"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%223.5%22 y=%225%22 width=%2217%22 height=%2215.5%22 rx=%223%22/%3E%3Cpath d=%22M3.5 10h17M8 3v4M16 3v4%22/%3E%3Cpath d=%22M8.5 14.5h2M13.5 14.5h2%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
+
+/* ---------- drawn icons in place of emoji ---------- */
+.pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.pg-games .workout .steps3 svg{width:15px;height:15px;display:block}
+.pg-games .herochips span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .herochips .ic{color:#ff9f0a}
+.pg-games #msleft{display:inline-flex;align-items:center;gap:6px}
+.pg-games .msmode span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .mc .msi{width:62%;height:62%;vertical-align:middle}
+.pg-games .mc.f .msi{color:var(--bad)}
+.pg-games .mc.mine .msi,.pg-games .mc.boom .msi{color:var(--ink)}
+.pg-games .mc.boom .msi{color:#fff}
+.pg-games .qcr{width:64%;height:64%;color:var(--ink);vertical-align:middle}
+.pg-games .qnbar .btn,.pg-games #tvhint{display:inline-flex;align-items:center;gap:5px}
+.pg-games .wlarr .wlok{width:22px;height:22px;color:var(--good)}
+.pg-games .tlh{display:inline-flex;gap:3px;align-items:center}
+.pg-games .tlh svg{width:17px;height:17px;fill:none;stroke:var(--ink-3);stroke-width:2}
+.pg-games .tlh svg.on{fill:var(--bad);stroke:var(--bad)}
+.pg-games .mc{place-items:center}
+.pg-games .mc .msi{display:block;margin:auto}
+.pg-games .mc.f .msi{width:58%;height:58%}
+.pg-games .mc.f .msi{width:72%;height:72%}
+@media (max-width:380px){.pg-games .gr.new,.pg-games .gr.go{padding:6px 13px!important}.pg-games .grow{gap:12px}}
+
+/* Math modes: a white line icon on the colored square */
+.pg-math .mode::after{content:"";width:44px;height:44px;grid-row:1/3;grid-column:1;background:#fff;-webkit-mask:var(--mi) center/24px no-repeat;mask:var(--mi) center/24px no-repeat}
+.pg-math .mode.sm{grid-template-columns:1fr!important;align-content:start;gap:4px!important}
+.pg-math .mode.sm::before,.pg-math .mode.sm::after{grid-row:1;grid-column:1;width:40px;height:40px;margin-bottom:8px}
+.pg-math .mode.sm b,.pg-math .mode.sm span{grid-column:1!important}
+.pg-math .mode[data-act="sprint"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%227.5%22/%3E%3Cpath d=%22M12 9.5v4l2.5 2M10 2.5h4M12 2.5V6%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="survival"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="daily"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%223.5%22 y=%225%22 width=%2217%22 height=%2215.5%22 rx=%223%22/%3E%3Cpath d=%22M3.5 10h17M8 3v4M16 3v4%22/%3E%3Cpath d=%22M8.5 14.5h2M13.5 14.5h2%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
 
 /* ---------- drawn icons in place of emoji ---------- */
 .pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
@@ -3061,7 +3253,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.11.09-2222";
+const APP_VERSION="2026.11.14-1953";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
