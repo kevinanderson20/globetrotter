@@ -10,6 +10,8 @@
 <meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <title>Verses</title>
+<script>/* a page transition that can't run is harmless; keep it from surfacing as an error */
+addEventListener("pagereveal",function(e){ var vt=e.viewTransition; if(vt){ ["ready","finished","updateCallbackDone"].forEach(function(k){ vt[k]&&vt[k].catch(function(){}); }); } });</script>
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -122,12 +124,51 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
 @keyframes pulse{50%{opacity:.5}}
 .notes textarea{min-height:72px;font:16px/1.5 var(--f-body)}
 .saved{font-size:12px;color:var(--ink-3);height:14px;margin-top:4px;transition:opacity 300ms}
-.ask{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:12px;background:var(--surface-2);font-weight:600;font-size:15px;color:var(--ink);text-decoration:none;transition:transform 140ms var(--ease)}
-.ask:active{transform:scale(.97)}
-.ask svg{width:16px;height:16px;color:var(--accent)}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-.acts .pill{font-size:14px;min-height:36px;padding:0 14px}
-.acts .del{color:var(--bad)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;padding-top:2px}
+.acts .pill{font-size:14px;min-height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.acts .pill svg{width:14px;height:14px;color:var(--accent)}
+.acts .del{color:var(--bad);margin-left:auto}
+/* study sections */
+[data-study]{display:grid;gap:0}
+[data-study]>.sec{padding:16px 0;border-top:1px solid var(--hair)}
+[data-study]>.sec:first-child{border-top:0;padding-top:0}
+[data-study]>.sec:last-child{padding-bottom:0}
+.mi>.notes{border-top:1px solid var(--hair);padding-top:16px}
+.mi{gap:16px}
+.sec h3{margin-bottom:8px}
+.sec .dim{color:var(--ink-2);font-size:15px}
+.kjv{font:700 10.5px var(--f-body);letter-spacing:.06em;color:var(--ink-3);border:1px solid var(--hair);border-radius:4px;padding:0 4px;margin-right:4px;vertical-align:.15em}
+[data-kjv]{font:400 17px/1.5 var(--f-quote);color:var(--ink)}
+.pts{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.pts li{position:relative;padding-left:16px;font-size:15.5px;line-height:1.5}
+.pts li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.pts b{font-weight:700}
+.terms,.facts{margin:0;display:grid;gap:10px}
+.terms dt{font-weight:700;font-size:15px}
+.terms dt span{font-weight:500;color:var(--ink-3)}
+.terms dd{margin:2px 0 0;font-size:15px;line-height:1.5;color:var(--ink-2)}
+.facts{grid-template-columns:auto 1fr;gap:6px 14px}
+.facts dt{font-size:13px;font-weight:600;color:var(--ink-3);padding-top:1px;white-space:nowrap}
+.facts dd{margin:0;font-size:15px;line-height:1.45}
+.around{margin-top:12px}
+.around summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:15px;list-style:none;display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.around summary::-webkit-details-marker{display:none}
+.around summary::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform 200ms var(--ease)}
+.around[open] summary::after{transform:rotate(-135deg) translate(-2px,0)}
+.around [data-ctx]{margin-top:6px}
+.rel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}
+.rel>span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.chip{min-height:32px;padding:0 11px;border-radius:999px;background:var(--surface-2);font-size:13.5px;font-weight:600;color:var(--ink);transition:background-color 150ms,transform 140ms var(--ease)}
+.chip:active{transform:scale(.95)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.peek{margin-top:10px;background:var(--surface-2);border-radius:14px;padding:12px 14px;animation:walk 240ms var(--ease) both}
+@keyframes walk{from{opacity:0;transform:translateY(-4px)}}
+.pq{margin:0 0 8px;font:400 17px/1.5 var(--f-quote);white-space:pre-line}
+.peek .row{align-items:center}
+.peek .sp{flex:1}
+.ref.sm{font-size:13.5px}
+.pill.sm{min-height:34px;font-size:14px;padding:0 14px}
+.qq{font:400 18px/1.45 var(--f-quote);margin:0 0 10px!important;color:var(--ink)}
 
 .empty{text-align:center;padding:48px 20px;color:var(--ink-2)}
 .empty .big{font:400 22px/1.45 var(--f-quote);color:var(--ink);margin:0 0 10px}
@@ -162,16 +203,16 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
   </div>
   <div class="list" id="list"></div>
 
-  <p class="credit">Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved.<br>Study notes: <a href="https://tyndaleopenresources.com/" target="_blank" rel="noopener">Tyndale Open Study Notes</a>, © Tyndale House Publishers, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, via the Free Use Bible API.</p>
+  <p class="credit">Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved.<br>Study notes and book summaries adapted from Tyndale Open Study Notes; definitions adapted from Tyndale Open Bible Dictionary. The original works by Tyndale House Publishers are available for free at <a href="https://tyndaleopenresources.com/" target="_blank" rel="noopener">tyndaleopenresources.com</a>, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Changes: notes are split into short points, and dictionary entries are shortened to their opening lines.</p>
 </div>
 <div class="toast" id="toast" role="status"><span id="toastT"></span><button type="button" id="toastU">Undo</button></div>
 
 <script>
 "use strict";
 /* ================= Verses: a private list of favourite verses, kept only on this phone =================
-   Text: Tyndale's NLT API (official, no key needed for light use). Study notes: Tyndale Open Study Notes via bible.helloao.org.
+   Text: Tyndale's NLT API (official, no key needed for light use). Study: Tyndale Open Study Notes, book summaries and Bible dictionary, bundled in ./data (tools/verses_data.py).
    Saved under globetrotter.verses.v1, so the app's "Back up progress" code carries them too. */
-const KEY="globetrotter.verses.v1", NLT="https://api.nlt.to/api/passages", NOTES="https://bible.helloao.org/api/c/tyndale";
+const KEY="globetrotter.verses.v1", NLT="https://api.nlt.to/api/passages";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -201,8 +242,8 @@ try{ const o=JSON.parse(localStorage.getItem(KEY)||"null"); if(o&&Array.isArray(
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
 
 /* NLT text from Tyndale's API (HTML) → plain text with poetry line breaks */
-async function nltFetch(label){
-  const r=await fetch(`${NLT}?ref=${encodeURIComponent(label)}&version=NLT&key=TEST`);
+async function nltFetch(label,version="NLT"){
+  const r=await fetch(`${NLT}?ref=${encodeURIComponent(label)}&version=${version}&key=TEST`);
   if(!r.ok) throw new Error("http");
   const doc=new DOMParser().parseFromString(await r.text(),"text/html");
   const vs=[...doc.querySelectorAll("verse_export")];
@@ -247,10 +288,10 @@ function manual(p){
   $("msave").onclick=()=>{ const t=$("mtext").value.trim(); if(!t){ $("mtext").focus(); return; } addVerse(p,t); $("manualBox").innerHTML=""; say(""); inp.value=""; };
   $("mcancel").onclick=()=>{ $("manualBox").innerHTML=""; say(""); };
 }
-function addVerse(p,text){
+function addVerse(p,text,quiet){
   const v={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ref:p.label,book:p.book,code:p.code,bi:p.bi,c:p.c,v:p.v,v2:p.v2,text,added:Date.now(),note:""};
-  S.list.unshift(v); save(); haptic(); $("q").value=""; render(v.id);
-  requestAnimationFrame(()=>document.querySelector(`[data-id="${v.id}"]`)?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"}));
+  S.list.unshift(v); save(); haptic(); $("q").value=""; render(quiet?null:v.id);
+  if(!quiet) requestAnimationFrame(()=>document.querySelector(`[data-id="${v.id}"]`)?.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"}));
 }
 
 /* list */
@@ -281,34 +322,139 @@ function render(fresh){
 function showTile(id){ $("q").value=""; render(); const el=document.querySelector(`[data-id="${id}"]`); if(!el) return;
   el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"center"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
 
-/* the Meaning drop-down: study note, the verses around it, your notes, ask Claude */
+/* ================= the study drop-down =================
+   Overview · Core meaning · Key terms · Context · Live it out, built from Tyndale's open study notes, book summaries
+   and Bible dictionary (bundled in ./data, so it works offline), plus the KJV wording from Tyndale's NLT API. */
+const DATA={}, getJSON=u=>DATA[u]||(DATA[u]=fetch(u).then(r=>{ if(!r.ok) throw new Error("http"); return r.json(); }).catch(e=>{ delete DATA[u]; throw e; }));
+const bookData=code=>getJSON(`data/${code}.json`), dictData=()=>getJSON("data/dict.json");
+const at=(c,v)=>c*1000+(v==null?0:v), end=(c,v)=>c*1000+(v==null?999:v);
+const span=n=>n[2]===n[0]?((n[3]??999)-(n[1]??1)+1):999;
+const sents=t=>String(t).split(/(?<=[.!?])\s+(?=[A-Z“"(])/).map(x=>x.trim()).filter(Boolean);
+const clip=(t,n)=>sents(t).slice(0,n).join(" ");
+
+/* the notes that speak to this verse, and the passage note it sits in */
+function pickNotes(v,notes){
+  const lo=at(v.c,v.v||1), hi=end(v.c,v.v2||v.v);
+  const cover=notes.filter(n=>at(n[0],n[1]??1)<=hi && end(n[2],n[3])>=lo);
+  let own=cover.filter(n=>span(n)<=3 && at(n[0],n[1]??1)>=lo-2);
+  if(!v.v) own=cover.filter(n=>n[0]===v.c&&(n[1]??1)===1).sort((x,y)=>span(x)-span(y)).slice(0,1);
+  const own2=own.length?own:cover.filter(n=>span(n)<=12).sort((x,y)=>span(x)-span(y)).slice(0,1);
+  const section=cover.filter(n=>span(n)>3 && !own2.includes(n)).sort((x,y)=>span(x)-span(y))[0]||null;
+  return {own:own2.slice(0,3),section,exact:own.length>0};
+}
+const citesFor=(v,cited)=>(cited||[]).filter(x=>x[0]===v.c&&v.v&&x[1]<=(v.v2||v.v)&&x[2]>=v.v);
+const rangeLabel=(book,n)=>{ const nm=book==="Psalms"&&n[0]===n[2]?"Psalm":book;
+  if(n[1]==null) return `${nm} ${n[0]}${n[2]!==n[0]?"–"+n[2]:""}`;
+  return n[0]===n[2]?`${nm} ${n[0]}:${n[1]}${n[3]!==n[1]?"–"+n[3]:""}`:`${nm} ${n[0]}:${n[1]}–${n[2]}:${n[3]}`; };
+
+/* core meaning as short points with a bold lead, the way a study Bible reads */
+const BK="(?:[1-3]\\s?)?(?:Gen|Exod|Lev|Num|Deut|Josh|Judg|Ruth|Sam|Kgs|Chr|Ezra|Neh|Esth|Job|Pss?|Prov|Eccl|Song|Isa|Jer|Lam|Ezek|Dan|Hos|Joel|Amos|Obad|Jonah|Mic|Nah|Hab|Zeph|Hag|Zech|Mal|Matt|Mark|Luke|John|Jn|Acts|Rom|Cor|Gal|Eph|Phil|Col|Thes|Tim|Titus|Phlm|Heb|Jas|Pet|Jude|Rev)\\.?";
+const REFRUN=new RegExp(`^(?:see(?: also)?|cp\\.|cf\\.|e\\.g\\.,?|also|and|KJV|NLT|RSV|NIV|vv?\\.?|chs?\\.?|Sm|Kgs|Chr|${BK}|\\d+(?::\\d+)?(?:[-–]\\d+(?::\\d+)?)?|[,;\\s])+$`,"i");
+const cleanRefs=t=>String(t).replace(/\s*\(([^()]*)\)/g,(m,inner)=>REFRUN.test(inner.trim())||/Theme Note|Profile\b/.test(inner)?"":m).replace(/\s*—[^—]{3,80}—\s*/g," ").replace(/\s+([.,;:])/g,"$1").replace(/\s{2,}/g," ").trim();
+const cap=t=>t?t[0].toUpperCase()+t.slice(1):t;
+/* "through Christ: With Christ's help…" → label "Through Christ", text "With Christ's help…" */
+const lead=(lab,t)=>{ const m=!lab&&String(t).match(/^((?:[a-z“‘]|\. \. \.)[^:]{1,70}):\s+(\S.*)$/s); return m?[cap(m[1].replace(/\s*\.\s\.\s\.\s*/g,"… ").trim()),m[2]]:[cap(lab),t]; };
+const prose=t=>(cleanRefs(t).replace(new RegExp(`\\b(?:see(?: also)?|cp\\.)?\\s*${BK}\\s*\\d[\\d:,;\\s–-]*`,"gi")," ").match(/[A-Za-z]{3,}/g)||[]).length;
+function points(own,cites){
+  const out=[];
+  own.forEach(n=>n[4].forEach(([lab,t])=>{
+    const ss=sents(cleanRefs(t));
+    if(!lab && ss.length>1 && n[4].length===1) ss.forEach(x=>out.push(lead("",x)));
+    else if(t||lab) out.push(lead(lab,cleanRefs(t)));
+  }));
+  const mine=out.filter(p=>p[1]&&prose(p[1])>=4).slice(0,3);      // drop points that are only "See 33:2; 49:23"
+  cites.slice(0,Math.max(1,3-mine.length)).forEach(c=>{ const [l,t]=c[3]==="note"?lead("",cleanRefs(c[5])):["",cleanRefs(c[5])]; mine.push([c[3]==="theme"?c[4]:(l||c[4]),t,c[3]]); });
+  return mine.slice(0,4);
+}
+/* key terms: distinctive words in the verse (NLT and KJV wording) that the Tyndale Bible Dictionary explains */
+const STOP=new Set("a an and the of to in on for with by at from as is was be are were been am it its this that these those he she they them his her their him i me my we us our you your who whom which what when where why how not no nor or but so if then than there here all any some one two three four five six seven many much more most such very also only even just own same other each every both few man men woman women day days time times world land city house hand hands life son sons daughter king kings earth water people name year years way place eye eyes head word words voice child children brother brothers sister mother father fathers wife husband friend night morning evening door gate road tree trees stone fire sea river thing things body lord god jesus christ israel".split(" "));
+const THEO=new Set("grace faith sin sins righteousness salvation mercy peace love hope wisdom repentance covenant atonement redemption sanctification justification holiness glory spirit soul worship prayer forgiveness kingdom resurrection eternal judgment humility pride anger joy patience kindness fear obedience praise blessing curse sacrifice temple sabbath gospel heaven hell sheol abaddon idolatry".split(" "));
+const LEMMA={hate:"hatred",hated:"hatred",hates:"hatred",hateful:"hatred",loved:"love",loves:"love",loving:"love",sinned:"sin",sinful:"sin",forgive:"forgiveness",forgiven:"forgiveness",forgives:"forgiveness",righteous:"righteousness",wise:"wisdom",proud:"pride",humble:"humility",angry:"anger",feared:"fear",fears:"fear",praised:"praise",praising:"praise",blessed:"blessing",bless:"blessing",holy:"holiness",saved:"salvation",save:"salvation",saves:"salvation",prayed:"prayer",pray:"prayer",trusts:"trust",trusted:"trust",joyful:"joy",merciful:"mercy",patient:"patience",kind:"kindness",humbled:"humility",repent:"repentance",glorious:"glory",worshiped:"worship",oxen:"ox",gentle:"gentleness",rested:"rest",shepherds:"shepherd",wealthy:"wealth",rich:"wealth",riches:"wealth",harvests:"harvest"};
+const singular=w=>w.endsWith("ies")?w.slice(0,-3)+"y":/(ches|shes|sses|xes)$/.test(w)?w.slice(0,-2):w.endsWith("s")&&!w.endsWith("ss")?w.slice(0,-1):w;
+function keyTerms(texts,dict,exclude){
+  const words=texts.join(" ").toLowerCase().replace(/[’']/g,"'").replace(/[^a-z' ]+/g," ").split(/\s+/).filter(Boolean);
+  const found=new Map();
+  for(let i=0;i<words.length;i++){
+    for(let n=3;n>=1;n--){
+      if(i+n>words.length) continue;
+      const g=words.slice(i,i+n).join(" ").replace(/'s$/,"");
+      if(n===1&&(STOP.has(g)||g.length<2)) continue;
+      const forms=[g,LEMMA[g],singular(g),LEMMA[singular(g)]].filter(Boolean);
+      const k=forms.find(f=>dict[f]&&!STOP.has(f));
+      if(k&&!found.has(k)&&!exclude.has(k)){ found.set(k,{k,word:words.slice(i,i+n).join(" "),title:dict[k][0],def:cleanRefs(dict[k][1]),freq:dict[k][2]||0,q:dict[k][3]??2,pos:i,theo:THEO.has(k)}); if(n>1) i+=n-1; break; }
+    }
+  }
+  const seenDef=new Set();
+  const all=[...found.values()].filter(t=>t.def&&t.def.length>20&&t.q>0&&!seenDef.has(t.def)&&seenDef.add(t.def));
+  const concrete=all.filter(t=>!t.theo&&t.freq<400).sort((a,b)=>(b.q-a.q)||(a.freq-b.freq));
+  const theo=all.filter(t=>t.theo).sort((a,b)=>a.freq-b.freq);
+  const pick=[...concrete,...theo].slice(0,3);
+  return pick.sort((a,b)=>a.pos-b.pos);
+}
+
+/* one reflection question, matched to the kind of book */
+const GENRE=i=>i<=4?"law":i<=16?"story":i===17||i>=19&&i<=21?"wisdom":i===18?"psalm":i<=38?"prophet":i<=42?"gospel":i===43?"story":i<=64?"letter":"vision";
+const ASK={
+  wisdom:["Where does this choice show up in your week?","Which side of this saying are you living on right now?","What would change if you took this seriously for one day?","Who in your life lives this out well?"],
+  psalm:["What in this verse could you pray back to God today?","Which feeling here do you recognize in yourself?","What does this say about who God is?","When have you seen this be true?"],
+  law:["What does this show about what God values?","What principle behind this still applies today?","What would honoring this look like in your daily life?","How does this show God's care for his people?"],
+  story:["What does this moment show about God's faithfulness?","Where do you see yourself in this story?","What choice here would you want to imitate or avoid?","How did God work through ordinary people here?"],
+  prophet:["What hope does this hold out for you?","What does this reveal about God's character?","What is God asking of his people here, and of you?","How does this change the way you see your situation?"],
+  gospel:["What does this show you about Jesus?","How would you have responded if you were there?","What is Jesus inviting you to do or believe here?","Who could you share this with this week?"],
+  letter:["What is one thing this asks you to do?","What does this say is true about you in Christ?","Which relationship could this change this week?","What would living this out look like tomorrow?"],
+  vision:["What hope does this give you for the future?","What does this show about God's power over everything?","How should this shape what you value today?","What does this call you to hold on to?"]};
+const question=v=>{ const q=ASK[GENRE(v.bi)]; return q[((v.c||0)*31+(v.v||0))%q.length]; };
+
+const brief=(d,max=80)=>{ let t=String(d||"").split(/;\s*/)[0].trim(); if(t.length>max){ const parts=t.split(/,\s+/); let o=parts[0]; for(let i=1;i<parts.length&&o.length<24;i++) o+=", "+parts[i]; t=o; } return t.replace(/[.,]$/,""); };
+
 function fillMore(v){
   const box=document.querySelector(`[data-id="${v.id}"] [data-mi]`); if(!box||box.dataset.done) return; box.dataset.done=1;
   const askQ=`Help me understand ${v.ref} (NLT): "${v.text.replace(/\n/g," ")}". Briefly explain its original context, what it means, and how I might apply it today.`;
-  box.innerHTML=`<section class="sec"><h3>Study note</h3><div data-note><div class="load"><i></i><i></i><i></i></div></div></section>
-    ${v.v?`<section class="sec"><h3>In context</h3><div data-ctx><div class="load"><i></i><i></i></div></div></section>`:""}
-    <section class="sec notes"><h3>My notes</h3><textarea data-mynote placeholder="What this verse means to you…" aria-label="My notes on ${esc(v.ref)}">${esc(v.note||"")}</textarea><div class="saved" data-saved></div></section>
-    <a class="ask" href="https://claude.ai/new?q=${encodeURIComponent(askQ)}" target="_blank" rel="noopener">${IC.spark}Go deeper with Claude</a>
-    <div class="acts"><button class="pill" type="button" data-act="share">Share</button><button class="pill del" type="button" data-act="del">Remove</button></div>`;
+  box.innerHTML=`<div data-study><div class="load"><i></i><i></i><i></i></div></div>
+    <section class="sec notes"><h3>Live it out</h3><p class="qq">${esc(question(v))}</p><textarea data-mynote placeholder="Write your answer or thoughts…" aria-label="Your thoughts on ${esc(v.ref)}">${esc(v.note||"")}</textarea><div class="saved" data-saved></div></section>
+    <div class="acts"><a class="pill ask" href="https://claude.ai/new?q=${encodeURIComponent(askQ)}" target="_blank" rel="noopener">${IC.spark}Ask Claude</a><button class="pill" type="button" data-act="share">Share</button><button class="pill del" type="button" data-act="del">Remove</button></div>`;
   const ta=box.querySelector("[data-mynote]"), sv=box.querySelector("[data-saved]"); let t;
   ta.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(()=>{ v.note=ta.value; save(); sv.textContent="Saved"; setTimeout(()=>sv.textContent="",1400); },400); });
-  loadNote(v,box.querySelector("[data-note]"));
-  if(v.v) loadCtx(v,box.querySelector("[data-ctx]"));
+  buildStudy(v,box.querySelector("[data-study]"));
 }
-const paras=t=>String(t).split(/\n+/).map(s=>s.trim()).filter(Boolean).map(s=>`<p>${esc(s)}</p>`).join("");
-async function loadNote(v,el){
-  if(v.study!=null){ el.innerHTML=v.study?paras(v.study)+`<p class="src">Tyndale Open Study Notes</p>`:`<p class="load">There's no study note for this verse. Try “Go deeper with Claude” below.</p>`; return; }
-  try{
-    const r=await fetch(`${NOTES}/${v.code}/${v.c}.json`); if(!r.ok) throw new Error("http");
-    const j=await r.json(), items=(j.chapter&&j.chapter.content||[]).filter(x=>x.type==="verse"&&x.number);
-    const lo=v.v||1, hi=v.v2||v.v||999;
-    let pick=items.filter(x=>x.number>=lo&&x.number<=hi);
-    if(!pick.length){ const before=items.filter(x=>x.number<=lo); if(before.length) pick=[before[before.length-1]]; }
-    const txt=pick.map(x=>(x.content||[]).map(c=>typeof c==="string"?c:(c&&c.text)||"").join(" ")).join("\n").trim();
-    const intro=!v.v&&j.chapter.introduction?String(j.chapter.introduction):"";
-    v.study=(txt||intro).trim(); save();
-    loadNote(v,el);
-  }catch(e){ el.innerHTML=`<p class="load">Couldn't load the study note. Check your connection and open this again.</p>`; el.closest("[data-mi]").removeAttribute("data-done"); }
+
+async function buildStudy(v,el){
+  let bd, dict;
+  try{ [bd,dict]=await Promise.all([bookData(v.code),dictData()]); }
+  catch(e){ el.innerHTML=`<p class="load">Couldn't open the study notes. Check your connection and tap Meaning again.</p>`; el.closest("[data-mi]").removeAttribute("data-done"); return; }
+  const {own,section:sec0,exact}=pickNotes(v,bd.notes||[]);
+  const cites=citesFor(v,bd.cited);
+  const useOwn=exact||!cites.length?own:[];
+  const pts=points(useOwn,cites), about=bd.about||{};
+  const rel=[...new Set([...useOwn.flatMap(n=>n[5]||[]),...cites.filter(c=>c[3]==="note").map(c=>c[4])])].filter(r=>r!==v.ref).slice(0,4);
+  // the passage this verse sits in, told plainly: skip remarks about manuscripts and translation
+  const TECH=/translat|manuscript|Greek text|Hebrew text|Septuagint|Masoretic|scribe|textual|quotation marks|literally/i;
+  const secs=(bd.notes||[]).filter(n=>span(n)>3&&at(n[0],n[1]??1)<=at(v.c,v.v||1)&&end(n[2],n[3])>=at(v.c,v.v||1)).sort((x,y)=>span(x)-span(y));
+  let section=null, secLine="";
+  for(const n of secs){ const t=sents(cleanRefs(n[4].map(p=>p[1]).join(" "))).filter(x=>!TECH.test(x)).slice(0,2).join(" "); if(t){ section=n; secLine=t; break; } }
+  el.innerHTML=`
+    <section class="sec"><h3>Overview</h3>
+      <p data-kjv>${v.kjv?`<span class="kjv">KJV</span> “${esc(v.kjv)}”`:`<span class="load">Loading the KJV wording…</span>`}</p>
+      ${secLine?`<p class="dim">${esc(secLine)}</p><p class="src">From the note on ${esc(rangeLabel(bd.book,section))}</p>`:""}
+    </section>
+    <section class="sec"><h3>Core meaning</h3>
+      ${pts.length?`<ul class="pts">${pts.map(([l,t,k])=>`<li>${l?`<b>${esc(l)}${k==="theme"?"":""}:</b> `:""}${esc(t)}</li>`).join("")}</ul>${!exact&&useOwn.length?`<p class="src">From the note on ${esc(rangeLabel(bd.book,useOwn[0]))}</p>`:""}`
+        :`<p class="dim">Tyndale's notes don't single out this verse. Read it with the passage it sits in (Overview above) and the question below.</p>`}
+      ${rel.length?`<div class="rel"><span>See also</span>${rel.map(r=>`<button type="button" class="chip" data-act="peek" data-ref="${esc(r)}">${esc(r)}</button>`).join("")}</div><div class="peek" data-peek hidden></div>`:""}
+    </section>
+    <section class="sec" data-terms-sec hidden><h3>Key terms</h3><dl class="terms" data-terms></dl></section>
+    <section class="sec"><h3>Context</h3>
+      <dl class="facts">${about.author?`<dt>Written by</dt><dd>${esc(about.author)}</dd>`:""}${about.date?`<dt>When</dt><dd>${esc(brief(about.date))}</dd>`:""}${about.purpose?`<dt>Why</dt><dd>${esc(about.purpose)}</dd>`:""}${about.setting?`<dt>Setting</dt><dd>${esc(brief(about.setting,110))}</dd>`:""}</dl>
+      ${v.v?`<details class="around"><summary>Read the verses around it</summary><div data-ctx><div class="load"><i></i><i></i></div></div></details>`:""}
+    </section>`;
+  const terms=()=>{ const ex=new Set(); const list=keyTerms([v.text,v.kjv||""],dict,ex);
+    const sec=el.querySelector("[data-terms-sec]"); if(!list.length){ sec.hidden=true; return; }
+    el.querySelector("[data-terms]").innerHTML=list.map(t=>`<dt>${esc(t.word.replace(/^\w/,c=>c.toUpperCase()))}${t.title.toLowerCase()!==t.word?` <span>(${esc(t.title)})</span>`:""}</dt><dd>${esc(t.def)}</dd>`).join(""); sec.hidden=false; };
+  terms();
+  if(!v.kjv){ try{ const k=toText(await nltFetch(v.label||v.ref,"KJV")).replace(/\n/g," "); if(k){ v.kjv=k; save(); }
+      el.querySelector("[data-kjv]").innerHTML=v.kjv?`<span class="kjv">KJV</span> “${esc(v.kjv)}”`:""; terms(); }
+    catch(e){ const k=el.querySelector("[data-kjv]"); if(k) k.remove(); } }
+  const det=el.querySelector(".around"); if(det) det.addEventListener("toggle",()=>{ if(det.open) loadCtx(v,det.querySelector("[data-ctx]")); });
 }
 async function loadCtx(v,el){
   if(v.ctx){ el.innerHTML=ctxHtml(v); return; }
@@ -319,13 +465,27 @@ async function loadCtx(v,el){
   }catch(e){ el.innerHTML=`<p class="load">Couldn't load the surrounding verses right now.</p>`; }
 }
 function ctxHtml(v){ const hi=v.v2||v.v;
-  return `<p class="ctx">${v.ctx.map(x=>{ const t=`<sup>${x.n}</sup>${esc(x.t.replace(/\n/g," "))}`; return x.n>=v.v&&x.n<=hi?`<mark>${t}</mark>`:t; }).join(" ")}</p><p class="src">${esc(v.code==="PSA"?"Psalm":v.book)} ${v.c}:${v.ctx[0].n}-${v.ctx[v.ctx.length-1].n}, NLT</p>`; }
+  return `<p class="ctx">${v.ctx.map(x=>{ const t=`<sup>${x.n}</sup>${esc(x.t.replace(/\n/g," "))}`; return x.n>=v.v&&x.n<=hi?`<mark>${t}</mark>`:t; }).join(" ")}</p>`; }
+async function peek(btn){
+  const box=btn.closest(".sec").querySelector("[data-peek]"), r=btn.dataset.ref;
+  if(!box.hidden&&box.dataset.ref===r){ box.hidden=true; btn.setAttribute("aria-pressed","false"); return; }
+  btn.parentNode.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c===btn));
+  box.hidden=false; box.dataset.ref=r; box.innerHTML=`<div class="load"><i></i><i></i></div>`;
+  const p=parseRef(r);
+  try{ const t=toText(await nltFetch(p.label));
+    const saved=S.list.some(x=>x.ref===p.label);
+    box.innerHTML=`<p class="pq">${esc(t)}</p><div class="row"><span class="ref sm">${esc(p.label)}</span><span class="sp"></span>${saved?`<span class="src">Saved</span>`:`<button class="pill go sm" type="button" data-act="savepeek">Save verse</button>`}</div>`;
+    box.dataset.text=t;
+  }catch(e){ box.innerHTML=`<p class="load">Couldn't load ${esc(r)} right now.</p>`; }
+}
 
 /* taps */
 $("list").addEventListener("click",async e=>{
   const b=e.target.closest("[data-act]"); if(!b) return;
   const tile=b.closest(".tile"), v=S.list.find(x=>x.id===tile.dataset.id); if(!v) return;
   const act=b.dataset.act;
+  if(act==="peek"){ peek(b); return; }
+  if(act==="savepeek"){ const box=b.closest("[data-peek]"), p=parseRef(box.dataset.ref); if(p&&box.dataset.text&&!S.list.some(x=>x.ref===p.label)){ const keep=window.scrollY; addVerse(p,box.dataset.text,true); window.scrollTo(0,keep); toast(`Saved ${p.label}`); } return; }
   if(act==="more"){ const open=!tile.classList.contains("open"); tile.classList.toggle("open",open); b.setAttribute("aria-expanded",open);
     if(open){ opened.add(v.id); fillMore(v); setTimeout(()=>{ const r=tile.getBoundingClientRect(); if(r.bottom>innerHeight) tile.scrollIntoView({behavior:reduce?"auto":"smooth",block:r.height>innerHeight?"start":"end"}); },330); }
     else opened.delete(v.id); haptic(); }
