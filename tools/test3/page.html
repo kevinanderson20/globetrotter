@@ -142,6 +142,32 @@ ex{display:block;margin-top:10px;padding:10px 12px;border-radius:12px;background
 /* problems */
 .setup{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--tc,var(--t1));border-radius:16px;padding:14px;font-size:15.5px;display:grid;gap:8px}
 .setup summary{font-weight:800;font-family:var(--f-display);font-size:15px;cursor:pointer;color:var(--ink-2)}
+
+/* posted practice test: the exact questions, walkthroughs tucked under each part */
+.ptintro p{margin:0 0 12px;line-height:1.5}
+.ptjump{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ptjump a,.ptjump button{border:0;cursor:pointer;font:700 14px var(--f-body);color:var(--ink-2);text-decoration:none;padding:7px 12px;border-radius:999px;background:var(--surface-2)}
+.ptprob,#ptf{scroll-margin-top:calc(64px + env(safe-area-inset-top,0px))}
+.ptstem{margin:8px 0 4px;font-size:16px;line-height:1.55}
+.ptpart{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.ptq{margin:0 0 10px;font-size:16px;line-height:1.55}
+.ptq b{color:var(--t1);margin-right:2px}
+.walk{border-radius:12px;background:color-mix(in srgb,var(--t1) 7%,var(--surface));border:1px solid color-mix(in srgb,var(--t1) 25%,var(--line))}
+.walk summary{list-style:none;cursor:pointer;padding:11px 14px;font:700 15px var(--f-body);color:var(--t1);display:flex;align-items:center;gap:8px;min-height:44px;box-sizing:border-box}
+.walk summary::-webkit-details-marker{display:none}
+.walk summary::before{content:"";width:8px;height:8px;border-right:2.2px solid currentColor;border-bottom:2.2px solid currentColor;transform:rotate(-45deg);transition:transform 200ms cubic-bezier(.2,.8,.2,1);flex:none}
+.walk[open] summary::before{transform:rotate(45deg) translate(-2px,-1px)}
+.walk[open] summary span::after{content:" (tap to hide)";font-weight:500;color:var(--ink-3)}
+.walk[open]>:not(summary){animation:walkin 260ms cubic-bezier(.2,.8,.2,1) both}
+@keyframes walkin{from{opacity:0;transform:translateY(-4px)}}
+@media (prefers-reduced-motion: reduce){.walk[open]>:not(summary){animation:none}.walk summary::before{transition:none}}
+.wsteps{margin:0;padding:0 14px 4px 34px;font-size:15px;line-height:1.55;color:var(--ink)}
+.wsteps li{margin:0 0 8px;padding-left:2px}
+.walk .cb{padding:0 12px}
+.wsay{margin:8px 14px 4px;font-size:15px;line-height:1.5;color:var(--ink-2)}
+.wobj{margin:0 14px 12px;font-size:12.5px;color:var(--ink-3)}
+.fsheet{font-size:15px;line-height:1.5;background:var(--surface-2);border-radius:12px;padding:6px 14px;margin:8px 0 12px}
+.fsheet p{margin:8px 0}
 .dt{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;margin:6px 0}
 .dt th,.dt td{border:1px solid var(--line);padding:5px 9px;text-align:center}
 .dt th{background:var(--surface-2);font-weight:700}

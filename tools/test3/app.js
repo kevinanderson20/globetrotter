@@ -63,6 +63,7 @@ const IC={
  learn:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="13" height="16" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M8 3h9a3 3 0 0 1 3 3v12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M7.5 11h6M7.5 15h4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>',
  prac:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="#fff" stroke-width="2"/><path d="m8 12.3 2.7 2.7L16.3 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  test:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 9.5v4l2.5 2M9.5 3h5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+ paper:'<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3h8l4 4v13a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v4.5h4.5M8.5 12h7M8.5 16h5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  logo:'<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect x="2" y="2" width="32" height="32" rx="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><path d="M6 27c5 0 6-15 12-15s7 15 12 15" fill="none" stroke="var(--m-learn)" stroke-width="3" stroke-linecap="round"/><path d="M6 28.5h24" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/><circle cx="27" cy="9" r="3.5" fill="var(--sun)" stroke="var(--ink)" stroke-width="2"/></svg>'
 };
 function bar(title,opts={}){ return `<div class="bar"><button class="x" data-act="${opts.back||"home"}" aria-label="Back">${opts.close?IC.x:IC.back}</button>${opts.prog!=null?`<div class="steps"><i style="width:${opts.prog*100}%"></i></div>`:`<div class="ttl">${esc(title)}</div>`}${opts.calc?'<button class="zbtn" data-act="calc" aria-label="Calculator">Calc</button>':""}${opts.z?'<button class="zbtn" data-act="ztable">z table</button>':""}${opts.t?'<button class="zbtn" data-act="ttable">t table</button>':""}${opts.timer?'<span class="timer" id="timer">0:00</span>':""}</div>`; }
@@ -94,6 +95,7 @@ function home(){
   </section>
   <button class="mode" style="--cc:var(--m-learn)" data-act="learn"><span class="ic">${IC.learn}</span><span><b>Learn key concepts</b><span>Flip cards for every idea on the test</span></span><i>${Math.round(cs.got/cs.n*100)}%</i></button>
   <button class="mode" style="--cc:var(--m-prac)" data-act="practice"><span class="ic">${IC.prac}</span><span><b>Practice questions</b><span>Instant feedback, step by step</span></span><i>${Object.keys(S.qc).length}/${QC.length}</i></button>
+  <button class="mode" style="--cc:var(--t1)" data-act="ptest" data-from="home"><span class="ic">${IC.paper}</span><span><b>The practice test</b><span>Exact questions, every answer walked through</span></span><i>3</i></button>
   <button class="mode" style="--cc:var(--m-test)" data-act="testmenu"><span class="ic">${IC.test}</span><span><b>Test mode</b><span>Timed, graded at the end</span></span><i>${S.tests.length} run${S.tests.length===1?"":"s"}</i></button>
   <section class="card"><h3>Your weak spots</h3>${weak.length?`<div class="weak">${weak.map(w=>wrow(w.k,w.a)).join("")}</div><button class="btn go wide" data-act="weakqc">Practice these</button>`:`<p class="muted">${Object.keys(S.obj).length?"Nothing below 85% right now. Nice work.":"Answer a few practice questions and the topics you miss most show up here."}</p>`}</section>
   <div class="duo">
@@ -158,6 +160,7 @@ function practice(){
   const due=QC.filter((q,i)=>S.qc[i]&&S.qc[i].n<=S.sess).length, unseen=QC.length-Object.keys(S.qc).length;
   const objs=Object.keys(OBJ).filter(k=>S.obj[k]);
   show(`${bar("Practice questions")}
+  <button class="mode" style="--cc:var(--t1)" data-act="ptest" data-from="practice"><span class="ic">${IC.paper}</span><span><b>The practice test</b><span>Exact questions, every answer walked through</span></span><i>3</i></button>
   <section class="card"><h3>Quick checks</h3><p class="muted">One idea per question: the CLT, standard errors, interval wording, hypotheses, p-values, control charts. Missed ones come back sooner.</p>
     <p class="muted">${unseen} new · ${due} due for review</p>
     <button class="btn go wide" data-act="qc">Start 10 questions</button></section>
@@ -452,6 +455,35 @@ $('tsheet').addEventListener("click",e=>{ if(e.target.id==="tsheet") $('tsheet')
 $('zclose').onclick=()=>{ $('zsheet').hidden=true; };
 $('zsheet').addEventListener("click",e=>{ if(e.target.id==="zsheet") $('zsheet').hidden=true; });
 
+
+/* ================= POSTED PRACTICE TEST: the exact questions, each with a walkthrough you can open ================= */
+let PTB="practice";
+function ptest(back){ if(back) PTB=back;
+  const part=(p,x)=>`<div class="ptpart" id="pt${p.n}${x.l}"><p class="ptq"><b>(${x.l})</b> ${x.q}</p>
+    <details class="walk"><summary><span>Answer walkthrough</span></summary>
+      <ol class="wsteps">${x.w.map(w=>`<li>${w}</li>`).join("")}</ol>
+      ${x.pic?`<div class="cb">${rich(x.pic)}</div>`:""}
+      <p class="wsay"><b>In short:</b> ${x.say}</p><p class="wobj">Objectives: ${x.o}</p></details></div>`;
+  show(`${bar("Posted practice test",{back:PTB})}
+  <section class="card ptintro"><p>The posted practice test (Test III), word for word. Your test is <b>one</b> problem built like one of these three, in a new context, written out by hand. You get the formula sheet, the z table and the t table.</p>
+    <button class="btn go wide" data-act="ptall">Show all answers</button>
+    <nav class="ptjump" aria-label="Jump to">${PTEST.map(p=>`<a href="#ptp${p.n}">Problem ${p.n}</a>`).join("")}<a href="#ptf">Formula sheet</a><button type="button" data-act="ztable">z table</button><button type="button" data-act="ttable">t table</button></nav></section>
+  ${PTEST.map(p=>`<section class="card ptprob" id="ptp${p.n}"><div class="eyebrow">Problem ${p.n} · ${esc(p.tpl)}</div>
+    <p class="ptstem">${p.stem}</p>${p.parts.map(x=>part(p,x)).join("")}</section>`).join("")}
+  <section class="card" id="ptf"><h3>Formula sheet</h3><p class="muted">What's printed on the test.</p><div class="fsheet">
+    <p>If X ~ N(μ, σ), then Z = (X − μ)/σ ~ N(0, 1)</p>
+    <p>CLT, sample mean: X̄ ~ N(μ, σ/√n), z = (x̄ − μ)/(σ/√n)</p>
+    <p>CLT, sample proportion: p̂ ~ N(p, √(p(1 − p)/n)), z = (p̂ − p)/√(p(1 − p)/n)</p>
+    <p>α = 1 − CL</p>
+    <p>CI for a mean: x̄ ± z<sub>α/2</sub> · σ/√n, or x̄ ± t<sub>α/2</sub> · s/√n with n − 1 d.f.</p>
+    <p>SE of a proportion: √(p(1 − p)/n), estimated by √(p̂(1 − p̂)/n)</p>
+    <p>CI for a proportion: p̂ ± z<sub>α/2</sub> · √(p̂(1 − p̂)/n)</p>
+    <p>Test statistic for a mean: t = (x̄ − μ)/(s/√n), d.f. = n − 1</p></div>
+    <p class="muted"><b>Not on the sheet, so know these:</b> the normal-model conditions (random sample, and n ≥ 30 or a roughly normal population for a mean; n ≥ 30, n·p̂ ≥ 15 and n(1 − p̂) ≥ 15 for a proportion), how to read z<sub>α/2</sub> and t<sub>α/2</sub> from the tables, how to bracket a p-value, margin of error = critical value × standard error, x-bar chart limits μ ± 3σ/√n, p chart limits p̄ ± 3√(p̄(1 − p̄)/n) with a negative LCL set to 0, and Cp = (USL − LSL)/6σ, Cpk = the smaller of (USL − μ)/3σ and (μ − LSL)/3σ.</p></section>`);
+  app.querySelectorAll(".ptjump a").forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); $(a.getAttribute("href").slice(1))?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }));
+}
+function ptAll(b){ const ds=[...app.querySelectorAll("details.walk")], open=!ds.every(d=>d.open); ds.forEach(d=>d.open=open); b.textContent=open?"Hide all answers":"Show all answers"; }
+
 /* ================= event wiring ================= */
 app.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]"); if(!b||b.disabled) return; const a=b.dataset.act;
@@ -459,6 +491,8 @@ app.addEventListener("click",e=>{
     case "home": return home();
     case "learn": return learn();
     case "practice": return practice();
+    case "ptest": return ptest(b.dataset.from);
+    case "ptall": return ptAll(b);
     case "testmenu": return testmenu();
     case "deck": { const d=DECKS.find(x=>x.id===b.dataset.d); return cards(ALLCARDS.filter(c=>c.deck===d.id), d.title, "learn"); }
     case "review": { const l=shuf(ALLCARDS.filter(c=>S.cards[c.key]===0)); return l.length?cards(l,"Still learning"):learn(); }
