@@ -1005,6 +1005,102 @@ hr{border:0;height:.5px;background:var(--sep)}
 .pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
 .pg-games .hgl .gico{width:100%;height:100%;display:block}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
+
+/* ---------- drawn icons in place of emoji ---------- */
+.pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.pg-games .workout .steps3 svg{width:15px;height:15px;display:block}
+.pg-games .herochips span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .herochips .ic{color:#ff9f0a}
+.pg-games #msleft{display:inline-flex;align-items:center;gap:6px}
+.pg-games .msmode span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .mc .msi{width:62%;height:62%;vertical-align:middle}
+.pg-games .mc.f .msi{color:var(--bad)}
+.pg-games .mc.mine .msi,.pg-games .mc.boom .msi{color:var(--ink)}
+.pg-games .mc.boom .msi{color:#fff}
+.pg-games .qcr{width:64%;height:64%;color:var(--ink);vertical-align:middle}
+.pg-games .qnbar .btn,.pg-games #tvhint{display:inline-flex;align-items:center;gap:5px}
+.pg-games .wlarr .wlok{width:22px;height:22px;color:var(--good)}
+.pg-games .tlh{display:inline-flex;gap:3px;align-items:center}
+.pg-games .tlh svg{width:17px;height:17px;fill:none;stroke:var(--ink-3);stroke-width:2}
+.pg-games .tlh svg.on{fill:var(--bad);stroke:var(--bad)}
+.pg-games .mc{place-items:center}
+.pg-games .mc .msi{display:block;margin:auto}
+.pg-games .mc.f .msi{width:58%;height:58%}
+.pg-games .mc.f .msi{width:72%;height:72%}
+@media (max-width:380px){.pg-games .gr.new,.pg-games .gr.go{padding:6px 13px!important}.pg-games .grow{gap:12px}}
+
+/* Math modes: a white line icon on the colored square */
+.pg-math .mode::after{content:"";width:44px;height:44px;grid-row:1/3;grid-column:1;background:#fff;-webkit-mask:var(--mi) center/24px no-repeat;mask:var(--mi) center/24px no-repeat}
+.pg-math .mode.sm{grid-template-columns:1fr!important;align-content:start;gap:4px!important}
+.pg-math .mode.sm::before,.pg-math .mode.sm::after{grid-row:1;grid-column:1;width:40px;height:40px;margin-bottom:8px}
+.pg-math .mode.sm b,.pg-math .mode.sm span{grid-column:1!important}
+.pg-math .mode[data-act="sprint"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%227.5%22/%3E%3Cpath d=%22M12 9.5v4l2.5 2M10 2.5h4M12 2.5V6%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="survival"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="daily"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%223.5%22 y=%225%22 width=%2217%22 height=%2215.5%22 rx=%223%22/%3E%3Cpath d=%22M3.5 10h17M8 3v4M16 3v4%22/%3E%3Cpath d=%22M8.5 14.5h2M13.5 14.5h2%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
+.pg-games .mc.f .msi{width:92%!important;height:92%!important}
+@media (max-width:380px){.pg-games .grow{grid-template-columns:50px minmax(0,1fr) auto}.pg-games .gi{width:50px;height:50px;border-radius:12.5px}.pg-games .grow+.grow::before{left:76px}.pg-games .gr.new,.pg-games .gr.go{padding:6px 11px!important;font-size:13px}}
+
+/* ---------- drawn icons in place of emoji ---------- */
+.pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.pg-games .workout .steps3 svg{width:15px;height:15px;display:block}
+.pg-games .herochips span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .herochips .ic{color:#ff9f0a}
+.pg-games #msleft{display:inline-flex;align-items:center;gap:6px}
+.pg-games .msmode span{display:inline-flex;align-items:center;gap:5px}
+.pg-games .mc .msi{width:62%;height:62%;vertical-align:middle}
+.pg-games .mc.f .msi{color:var(--bad)}
+.pg-games .mc.mine .msi,.pg-games .mc.boom .msi{color:var(--ink)}
+.pg-games .mc.boom .msi{color:#fff}
+.pg-games .qcr{width:64%;height:64%;color:var(--ink);vertical-align:middle}
+.pg-games .qnbar .btn,.pg-games #tvhint{display:inline-flex;align-items:center;gap:5px}
+.pg-games .wlarr .wlok{width:22px;height:22px;color:var(--good)}
+.pg-games .tlh{display:inline-flex;gap:3px;align-items:center}
+.pg-games .tlh svg{width:17px;height:17px;fill:none;stroke:var(--ink-3);stroke-width:2}
+.pg-games .tlh svg.on{fill:var(--bad);stroke:var(--bad)}
+.pg-games .mc{place-items:center}
+.pg-games .mc .msi{display:block;margin:auto}
+.pg-games .mc.f .msi{width:58%;height:58%}
+.pg-games .mc.f .msi{width:72%;height:72%}
+@media (max-width:380px){.pg-games .gr.new,.pg-games .gr.go{padding:6px 13px!important}.pg-games .grow{gap:12px}}
+
+/* Math modes: a white line icon on the colored square */
+.pg-math .mode::after{content:"";width:44px;height:44px;grid-row:1/3;grid-column:1;background:#fff;-webkit-mask:var(--mi) center/24px no-repeat;mask:var(--mi) center/24px no-repeat}
+.pg-math .mode.sm{grid-template-columns:1fr!important;align-content:start;gap:4px!important}
+.pg-math .mode.sm::before,.pg-math .mode.sm::after{grid-row:1;grid-column:1;width:40px;height:40px;margin-bottom:8px}
+.pg-math .mode.sm b,.pg-math .mode.sm span{grid-column:1!important}
+.pg-math .mode[data-act="sprint"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%227.5%22/%3E%3Cpath d=%22M12 9.5v4l2.5 2M10 2.5h4M12 2.5V6%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="survival"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="daily"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Crect x=%223.5%22 y=%225%22 width=%2217%22 height=%2215.5%22 rx=%223%22/%3E%3Cpath d=%22M3.5 10h17M8 3v4M16 3v4%22/%3E%3Cpath d=%22M8.5 14.5h2M13.5 14.5h2%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="practice"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%228.5%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224.8%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%221.3%22 fill=%22black%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="chain"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1%22/%3E%3Cpath d=%22M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1%22/%3E%3C/svg%3E")}
+.pg-math .mode[data-act="estimate"]{--mi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 9.5c2.3-2 4.7-2 7 0s4.7 2 7 0M5 15.5c2.3-2 4.7-2 7 0s4.7 2 7 0%22/%3E%3C/svg%3E")}
+
+/* ---------- game app icons ---------- */
+.pg-games .gi{position:relative;width:56px;height:56px;border-radius:14px;background:none!important;box-shadow:none!important;overflow:visible;display:block;padding:0}
+.pg-games .gi .gico{width:100%;height:100%;display:block;border-radius:inherit;box-shadow:0 1px 2px rgba(0,0,0,.08),0 4px 10px -4px rgba(0,0,0,.22)}
+.pg-games .gi::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 46%);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.1),inset 0 .5px 0 rgba(255,255,255,.35)}
+.pg-games .ginf{position:absolute;right:-5px;bottom:-5px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.pg-games .ginf svg{width:15px;height:8px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.pg-games .hgl{display:inline-block;width:28px;height:28px;border-radius:8px;overflow:hidden;flex:none}
+.pg-games .hgl .gico{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pg-games .gi .gico{box-shadow:none}}
 
 /* ---------- drawn icons in place of emoji ---------- */
 .pg-games .ic,.pg-games .msi,.pg-games .qcr{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
@@ -1791,6 +1887,18 @@ h1,h2,h3,b{letter-spacing:-.02em}
 /* segmented controls */
 .msmode,.seg,.seg2,.seg3{border-radius:10px}
 /* ==/NATIVE== */
+/* challenges: the mode panel opens under the region you tapped, the rest fade back */
+body .cgrid .cbtn{transition:opacity 240ms cubic-bezier(.2,.8,.2,1),transform 160ms cubic-bezier(.2,.8,.2,1),background-color 200ms ease}
+body .cgrid.has-sel .cbtn[aria-pressed="false"]{opacity:.38}
+body .cgrid.has-sel .cbtn[aria-pressed="false"]:active{opacity:.6}
+body .cgrid .cpick{grid-column:1/-1;position:relative;margin-top:4px}
+body .cgrid .cpick::before{content:"";position:absolute;top:-7px;left:var(--caret,50%);width:14px;height:14px;margin-left:-7px;background:inherit;transform:rotate(45deg);border-radius:3px 0 0 0}
+body .cgrid .cpick.opening{animation:cpickin 320ms cubic-bezier(.2,.9,.25,1.05) both;transform-origin:var(--caret,50%) 0}
+@keyframes cpickin{from{opacity:0;transform:translateY(-8px) scale(.97)}}
+body .cgrid .cpick.opening .mode{animation:cpickmode 300ms cubic-bezier(.2,.8,.2,1) both}
+body .cgrid .cpick.opening .mode:nth-child(2){animation-delay:40ms}body .cgrid .cpick.opening .mode:nth-child(3){animation-delay:70ms}body .cgrid .cpick.opening .mode:nth-child(4){animation-delay:100ms}
+@keyframes cpickmode{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion: reduce){body .cgrid .cpick.opening,body .cgrid .cpick.opening .mode{animation:none}body .cgrid .cbtn{transition:none}}
 </style>
 
 <section class="screen home" id="home">
@@ -2632,17 +2740,21 @@ const scopeIds=sc=>sc==="All 50"?IDS:IDS.filter(id=>BY[id].c===sc);
 const better=(a,b)=>!b || a.c>b.c || (a.c===b.c && a.ms<b.ms);
 function bestLine(k){ const r=S.ch[k]; return r&&r.best ? `Best ${r.best.c}/${r.best.n} in ${fmt(r.best.ms)}` : "Not tried yet"; }
 function renderChallenges(){
-  const g=$('cgrid'); g.innerHTML="";
-  ["All 50",...CONTS.map(c=>c.key)].forEach(sc=>{
-    const b=document.createElement('button'); b.className="cbtn"; b.setAttribute('aria-pressed',cSel===sc);
-    b.style.setProperty('--cc',sc==="All 50"?"var(--ink)":ccol(sc));
-    const n=scopeIds(sc).length, best=[S.ch[sc+"|name"],S.ch[sc+"|find"],S.ch[sc+"|type"]].filter(r=>r&&r.best).map(r=>r.best).sort((a,b)=>b.c/b.n-a.c/a.n)[0];
-    b.innerHTML=`<b>${esc(sc)}</b><span>${n} states${best?` · best ${Math.round(best.c/best.n*100)}%`:""}</span>`;
-    b.onclick=()=>{ cSel = cSel===sc?null:sc; renderChallenges(); };
-    g.appendChild(b);
-  });
-  const pk=$('cpick');
-  if(!cSel){ pk.hidden=true; return; }
+  const g=$('cgrid'), pk=$('cpick'), scopes=["All 50",...CONTS.map(c=>c.key)];
+  // the panel lives inside the grid, so it can open right under the region you tapped
+  if(pk.parentNode!==g) g.appendChild(pk);
+  let bs=[...g.querySelectorAll('.cbtn')];
+  if(bs.length!==scopes.length){ bs.forEach(b=>b.remove()); bs=scopes.map(sc=>{ const b=document.createElement('button'); b.className="cbtn"; b.dataset.sc=sc;
+    b.style.setProperty('--cc',sc==="All 50"?"var(--ink)":ccol(sc)); b.onclick=()=>{ cSel = cSel===sc?null:sc; renderChallenges(); }; g.insertBefore(b,pk); return b; }); }
+  bs.forEach(b=>{ const sc=b.dataset.sc, n=scopeIds(sc).length, best=[S.ch[sc+"|name"],S.ch[sc+"|find"],S.ch[sc+"|type"]].filter(r=>r&&r.best).map(r=>r.best).sort((a,b)=>b.c/b.n-a.c/a.n)[0];
+    b.setAttribute('aria-pressed',cSel===sc); b.setAttribute('aria-expanded',cSel===sc);
+    b.innerHTML=`<b>${esc(sc)}</b><span>${n} states${best?` · best ${Math.round(best.c/best.n*100)}%`:""}</span>`; });
+  g.classList.toggle('has-sel',!!cSel);
+  if(!cSel){ pk.hidden=true; pk.dataset.for=""; return; }
+  // put the panel after the last button on the selected button's row (World has a row to itself; the rest go two per row)
+  const i=scopes.indexOf(cSel), rowEnd=i===0?0:Math.min(scopes.length-1, i%2?i+1:i), sel=bs[i];
+  const moved=pk.dataset.for!==cSel; bs[rowEnd].after(pk); pk.dataset.for=cSel;
+  const half=i===0?.5:(i%2?.25:.75); pk.style.setProperty('--caret',`${half*100}%`);
   const n=scopeIds(cSel).length;
   pk.hidden=false; pk.style.setProperty('--cc',cSel==="All 50"?"var(--ink)":ccol(cSel));
   pk.innerHTML=`<h4>${esc(cSel)} challenge · ${n} states</h4>
@@ -2650,6 +2762,9 @@ function renderChallenges(){
     <button class="mode" id="mFind"><b>Find them</b><span>Tap each on the map</span><span>${bestLine(cSel+"|find")}</span></button>
     <button class="mode" id="mType"><b>Type them</b><span>Type each name</span><span>${bestLine(cSel+"|type")}</span></button>
     <button class="mode" id="mFill"><b>Fill the map</b><span>Name them all from memory</span><span>${bestLine(cSel+"|fill")}</span></button></div>`;
+  if(moved){ pk.classList.remove('opening'); void pk.offsetWidth; pk.classList.add('opening');
+    requestAnimationFrame(()=>{ const r=pk.getBoundingClientRect(), tb=document.querySelector('.tabbar'), bot=innerHeight-(tb?tb.offsetHeight:0)-12;
+      if(r.bottom>bot) scrollBy({top:Math.min(r.bottom-bot, sel.getBoundingClientRect().top-70), behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }); }
   $('mName').onclick=()=>startChallenge(cSel,"name");
   $('mFind').onclick=()=>startChallenge(cSel,"find");
   $('mType').onclick=()=>startChallenge(cSel,"type");
@@ -3397,7 +3512,7 @@ const placeCtl=()=>{ $('stage').style.setProperty('--occl',(H-band()[1])+"px"); 
 new ResizeObserver(placeCtl).observe(panelEl);
 
 /* ================= updates: notice when a newer version is online ================= */
-const APP_VERSION="2026.11.14-1958";
+const APP_VERSION="2026.11.14-2012";
 $('ver').textContent="Version "+APP_VERSION;
 async function checkUpdate(){
   if(!navigator.onLine) return;
