@@ -17,7 +17,7 @@ json.dump({"v": VERSION}, open('version.json', 'w'))
 _bk = open('tools/backup.js', encoding='utf-8').read().strip()
 _a = _src.index('/* ==BACKUP== */'); _b = _src.index('/* ==/BACKUP== */', _a) + len('/* ==/BACKUP== */')
 _src = _src[:_a] + _bk + _src[_b:]
-# the shared premium styles live in tools/premium.css; copy them into the World source (and the Math and Test 3 pages below)
+# the shared premium styles live in tools/premium.css; copy them into the World source (and the Math page below)
 _pm = open('tools/premium.css', encoding='utf-8').read().strip()
 _mo = open('tools/motion.css', encoding='utf-8').read().strip()
 _na = open('tools/native.css', encoding='utf-8').read().strip()
@@ -65,7 +65,7 @@ def build(folder, title, tabs, data_map, data_meta, conts, alias, ls_key, open_k
     head = rep(head, '<title>Globetrotter</title>', f'<title>{title}</title>', 1)
     for icon in ('icon-180.png', 'icon-192.png', 'manifest.webmanifest'):
         head = rep(head, f'href="{icon}"', f'href="../{icon}"', 1)
-    head = rep(head, '<a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a><a href="math/">Math</a><a href="games/">Games</a><a href="test3/">Test 3</a>', tabs, 1)
+    head = rep(head, '<a href="./" aria-current="page">World</a><a href="usa/">USA</a><a href="earth/">Earth</a><a href="math/">Math</a><a href="games/">Games</a>', tabs, 1)
     head = rep(head, 'Every country in a region', f'Every {unit} in a {region_word}', 1)
     for a, b in extra_head:
         head = rep(head, a, b)
@@ -101,7 +101,7 @@ def tighten_frames(app):  # states are small: shrink the minimum zoom spans used
 
 # ---------------- USA ----------------
 build('usa', 'Globetrotter USA',
-      '<a href="../">World</a><a href="./" aria-current="page">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="../games/">Games</a><a href="../test3/">Test 3</a>',
+      '<a href="../">World</a><a href="./" aria-current="page">USA</a><a href="../earth/">Earth</a><a href="../math/">Math</a><a href="../games/">Games</a>',
       open('tools/us-map.json').read(), open('tools/us-meta.json').read(),
       '''const CONTS=[
   {key:"West",short:"W",tok:"c-sa",groups:[["Pacific",["Pacific"]],["Mountain West",["Mountain West"]]]},
@@ -127,7 +127,7 @@ build('usa', 'Globetrotter USA',
 
 # ---------------- Earth ----------------
 build('earth', 'Globetrotter Earth',
-      '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a><a href="../math/">Math</a><a href="../games/">Games</a><a href="../test3/">Test 3</a>',
+      '<a href="../">World</a><a href="../usa/">USA</a><a href="./" aria-current="page">Earth</a><a href="../math/">Math</a><a href="../games/">Games</a>',
       open('tools/earth-map.json').read(), open('tools/earth-meta.json').read(),
       '''const CONTS=[
   {key:"Oceans & Seas",short:"OS",tok:"t-sea",groups:[["Oceans",["Oceans"]],["Seas of Europe & Africa",["Seas of Europe & Africa"]],["Seas of the Americas",["Seas of the Americas"]],["Seas of Asia",["Seas of Asia"]]]},
@@ -172,18 +172,9 @@ os.makedirs('games', exist_ok=True)
 open('games/index.html', 'w', encoding='utf-8').write(page)
 print('games/index.html', len(page), VERSION)
 
-# ---------------- 640 Test 3 (a study tutor for BUAN 640, Test 3) ----------------
-# Assembled from tools/test3/: page.html is the shell and styles; content.js holds every card, question and table.
-T3 = 'tools/test3/'
-page = with_premium(open(T3 + 'page.html', encoding='utf-8').read())
-for mark, fname in (('/*CONTENT*/', 'content.js'), ('/*PROBLEMS*/', 'problems.js'), ('/*VIZ*/', 'viz.js'), ('/*APP*/', 'app.js')):
-    code = open(T3 + fname, encoding='utf-8').read()
-    if fname == 'app.js':
-        code = rep(code, 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
-    page = rep(page, mark, code, 1)
+# Test 3 was removed: keep its old address working by sending it to the World tab
 os.makedirs('test3', exist_ok=True)
-open('test3/index.html', 'w', encoding='utf-8').write(page)
-print('test3/index.html', len(page), VERSION)
+open('test3/index.html', 'w', encoding='utf-8').write('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Globetrotter</title><meta http-equiv="refresh" content="0;url=../"><script>location.replace("../")</script><a href="../">Open Globetrotter</a>')
 
 # the tab was first published at /brain/: keep that address working
 os.makedirs('brain', exist_ok=True)
