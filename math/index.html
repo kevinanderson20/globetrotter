@@ -931,7 +931,7 @@ const GT_BK=(()=>{
 })();
 /* ==/BACKUP== */
 /* ================= MATH: rapid-fire mental arithmetic ================= */
-const APP_VERSION="2026.11.19-1315";
+const APP_VERSION="2026.11.19-1327";
 const LS="globetrotter.math.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -949,7 +949,7 @@ const LVNAME=["","Warm-up","Easy","Medium","Hard","Brutal"];
 const FRESH=()=>({cust:{a:1,b:2}, ops:["add","sub","mul","div"], lv:2, style:"normal", xp:0, sprint:{}, ghost:{}, survival:0, daily:{}, stats:{}, facts:{}, plev:{add:1,sub:1,mul:1,div:1,pct:1}, days:[], sound:true, tricks:{}, rounds:0, solved:0, chain:{len:8,speed:1,hard:0}, chainBest:{}, estBest:0, hist:{}});
 let S=FRESH();
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
-S.plev.pct=S.plev.pct||1; S.ghost=S.ghost||{}; S.hist=S.hist||{}; S.chain=S.chain||{len:8,speed:1,hard:0}; S.chainBest=S.chainBest||{}; S.style=S.style||"normal";
+S.plev.pct=S.plev.pct||1; S.ghost=S.ghost||{}; S.hist=S.hist||{}; S.chain=S.chain||{len:8,speed:1,hard:0}; S.chainBest=S.chainBest||{}; S.style=S.style||"normal"; S.ds=S.ds||{}; S.dsGhost=S.dsGhost||null;
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
 
 /* ---------- problems ---------- */
@@ -1138,6 +1138,17 @@ function dayStreak(){ const set=new Set(S.days); let d=new Date(), n=0; if(!set.
 function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; }
   return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
 
+/* ---------- daily sprint: the same 60 seconds of problems for everyone each day ---------- */
+const SPR=m=>m==="sprint"||m==="dsprint";
+const dsDays=()=>Object.keys(S.ds).sort();
+function dsStreak(){ let d=new Date(), n=0; if(!S.ds[dstr(d)]) d=new Date(Date.now()-864e5); while(S.ds[dstr(d)]){ n++; d=new Date(d.getTime()-864e5); } return n; }
+const dsBest=()=>Math.max(0,...Object.values(S.ds).map(x=>x.s));
+function dsList(day){ const r=seeded("math-dsprint-"+day); return [...Array(240)].map((_,k)=>gen(pick(["add","sub","mul","div"],r),k<8?1:k<24?2:r()<.6?2:3,r)); }
+function dsShare(btn){ const t=S.ds[today()]; if(!t) return; const d=new Date(), st=dsStreak();
+  const txt=`Globetrotter Math · Daily sprint ${d.toLocaleDateString("en-US",{month:"short",day:"numeric"})}\n${t.s} points · ${t.r} right${t.w?` · ${t.w} missed`:""}${st>1?`\n${st}-day streak`:""}\n${location.origin}${location.pathname}`;
+  const done=()=>{ btn.textContent="Copied"; setTimeout(()=>btn.textContent="Share",1600); };
+  if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else if(navigator.clipboard) navigator.clipboard.writeText(txt).then(done,()=>{}); }
+
 /* ---------- sound + reinforcement ---------- */
 let actx=null;
 function snd(kind){ if(!S.sound) return;
@@ -1175,7 +1186,7 @@ function show(html){ app.innerHTML=html; window.scrollTo(0,0); }
 /* ================= HOME ================= */
 function home(){
   const rk=rankOf(S.xp), st=dayStreak(), td=S.daily[today()];
-  const skey=sprintKey(), sb=S.sprint[skey];
+  const skey=sprintKey(), sb=S.sprint[skey], dt=S.ds[today()], dst=dsStreak();
   const sample=S.ops.map(o=>{ const p=genP(o,S.lv); return `<span style="color:var(${OPS[o].c})">${esc(ptext(p))}</span>`; }).join(" · ");
   show(`
   <div class="brand">${IC.logo}<h1>Math</h1>
@@ -1191,6 +1202,7 @@ function home(){
     <div class="seg3 style" role="group" aria-label="Problem style">${[["normal","Normal"],["missing","Missing number"],["mix","Mix"]].map(([k,l])=>`<button data-act="style" data-v="${k}" aria-pressed="${S.style===k}">${l}</button>`).join("")}</div>
     <div class="eg">${S.lv==="c"?`Custom, ${custLabel()}`:`Level ${S.lv}, ${LVNAME[S.lv]}`}: ${sample}</div>${S.ops.includes("pct")&&S.lv==="c"?`<p class="muted" style="font-size:12px;text-align:center">Percents use level 3 when Digits is on.</p>`:""}</section>
   <button class="mode" style="--cc:var(--mul)" data-act="sprint"><b>60-second sprint</b><span>${S.ghost[skey]?"Race the ghost of your best run on this mix.":"As many as you can. Speed and streaks score more."}</span><i>${sb?`Best ${sb}`:"Go"}</i></button>
+  <button class="mode" style="--cc:var(--good)" data-act="dsprint"><b>Daily sprint</b><span>${dt?`Today's official score is in. Play again for practice${dst>1?` · ${dst}-day streak`:""}.`:"60 seconds, same problems for everyone today. Your first run counts."}</span><i>${dt?dt.s:"New"}</i></button>
   <button class="mode" style="--cc:var(--hot)" data-act="survival"><b>Survival</b><span>3 lives. It gets harder and faster.</span><i>${S.survival?`Best ${S.survival}`:"Go"}</i></button>
   <button class="mode" style="--cc:var(--sub)" data-act="daily"><b>Daily 20</b><span>Same 20 for everyone today. Wrong answers add 5 seconds.</span><i>${td?fmtT(td.t/1000):"New"}</i></button>
   <button class="mode" style="--cc:var(--add)" data-act="practice"><b>Practice</b><span>No clock. Levels adjust to you, with a shortcut when you miss.</span><i>20 Qs</i></button>
@@ -1202,7 +1214,7 @@ function home(){
     <button class="tile" data-act="tricks"><b>Mental math tricks</b><span>${TRICKS.length} shortcuts, including percents</span><span class="ex" style="--c:var(--mul)">15% = 10% + half</span></button>
     <button class="tile" data-act="map"><b>Mastery map</b><span>Every × and + fact, colored by speed</span><span class="ex" style="--c:var(--hot)">${toughFacts().length?`${toughFacts().length} facts to fix`:"Play to fill"}</span></button>
   </div>
-  <button class="tile" data-act="progress"><b>Progress</b><span>Charts of your speed, accuracy, sprints and Daily 20 over time</span></button>
+  <button class="tile" data-act="progress"><b>Progress</b><span>Charts of your speed, accuracy, sprints and dailies over time</span></button>
   <div class="foot">
     <div>Progress saves on this device</div>
     <div id="bk" style="width:100%"></div>
@@ -1274,6 +1286,7 @@ function progress(){
   <section class="card"><h3>Average answer speed</h3>${chart(speed,{fmt:v=>v+"s",color:"--mul",lowerBetter:true})}</section>
   <section class="card"><h3>Accuracy</h3>${chart(acc,{fmt:v=>Math.round(v)+"%",color:"--good"})}</section>
   <section class="card"><h3>Best sprint each day</h3>${sp.length?chart(sp,{color:"--hot",fmt:Math.round}):`<p class="muted">Play a 60-second sprint to start this chart.</p>`}</section>
+  <section class="card"><h3>Daily sprint${dsDays().length?` · best ${dsBest()}`:""}</h3>${dsDays().length?chart(dsDays().slice(-30).map(d=>({d,v:S.ds[d].s})),{color:"--good",fmt:Math.round}):`<p class="muted">Play the daily sprint to start this chart.</p>`}</section>
   <section class="card"><h3>Daily 20 time</h3>${dl.length?chart(dl,{fmt:v=>fmtT(v),color:"--sub",lowerBetter:true}):`<p class="muted">Play the Daily 20 to start this chart.</p>`}</section>
   <section class="card"><h3>By operation</h3>${Object.entries(OPS).map(([k,o])=>{ const st=S.stats[k]; if(!st||!(st.r+st.w)) return `<div class="statrow" style="--c:var(${o.c})"><span class="o">${o.s}</span><span>${o.name}</span><em>not played</em><b></b></div>`;
     const a=st.r/(st.r+st.w), avg=st.r?st.t/st.r:0; return `<div class="statrow" style="--c:var(${o.c})"><span class="o">${o.s}</span><span>${o.name}</span><em>${Math.round(a*100)}%</em><b>${fmtS(avg)}</b><div class="bar2"><i style="width:${Math.max(4,Math.min(100,100*2500/Math.max(avg,1)))}%"></i></div></div>`; }).join("")}
@@ -1310,12 +1323,13 @@ function start(mode,opt={}){
   if(mode==="chain"){ const c=S.chain; G.list=[...Array(5)].map(()=>genChain(c.len,!!c.hard)); G.speed=[2400,1600,1050][c.speed]; }
   if(mode==="estimate"){ G.list=[...Array(12)].map(()=>genEst()); }
   if(mode==="sprint"){ G.trace=[]; G.gkey=sprintKey(); G.ghost=S.ghost[G.gkey]||null; }
+  if(mode==="dsprint"){ G.day=today(); G.list=dsList(G.day); G.trace=[]; G.ghost=S.dsGhost; G.practice=!!S.ds[G.day]; }
   document.body.classList.add("playing"); play.hidden=false; play.classList.remove("opening"); void play.offsetWidth; play.classList.add("opening"); setTimeout(()=>play.classList.remove("opening"),320);
   const est=mode==="estimate"; $('pad').hidden=est; $('ans').hidden=est; $('choices').hidden=!est; $('choices').innerHTML="";
-  $('ghost').hidden=!(mode==="sprint"&&G.ghost); $('ghost').textContent=""; $('ghost').className="ghost";
-  $('hearts').hidden=mode!=="survival"; $('score').hidden=!(mode==="sprint"||mode==="survival"||mode==="estimate");
+  $('ghost').hidden=!(SPR(mode)&&G.ghost); $('ghost').textContent=""; $('ghost').className="ghost";
+  $('hearts').hidden=mode!=="survival"; $('score').hidden=!(SPR(mode)||mode==="survival"||mode==="estimate");
   $('clock').textContent=""; $('reveal').innerHTML=""; $('pts').classList.remove("on"); $('toast').classList.remove("on"); renderHearts(); $('score').textContent="0"; setCombo();
-  const timed=mode==="sprint"||mode==="survival"||mode==="daily"||mode==="estimate"||mode==="chain";
+  const timed=SPR(mode)||mode==="survival"||mode==="daily"||mode==="estimate"||mode==="chain";
   if(timed) countdown(()=>{ G.t0=performance.now(); next(); loop(); }); else { G.t0=performance.now(); next(); loop(); }
 }
 function parseFact(k){ const m=k.match(/^(\d+)([+−×÷])(\d+)$/); if(!m) return null; const a=+m[1], b=+m[3], op=Object.keys(OPS).find(o=>OPS[o].s===m[2]);
@@ -1390,12 +1404,12 @@ function hit(){
   G.score+=pts; S.xp+=p.lv+(G.combo>=10?1:0);
   G.log.push({p,ok:true,ms}); stat(p,true,ms);
   drawAns("ok"); flash(); snd("ok"); setCombo(true);
-  if(G.mode==="sprint"||G.mode==="survival"||G.mode==="chain") floatPts(pts);
+  if(SPR(G.mode)||G.mode==="survival"||G.mode==="chain") floatPts(pts);
   $('score').textContent=G.mode==="survival"?G.right:G.score;
   if(G.mode==="chain") $('reveal').innerHTML=`<span class="hint">${esc(p.h)}</span>`;
   if([10,25,50,75,100].includes(G.combo)) toast(`${G.combo} in a row!`);
   if(G.mode==="practice"&&S.lv!=="c") adapt(p.op,true,ms);
-  G.i++; setTimeout(next,G.mode==="sprint"||G.mode==="survival"?140:G.mode==="chain"?1600:260);
+  G.i++; setTimeout(next,SPR(G.mode)||G.mode==="survival"?140:G.mode==="chain"?1600:260);
 }
 function miss(skipped){
   const p=G.p, ms=performance.now()-G.qStart;
@@ -1409,7 +1423,7 @@ function miss(skipped){
   if(G.mode==="survival"){ G.hearts--; renderHearts(); if(G.hearts<=0) return setTimeout(finish,900); }
   if(G.mode==="daily") G.penalty+=5000;
   if(learn){ setTimeout(()=>{ if(!G) return; G.retype=true; G.typed=""; G.lock=false; drawAns(); $('lvtag').textContent="Type the answer to continue"; },700); return; }
-  G.i++; setTimeout(next,G.mode==="sprint"?650:G.mode==="chain"?3200:1000);
+  G.i++; setTimeout(next,SPR(G.mode)?650:G.mode==="chain"?3200:1000);
 }
 function setCombo(bump){ const c=$('combo'); if(!G||G.combo<3){ c.className="combo"; return; } const m=Math.min(5,1+Math.floor(G.combo/5));
   c.textContent=`${G.combo} streak${m>1?` · ×${m}`:""}`; c.className="combo on"+(bump?" bump":""); }
@@ -1432,9 +1446,9 @@ function adapt(op,ok,ms){ G.ad=G.ad||{}; const a=G.ad[op]||(G.ad[op]=[]); a.push
 function loop(){
   cancelAnimationFrame(raf);
   const step=()=>{ if(!G||play.hidden) return; const now=performance.now();
-    if(G.mode==="sprint"){ const left=60000-(now-G.t0); $('meter').style.transform=`scaleX(${Math.max(0,left/60000)})`; $('meter').classList.toggle("low",left<10000); $('clock').textContent=Math.ceil(Math.max(0,left)/1000);
+    if(SPR(G.mode)){ const left=60000-(now-G.t0); $('meter').style.transform=`scaleX(${Math.max(0,left/60000)})`; $('meter').classList.toggle("low",left<10000); $('clock').textContent=Math.ceil(Math.max(0,left)/1000);
       const sec=Math.min(60,Math.floor((now-G.t0)/1000)); while(G.trace.length<=sec) G.trace.push(G.score);
-      if(G.ghost){ const gs=G.ghost[Math.min(sec,G.ghost.length-1)], d=G.score-gs, el=$('ghost'); el.textContent=`Ghost ${gs} · ${d>=0?"+":"−"}${Math.abs(d)}`; el.className="ghost "+(d>0?"ahead":d<0?"behind":""); }
+      if(G.ghost){ const gs=G.ghost[Math.min(sec,G.ghost.length-1)], d=G.score-gs, el=$('ghost'); el.textContent=`${G.mode==="dsprint"?"Best day":"Ghost"} ${gs} · ${d>=0?"+":"−"}${Math.abs(d)}`; el.className="ghost "+(d>0?"ahead":d<0?"behind":""); }
       if(left<=0) return finish(); }
     else if(G.mode==="estimate"){ if(!G.lock&&G.qStart){ const left=G.limit-(now-G.qStart); $('meter').style.transform=`scaleX(${Math.max(0,left/G.limit)})`; $('meter').classList.toggle("low",left<3000); if(left<=0) choose(null); } $('clock').textContent=`${G.i+1}/12`; }
     else if(G.mode==="survival"){ if(!G.lock&&G.qStart){ const left=G.limit-(now-G.qStart); $('meter').style.transform=`scaleX(${Math.max(0,left/G.limit)})`; $('meter').classList.toggle("low",left<G.limit*.3);
@@ -1448,7 +1462,7 @@ function stopGame(){ cancelAnimationFrame(raf); if(G&&G.cdiv) clearInterval(G.cd
 function quit(){ const g=G; stopGame(); G=null; if(g&&g.right+g.wrong>0){ S.rounds++; } save(); home(); }
 
 /* ================= RESULTS ================= */
-const MODE_NAME={sprint:"60-second sprint", survival:"Survival", daily:"Daily 20", practice:"Practice", trick:"Trick drill", facts:"Toughest facts", chain:"Chain math", estimate:"Estimation", row:"Row drill", mapdrill:"Mastery map drill"};
+const MODE_NAME={dsprint:"Daily sprint", sprint:"60-second sprint", survival:"Survival", daily:"Daily 20", practice:"Practice", trick:"Trick drill", facts:"Toughest facts", chain:"Chain math", estimate:"Estimation", row:"Row drill", mapdrill:"Mastery map drill"};
 function finish(){
   if(!G) return; const g=G; stopGame(); G=null; S.rounds++;
   const n=g.right+g.wrong, acc=n?g.right/n:0, okMs=g.log.filter(x=>x.ok).map(x=>x.ms), avg=okMs.length?okMs.reduce((a,b)=>a+b,0)/okMs.length:0;
@@ -1458,6 +1472,15 @@ function finish(){
     while(g.trace.length<=60) g.trace.push(g.score);
     if(g.score>prev&&g.right){ S.sprint[k]=g.score; S.ghost[k]=g.trace.slice(0,61); best=prev>0; cheer=prev?`New best! You beat your ghost by ${g.score-prev}.`:"First score on this mix. Next time you'll race its ghost."; }
     else if(prev) cheer=g.ghost?`Your ghost won by ${prev-g.score}. Best: ${prev}`:`Best on this mix: ${prev}`; }
+  else if(g.mode==="dsprint"){ big=g.score; sub=`points · ${g.right} right`; H.sp=Math.max(H.sp||0,g.score);
+    while(g.trace.length<=60) g.trace.push(g.score);
+    const past=dsDays().filter(d=>d!==g.day).slice(-7).map(d=>S.ds[d].s), avg7=past.length?Math.round(past.reduce((a,b)=>a+b,0)/past.length):0, prevBest=dsBest();
+    if(g.practice){ cheer=`Practice run. Today's official score: ${S.ds[g.day].s}`; }
+    else { S.ds[g.day]={s:g.score,r:g.right,w:g.wrong};
+      const ks=dsDays(); if(ks.length>400) ks.slice(0,ks.length-400).forEach(k=>delete S.ds[k]);
+      if(g.score>prevBest&&g.right){ S.dsGhost=g.trace.slice(0,61); best=prevBest>0; cheer=prevBest?`Best day ever! Up ${NUM(g.score-prevBest)} on your old best.`:"First daily sprint. Come back tomorrow for a new set."; }
+      else if(avg7) cheer=g.score>=avg7?`${g.score-avg7} above your recent average of ${avg7}.`:`${avg7-g.score} under your recent average of ${avg7}.`;
+      else cheer=`Best day: ${prevBest}`; } }
   else if(g.mode==="chain"){ const c=S.chain, k=`${c.len}|${c.speed}|${c.hard}`, prev=S.chainBest[k]||0; big=`${g.right}/5`; sub=`${c.len}-step chains · ${["relaxed","normal","fast"][c.speed]}${c.hard?" · hard":""}`;
     if(g.right>prev){ S.chainBest[k]=g.right; best=prev>0||g.right===5; cheer=g.right===5?"All five! Try a longer chain or a faster speed.":`New best on this setting.`; } else cheer=`Best on this setting: ${prev}/5`; }
   else if(g.mode==="estimate"){ const prev=S.estBest||0; big=g.score; sub=`points · ${g.right}/12 closest`; if(g.score>prev){ S.estBest=g.score; best=prev>0; cheer=prev?`New best! Old best was ${prev}.`:"Now beat it!"; } else cheer=`Best: ${prev}`; }
@@ -1473,13 +1496,17 @@ function finish(){
   save();
   const misses=g.log.filter(x=>!x.ok);
   const byOp={}; g.log.filter(x=>OPS[x.p.op]).forEach(x=>{ const b=byOp[x.p.op]||(byOp[x.p.op]={r:0,n:0,t:0}); b.n++; if(x.ok){ b.r++; b.t+=x.ms; } });
-  const again={sprint:"sprint",survival:"survival",daily:"home",practice:"practice",trick:"trick",facts:"facts",chain:"chainplay",estimate:"estimate",row:"row",mapdrill:"map"}[g.mode];
+  const dsRows=g.mode==="dsprint"?dsDays().slice(-14).map(d=>({d,v:S.ds[d].s})):[];
+  const again={dsprint:"dsprint",sprint:"sprint",survival:"survival",daily:"home",practice:"practice",trick:"trick",facts:"facts",chain:"chainplay",estimate:"estimate",row:"row",mapdrill:"map"}[g.mode];
   show(`${bar(MODE_NAME[g.mode])}
   <section class="card center"><div class="big">${esc(big)}</div><p class="muted">${esc(sub)}</p>${cheer?`<p class="cheer">${esc(cheer)}</p>`:""}</section>
   <div class="kv"><div><b>${Math.round(acc*100)}%</b><span>accuracy</span></div><div><b>${avg?fmtS(avg):"–"}</b><span>avg per answer</span></div><div><b>${g.maxCombo}</b><span>best streak</span></div></div>
   ${Object.keys(byOp).length>1?`<section class="card"><h3>By operation</h3>${Object.entries(byOp).map(([k,b])=>`<div class="statrow" style="--c:var(${OPS[k].c})"><span class="o">${OPS[k].s}</span><span>${b.r}/${b.n} right</span><em>${b.r?fmtS(b.t/b.r):"–"}</em><b></b></div>`).join("")}</section>`:""}
   ${misses.length?`<section class="card"><h3>Missed</h3><div class="miss">${misses.slice(0,12).map(x=>`<div><span>${esc(solvedText(x.p)).replace(/(=|≈) ([\d,]+)$/,"$1 <b>$2</b>")}</span><span class="y">${esc(x.typed||"")}</span><small>${esc(hint(x.p))}</small></div>`).join("")}</div></section>`:""}
-  ${g.mode==="daily"?"":`<button class="btn go wide" data-act="${again}" ${g.mode==="trick"?`data-id="${g.trick.id}"`:""} ${g.mode==="row"?`data-row="${g.opt.row}" data-op="${g.opt.op}"`:""}>${g.mode==="mapdrill"?"Back to the map":"Play again"}</button>`}
+  ${g.mode==="dsprint"?`<div class="kv"><div><b>${S.ds[g.day]?NUM(S.ds[g.day].s):"–"}</b><span>today</span></div><div><b>${dsBest()?NUM(dsBest()):"–"}</b><span>best day</span></div><div><b>${dsStreak()}</b><span>day streak</span></div></div>
+  <section class="card"><h3>Your daily sprints</h3>${chart(dsRows,{color:"--good",fmt:v=>NUM(Math.round(v))})}</section>
+  <button class="btn go wide" data-act="dsshare">Share</button>`:""}
+  ${g.mode==="daily"?"":`<button class="btn ${g.mode==="dsprint"?"ghost":"go"} wide" data-act="${again}" ${g.mode==="trick"?`data-id="${g.trick.id}"`:""} ${g.mode==="row"?`data-row="${g.opt.row}" data-op="${g.opt.op}"`:""}>${g.mode==="mapdrill"?"Back to the map":g.mode==="dsprint"?"Practice run":"Play again"}</button>`}
   <button class="btn ghost wide" data-act="home">Home</button>`);
   if((best||(acc===1&&n>=10))) setTimeout(confetti,120);
 }
@@ -1497,7 +1524,8 @@ app.addEventListener("click",e=>{
     case "op": { const o=b.dataset.o; S.ops=S.ops.includes(o)?S.ops.filter(x=>x!==o):[...S.ops,o]; if(!S.ops.length) S.ops=[o]; save(); const y=scrollY; home(); scrollTo(0,y); return; }
     case "dig": S.cust[b.dataset.w]=+b.dataset.d; save(); { const y=scrollY; home(); scrollTo(0,y); } return;
     case "lv": S.lv=b.dataset.l==="c"?"c":+b.dataset.l; save(); { const y=scrollY; home(); scrollTo(0,y); } return;
-    case "sprint": case "survival": case "daily": case "practice": case "facts": case "estimate": return start(a);
+    case "dsshare": return dsShare(b);
+    case "dsprint": case "sprint": case "survival": case "daily": case "practice": case "facts": case "estimate": return start(a);
     case "chain": return chainMenu();
     case "chainset": { const k=b.dataset.k; S.chain[k]=+b.dataset.v; save(); return chainMenu(); }
     case "chainplay": return start("chain");
