@@ -160,6 +160,8 @@ print('math/index.html', len(page), VERSION)
 # ---------------- Hockey (5-on-5 arcade hockey, not a map edition) ----------------
 page = with_premium(open('tools/hockey/page.html', encoding='utf-8').read())
 code = rep(open('tools/hockey/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
+code = rep(code, '/*ROSTERS*/', open('tools/hockey/rosters.js', encoding='utf-8').read(), 1)   # real lines and ratings
+code = rep(code, '/*SEASON*/', open('tools/hockey/season.js', encoding='utf-8').read(), 1)     # season and playoffs
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('hockey', exist_ok=True)
 open('hockey/index.html', 'w', encoding='utf-8').write(page)

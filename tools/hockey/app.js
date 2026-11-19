@@ -1,7 +1,8 @@
 /* ================= HOCKEY: 5-on-5 arcade hockey against the computer =================
    Top-down rink in feet (85 wide, 200 long). You always attack up the screen.
    You control one skater (the puck carrier when your team has it); the computer plays everyone else.
-   No offsides or icing. Three periods, sudden-death overtime, then a shootout. */
+   No offsides or icing. Three periods, sudden-death overtime, then a shootout (playoff games keep playing overtime).
+   Each team dresses its real top two lines and pairs (rosters.js), with ratings that change speed, shots, passing and hits. */
 const APP_VERSION="dev";
 const LS="globetrotter.hockey.v1";
 const $=id=>document.getElementById(id);
@@ -17,6 +18,7 @@ const TEAMS=[
   {n:"Montreal Canadiens",ab:"MTL",c:"#AF1E2D",k:"#ffffff",s:"#192168"},
   {n:"New York Rangers",ab:"NYR",c:"#0038A8",k:"#ffffff",s:"#CE1126"},
   {n:"Toronto Maple Leafs",ab:"TOR",c:"#00205B",k:"#ffffff"}];
+/*ROSTERS*/
 const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const clash=(a,b)=>{ const x=hexRGB(a.c), y=hexRGB(b.c); return hyp(x[0]-y[0],x[1]-y[1],x[2]-y[2])<150; };
 // when the colors are too close (two red teams, two blue teams), the visitors wear road whites
@@ -28,7 +30,7 @@ const DIFF=[
   {n:"All-Star",spd:1.03,dec:.2,  acc:.065,gk:.905,gsp:15.5,chk:.58, fo:.6}];
 const MINE={dec:.3, acc:.1, gk:.86, gsp:13.5};   // your goalie and the teammates the computer runs for you
 const LENS=[2,3,5];
-const FRESH=()=>({team:0, diff:1, len:3, sound:true, rec:{w:0,l:0,otl:0}, last:[], tot:{gp:0,gf:0,ga:0,sh:0,hits:0}, tips:false});
+const FRESH=()=>({team:0, diff:1, len:3, sound:true, rec:{w:0,l:0,otl:0}, last:[], tot:{gp:0,gf:0,ga:0,sh:0,hits:0}, tips:false, sea:null});
 let S=FRESH();
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
@@ -86,21 +88,32 @@ function snd(k){ sfx(k); }   // the big moments; the tab bar adds a haptic tap t
 
 /* ================= the game ================= */
 const ROLES=["C","LW","RW","LD","RD","G"];
-const NUMS=[[19,11,27,4,44,31],[91,17,8,2,55,35],[29,13,21,6,77,30],[87,14,9,3,22,40],[97,10,16,5,58,1],[71,12,24,7,33,39]];
 const PER=["1st","2nd","3rd","OT","SO"];
-const IN={jx:0,jy:0,kx:0,ky:0,a:false,aDown:false,bDown:false,charging:false,ch:0};
+const perName=per=>per<=3?PER[per-1]:per===4?"OT":`${per-3}OT`;
+const perLabel=g=>g.so?"SO":perName(g.per);
+const IN={jx:0,jy:0,kx:0,ky:0,a:false,aDown:false,bDown:false,charging:false,ch:0,ot:false};
+const SLOT={LW:0,C:1,RW:2,LD:0,RD:1};
+// put a team's current line on the ice: the five skater slots take that line's players and ratings
+function setLines(t){ const g=G, R=ROSTERS[g.T[t].ab];
+  for(const p of g.P){ if(p.t!==t) continue; const d=p.g?R.G:(p.role==="LD"||p.role==="RD")?R.D[g.dl[t]][SLOT[p.role]]:R.F[g.fl[t]][SLOT[p.role]];
+    p.num=d[0]; p.name=d[1]; p.ln=lastName(d[1]); p.r=p.g?{gk:d[2]}:{sk:d[2],sh:d[3],ps:d[4],ck:d[5]}; } }
+// shifts: forwards change after about 40 seconds of play and the D after 55, at the next faceoff
+function lineChange(){ const g=G; let ch=false; for(const t of [0,1]){
+  if(g.shF[t]>40){ g.fl[t]^=1; g.shF[t]=0; ch=true; } if(g.shD[t]>55){ g.dl[t]^=1; g.shD[t]=0; ch=true; } setLines(t); } return ch; }
 let G=null;
 
 function newGame(opt={}){
-  const ti=S.team; let oi=opt.opp; if(oi==null){ do{ oi=Math.floor(Math.random()*TEAMS.length); }while(oi===ti); }
-  const P=[];
-  [0,1].forEach(t=>ROLES.forEach((r,i)=>P.push({t,role:r,g:r==="G",num:NUMS[t?oi:ti][i],x:0,y:0,vx:0,vy:0,fx:0,fy:t?1:-1,wx:0,wy:0,
-    stun:0,cd:0,boost:0,hitting:0,chk:0,dec:rnd(0,.3),tt:0,tgt:null,hold:0,jit:rnd(-3,3),on:true})));
-  G={T:[TEAMS[ti],clash(TEAMS[ti],TEAMS[oi])?road(TEAMS[oi]):TEAMS[oi]], ti, oi, P, d:DIFF[S.diff], auto:!!opt.auto,
+  const ti=opt.team!=null?opt.team:S.team; let oi=opt.opp; if(oi==null){ do{ oi=Math.floor(Math.random()*TEAMS.length); }while(oi===ti); }
+  const P=[], cl=clash(TEAMS[ti],TEAMS[oi]);
+  [0,1].forEach(t=>ROLES.forEach(r=>P.push({t,role:r,g:r==="G",num:0,name:"",ln:"",r:{},x:0,y:0,vx:0,vy:0,fx:0,fy:t?1:-1,wx:0,wy:0,
+    stun:0,cd:0,boost:0,hitting:0,chk:0,dec:rnd(0,.3),tt:0,tgt:null,hold:0,jit:rnd(-3,3),on:true,dk:0,bite:0})));
+  G={T:[cl&&opt.away?road(TEAMS[ti]):TEAMS[ti], cl&&!opt.away?road(TEAMS[oi]):TEAMS[oi]], ti, oi, P, d:DIFF[opt.diff!=null?opt.diff:S.diff], auto:!!opt.auto,
+     season:!!opt.season, playoff:!!opt.playoff, len:opt.len||S.len, fl:[0,0], dl:[0,0], shF:[0,0], shD:[0,0], camX:42.5,
      pk:{x:42.5,y:100,vx:0,vy:0,owner:null,last:null,passTo:null,shot:false,shooter:null,ghost:null,hist:[],still:0,trail:[]},
-     per:1, clock:S.len*60, sc:[0,0], st:[{sh:0,hits:0,fo:0},{sh:0,hits:0,fo:0}], goals:[], state:"faceoff", tm:0, ctl:null, cam:100, ph:[], so:null, shake:0, paused:false};
+     per:1, clock:(opt.len||S.len)*60, sc:[0,0], st:[{sh:0,hits:0,fo:0},{sh:0,hits:0,fo:0}], goals:[], state:"faceoff", tm:0, ctl:null, cam:100, ph:[], so:null, shake:0, paused:false};
   G.ctl=P.find(p=>p.t===0&&p.role==="C");
-  IN.charging=false; IN.aDown=IN.bDown=false;
+  setLines(0); setLines(1);
+  IN.charging=false; IN.aDown=IN.bDown=false; IN.ot=false;
   faceoff(42.5,100,true);
 }
 const team=(t,sk=true)=>G.P.filter(p=>p.t===t&&p.on&&(!sk||!p.g));
@@ -108,7 +121,7 @@ const goalieOf=t=>G.P.find(p=>p.g&&p.t===t);
 
 function faceoff(dx,dy,quiet){ const g=G, pk=g.pk;
   Object.assign(pk,{x:dx,y:dy,vx:0,vy:0,owner:null,passTo:null,shot:false,shooter:null,ghost:null,hist:[],still:0,trail:[]});
-  g.state="faceoff"; g.tm=0; g.dropped=false; g.foTap=false; g.ph=[];
+  g.state="faceoff"; g.tm=0; g.dropped=false; g.foTap=false; g.ph=[]; if(!g.so) lineChange(); IN.ot=false;
   for(const p of g.P){ if(!p.on) continue; let x,y;
     if(p.g){ x=42.5; y=RL-GLY-2.4; }
     else { const [nx,ny]=P_(p.t,dx,dy), o={C:[0,3.4],LW:[-14,5],RW:[14,5],LD:[-10,17],RD:[10,17]}[p.role]; x=clamp(nx+o[0],5,RW-5); y=clamp(ny+o[1],8,RL-GLY-7); }
@@ -122,25 +135,37 @@ const nearestDot=(x,y)=>DOTS.slice(1).reduce((b,d)=>hyp(d[0]-x,d[1]-y)<hyp(b[0]-
 
 /* ---------- puck handling ---------- */
 function release(p){ const pk=G.pk; pk.owner=null; p.cd=G.so?99:.28; p.hold=0; pk.shot=false; pk.ghost=null; pk.passTo=null; }
-function take(p){ const g=G, pk=g.pk;
+function take(p){ const g=G, pk=g.pk, wasPass=pk.passTo===p&&p.t===(pk.last&&pk.last.t);
   pk.owner=p; pk.passTo=null; pk.shot=false; pk.ghost=null; p.hold=0;
   if(pk.hist.length&&pk.hist[pk.hist.length-1].t!==p.t) pk.hist=[];
   if(pk.hist[pk.hist.length-1]!==p) pk.hist.push(p); if(pk.hist.length>3) pk.hist.shift();
   pk.last=p; sfx("stick");
+  const human=!g.auto&&p===g.ctl;
+  if(wasPass&&g.state==="play"){ const n=P_(p.t,p.x,p.y), slot=n[1]<40&&n[1]>GLY+3&&Math.abs(n[0]-42.5)<22;
+    if(human&&IN.ot){ IN.ot=false; IN.charging=false; shoot(p,.85,Math.abs(IN.jx)>.3?Math.sign(IN.jx):0,true); return; }
+    if(!human&&!(p.t===0&&!g.auto)&&slot&&Math.random()<.45){ shoot(p,.8,0,true); return; } }
+  if(p.t!==0||g.auto) IN.ot=false;
   if(g.auto) return;
-  if(p.t===0){ if(g.ctl!==p&&!(IN.charging&&g.ctl&&g.ctl.on)) g.ctl=p; else g.ctl=p; }
+  if(p.t===0) g.ctl=p;
   else if(g.ctl&&hyp(g.ctl.x-pk.x,g.ctl.y-pk.y)>16) switchCtl(); }
 function pass(p,m){ const pk=G.pk; let tx=m.x, ty=m.y; const sp=clamp(hyp(tx-pk.x,ty-pk.y)*1.5+30,42,88);
   for(let i=0;i<2;i++){ const tt=hyp(tx-pk.x,ty-pk.y)/sp; tx=m.x+m.vx*tt*.85; ty=m.y+m.vy*tt*.85; }
-  const dx=tx-pk.x, dy=ty-pk.y, d=hyp(dx,dy)||1;
-  release(p); pk.vx=dx/d*sp; pk.vy=dy/d*sp; pk.passTo=m; pk.last=p; p.fx=dx/d; p.fy=dy/d; sfx("pass"); }
-function shoot(p,power,side){ const g=G, pk=g.pk, gy=p.t===0?GLY:RL-GLY, gl=goalieOf(1-p.t);
+  const dx=tx-pk.x, dy=ty-pk.y, d=hyp(dx,dy)||1, err=(1-p.r.ps/100)*.12*(Math.random()*2-1), ca=Math.cos(err), sa=Math.sin(err);
+  release(p); pk.vx=(dx*ca-dy*sa)/d*sp*1.08; pk.vy=(dx*sa+dy*ca)/d*sp*1.08; pk.passTo=m; pk.last=p; p.fx=dx/d; p.fy=dy/d; sfx("pass"); }
+function shoot(p,power,side,ot){ const g=G, pk=g.pk, gy=p.t===0?GLY:RL-GLY, gl=goalieOf(1-p.t);
   if(!side) side=gl&&gl.x>42.5?-1:1;            // the side the goalie isn't covering
   const tx=42.5+side*(2.2+Math.random()*.5);
-  const q=p.t===1?g.d:MINE, acc=(p===g.ctl&&!g.auto)?.075:q.acc;
+  const q=p.t===1?g.d:MINE, acc=((p===g.ctl&&!g.auto)?.075:q.acc)*(1.5-p.r.sh/100);
   let a=Math.atan2(gy-pk.y,tx-pk.x)+(Math.random()*2-1)*acc*(.6+power*.6);
-  const sp=52+power*46;
-  release(p); pk.vx=Math.cos(a)*sp; pk.vy=Math.sin(a)*sp; pk.shot=true; pk.shooter=p; pk.last=p; p.cd=g.so?99:.35; p.fx=Math.cos(a); p.fy=Math.sin(a); sfx("shot"); }
+  const sp=(52+power*46)*(.86+p.r.sh/100*.18);
+  release(p); pk.vx=Math.cos(a)*sp; pk.vy=Math.sin(a)*sp; pk.shot=true; pk.ot=!!ot; pk.shooter=p; pk.last=p; p.cd=g.so?99:.35; if(ot&&!g.auto) msg("One-timer!","",.7); p.fx=Math.cos(a); p.fy=Math.sin(a); sfx("shot"); }
+// near the net the second button is a deke: a quick fake that sends the goalie (and a checker) the wrong way
+function canDeke(c){ const n=P_(c.t,c.x,c.y), gd=hyp(n[0]-42.5,n[1]-GLY); return n[1]>GLY+2&&gd<30&&Math.abs(Math.atan2(n[0]-42.5,n[1]-GLY))<1.05; }
+function deke(c,dir){ if(c.dk>0) return false; c.dk=.9; dir=dir||(Math.random()<.5?-1:1);
+  c.vx+=dir*14*(.7+c.r.sk/300); c.boost=.25;
+  const k=goalieOf(1-c.t); if(k&&hyp(k.x-c.x,k.y-c.y)<26){ k.bite=.5+c.r.ps/400; k.biteDir=-dir; }
+  for(const o of team(1-c.t)) if(hyp(o.x-c.x,o.y-c.y)<7) o.chk=Math.max(o.chk,.8);
+  sfx("stick"); if(c===G.ctl&&!G.auto) msg("Deke!","",.6); return true; }
 function laneClear(p,tx,ty,w,skipG){ const pk=G.pk; for(const o of G.P){ if(!o.on||o.t===p.t||(skipG&&o.g)) continue; if(segDist(o.x,o.y,pk.x,pk.y,tx,ty)<w) return false; } return true; }
 function bestPass(p){ const g=G, t=p.t, n=P_(t,p.x,p.y); let best=null, bs=1.5;
   for(const m of team(t)){ if(m===p||m.stun>0) continue; const d=hyp(m.x-p.x,m.y-p.y); if(d<9||d>80) continue;
@@ -153,14 +178,14 @@ function userPassTarget(c){ let ax=IN.jx, ay=IN.jy; if(hyp(ax,ay)<.3){ ax=c.fx; 
   let best=null, bs=-9; for(const m of team(0)){ if(m===c) continue; const dx=m.x-c.x, dy=m.y-c.y, d=hyp(dx,dy)||1; const s=(dx*ax+dy*ay)/d-d/160; if(s>bs){ bs=s; best=m; } }
   return best; }
 function switchCtl(){ const g=G, pk=g.pk; let best=null, bd=1e9; for(const m of team(0)){ if(m===g.ctl) continue; const d=hyp(m.x-pk.x,m.y-pk.y); if(d<bd){ bd=d; best=m; } } if(best) g.ctl=best; }
-function bodyCheck(h,v){ const g=G; v.stun=.85; const dx=v.x-h.x, dy=v.y-h.y, d=hyp(dx,dy)||1; v.vx+=dx/d*14; v.vy+=dy/d*14; h.vx*=.5; h.vy*=.5; h.hitting=0;
+function bodyCheck(h,v){ const g=G; v.stun=.6+(h.r.ck||70)/250; const dx=v.x-h.x, dy=v.y-h.y, d=hyp(dx,dy)||1; v.vx+=dx/d*14; v.vy+=dy/d*14; h.vx*=.5; h.vy*=.5; h.hitting=0;
   if(g.pk.owner===v){ release(v); v.cd=.8; const pk=g.pk; pk.vx=v.vx*.6+rnd(-10,10); pk.vy=v.vy*.6+rnd(-10,10); pk.last=h; }
   g.st[h.t].hits++; g.shake=.25; snd("hit"); }
 function poke(p,c){ const pk=G.pk; release(c); c.cd=.5; const dx=p.x-pk.x, dy=p.y-pk.y, d=hyp(dx,dy)||1; pk.vx=dx/d*9+rnd(-7,7); pk.vy=dy/d*9+rnd(-7,7); pk.last=p; sfx("stick"); }
 
 /* ---------- the computer players ---------- */
-function maxS(p){ const g=G; if(p.g) return p.t===1?g.d.gsp:MINE.gsp;
-  let s=27*(p.t===1?g.d.spd:1); if(g.pk.owner===p) s*=.9; if(p.boost>0) s*=1.32; if(p===g.ctl&&IN.charging&&!g.auto) s*=.6; return s; }
+function maxS(p){ const g=G; if(p.g) return (p.t===1?g.d.gsp:MINE.gsp)*1.12;
+  let s=31*(p.t===1?g.d.spd:1)*(.8+p.r.sk/400); if(g.pk.owner===p) s*=.92; if(p.boost>0) s*=1.32; if(p===g.ctl&&IN.charging&&!g.auto) s*=.6; return s; }
 function seek(p,tx,ty){ const dx=tx-p.x, dy=ty-p.y, d=hyp(dx,dy), sp=d<.6?0:Math.min(maxS(p),d*2.4); p.wx=d?dx/d*sp:0; p.wy=d?dy/d*sp:0; }
 function think(dt){ const g=G, pk=g.pk, own=pk.owner;
   for(const t of [0,1]){
@@ -191,7 +216,7 @@ function spot(p,t,own){ const g=G, pk=g.pk, P=P_(t,pk.x,pk.y), r=p.role, j=p.jit
     else { x=42.5+(P[0]-42.5)*.3; y=Math.min(176,P[1]+12); } }
   return P_(t,clamp(x,3,RW-3),clamp(y,3,RL-3)); }
 function tryCheck(p,c,dt){ p.chk-=dt; if(p.chk>0) return; if(hyp(p.x-c.x,p.y-c.y)>4.2) return;
-  const q=p.t===1?G.d.chk:.42; p.chk=rnd(.45,1);
+  const q=(p.t===1?G.d.chk:.42)*(.7+(p.r.ck-(c.r.sk+c.r.ps)/2+70)/230); p.chk=rnd(.45,1);
   if(Math.random()<q){ if(Math.random()<.45) bodyCheck(p,c); else poke(p,c); } else p.chk+=.3; }
 function carrierAI(p,dt){ const g=G, t=p.t, Q=t===1?g.d:MINE, so=!!g.so, n=P_(t,p.x,p.y);
   p.hold+=dt; p.dec-=dt;
@@ -207,32 +232,35 @@ function carrierAI(p,dt){ const g=G, t=p.t, Q=t===1?g.d:MINE, so=!!g.so, n=P_(t,
   let mx=dx+ax, my=dy+ay; const ml=hyp(mx,my)||1; const ms=maxS(p); [p.wx,p.wy]=V_(t,mx/ml*ms,my/ml*ms);
   if(p.dec>0) return; p.dec=Q.dec*rnd(.6,1.4);
   const gd=hyp(n[0]-42.5,n[1]-GLY), ang=Math.abs(Math.atan2(n[0]-42.5,n[1]-GLY));
+  if(gd<24&&gd>11&&p.dk<=0&&press>11&&ang<.9&&Math.random()<(so?.35:.3)){ deke(p,Math.random()<.5?-1:1); p.dec=.28; return; }
   if(n[1]>GLY+3&&gd<(so?26:42)&&ang<1.1){ const [gx,gy]=P_(t,42.5,GLY), lane=laneClear(p,gx,gy,2.2,true);
     const pr=so?(gd<19?.9:.2):gd<22?.65:lane?.38:.1;
     if(Math.random()<pr){ shoot(p,clamp(gd/42+rnd(-.1,.35),.3,1),0); return; } }
   if(so) return;
   if(press<6.5||p.hold>4||n[1]<GLY+2||Math.random()<.07){ const m=bestPass(p); if(m){ pass(p,m); return; } if(p.hold>7) shoot(p,.9,0); } }
-function goalieAI(k){ const g=G, t=k.t, lag=Math.round((t===1?.26-g.d.gk*.14:.14)*120), h=g.ph[Math.max(0,g.ph.length-1-lag)]||[g.pk.x,g.pk.y];
+const gkSkill=k=>.55+k.r.gk*.0038+(k.t===1?[-.035,0,.025][S.diff]:0);
+function goalieAI(k){ const g=G, t=k.t, lag=Math.round((.27-gkSkill(k)*.15)*120), h=g.ph[Math.max(0,g.ph.length-1-lag)]||[g.pk.x,g.pk.y];
   const P=P_(t,h[0],h[1]), gx=42.5, gy=RL-GLY; let tx, ty;
   if(P[1]>gy-.3){ tx=P[0]<gx?gx-2.3:gx+2.3; ty=gy-1.3; }
   else { const a=clamp(Math.atan2(P[0]-gx,gy-P[1]),-1.2,1.2), dist=hyp(P[0]-gx,gy-P[1]), dep=clamp(dist*.1,1.3,3.1); tx=gx+Math.sin(a)*dep; ty=gy-Math.cos(a)*dep; }
-  const [wx,wy]=P_(t,tx,ty), dx=wx-k.x, dy=wy-k.y, d=hyp(dx,dy), sp=Math.min(maxS(k),d*8); k.wx=d?dx/d*sp:0; k.wy=d?dy/d*sp:0; }
+  let [wx,wy]=P_(t,tx,ty); if(k.bite>0) wx=42.5+k.biteDir*3.2;
+  const dx=wx-k.x, dy=wy-k.y, d=hyp(dx,dy), sp=Math.min(maxS(k),d*8); k.wx=d?dx/d*sp:0; k.wy=d?dy/d*sp:0; }
 
 /* ---------- your player ---------- */
 function input(dt){ const g=G, c=g.ctl; if(g.auto||!c||!c.on) return;
   let jx=IN.jx, jy=IN.jy; if(IN.kx||IN.ky){ const l=hyp(IN.kx,IN.ky); jx=IN.kx/l; jy=IN.ky/l; }
   IN.vx=jx; IN.vy=jy;
   const ms=maxS(c); c.wx=c.stun>0?0:jx*ms; c.wy=c.stun>0?0:jy*ms;
-  const has=g.pk.owner===c, canShoot=has||(g.pk.passTo===c&&!g.pk.owner);
-  if(IN.aDown){ IN.aDown=false; if(g.so&&g.so.turn===1){} else if(canShoot){ IN.charging=true; IN.ch=has?0:.35; } else if(!g.so){ c.boost=.4; c.hitting=.45; } }
+  const has=g.pk.owner===c, incoming=g.pk.passTo===c&&!g.pk.owner;
+  if(IN.aDown){ IN.aDown=false; if(g.so&&g.so.turn===1){} else if(has){ IN.charging=true; IN.ch=0; } else if(incoming){ IN.ot=true; } else if(!g.so){ c.boost=.4; c.hitting=.45; } }
   if(IN.charging){ IN.ch=Math.min(1,IN.ch+dt/.75); if(!IN.a){ IN.charging=false; if(g.pk.owner===c) shoot(c,IN.ch,Math.abs(jx)>.3?Math.sign(jx):0); } }
-  if(IN.bDown){ IN.bDown=false; if(g.so){} else if(has){ const m=userPassTarget(c); if(m) pass(c,m); } else switchCtl(); } }
+  if(IN.bDown){ IN.bDown=false; if(has&&canDeke(c)) deke(c,Math.abs(jx)>.3?Math.sign(jx):0); else if(g.so){} else if(has){ const m=userPassTarget(c); if(m) pass(c,m); } else switchCtl(); } }
 
 /* ---------- one physics step ---------- */
 function physics(dt){ const g=G, pk=g.pk, L=g.P.filter(p=>p.on);
   for(const p of L){
-    if(p.stun>0) p.stun-=dt; if(p.cd>0&&p.cd<50) p.cd-=dt; if(p.boost>0) p.boost-=dt; if(p.hitting>0) p.hitting-=dt;
-    const wx=p.stun>0?0:p.wx, wy=p.stun>0?0:p.wy, acc=(p.g?90:p.stun>0?10:44)*(p.boost>0?1.6:1)*dt;
+    if(p.stun>0) p.stun-=dt; if(p.cd>0&&p.cd<50) p.cd-=dt; if(p.dk>0) p.dk-=dt; if(p.bite>0) p.bite-=dt; if(p.boost>0) p.boost-=dt; if(p.hitting>0) p.hitting-=dt;
+    const wx=p.stun>0?0:p.wx, wy=p.stun>0?0:p.wy, acc=(p.g?100:p.stun>0?12:78)*(p.boost>0?1.5:1)*dt;
     let ax=wx-p.vx, ay=wy-p.vy; const am=hyp(ax,ay); if(am>acc){ ax*=acc/am; ay*=acc/am; }
     p.vx+=ax; p.vy+=ay; p.x+=p.vx*dt; p.y+=p.vy*dt;
     const bn=boardClamp(p,p.g?GR:PR); if(bn) reflect(p,bn,.1);
@@ -240,7 +268,7 @@ function physics(dt){ const g=G, pk=g.pk, L=g.P.filter(p=>p.on);
     let dx, dy; const has=pk.owner===p;
     if(has){ if(p===g.ctl&&!g.auto&&hyp(IN.vx||0,IN.vy||0)>.25){ dx=IN.vx; dy=IN.vy; } else { dx=p.vx; dy=p.vy; if(hyp(dx,dy)<3){ dx=p.fx; dy=p.fy; } } }
     else { dx=pk.x-p.x; dy=pk.y-p.y; if(!p.g&&hyp(p.vx,p.vy)>12&&pk.passTo!==p){ dx=p.vx; dy=p.vy; } }
-    const dl=hyp(dx,dy)||1, k=Math.min(1,dt*(has?9:7)); p.fx+=(dx/dl-p.fx)*k; p.fy+=(dy/dl-p.fy)*k; const fl=hyp(p.fx,p.fy)||1; p.fx/=fl; p.fy/=fl; }
+    const dl=hyp(dx,dy)||1, k=Math.min(1,dt*(has?15:10)); p.fx+=(dx/dl-p.fx)*k; p.fy+=(dy/dl-p.fy)*k; const fl=hyp(p.fx,p.fy)||1; p.fx/=fl; p.fy/=fl; }
   for(let i=0;i<L.length;i++) for(let j=i+1;j<L.length;j++){ const a=L[i], b=L[j], r=(a.g?GR:PR)+(b.g?GR:PR), dx=b.x-a.x, dy=b.y-a.y, d=hyp(dx,dy);
     if(d<r&&d>.001){ const nx=dx/d, ny=dy/d, o=r-d, wa=a.g?.15:b.g?.85:.5;
       a.x-=nx*o*wa; a.y-=ny*o*wa; b.x+=nx*o*(1-wa); b.y+=ny*o*(1-wa);
@@ -271,7 +299,7 @@ function goalieTouch(){ const g=G, pk=g.pk;
   for(const k of g.P){ if(!k.g||!k.on||pk.ghost===k) continue; const dx=pk.x-k.x, dy=pk.y-k.y, d=hyp(dx,dy); if(d>=GR+PKR) continue;
     const sp=hyp(pk.vx,pk.vy), onNet=pk.shot&&pk.shooter&&pk.shooter.t!==k.t;
     if(sp<16){ freeze(k,onNet); return true; }
-    const q=k.t===1?g.d:MINE, mv=hyp(k.vx,k.vy)/maxS(k), sv=clamp(q.gk+.07-(sp-65)*.004-mv*.08-(g.so?.2:0),.45,.975);
+    const mv=hyp(k.vx,k.vy)/maxS(k), sv=clamp(gkSkill(k)+.09-(sp-65)*.004-mv*.08-(g.so?.12:0)-(pk.ot?.12:0)-(k.bite>0?.22:0),.3,.975);
     if(Math.random()<sv){ if(onNet) g.st[pk.shooter.t].sh++; pk.shot=false; sfx("save");
       if(Math.random()<(sp<45?.55:.3)){ freeze(k,false,true); return true; }
       const nx=dx/(d||1), ny=dy/(d||1); reflect(pk,[nx,ny],.35); pk.vx=pk.vx*.5+rnd(-9,9); pk.vy=pk.vy*.5+rnd(-9,9);
@@ -293,9 +321,9 @@ function goal(t){ const g=G, pk=g.pk; if(g.state==="goal"||g.state==="soend") re
   pk.owner=null; pk.vx=pk.vy=0; pk.y=t===0?GLY-1.6:RL-GLY+1.6; pk.x=clamp(pk.x,PX0+.7,PX1-.7);
   if(g.so) return soResult(true);
   const hs=pk.hist.filter(p=>p.t===t), sc=hs[hs.length-1]||null, ast=hs.slice(0,-1).reverse().slice(0,2);
-  g.st[t].sh++; g.sc[t]++; g.goals.push({t,per:g.per,clk:g.clock,n:sc?sc.num:null,a:ast.map(p=>p.num)});
+  g.st[t].sh++; g.sc[t]++; g.goals.push({t,per:g.per,clk:g.clock,n:sc?sc.num:null,nm:sc?sc.name:null,a:ast.map(p=>p.num),an:ast.map(p=>p.name)});
   g.state="goal"; g.tm=0; g.goalT=t; snd("goal");
-  msg("GOAL!",`${g.T[t].ab}${sc?` #${sc.num}`:""}${ast.length?` · assists ${ast.map(p=>"#"+p.num).join(", ")}`:""}`,2.6); }
+  msg("GOAL!",`${sc?sc.name:g.T[t].n}${ast.length?` (${ast.map(p=>p.ln).join(", ")})`:""}`,2.6); }
 
 /* ---------- periods, overtime, shootout ---------- */
 function update(dt){ const g=G; if(!g||g.paused) return;
@@ -311,7 +339,7 @@ function update(dt){ const g=G; if(!g||g.paused) return;
     else if(st==="whistle"&&g.tm>1.3) faceoff(g.foDot[0],g.foDot[1]);
     else if(st==="soend"&&g.tm>1.7) soNext();
     return; }
-  if(st==="play"){ g.clock-=dt; if(g.clock<=0){ g.clock=0; return endPeriod(); } }
+  if(st==="play"){ g.clock-=dt; for(const t of [0,1]){ g.shF[t]+=dt; g.shD[t]+=dt; } if(g.clock<=0){ g.clock=0; return endPeriod(); } }
   if(st==="play"||st==="so"){ think(dt); input(dt); physics(dt);
     if(g.state==="so"){ const so=g.so, pk=g.pk; so.tm+=dt; const behind=so.turn===0?pk.y<GLY-.4:pk.y>RL-GLY+.4;
       if((!pk.owner&&pk.last===so.shooter&&(hyp(pk.vx,pk.vy)<3||behind))||so.tm>12) soResult(false); } } }
@@ -321,14 +349,16 @@ function dropPuck(){ const g=G, pk=g.pk; const pU=clamp(1-g.d.fo+(g.foTap?.28:0)
   g.state="play"; hideMsg(); }
 function endPeriod(){ const g=G; snd("horn");
   if(g.per>=3&&g.sc[0]!==g.sc[1]) return gameOver();
-  if(g.per===4) return startShootout();
+  if(g.per>=4&&!g.playoff) return startShootout();
   g.state="inter";
-  if(g.auto){ g.per++; g.clock=(g.per===4?Math.min(5,S.len):S.len)*60; faceoff(42.5,100,true); return; }
-  overlay(`<p class="ovk">End of the ${PER[g.per-1]}</p>${scoreLine()}<div class="box">${boxRows()}</div>
-    <button class="btn go wide" data-act="nextper">${g.per===3?"Start overtime":`Start the ${PER[g.per]} period`}</button>
-    ${g.per===3?`<p class="muted">Sudden death. Next goal wins. Still tied after ${Math.min(5,S.len)} minutes means a shootout.</p>`:""}`); }
-function nextPeriod(){ const g=G; closeOverlay(); g.per++; g.clock=(g.per===4?Math.min(5,S.len):S.len)*60; faceoff(42.5,100,true); msg(g.per===4?"Overtime":`${PER[g.per-1]} period`,"",1.4); }
-function startShootout(){ const g=G; g.so={res:[[],[]],turn:0,tm:0}; g.per=5; msg("Shootout","Best of three",1.8); setupAttempt(); }
+  const otLen=g.playoff?g.len:Math.min(5,g.len);
+  if(g.auto){ g.per++; g.clock=(g.per>=4?otLen:g.len)*60; faceoff(42.5,100,true); return; }
+  const nx=g.per+1, nxl=nx<=3?`Start the ${PER[nx-1]} period`:nx===4?"Start overtime":`Start overtime #${nx-3}`;
+  overlay(`<p class="ovk">End of ${g.per<=3?"the "+PER[g.per-1]:perLabel(g)}</p>${scoreLine()}<div class="box">${boxRows()}</div>
+    <button class="btn go wide" data-act="nextper">${nxl}</button>
+    ${g.per>=3?`<p class="muted">Sudden death. Next goal wins.${g.playoff?" Playoff overtime keeps going until someone scores.":` Still tied after ${otLen} minutes means a shootout.`}</p>`:""}`); }
+function nextPeriod(){ const g=G; closeOverlay(); g.per++; g.clock=(g.per>=4?(g.playoff?g.len:Math.min(5,g.len)):g.len)*60; faceoff(42.5,100,true); msg(g.per>=4?(g.per===4?"Overtime":perLabel(g)):`${PER[g.per-1]} period`,"",1.4); }
+function startShootout(){ const g=G; g.so={res:[[],[]],turn:0,tm:0}; g.per=5; g.fl=[0,0]; setLines(0); setLines(1); msg("Shootout","Best of three",1.8); setupAttempt(); }
 function setupAttempt(){ const g=G, so=g.so, t=so.turn; g.state="so"; so.tm=0;
   for(const p of g.P){ p.on=false; p.vx=p.vy=p.wx=p.wy=0; p.stun=0; p.cd=0; p.soSide=null; }
   const sh=g.P.find(p=>p.t===t&&p.role===["C","LW","RW"][so.res[t].length%3]), k=goalieOf(1-t);
@@ -345,14 +375,18 @@ function soNext(){ const g=G, so=g.so, a=so.res[0], b=so.res[1], A=a.reduce((s,v
 function gameOver(){ const g=G; if(g.state==="final") return; g.state="final"; snd("horn");
   const w=g.sc[0]>g.sc[1], ty=g.so?"SO":g.per>=4?"OT":"";
   if(g.auto) return;
-  if(w) S.rec.w++; else if(ty) S.rec.otl++; else S.rec.l++;
-  S.last.unshift({w,ty,a:g.sc[0],b:g.sc[1],o:g.oi}); S.last=S.last.slice(0,10);
-  const T=S.tot; T.gp++; T.gf+=g.sc[0]; T.ga+=g.sc[1]; T.sh+=g.st[0].sh; T.hits+=g.st[0].hits; save();
+  let seaNote="";
+  if(g.season) seaNote=seasonResult(g,ty);
+  else { if(w) S.rec.w++; else if(ty) S.rec.otl++; else S.rec.l++;
+    S.last.unshift({w,ty,a:g.sc[0],b:g.sc[1],o:g.oi}); S.last=S.last.slice(0,10);
+    const T=S.tot; T.gp++; T.gf+=g.sc[0]; T.ga+=g.sc[1]; T.sh+=g.st[0].sh; T.hits+=g.st[0].hits; }
+  save();
   setTimeout(()=>{ if(G!==g) return;
     overlay(`<p class="ovk">${ty==="SO"?"Final · shootout":ty==="OT"?"Final · overtime":"Final"}</p><h2 class="ovh ${w?"win":"loss"}">${w?"You win!":"You lose"}</h2>${scoreLine()}
-      <div class="box">${boxRows()}</div>${g.goals.length?`<div class="glist">${g.goals.map(x=>`<div><span class="gdot" style="background:${g.T[x.t].rim||g.T[x.t].c}"></span><b>${esc(g.T[x.t].ab)}${x.n?` #${x.n}`:""}</b><span>${x.a.length?`from ${x.a.map(n=>"#"+n).join(", ")}`:"unassisted"}</span><em>${PER[x.per-1]} ${fmtClk(x.clk)}</em></div>`).join("")}</div>`:""}
+      <div class="box">${boxRows()}</div>${g.goals.length?`<div class="glist">${g.goals.map(x=>`<div><span class="gdot" style="background:${g.T[x.t].rim||g.T[x.t].c}"></span><b>${x.nm?esc(lastName(x.nm)):esc(g.T[x.t].ab)}</b><span>${x.an&&x.an.length?esc(x.an.map(lastName).join(", ")):"unassisted"}</span><em>${perName(x.per)} ${fmtClk(x.clk)}</em></div>`).join("")}</div>`:""}
       ${g.so?`<p class="muted">Shootout: ${g.so.res[0].map(v=>v?"●":"○").join(" ")} vs ${g.so.res[1].map(v=>v?"●":"○").join(" ")}</p>`:""}
-      <button class="btn go wide" data-act="again">Play again</button><button class="btn ghost wide" data-act="quit">Home</button>`); },1300); }
+      ${seaNote?`<p class="cheer">${esc(seaNote)}</p>`:""}
+      ${g.season?`<button class="btn go wide" data-act="toseason">Back to the season</button>`:`<button class="btn go wide" data-act="again">Play again</button><button class="btn ghost wide" data-act="quit">Home</button>`}`); },1300); }
 const fmtClk=s=>{ s=Math.max(0,Math.ceil(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); };
 function scoreLine(){ const g=G; return `<div class="fscore"><span style="--tc:${g.T[0].c};--tk:${g.T[0].k}">${esc(g.T[0].ab)}</span><b>${g.sc[0]}</b><i>–</i><b>${g.sc[1]}</b><span style="--tc:${g.T[1].c};--tk:${g.T[1].k}">${esc(g.T[1].ab)}</span></div>`; }
 function boxRows(){ const g=G, r=(l,a,b)=>`<div><b>${a}</b><span>${l}</span><b>${b}</b></div>`; return r("Shots",g.st[0].sh,g.st[1].sh)+r("Hits",g.st[0].hits,g.st[1].hits)+r("Faceoffs won",g.st[0].fo,g.st[1].fo); }
@@ -360,10 +394,10 @@ function boxRows(){ const g=G, r=(l,a,b)=>`<div><b>${a}</b><span>${l}</span><b>$
 /* ================= screen: drawing ================= */
 const game=$('game'), cv=$('cv'), cx=cv.getContext('2d');
 let CW=0, CH=0, DPR=1, SC=4, OX=0, RINK=null, RINKFOR=-1;
-function resize(){ DPR=Math.min(3,window.devicePixelRatio||1); CW=innerWidth; CH=innerHeight; cv.width=Math.round(CW*DPR); cv.height=Math.round(CH*DPR); SC=Math.min(CW/(RW+5),CH/78); OX=(CW-RW*SC)/2; RINK=null; }
+function resize(){ DPR=Math.min(3,window.devicePixelRatio||1); CW=innerWidth; CH=innerHeight; cv.width=Math.round(CW*DPR); cv.height=Math.round(CH*DPR); SC=Math.min(CW/(RW+5),CH/78)*1.5; OX=0; RINK=null; }
 function rinkPath(c){ c.beginPath(); c.moveTo(CR,0); c.lineTo(RW-CR,0); c.arc(RW-CR,CR,CR,-PI/2,0); c.lineTo(RW,RL-CR); c.arc(RW-CR,RL-CR,CR,0,PI/2); c.lineTo(CR,RL); c.arc(CR,RL-CR,CR,PI/2,PI); c.lineTo(0,CR); c.arc(CR,CR,CR,PI,1.5*PI); c.closePath(); }
-function rinkImage(){ const m=3, c=document.createElement('canvas'); c.width=Math.ceil((RW+2*m)*SC*DPR); c.height=Math.ceil((RL+2*m)*SC*DPR);
-  const x=c.getContext('2d'); x.setTransform(SC*DPR,0,0,SC*DPR,m*SC*DPR,m*SC*DPR);
+function rinkImage(){ const m=3, D=Math.min(DPR,2), c=document.createElement('canvas'); c.width=Math.ceil((RW+2*m)*SC*D); c.height=Math.ceil((RL+2*m)*SC*D);
+  const x=c.getContext('2d'); x.setTransform(SC*D,0,0,SC*D,m*SC*D,m*SC*D);
   const RED="#d43a45", BLUE="#2c5fd0";
   rinkPath(x); const ice=x.createLinearGradient(0,0,RW,0); ice.addColorStop(0,"#e9f1f7"); ice.addColorStop(.5,"#f7fafc"); ice.addColorStop(1,"#e9f1f7"); x.fillStyle=ice; x.fill();
   x.save(); rinkPath(x); x.clip();
@@ -392,10 +426,11 @@ function frame(ts){ requestAnimationFrame(frame); if(game.hidden||!G){ last=ts; 
   if(!G.paused&&G.state!=="inter"&&G.state!=="final"){ acc+=dt; while(acc>=1/120){ update(1/120); acc-=1/120; } } else acc=0;
   camera(dt); draw(); hud(); }
 function camera(dt){ const g=G, vh=CH/SC; let ty=g.state==="goal"?(g.goalT===0?GLY:RL-GLY):g.pk.y; ty+=vh*.08;
-  const lo=-4+(CH/2-64)/SC, hi=RL+4-(CH*.7-CH/2)/SC; ty=clamp(ty,lo,hi); g.cam+=(ty-g.cam)*Math.min(1,dt*5); }
+  const lo=-4+(CH/2-64)/SC, hi=RL+4-(CH*.7-CH/2)/SC; ty=clamp(ty,lo,hi); g.cam+=(ty-g.cam)*Math.min(1,dt*5);
+  const vw=CW/SC; let tx=g.state==="goal"?42.5:g.pk.x+g.pk.vx*.15; tx=vw>=RW+6?42.5:clamp(tx,vw/2-3,RW+3-vw/2); g.camX+=(tx-g.camX)*Math.min(1,dt*4.5); }
 function draw(){ const g=G; cx.setTransform(DPR,0,0,DPR,0,0); cx.fillStyle="#0c141d"; cx.fillRect(0,0,CW,CH);
   if(!RINK||RINKFOR!==g.ti){ RINK=rinkImage(); RINKFOR=g.ti; }
-  const sh=g.shake>0?(Math.random()*2-1)*5*g.shake/.25:0, sx=x=>OX+x*SC+sh*.5, sy=y=>(y-g.cam)*SC+CH/2+sh;
+  const sh=g.shake>0?(Math.random()*2-1)*5*g.shake/.25:0, sx=x=>(x-g.camX)*SC+CW/2+sh*.5, sy=y=>(y-g.cam)*SC+CH/2+sh;
   cx.drawImage(RINK,sx(-3),sy(-3),(RW+6)*SC,(RL+6)*SC);
   const pk=g.pk, L=g.P.filter(p=>p.on).sort((a,b)=>a.y-b.y), human=!g.auto&&g.ctl&&g.ctl.on&&!(g.so&&g.so.turn===1);
   // the teammate a pass would go to
@@ -409,7 +444,7 @@ function draw(){ const g=G; cx.setTransform(DPR,0,0,DPR,0,0); cx.fillStyle="#0c1
   if(human){ const c=g.ctl, X=sx(c.x), Y=sy(c.y), r=PR*SC;
     cx.fillStyle="#ffd23f"; cx.beginPath(); cx.moveTo(X,Y-r-9); cx.lineTo(X-5,Y-r-16); cx.lineTo(X+5,Y-r-16); cx.closePath(); cx.fill();
     if(IN.charging){ cx.strokeStyle="#ff7a2f"; cx.lineWidth=4; cx.beginPath(); cx.arc(X,Y,r+11,-PI/2,-PI/2+IN.ch*2*PI); cx.stroke(); }
-    if(Y<70||Y>CH-8){ const ay=clamp(Y,70,CH-14), up=Y<70; cx.fillStyle="#ffd23f"; cx.beginPath(); cx.moveTo(X,ay+(up?-8:8)); cx.lineTo(X-8,ay+(up?4:-4)); cx.lineTo(X+8,ay+(up?4:-4)); cx.closePath(); cx.fill(); } } }
+    if(Y<70||Y>CH-8||X<0||X>CW){ const ax=clamp(X,14,CW-14), ay=clamp(Y,74,CH-14), a=Math.atan2(Y-ay,X-ax)||(-PI/2); cx.save(); cx.translate(ax,ay); cx.rotate(a); cx.fillStyle="#ffd23f"; cx.beginPath(); cx.moveTo(10,0); cx.lineTo(-5,-8); cx.lineTo(-5,8); cx.closePath(); cx.fill(); cx.restore(); } } }
 function drawPlayer(p,sx,sy){ const g=G, T=g.T[p.t], X=sx(p.x), Y=sy(p.y), r=(p.g?GR:PR)*SC, down=p.stun>.15;
   cx.fillStyle="rgba(10,25,40,.18)"; cx.beginPath(); cx.ellipse(X+r*.22,Y+r*.35,r*1.05,r*.8,0,0,2*PI); cx.fill();
   const fx=p.fx, fy=p.fy, px=-fy, py=fx, hx=X+px*r*.55, hy=Y+py*r*.55, L=(p.g?2.6:3)*SC, bx=hx+fx*L, by=hy+fy*L;
@@ -424,10 +459,12 @@ function drawPlayer(p,sx,sy){ const g=G, T=g.T[p.t], X=sx(p.x), Y=sy(p.y), r=(p.
 /* ---------- HUD, messages, overlays ---------- */
 function hud(){ const g=G, s=[g.sc[0],g.sc[1],g.per,Math.ceil(g.clock),g.st[0].sh,g.st[1].sh,g.so?g.so.res.map(r=>r.join("")).join("|"):""].join(",");
   if(s!==hud.l){ hud.l=s; $('s0').textContent=g.sc[0]; $('s1').textContent=g.sc[1];
-    $('per').textContent=g.so?`SO ${g.so.res[0].reduce((a,b)=>a+b,0)}–${g.so.res[1].reduce((a,b)=>a+b,0)}`:`${PER[g.per-1]} ${fmtClk(g.clock)}`;
+    $('per').textContent=g.so?`SO ${g.so.res[0].reduce((a,b)=>a+b,0)}–${g.so.res[1].reduce((a,b)=>a+b,0)}`:`${perLabel(g)} ${fmtClk(g.clock)}`;
     $('sog').textContent=`Shots ${g.st[0].sh} – ${g.st[1].sh}`; }
   const has=g.pk.owner===g.ctl||(g.pk.passTo===g.ctl&&!g.pk.owner), cpuSO=g.so&&g.so.turn===1, fo=g.state==="faceoff";
-  const la=fo?"Draw":cpuSO?"":has?"Shoot":g.so?"Shoot":"Check", lb=fo?"Draw":cpuSO||g.so?"":has?"Pass":"Switch";
+  const dk=g.pk.owner===g.ctl&&canDeke(g.ctl);
+  const la=fo?"Draw":cpuSO?"":has?"Shoot":g.so?"Shoot":"Check", lb=fo?"Draw":cpuSO?"":dk?"Deke":g.so?"":has?"Pass":"Switch";
+  const who=g.ctl&&g.ctl.on&&!cpuSO?`#${g.ctl.num} ${g.ctl.ln}`:""; if(who!==hud.w){ hud.w=who; $('who').textContent=who; $('who').hidden=!who; }
   if(la!==hud.a){ hud.a=la; $('bA').textContent=la; $('bA').classList.toggle("off",!la); }
   if(lb!==hud.b){ hud.b=lb; $('bB').textContent=lb; $('bB').classList.toggle("off",!lb); }
   $('bA').style.setProperty("--c",IN.charging?IN.ch:0); }
@@ -436,8 +473,8 @@ function hideMsg(){ $('msg').classList.remove("on"); }
 function overlay(html){ const o=$('ov'); o.innerHTML=`<div class="ovc">${html}</div>`; o.hidden=false; }
 function closeOverlay(){ $('ov').hidden=true; }
 function pause(){ const g=G; if(!g||g.state==="final"||g.state==="inter"||g.paused) return; g.paused=true; IN.a=false; IN.charging=false;
-  overlay(`<p class="ovk">Paused</p>${scoreLine()}<p class="muted">${g.so?"Shootout":`${PER[g.per-1]} period · ${fmtClk(g.clock)} left`}</p>
-    <button class="btn go wide" data-act="resume">Resume</button><button class="btn ghost wide" data-act="quit">Quit game</button><button class="btn ghost small" data-act="snd">Sound ${S.sound?"on":"off"}</button>`); }
+  overlay(`<p class="ovk">Paused</p>${scoreLine()}<p class="muted">${g.so?"Shootout":`${g.per<=3?PER[g.per-1]+" period":perLabel(g)} · ${fmtClk(g.clock)} left`}</p>
+    <button class="btn go wide" data-act="resume">Resume</button><button class="btn ghost wide" data-act="quit">${g.season?"Quit game (it won't count)":"Quit game"}</button><button class="btn ghost small" data-act="snd">Sound ${S.sound?"on":"off"}</button>`); }
 
 /* ---------- controls ---------- */
 const zone=$('stickzone'), stick=$('stick'), knob=$('knob'); let SP=null;
@@ -465,24 +502,28 @@ document.addEventListener("keyup",e=>{ const k=e.key.length===1?e.key.toLowerCas
 $('gpause').addEventListener("click",pause);
 function resume(){ if(!G) return; G.paused=false; closeOverlay(); }
 $('ov').addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
-  if(a==="resume") resume(); else if(a==="nextper") nextPeriod(); else if(a==="again"){ closeOverlay(); play(); } else if(a==="quit"){ leave(); }
+  if(a==="resume") resume(); else if(a==="nextper") nextPeriod(); else if(a==="again"){ closeOverlay(); play(); } else if(a==="quit"){ const se=G&&G.season; leave(); if(se) seasonScreen(); }
+  else if(a==="toseason"){ leave(); seasonScreen(); }
   else if(a==="tips"){ S.tips=true; save(); closeOverlay(); G.paused=false; }
   else if(a==="snd"){ S.sound=!S.sound; save(); b.textContent=`Sound ${S.sound?"on":"off"}`; } });
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"){ pause(); save(); } });
 game.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
 addEventListener("resize",()=>{ resize(); if(!game.hidden) restStick(); });
 
-function play(){ ac(); newGame(); game.hidden=false;
-  [0,1].forEach(t=>{ const el=$('t'+t); el.textContent=G.T[t].ab; el.style.setProperty("--tc",G.T[t].c); el.style.setProperty("--tk",G.T[t].k); }); document.body.classList.add("playing"); resize(); restStick(); hud.l=hud.a=hud.b=null; G.cam=100;
+function play(opt){ ac(); newGame(opt||{}); game.hidden=false;
+  [0,1].forEach(t=>{ const el=$('t'+t); el.textContent=G.T[t].ab; el.style.setProperty("--tc",G.T[t].c); el.style.setProperty("--tk",G.T[t].k); }); document.body.classList.add("playing"); resize(); restStick(); hud.l=hud.a=hud.b=hud.w=null; G.cam=100;
   if(!S.tips){ G.paused=true; overlay(`<p class="ovk">How to play</p><div class="tips">
     <div><b>Skate</b><span>Drag anywhere on the left side.</span></div>
     <div><b>Shoot</b><span>Tap for a wrist shot, hold for a slapshot. Push the stick left or right to pick a corner.</span></div>
-    <div><b>Pass</b><span>Goes to the teammate with the dashed ring, the one you're skating toward.</span></div>
+    <div><b>Pass</b><span>Goes to the teammate with the dashed ring, the one you're skating toward. Press Shoot while a pass is on its way for a one-timer.</span></div>
+    <div><b>Deke</b><span>Close to the net the Pass button turns into Deke. It fakes the goalie the wrong way, so shoot right after.</span></div>
     <div><b>Defense</b><span>Check bursts forward and knocks the puck loose. Switch jumps to the skater nearest the puck.</span></div>
     <div><b>Faceoffs</b><span>Tap a button the moment the puck drops.</span></div></div>
     <button class="btn go wide" data-act="tips">Got it</button>`); }
   else msg("1st period","",1.3); }
 function leave(){ closeOverlay(); game.hidden=true; document.body.classList.remove("playing"); G=null; home(); }
+
+/*SEASON*/
 
 /* ================= home ================= */
 function home(){ const t=TEAMS[S.team], R=S.rec, T=S.tot;
@@ -491,18 +532,20 @@ function home(){ const t=TEAMS[S.team], R=S.rec, T=S.tot;
   <section class="card hero">
     <div class="match"><div class="side"><span class="jersey" style="--c:${t.c};--k:${t.k}">${esc(t.ab)}</span><b>${esc(t.n)}</b><small>You</small></div>
       <span class="vs">vs</span><div class="side"><span class="jersey q">?</span><b>Random opponent</b><small>Computer · ${DIFF[S.diff].n}</small></div></div>
-    <button class="btn go wide" data-act="play">Play a game</button>
-    <p class="muted center">5 on 5 · three ${S.len}-minute periods · overtime and a shootout if it's tied</p></section>
+    <button class="btn go wide" data-act="play">Quick game</button>
+    <button class="btn wide seab" data-act="season">${S.sea?`Season · ${S.sea.phase==="reg"?`game ${S.sea.day+1} of ${SEA_GAMES}`:S.sea.phase==="po"?"playoffs":"finished"} · ${esc(TEAMS[S.sea.team].ab)}`:"Start a season"}</button>
+    <p class="muted center">5 on 5 · three ${S.len}-minute periods · seasons are 10 games plus a top-four playoff</p></section>
   <section class="card"><h3>Your record</h3>
     <div class="kv"><div><b>${R.w}</b><span>wins</span></div><div><b>${R.l}</b><span>losses</span></div><div><b>${R.otl}</b><span>OT losses</span></div></div>
     ${S.last.length?`<div class="lastres">${S.last.map(x=>`<span class="${x.w?"w":x.ty?"o":"l"}" title="vs ${esc(TEAMS[x.o].n)}">${x.w?"W":x.ty?"OTL":"L"} ${x.a}–${x.b}</span>`).join("")}</div>`:`<p class="muted">Play your first game to start your record.</p>`}
     ${T.gp?`<p class="muted">${T.gp} games · ${T.gf} goals for, ${T.ga} against · ${(T.sh/T.gp).toFixed(1)} shots and ${(T.hits/T.gp).toFixed(1)} hits a game</p>`:""}</section>
-  <section class="card"><h3>Your team</h3><div class="teams">${TEAMS.map((x,i)=>`<button class="tmb" data-act="team" data-i="${i}" aria-pressed="${S.team===i}" style="--c:${x.c};--k:${x.k}"><i>${esc(x.ab)}</i><span>${esc(x.n)}</span></button>`).join("")}</div></section>
+  <section class="card"><h3>Your team</h3>${linesHtml(t.ab)}<div class="teams">${TEAMS.map((x,i)=>`<button class="tmb" data-act="team" data-i="${i}" aria-pressed="${S.team===i}" style="--c:${x.c};--k:${x.k}"><i>${esc(x.ab)}</i><span>${esc(x.n)}</span></button>`).join("")}</div></section>
   <section class="card"><h3>Computer difficulty</h3><div class="seg3" role="group" aria-label="Difficulty">${DIFF.map((d,i)=>`<button data-act="diff" data-i="${i}" aria-pressed="${S.diff===i}">${d.n}</button>`).join("")}</div>
     <h3>Period length</h3><div class="seg3" role="group" aria-label="Period length">${LENS.map(l=>`<button data-act="len" data-i="${l}" aria-pressed="${S.len===l}">${l} min</button>`).join("")}</div></section>
   <section class="card"><h3>How to play</h3><div class="tips">
     <div><b>Skate</b><span>Drag anywhere on the left half of the screen. You always attack up the ice.</span></div>
     <div><b>With the puck</b><span>Shoot: tap for a wrist shot, hold for a slapshot, push left or right to aim. Pass goes to the teammate with the dashed ring.</span></div>
+    <div><b>One-timers and dekes</b><span>Press Shoot while a pass is coming to you to fire it right off the pass. Close to the net, Pass becomes Deke: it fakes the goalie the wrong way, so shoot right after.</span></div>
     <div><b>Without it</b><span>Check bursts forward and knocks the puck loose. Switch moves you to the skater nearest the puck.</span></div>
     <div><b>Rules</b><span>No offsides or icing. The clock stops on whistles and goals. Sudden-death overtime, then a best-of-three shootout.</span></div>
     <div><b>Keyboard</b><span>Arrows or WASD to skate, Space to shoot or check, J to pass or switch, P to pause.</span></div></div></section>
@@ -512,6 +555,9 @@ function home(){ const t=TEAMS[S.team], R=S.rec, T=S.tot;
   if(window.GT_BK) GT_BK.ui($('bk'),{beforeBackup:save}); }
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act, y=scrollY;
   if(a==="play") return play();
+  if(a==="season") return seasonScreen();
+  if(a==="home") return home(), scrollTo(0,0);
+  if(a.startsWith("sea-")) return seasonAct(a,b);
   if(a==="team"){ S.team=+b.dataset.i; } else if(a==="diff"){ S.diff=+b.dataset.i; } else if(a==="len"){ S.len=+b.dataset.i; } else if(a==="sound"){ S.sound=!S.sound; }
   else if(a==="reset"){ if(!b.dataset.sure){ b.dataset.sure="1"; b.textContent="Tap again to erase your record"; return; } const k=S; S=FRESH(); S.team=k.team; S.diff=k.diff; S.len=k.len; S.sound=k.sound; S.tips=k.tips; }
   else return;

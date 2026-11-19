@@ -139,6 +139,43 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .bug b{padding:9px 9px;font-variant-numeric:tabular-nums;min-width:30px;text-align:center}
 .bug .per{padding:9px 8px;background:rgba(255,255,255,.1);font-variant-numeric:tabular-nums;font-size:13px;display:grid;place-items:center;min-width:70px}
 .sog{position:absolute;top:calc(58px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);font:700 11px var(--f-body);color:rgba(255,255,255,.9);background:rgba(10,18,28,.55);padding:3px 9px;border-radius:999px;pointer-events:none;white-space:nowrap}
+.who{position:absolute;left:max(10px,env(safe-area-inset-left,0px));top:calc(58px + env(safe-area-inset-top,0px));font:800 13px var(--f-display);color:#1b1300;background:#ffd23f;padding:4px 11px;border-radius:999px;pointer-events:none;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.who[hidden]{display:none}
+/* season */
+.stand{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+.stand th{font:700 11px var(--f-body);color:var(--ink-3);text-align:right;padding:4px 4px;text-transform:uppercase;letter-spacing:.04em}
+.stand th:nth-child(2),.stand td:nth-child(2){text-align:left}
+.stand td{padding:7px 4px;text-align:right;border-top:1px solid var(--line)}
+.stand td:first-child,.stand th:first-child{text-align:center;width:22px;color:var(--ink-3)}
+.stand tr.me td{font-weight:800;background:color-mix(in srgb,var(--sun) 14%,transparent)}
+.stand tr.cut td{border-top:2px dashed var(--ink-3)}
+.stand .pts{font-weight:800}
+.tchip{display:inline-flex;align-items:center;gap:7px;min-width:0}
+.tchip i{flex:none;font-style:normal;width:34px;height:22px;border-radius:7px;background:var(--c);color:var(--k);display:grid;place-items:center;font:800 10px var(--f-display);letter-spacing:.03em}
+.nextg{display:grid;gap:10px}
+.nextg .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.res{display:grid;gap:6px}
+.res div{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}
+.res b{font-family:var(--f-display)}
+.res .me{font-weight:800}
+.lead{display:grid;gap:4px}
+.lead div{display:grid;grid-template-columns:22px 1fr 34px 28px 28px 32px;gap:4px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+.lead div span:first-child{color:var(--ink-3);text-align:center}
+.lead div em{font-style:normal;color:var(--ink-3);font-size:11px;font-weight:700}
+.lead div b{text-align:right}
+.lead .hd{font:700 11px var(--f-body);color:var(--ink-3);text-transform:uppercase}
+.bracket{display:grid;gap:8px}
+.series{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:6px}
+.series small{font:700 11px var(--f-body);color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.series div{display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.series div b{font:800 18px var(--f-display);font-variant-numeric:tabular-nums}
+.series .won{font-weight:800}
+.series .out{opacity:.5}
+.champ{text-align:center;display:grid;gap:6px;justify-items:center}
+.champ .jersey{width:84px;height:84px;font-size:22px}
+.btn.seab{background:var(--surface-2);color:var(--ink);box-shadow:none;border:2px solid var(--line)}
+.lines{display:grid;gap:6px;font-size:13px;color:var(--ink-2)}
+.lines b{color:var(--ink);font-weight:700}
 .msg{position:absolute;left:0;right:0;top:30%;padding:0 20px;text-align:center;font:800 46px/1 var(--f-display);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.55);pointer-events:none;opacity:0;transform:scale(.85);transition:opacity .2s,transform .25s}
 .msg.on{opacity:1;transform:scale(1)}
 .msg small{display:block;font:700 16px/1.3 var(--f-body);margin-top:10px}
@@ -188,6 +225,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
   <div class="hud"><button class="hbtn" id="gpause" aria-label="Pause"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1.5" fill="currentColor"/></svg></button>
     <div class="bug" id="bug"><span class="tm" id="t0"></span><b id="s0">0</b><span class="per" id="per"></span><b id="s1">0</b><span class="tm" id="t1"></span></div><span class="hspace"></span></div>
   <div class="sog" id="sog"></div>
+  <div class="who" id="who" hidden></div>
   <div class="msg" id="msg" aria-live="polite"></div>
   <div class="stickzone" id="stickzone"><div class="stick" id="stick"><i id="knob"></i></div></div>
   <div class="btns"><button class="hb a" id="bA">Shoot</button><button class="hb b" id="bB">Pass</button></div>
