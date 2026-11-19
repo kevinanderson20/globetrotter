@@ -878,20 +878,25 @@ const GT_BK=(()=>{
    Top-down rink in feet (85 wide, 200 long). You always attack up the screen.
    You control one skater (the puck carrier when your team has it); the computer plays everyone else.
    No offsides or icing. Three periods, sudden-death overtime, then a shootout. */
-const APP_VERSION="2026.11.19-1348";
+const APP_VERSION="2026.11.19-1418";
 const LS="globetrotter.hockey.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v, hyp=Math.hypot, rnd=(a,b)=>a+Math.random()*(b-a), PI=Math.PI;
 
+// the Original Six, in their home colors (c jersey, k numbers). Logos stay off: the site is public, so each team shows its city letters.
 const TEAMS=[
-  {n:"Summit Peaks",ab:"SUM",c:"#d62839",k:"#ffffff"},
-  {n:"Harbor Hawks",ab:"HAR",c:"#1f4fa8",k:"#ffffff"},
-  {n:"Prairie Storm",ab:"PRS",c:"#13864a",k:"#ffffff"},
-  {n:"Glacier Wolves",ab:"GLW",c:"#0b8797",k:"#ffffff"},
-  {n:"Copper Kings",ab:"COP",c:"#e2711d",k:"#1b1206"},
-  {n:"Midnight Owls",ab:"MID",c:"#6a3fbf",k:"#ffffff"}];
+  {n:"Boston Bruins",ab:"BOS",c:"#111111",k:"#FFB81C"},
+  {n:"Chicago Blackhawks",ab:"CHI",c:"#CF0A2C",k:"#ffffff"},
+  {n:"Detroit Red Wings",ab:"DET",c:"#CE1126",k:"#ffffff"},
+  {n:"Montreal Canadiens",ab:"MTL",c:"#AF1E2D",k:"#ffffff",s:"#192168"},
+  {n:"New York Rangers",ab:"NYR",c:"#0038A8",k:"#ffffff",s:"#CE1126"},
+  {n:"Toronto Maple Leafs",ab:"TOR",c:"#00205B",k:"#ffffff"}];
+const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const clash=(a,b)=>{ const x=hexRGB(a.c), y=hexRGB(b.c); return hyp(x[0]-y[0],x[1]-y[1],x[2]-y[2])<150; };
+// when the colors are too close (two red teams, two blue teams), the visitors wear road whites
+const road=t=>({...t, c:"#f4f5f7", k:t.c==="#111111"?"#111111":t.c, rim:t.c==="#111111"?"#FFB81C":t.c, road:true})
 // how the computer team plays: skating speed, seconds between decisions, shot spread, goalie skill, checking, faceoffs
 const DIFF=[
   {n:"Rookie",  spd:.88, dec:.5,  acc:.15, gk:.80, gsp:11, chk:.28, fo:.38},
@@ -967,7 +972,7 @@ function newGame(opt={}){
   const P=[];
   [0,1].forEach(t=>ROLES.forEach((r,i)=>P.push({t,role:r,g:r==="G",num:NUMS[t?oi:ti][i],x:0,y:0,vx:0,vy:0,fx:0,fy:t?1:-1,wx:0,wy:0,
     stun:0,cd:0,boost:0,hitting:0,chk:0,dec:rnd(0,.3),tt:0,tgt:null,hold:0,jit:rnd(-3,3),on:true})));
-  G={T:[TEAMS[ti],TEAMS[oi]], ti, oi, P, d:DIFF[S.diff], auto:!!opt.auto,
+  G={T:[TEAMS[ti],clash(TEAMS[ti],TEAMS[oi])?road(TEAMS[oi]):TEAMS[oi]], ti, oi, P, d:DIFF[S.diff], auto:!!opt.auto,
      pk:{x:42.5,y:100,vx:0,vy:0,owner:null,last:null,passTo:null,shot:false,shooter:null,ghost:null,hist:[],still:0,trail:[]},
      per:1, clock:S.len*60, sc:[0,0], st:[{sh:0,hits:0,fo:0},{sh:0,hits:0,fo:0}], goals:[], state:"faceoff", tm:0, ctl:null, cam:100, ph:[], so:null, shake:0, paused:false};
   G.ctl=P.find(p=>p.t===0&&p.role==="C");
@@ -1221,7 +1226,7 @@ function gameOver(){ const g=G; if(g.state==="final") return; g.state="final"; s
   const T=S.tot; T.gp++; T.gf+=g.sc[0]; T.ga+=g.sc[1]; T.sh+=g.st[0].sh; T.hits+=g.st[0].hits; save();
   setTimeout(()=>{ if(G!==g) return;
     overlay(`<p class="ovk">${ty==="SO"?"Final · shootout":ty==="OT"?"Final · overtime":"Final"}</p><h2 class="ovh ${w?"win":"loss"}">${w?"You win!":"You lose"}</h2>${scoreLine()}
-      <div class="box">${boxRows()}</div>${g.goals.length?`<div class="glist">${g.goals.map(x=>`<div><span class="gdot" style="background:${g.T[x.t].c}"></span><b>${esc(g.T[x.t].ab)}${x.n?` #${x.n}`:""}</b><span>${x.a.length?`from ${x.a.map(n=>"#"+n).join(", ")}`:"unassisted"}</span><em>${PER[x.per-1]} ${fmtClk(x.clk)}</em></div>`).join("")}</div>`:""}
+      <div class="box">${boxRows()}</div>${g.goals.length?`<div class="glist">${g.goals.map(x=>`<div><span class="gdot" style="background:${g.T[x.t].rim||g.T[x.t].c}"></span><b>${esc(g.T[x.t].ab)}${x.n?` #${x.n}`:""}</b><span>${x.a.length?`from ${x.a.map(n=>"#"+n).join(", ")}`:"unassisted"}</span><em>${PER[x.per-1]} ${fmtClk(x.clk)}</em></div>`).join("")}</div>`:""}
       ${g.so?`<p class="muted">Shootout: ${g.so.res[0].map(v=>v?"●":"○").join(" ")} vs ${g.so.res[1].map(v=>v?"●":"○").join(" ")}</p>`:""}
       <button class="btn go wide" data-act="again">Play again</button><button class="btn ghost wide" data-act="quit">Home</button>`); },1300); }
 const fmtClk=s=>{ s=Math.max(0,Math.ceil(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); };
@@ -1287,8 +1292,8 @@ function drawPlayer(p,sx,sy){ const g=G, T=g.T[p.t], X=sx(p.x), Y=sy(p.y), r=(p.
   if(!down){ cx.lineCap="round"; cx.strokeStyle="#3a2b1f"; cx.lineWidth=Math.max(2,.3*SC); cx.beginPath(); cx.moveTo(hx,hy); cx.lineTo(bx,by); cx.stroke();
     cx.lineWidth=Math.max(3,.5*SC); cx.beginPath(); cx.moveTo(bx,by); cx.lineTo(bx-px*.9*SC,by-py*.9*SC); cx.stroke(); }
   cx.save(); cx.translate(X,Y); if(down){ cx.rotate(Math.atan2(p.vy,p.vx)||0); cx.scale(1.25,.72); cx.globalAlpha=.85; }
-  if(p.g){ cx.fillStyle="#f4f6f8"; cx.strokeStyle=T.c; cx.lineWidth=Math.max(3,.5*SC); cx.beginPath(); cx.arc(0,0,r-1.5,0,2*PI); cx.fill(); cx.stroke(); cx.fillStyle=T.c; }
-  else { cx.fillStyle=T.c; cx.strokeStyle="rgba(255,255,255,.95)"; cx.lineWidth=2; cx.beginPath(); cx.arc(0,0,r,0,2*PI); cx.fill(); cx.stroke(); cx.fillStyle=T.k; }
+  if(p.g){ const gc=T.rim||T.c; cx.fillStyle=T.road?"#dfe3e8":"#f4f6f8"; cx.strokeStyle=gc; cx.lineWidth=Math.max(3,.5*SC); cx.beginPath(); cx.arc(0,0,r-1.5,0,2*PI); cx.fill(); cx.stroke(); cx.fillStyle=gc; }
+  else { cx.fillStyle=T.c; cx.strokeStyle=T.road?T.rim:(T.s||"rgba(255,255,255,.95)"); cx.lineWidth=T.road?1.6:2; cx.beginPath(); cx.arc(0,0,r,0,2*PI); cx.fill(); cx.stroke(); cx.fillStyle=T.k; }
   cx.font=`800 ${Math.round(r*(p.g?.9:1.02))}px Figtree,system-ui,sans-serif`; cx.textAlign="center"; cx.textBaseline="middle"; cx.fillText(p.num,0,r*.06);
   cx.restore(); }
 
