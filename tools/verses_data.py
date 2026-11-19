@@ -142,7 +142,7 @@ def build_notes():
             k = (c[0], c[1], c[5])
             if k in seen: continue
             seen.add(k)
-            if sum(1 for x in cites if x[0] == c[0] and x[1] == c[1]) >= 3: continue   # three per verse is plenty
+            if sum(1 for x in cites if x[0] == c[0] and x[1] == c[1]) >= 6: continue   # up to six explanations per verse
             cites.append(c[:6])
         data = {"book": NAMES[i], "about": summ.get(i, {}), "notes": notes, "cited": cites}
         p = os.path.join(OUT, USFM[i] + ".json")
@@ -223,6 +223,21 @@ def build_dict():
     with open(p, "w", encoding="utf-8") as f: json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     print(f"dictionary: {len(out)} of {len(arts)} articles, {os.path.getsize(p)/1e6:.2f} MB")
 
+def build_themes():
+    """theme title -> its opening two sentences: the "bigger picture" for any verse the theme discusses"""
+    s = open(os.path.join(SRC, "Tyndale Open Study Notes", "ThemeNotes.xml"), encoding="utf-8").read()
+    out = {}
+    for attrs, body in re.findall(r"<item ([^>]*)>(.*?)</item>", s, re.S):
+        t = re.search(r"<title>(.*?)</title>", body, re.S)
+        if not t: continue
+        paras = [text(p) for cls, p in re.findall(r'<p class="([^"]*)"[^>]*>(.*?)</p>', body, re.S) if not cls.startswith(("theme-h", "h", "theme-refs", "theme-ref"))]
+        lead = next((p for p in paras if len(p) > 60 and not p.startswith(("See ", "Key ", "Passages"))), "")
+        if lead: out[text(t.group(1))] = sentences(lead, 2, 320)
+    p = os.path.join(OUT, "themes.json")
+    with open(p, "w", encoding="utf-8") as f: json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"themes: {len(out)}, {os.path.getsize(p)/1e3:.0f} KB")
+
 CITED = citations()
+build_themes()
 build_notes()
 build_dict()

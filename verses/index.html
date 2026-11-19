@@ -136,6 +136,9 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
 .mi{gap:16px}
 .sec h3{margin-bottom:8px}
 .sec .dim{color:var(--ink-2);font-size:15px}
+.sec .theme{margin-top:10px}
+.sec .theme b{color:var(--ink)}
+.kw .terms{margin-top:8px}
 .kjv{font:700 10.5px var(--f-body);letter-spacing:.06em;color:var(--ink-3);border:1px solid var(--hair);border-radius:4px;padding:0 4px;margin-right:4px;vertical-align:.15em}
 [data-kjv]{font:400 17px/1.5 var(--f-quote);color:var(--ink)}
 .pts{margin:0;padding:0;list-style:none;display:grid;gap:8px}
@@ -230,6 +233,75 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
 .star.pop svg{animation:starpop 420ms var(--spring)}
 @keyframes starpop{40%{transform:scale(1.35) rotate(-8deg)}}
 
+/* Saved | Bible */
+.views{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;margin:0 0 18px}
+.views button{flex:1;min-height:38px;border-radius:10px;font-weight:700;font-size:15px;color:var(--ink-2);transition:background-color 180ms,color 180ms,box-shadow 180ms}
+.views button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+
+/* the reader */
+.rbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:4;display:flex;align-items:center;gap:2px;margin:0 -16px;padding:6px 10px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-bottom:.5px solid var(--hair)}
+.rbar .sp{flex:1}
+.rb-arrow{width:40px;height:44px;display:grid;place-items:center;color:var(--accent);border-radius:12px}
+.rb-arrow svg{width:11px;height:17px}
+.rb-arrow:disabled{opacity:.3}
+.rb-title{display:flex;align-items:center;gap:6px;font:700 18px var(--f-body);padding:8px 10px;border-radius:12px;min-height:44px;white-space:nowrap}
+.rb-title svg{width:12px;height:12px;color:var(--ink-3)}
+.rb-arrow:active,.rb-title:active,.rb-size:active,.rb-tr:active{background:var(--surface-2)}
+.rb-size{width:40px;height:44px;border-radius:12px;font:600 15px var(--f-quote);color:var(--ink-2)}
+.rb-size.big{font-size:21px}
+.rb-size sup{font:700 10px var(--f-body);margin-left:1px}
+.rb-size:disabled{opacity:.3}
+.rb-tr{min-width:44px;height:30px;margin-left:4px;padding:0 8px;border-radius:8px;border:1.5px solid var(--hair);font:800 11.5px var(--f-body);letter-spacing:.06em;color:var(--ink-2)}
+.rb-tr[data-tr="BSB"]{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.rnote{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:14px;line-height:1.45}
+.rtext{--rs:20px;padding:18px 2px 8px;font:400 var(--rs)/1.68 var(--f-quote);color:var(--ink)}
+.rtext .rch{font:700 calc(var(--rs) * 2.4)/1 var(--f-quote);color:var(--accent);margin:0 0 6px}
+.rtext h3{font:700 calc(var(--rs) * .78)/1.3 var(--f-body);letter-spacing:.01em;color:var(--ink);margin:1.5em 0 .5em}
+.rtext h3:first-of-type{margin-top:.6em}
+.rtext .rd{font-style:italic;color:var(--ink-2);margin:.2em 0 .6em}
+.rtext p{margin:0 0 .75em}
+.rtext .q1,.rtext .q2,.rtext .q3{margin:0;padding-left:1.2em;text-indent:-1.2em}
+.rtext .q2{padding-left:2.4em}
+.rtext .q3{padding-left:3.4em}
+.rtext .pc{text-align:center}
+.rtext .rgap{height:.7em}
+.rtext sup{font:700 calc(var(--rs) * .55) var(--f-body);color:var(--ink-3);margin-right:.18em;vertical-align:.5em;user-select:none;-webkit-user-select:none}
+.vs{cursor:pointer;border-radius:4px;transition:background-color 140ms;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.vs.mine{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--accent) 45%,transparent);text-decoration-thickness:2px;text-underline-offset:.22em}
+.vs.isfav sup{color:var(--accent)}
+.vs.isfav sup::after{content:"★";margin-left:1px}
+.vs.on{background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent-soft)}
+.rfoot{display:flex;gap:10px;padding:8px 0 4px}
+.rfoot button{flex:1;min-height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--hair);box-shadow:var(--shadow);font-weight:600;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
+.rfoot button span{font-size:12px;color:var(--ink-3);font-weight:500}
+.rfoot button:active{transform:scale(.98)}
+.roff{font-size:13px;color:var(--ink-3);text-align:center;margin:14px 0 0;min-height:18px}
+.roff button{color:var(--accent);font-weight:600;font-size:13px}
+.rload{padding:30px 0}
+.rsel{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:15;max-width:616px;margin:0 auto;background:var(--surface);border:1px solid var(--hair);border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.22);padding:12px 12px 12px 16px;animation:selin 260ms var(--spring) both}
+.rsel[hidden]{display:none}
+@keyframes selin{from{opacity:0;transform:translateY(20px)}}
+.rs-ref{font-weight:700;font-size:15px;color:var(--accent);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-acts{display:flex;gap:8px;align-items:center}
+.rs-acts .pill{min-height:42px}
+.rs-x{margin-left:auto;width:40px;height:40px;border-radius:20px;display:grid;place-items:center;color:var(--ink-3)}
+.rs-x svg{width:16px;height:16px}
+body.selecting .wrap{padding-bottom:150px}
+/* book and chapter picker */
+.bpick{width:100%;max-width:560px;height:100%;display:flex;flex-direction:column;animation:rise 320ms var(--spring) both}
+.bp-head{display:flex;align-items:center;gap:8px;padding:4px 44px 10px 0;font-weight:700;font-size:20px}
+.bp-head button{color:var(--accent);font-size:16px;font-weight:600;display:flex;align-items:center;gap:2px;padding:6px 0}
+.bp-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;margin:0 -8px;padding:0 8px 20px}
+.bp-scroll h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:14px 2px 8px}
+.bp-books{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
+.bp-books button{min-height:46px;border-radius:12px;background:var(--surface);border:1px solid var(--hair);font-weight:600;font-size:14.5px;padding:4px 6px;line-height:1.2}
+.bp-books button[aria-current="true"],.bp-chs button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){.bp-books button[aria-current="true"],.bp-chs button[aria-current="true"]{color:#1a1205}}
+.bp-chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+.bp-chs button{height:50px;border-radius:12px;background:var(--surface);border:1px solid var(--hair);font-weight:600;font-size:16px;font-variant-numeric:tabular-nums}
+.over.full{justify-content:flex-start;padding-top:calc(env(safe-area-inset-top,0px) + 14px)}
+.tr-chip{font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--ink-3);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;flex:none}
+
 /* topics */
 .topics{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:0 16px 2px;scrollbar-width:none}
 .topics::-webkit-scrollbar{display:none}
@@ -277,6 +349,8 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
   <div class="nav" id="nav"><a class="back" href="../" aria-label="Back to Globetrotter"><svg viewBox="0 0 13 21" aria-hidden="true"><path d="M11 2 2.5 10.5 11 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Globetrotter</a><span class="navt">Verses</span><span class="navr"><span class="streak" id="streak" role="img"></span><button class="shuf" id="shuf" type="button" aria-label="Surprise me with a saved verse" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.5c2 0 3.2 1 4.3 2.7l2.4 3.8c1.1 1.7 2.3 2.5 4.3 2.5H21M17.5 13.5 21 17l-3.5 3.5M3 17h3.5c1.3 0 2.3-.4 3.1-1.2M13.4 8.2c.8-.8 1.8-1.2 3.1-1.2H21M17.5 3.5 21 7l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></div>
   <h1 id="ttl">Verses</h1>
   <p class="sub" id="sub">New Living Translation</p>
+  <div class="views" role="tablist" aria-label="View"><button type="button" role="tab" data-view="saved" aria-selected="true">Saved</button><button type="button" role="tab" data-view="bible" aria-selected="false">Bible</button></div>
+  <div id="savedView">
 
   <form class="add" id="add" autocomplete="off">
     <input id="ref" type="text" inputmode="text" enterkeyhint="go" autocapitalize="words" spellcheck="false" placeholder="Type a book or paste verses" aria-label="Add verses" role="combobox" aria-expanded="false" aria-controls="pick" aria-autocomplete="list">
@@ -292,8 +366,28 @@ h1{font:700 34px/1.1 var(--f-body);letter-spacing:-.02em;margin:6px 0 2px}
   </div>
   <div class="topics" id="topics" hidden></div>
   <div class="list" id="list"></div>
+  </div>
+  <div id="bibleView" hidden>
+    <div class="rbar" id="rbar">
+      <button type="button" class="rb-arrow" id="rPrev" aria-label="Previous chapter"><svg viewBox="0 0 10 16" aria-hidden="true"><path d="M8 2 2 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="rb-title" id="rTitle" aria-haspopup="dialog"><span id="rTitleT">John 3</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="m2.5 4.5 3.5 3.5 3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="rb-arrow" id="rNext" aria-label="Next chapter"><svg viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <span class="sp"></span>
+      <button type="button" class="rb-size" id="rSmaller" aria-label="Smaller text">A<sup>−</sup></button>
+      <button type="button" class="rb-size big" id="rBigger" aria-label="Bigger text">A<sup>+</sup></button>
+      <button type="button" class="rb-tr" id="rTr" aria-label="Switch translation">NLT</button>
+    </div>
+    <p class="rnote" id="rNote" hidden></p>
+    <article class="rtext" id="rText" aria-live="polite"></article>
+    <div class="rfoot" id="rFoot"></div>
+    <p class="roff" id="rOff"></p>
+  </div>
+  <div class="rsel" id="rSel" hidden>
+    <div class="rs-ref" id="rSelRef"></div>
+    <div class="rs-acts"><button type="button" class="pill go" id="rFav">★ Favorite</button><button type="button" class="pill" id="rSave">Save</button><button type="button" class="pill" id="rShare">Share</button><button type="button" class="rs-x" id="rClear" aria-label="Clear selection"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+  </div>
 
-  <p class="credit">Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved.<br>Study notes and book summaries adapted from Tyndale Open Study Notes; definitions adapted from Tyndale Open Bible Dictionary. The original works by Tyndale House Publishers are available for free at <a href="https://tyndaleopenresources.com/" target="_blank" rel="noopener">tyndaleopenresources.com</a>, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Changes: notes are split into short points, and dictionary entries are shortened to their opening lines.</p>
+  <p class="credit">Scripture quotations are taken from the Holy Bible, New Living Translation, copyright ©1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Carol Stream, Illinois 60188. All rights reserved.<br>Offline reading uses The Holy Bible, Berean Standard Bible (BSB), which has been dedicated to the public domain.<br>Study notes and book summaries adapted from Tyndale Open Study Notes; definitions adapted from Tyndale Open Bible Dictionary. The original works by Tyndale House Publishers are available for free at <a href="https://tyndaleopenresources.com/" target="_blank" rel="noopener">tyndaleopenresources.com</a>, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Changes: notes are split into short points, and dictionary entries are shortened to their opening lines.</p>
 </div>
 <div class="over" id="over" hidden></div>
 <div class="toast" id="toast" role="status"><span id="toastT"></span><button type="button" id="toastU">Undo</button></div>
@@ -597,7 +691,7 @@ const IC={
 const opened=new Set();
 function render(fresh){
   const list=$("list"), q=$("q").value.trim().toLowerCase(), n=S.list.length;
-  $("sub").textContent=n?`${n} saved · New Living Translation`:"New Living Translation";
+  $("sub").dataset.saved=n?`${n} saved · New Living Translation`:"New Living Translation"; if(S.view!=="bible") $("sub").textContent=$("sub").dataset.saved;
   $("tools").hidden=n<2; $("shuf").hidden=n<2; renderTopics(); renderStreak();
   document.querySelectorAll("[data-sort]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===S.sort));
   if(!n){ list.innerHTML=`<div class="empty"><p class="big">Your favorite verses will gather here.</p><p>Type a reference above, like Proverbs 14:4 or Psalm 23.</p></div>`; return; }
@@ -611,7 +705,7 @@ function render(fresh){
   list.innerHTML=items.map(v=>`<article class="tile${isNew(v.id)?" new":""}${opened.has(v.id)?" open":""}" data-id="${v.id}">
     <div class="q"><p class="qt">${esc(v.text)}</p></div>
     ${(v.topics||[]).length?`<div class="ttags">${v.topics.map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:""}
-    <div class="meta"><span class="ref">${esc(v.ref)}</span><button class="star" type="button" data-act="fav" aria-pressed="${!!v.fav}" aria-label="${v.fav?"Remove from favorites":"Add to favorites"}">${IC.star}</button><span class="sp"></span>
+    <div class="meta"><span class="ref">${esc(v.ref)}</span>${v.tr==="BSB"?`<span class="tr-chip" title="${v.up?"Switches to the NLT when you're online":"Berean Standard Bible"}">BSB</span>`:""}<button class="star" type="button" data-act="fav" aria-pressed="${!!v.fav}" aria-label="${v.fav?"Remove from favorites":"Add to favorites"}">${IC.star}</button><span class="sp"></span>
       <button class="ib" type="button" data-act="share" aria-label="Share ${esc(v.ref)}">${IC.share}</button>
       <button class="mbtn" type="button" data-act="more" aria-expanded="${opened.has(v.id)}" aria-controls="m-${v.id}">Meaning ${IC.chev}</button></div>
     <div class="more" id="m-${v.id}"><div><div class="mi" data-mi></div></div></div></article>`).join("");
@@ -624,7 +718,7 @@ function showTile(id){ $("q").value=""; render(); const el=document.querySelecto
    Overview · Core meaning · Key terms · Context · Live it out, built from Tyndale's open study notes, book summaries
    and Bible dictionary (bundled in ./data, so it works offline), plus the KJV wording from Tyndale's NLT API. */
 const DATA={}, getJSON=u=>DATA[u]||(DATA[u]=fetch(u).then(r=>{ if(!r.ok) throw new Error("http"); return r.json(); }).catch(e=>{ delete DATA[u]; throw e; }));
-const bookData=code=>getJSON(`data/${code}.json`), dictData=()=>getJSON("data/dict.json");
+const DV=2, bookData=code=>getJSON(`data/${code}.json?v=${DV}`), dictData=()=>getJSON(`data/dict.json?v=${DV}`), themeData=()=>getJSON(`data/themes.json?v=${DV}`).catch(()=>({}));
 const at=(c,v)=>c*1000+(v==null?0:v), end=(c,v)=>c*1000+(v==null?999:v);
 const span=n=>n[2]===n[0]?((n[3]??999)-(n[1]??1)+1):999;
 const sents=t=>String(t).split(/(?<=[.!?])\s+(?=[A-Z“"(])/).map(x=>x.trim()).filter(Boolean);
@@ -660,9 +754,11 @@ function points(own,cites){
     if(!lab && ss.length>1 && n[4].length===1) ss.forEach(x=>out.push(lead("",x)));
     else if(t||lab) out.push(lead(lab,cleanRefs(t)));
   }));
-  const mine=out.filter(p=>p[1]&&prose(p[1])>=4).slice(0,3);      // drop points that are only "See 33:2; 49:23"
-  cites.slice(0,Math.max(1,3-mine.length)).forEach(c=>{ const [l,t]=c[3]==="note"?lead("",cleanRefs(c[5])):["",cleanRefs(c[5])]; mine.push([c[3]==="theme"?c[4]:(l||c[4]),t,c[3]]); });
-  return mine.slice(0,4);
+  const mine=out.filter(p=>p[1]&&prose(p[1])>=4).slice(0,4);      // drop points that are only "See 33:2; 49:23"
+  // then what Tyndale says about this verse elsewhere: theme articles first, they speak to the message
+  const extra=[...cites.filter(c=>c[3]==="theme"),...cites.filter(c=>c[3]==="note")].filter(c=>prose(c[5])>=6);
+  extra.slice(0,Math.max(2,6-mine.length)).forEach(c=>{ const [l,t]=c[3]==="note"?lead("",cleanRefs(c[5])):["",cleanRefs(c[5])]; mine.push([c[3]==="theme"?c[4]:(l||c[4]),t,c[3]]); });
+  const seen=new Set(); return mine.filter(p=>{ const k=p[1].slice(0,60); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,6);
 }
 /* key terms: distinctive words in the verse (NLT and KJV wording) that the Tyndale Bible Dictionary explains */
 const STOP=new Set("a an and the of to in on for with by at from as is was be are were been am it its this that these those he she they them his her their him i me my we us our you your who whom which what when where why how not no nor or but so if then than there here all any some one two three four five six seven many much more most such very also only even just own same other each every both few man men woman women day days time times world land city house hand hands life son sons daughter king kings earth water people name year years way place eye eyes head word words voice child children brother brothers sister mother father fathers wife husband friend night morning evening door gate road tree trees stone fire sea river thing things body lord god jesus christ israel".split(" "));
@@ -715,8 +811,8 @@ function fillMore(v){
 }
 
 async function buildStudy(v,el){
-  let bd, dict;
-  try{ [bd,dict]=await Promise.all([bookData(v.code),dictData()]); }
+  let bd, dict, themes;
+  try{ [bd,dict,themes]=await Promise.all([bookData(v.code),dictData(),themeData()]); }
   catch(e){ el.innerHTML=`<p class="load">Couldn't open the study notes. Check your connection and tap Meaning again.</p>`; el.closest("[data-mi]").removeAttribute("data-done"); return; }
   const {own,section:sec0,exact}=pickNotes(v,bd.notes||[]);
   const cites=citesFor(v,bd.cited);
@@ -727,24 +823,27 @@ async function buildStudy(v,el){
   const TECH=/translat|manuscript|Greek text|Hebrew text|Septuagint|Masoretic|scribe|textual|quotation marks|literally/i;
   const secs=(bd.notes||[]).filter(n=>span(n)>3&&at(n[0],n[1]??1)<=at(v.c,v.v||1)&&end(n[2],n[3])>=at(v.c,v.v||1)).sort((x,y)=>span(x)-span(y));
   let section=null, secLine="";
-  for(const n of secs){ const t=sents(cleanRefs(n[4].map(p=>p[1]).join(" "))).filter(x=>!TECH.test(x)).slice(0,2).join(" "); if(t){ section=n; secLine=t; break; } }
+  for(const n of secs){ const t=sents(cleanRefs(n[4].map(p=>p[1]).join(" "))).filter(x=>!TECH.test(x)).slice(0,3).join(" "); if(t){ section=n; secLine=t; break; } }
+  const themeNames=[...new Set(cites.filter(c=>c[3]==="theme").map(c=>c[4]))].filter(t=>themes[t]).slice(0,1);
   el.innerHTML=`
-    <section class="sec"><h3>Overview</h3>
-      ${secLine?`<p class="dim">${esc(secLine)}</p><p class="src">From the note on ${esc(rangeLabel(bd.book,section))}</p>`:`<p class="dim">${esc(clip(about.purpose?`${bd.book} was written ${about.purpose.replace(/^To /,"to ")}.`:"",2))}</p>`}
-    </section>
-    <section class="sec"><h3>Core meaning</h3>
-      ${pts.length?`<ul class="pts">${pts.map(([l,t,k])=>`<li>${l?`<b>${esc(l)}${k==="theme"?"":""}:</b> `:""}${esc(t)}</li>`).join("")}</ul>${!exact&&useOwn.length?`<p class="src">From the note on ${esc(rangeLabel(bd.book,useOwn[0]))}</p>`:""}`
-        :`<p class="dim">Tyndale's notes don't single out this verse. Read it with the passage it sits in (Overview above) and the question below.</p>`}
+    <section class="sec"><h3>The message</h3>
+      ${pts.length?`<ul class="pts">${pts.map(([l,t])=>`<li>${l?`<b>${esc(l)}:</b> `:""}${esc(t)}</li>`).join("")}</ul>${!exact&&useOwn.length?`<p class="src">From the note on ${esc(rangeLabel(bd.book,useOwn[0]))}</p>`:""}`
+        :`<p class="dim">Tyndale's notes don't single out this verse. The passage it sits in, below, carries its message.</p>`}
       ${rel.length?`<div class="rel"><span>See also</span>${rel.map(r=>`<button type="button" class="chip" data-act="peek" data-ref="${esc(r)}">${esc(r)}</button>`).join("")}</div><div class="peek" data-peek hidden></div>`:""}
     </section>
-    <section class="sec" data-terms-sec hidden><h3>Key terms</h3><dl class="terms" data-terms></dl></section>
+    ${secLine||themeNames.length?`<section class="sec"><h3>The bigger picture</h3>
+      ${secLine?`<p class="dim">${esc(secLine)}</p><p class="src">${esc(rangeLabel(bd.book,section))}</p>`:""}
+      ${themeNames.map(t=>`<p class="dim theme"><b>${esc(t)}.</b> ${esc(cleanRefs(themes[t]))}</p>`).join("")}
+    </section>`:""}
     <section class="sec"><h3>Context</h3>
       <dl class="facts">${about.author?`<dt>Written by</dt><dd>${esc(about.author)}</dd>`:""}${about.date?`<dt>When</dt><dd>${esc(brief(about.date))}</dd>`:""}${about.purpose?`<dt>Why</dt><dd>${esc(about.purpose)}</dd>`:""}${about.setting?`<dt>Setting</dt><dd>${esc(brief(about.setting,110))}</dd>`:""}</dl>
       ${v.v?`<details class="around"><summary>Read the verses around it</summary><div data-ctx><div class="load"><i></i><i></i></div></div></details>`:""}
+      <details class="around kw" data-terms-sec hidden><summary data-terms-sum>Key words</summary><dl class="terms" data-terms></dl></details>
     </section>`;
   const terms=()=>{ const ex=new Set(); const list=keyTerms([v.text,v.kjv||""],dict,ex);
     const sec=el.querySelector("[data-terms-sec]"); if(!list.length){ sec.hidden=true; return; }
-    el.querySelector("[data-terms]").innerHTML=list.map(t=>`<dt>${esc(t.word.replace(/^\w/,c=>c.toUpperCase()))}${t.title.toLowerCase()!==t.word?` <span>(${esc(t.title)})</span>`:""}</dt><dd>${esc(t.def)}</dd>`).join(""); sec.hidden=false; };
+    el.querySelector("[data-terms]").innerHTML=list.map(t=>`<dt>${esc(t.word.replace(/^\w/,c=>c.toUpperCase()))}${t.title.toLowerCase()!==t.word?` <span>(${esc(t.title)})</span>`:""}</dt><dd>${esc(t.def)}</dd>`).join("");
+    el.querySelector("[data-terms-sum]").textContent=`Key words: ${list.map(t=>t.word.replace(/^\w/,c=>c.toUpperCase())).join(", ")}`; sec.hidden=false; };
   terms();
   // the KJV wording isn't shown, but its older words ("herbs", "stalled ox") help pick the key terms
   if(!v.kjv){ try{ const k=toText(await nltFetch(v.ref,"KJV")).replace(/\n/g," "); if(k){ v.kjv=k; save(); terms(); } }catch(e){} }
@@ -884,7 +983,201 @@ function haptic(){ try{ if(navigator.vibrate) navigator.vibrate(8); else hl&&hl.
 /* compact title once the large one scrolls away */
 const nav=$("nav"); new IntersectionObserver(([en])=>nav.classList.toggle("stuck",!en.isIntersecting),{rootMargin:"-56px 0px 0px 0px"}).observe($("ttl"));
 
+/* ================= the Bible reader: NLT when online, the Berean Standard Bible offline ================= */
+const BV=1, bsbBook=code=>getJSON(`bible/${code}.json?v=${BV}`);
+S.read=Object.assign({code:"JHN",c:1,size:20,tr:"NLT"},S.read||{});
+S.view=S.view||"saved";
+const R={sel:new Set(),lines:null,tr:"NLT",key:""}, NLTCH={};
+const rText=$("rText");
+const bookAt=code=>BOOKS.find(b=>b.code===code);
+/* the NLT chapter from Tyndale's service, as reader lines: headings, prose paragraphs, poetry lines */
+async function nltChapter(b,c){
+  const k=b.code+c; if(NLTCH[k]) return NLTCH[k];
+  const n=VC[b.i][c-1], parts=[];
+  for(let a=1;a<=n;a+=50) parts.push(fetch(`${NLT}?ref=${encodeURIComponent(`${nm(b)} ${c}:${a}-${Math.min(n,a+49)}`)}&version=NLT&key=TEST`).then(r=>{ if(!r.ok) throw new Error("http"); return r.text(); }));
+  const lines=[];
+  for(const html of await Promise.all(parts)){
+    const doc=new DOMParser().parseFromString(html,"text/html");
+    doc.querySelectorAll(".tn,.a-tn,h2,.chapter-number,.psa-book").forEach(x=>x.remove());
+    doc.querySelectorAll(".sc,.red-sc").forEach(x=>x.textContent=x.textContent.toUpperCase());
+    const root=doc.querySelector("#bibletext section")||doc.body;
+    const walk=node=>{ for(const el of node.children){
+      if(/^H[3-6]$/.test(el.tagName)||el.classList.contains("subhead")){ const t=el.textContent.replace(/\s+/g," ").trim(); if(t) lines.push(["h",t]); continue; }
+      if(el.tagName==="VERSE_EXPORT"){ const vn=+el.getAttribute("vn");
+        for(const p of el.querySelectorAll("p")){ const cl=p.className||"", t=[...p.childNodes].filter(x=>!(x.nodeType===1&&x.classList.contains("vn"))).map(x=>x.textContent).join("").replace(/\s+/g," ").trim(); if(!t) continue;
+          if(/psa-title|psa-hebrew|ps-title/.test(cl)){ lines.push(["d",[[0,t]]]); continue; }
+          const kind=/poet2|poet-2/.test(cl)?"q2":/poet|selah|lamentation/.test(cl)?"q1":"p";
+          const last=lines[lines.length-1];
+          if(kind==="p"&&last&&last[0]==="p"&&!/body-fl|body-ch|paragraph|ext|chapter/.test(cl)) last[1].push([vn,t]);
+          else lines.push([kind,[[vn,t]]]); }
+        el.querySelectorAll("h3,h4").forEach(h=>{ const t=h.textContent.trim(); if(t) lines.splice(lines.length-1,0,["h",t]); });
+        continue; }
+      walk(el); } };
+    walk(root);
+  }
+  if(!lines.some(l=>l[0]!=="h")) throw new Error("empty");
+  return NLTCH[k]=lines;
+}
+async function bsbChapter(b,c){ const d=await bsbBook(b.code); const ch=d.ch[c-1]; if(!ch) throw new Error("nochapter"); return ch; }
+
+function readerSave(){ save(); }
+function setView(v){
+  S.view=v; save();
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
+  $("savedView").hidden=v!=="saved"; $("bibleView").hidden=v!=="bible";
+  $("sub").textContent=v==="bible"?"Tap verses to favorite or save them":$("sub").dataset.saved||$("sub").textContent;
+  clearSel();
+  if(v==="bible"){ if(!R.lines||R.key!==S.read.code+S.read.c+S.read.tr) openChapter(S.read.code,S.read.c,{keepScroll:false}); offlineStatus(); }
+  else render();
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{ if(S.view!==b.dataset.view){ haptic(); setView(b.dataset.view); scrollTo(0,0); } }));
+
+function applySize(){ rText.style.setProperty("--rs",S.read.size+"px"); $("rSmaller").disabled=S.read.size<=15; $("rBigger").disabled=S.read.size>=32; }
+$("rSmaller").onclick=()=>{ S.read.size=Math.max(15,S.read.size-2); applySize(); save(); haptic(); };
+$("rBigger").onclick=()=>{ S.read.size=Math.min(32,S.read.size+2); applySize(); save(); haptic(); };
+$("rTr").onclick=()=>{ S.read.tr=R.tr==="NLT"?"BSB":"NLT"; save(); haptic(); openChapter(S.read.code,S.read.c,{keepScroll:true}); };
+
+const neighbour=(code,c,d)=>{ const b=bookAt(code); let i=b.i, n=c+d;
+  if(n<1){ if(i===0) return null; i--; n=VC[i].length; } else if(n>VC[i].length){ if(i===65) return null; i++; n=1; }
+  return {code:BOOKS[i].code,c:n}; };
+$("rPrev").onclick=()=>{ const p=neighbour(S.read.code,S.read.c,-1); if(p){ haptic(); openChapter(p.code,p.c); } };
+$("rNext").onclick=()=>{ const p=neighbour(S.read.code,S.read.c,1); if(p){ haptic(); openChapter(p.code,p.c); } };
+
+async function openChapter(code,c,opt={}){
+  const b=bookAt(code); if(!b) return;
+  c=Math.min(Math.max(1,c),VC[b.i].length);
+  S.read.code=code; S.read.c=c; save(); clearSel();
+  $("rTitleT").textContent=`${nm(b)} ${c}`;
+  $("rPrev").disabled=!neighbour(code,c,-1); $("rNext").disabled=!neighbour(code,c,1);
+  const want=S.read.tr, ticket=Symbol(); R.ticket=ticket;
+  if(!opt.keepScroll&&!$("bibleView").hidden) scrollTo({top:Math.max(0,$("bibleView").offsetTop-($("nav").offsetHeight)-6)});
+  rText.innerHTML=`<div class="rload"><div class="load"><i></i><i></i><i></i><i></i></div></div>`; $("rFoot").innerHTML=""; $("rNote").hidden=true;
+  let lines, tr=want, note="";
+  try{
+    if(want==="NLT"){ if(navigator.onLine===false) throw new Error("offline"); lines=await nltChapter(b,c); }
+    else lines=await bsbChapter(b,c);
+  }catch(e){
+    if(want==="NLT"){ try{ lines=await bsbChapter(b,c); tr="BSB"; note="You're offline, so this is the Berean Standard Bible, which is saved on your phone. The NLT comes back when you're connected."; }catch(e2){} }
+  }
+  if(R.ticket!==ticket) return;
+  if(!lines){ rText.innerHTML=`<p class="pk-err">Couldn't open ${esc(nm(b))} ${c}. When you're back online it will load, and the offline Bible will download.</p>`; return; }
+  R.lines=lines; R.tr=tr; R.key=code+c+want; R.b=b; R.c=c;
+  $("rTr").textContent=tr; $("rTr").dataset.tr=tr; $("rTr").setAttribute("aria-label",tr==="NLT"?"Showing New Living Translation. Switch to Berean Standard Bible":"Showing Berean Standard Bible. Switch to New Living Translation");
+  if(note){ $("rNote").textContent=note; $("rNote").hidden=false; }
+  renderChapter();
+  const prev=neighbour(code,c,-1), next=neighbour(code,c,1), lab=p=>{ const x=bookAt(p.code); return `${nm(x)} ${p.c}`; };
+  $("rFoot").innerHTML=(prev?`<button type="button" data-go="${prev.code},${prev.c}"><span>Previous</span>${esc(lab(prev))}</button>`:"")+(next?`<button type="button" data-go="${next.code},${next.c}"><span>Next</span>${esc(lab(next))}</button>`:"");
+}
+$("rFoot").addEventListener("click",e=>{ const b=e.target.closest("[data-go]"); if(!b) return; const [code,c]=b.dataset.go.split(","); haptic(); openChapter(code,+c); });
+
+/* which saved verses sit in this chapter: underline them, star the favorites */
+function savedMap(){ const m=new Map(); const b=R.b; if(!b) return m;
+  S.list.forEach(v=>{ if(v.code!==b.code||v.c!==R.c||!v.v) return; for(let n=v.v;n<=(v.v2||v.v);n++){ const was=m.get(n); m.set(n,(was==="fav"||v.fav)?"fav":"mine"); } }); return m; }
+function renderChapter(){
+  const seen=new Set(), sm=savedMap();
+  const span=(v,t)=>{ if(!v) return esc(t); const first=!seen.has(v); seen.add(v); const st=sm.get(v);
+    return `<span class="vs${st?" mine":""}${st==="fav"?" isfav":""}${R.sel.has(v)?" on":""}" data-v="${v}">${first?`<sup>${v}</sup>`:""}${esc(t)}</span>`; };
+  let html=`<div class="rch" aria-hidden="true">${R.c}</div>`;
+  R.lines.forEach(l=>{ const k=l[0];
+    if(k==="h") html+=`<h3>${esc(l[1])}</h3>`;
+    else if(k==="b") html+=`<div class="rgap"></div>`;
+    else if(k==="d") html+=`<p class="rd">${l[1].map(([v,t])=>span(v,t)).join(" ")}</p>`;
+    else html+=`<p class="${k==="p"?"rp":k}">${l[1].map(([v,t])=>span(v,t)).join(" ")}</p>`; });
+  rText.innerHTML=html; applySize();
+}
+/* tap verses to pick them */
+rText.addEventListener("click",e=>{ const sp=e.target.closest(".vs"); if(!sp) return; const v=+sp.dataset.v;
+  R.sel.has(v)?R.sel.delete(v):R.sel.add(v); haptic();
+  rText.querySelectorAll(`.vs[data-v="${v}"]`).forEach(x=>x.classList.toggle("on",R.sel.has(v))); selBar(); });
+const verseText=n=>{ const parts=[]; let lastKind=null;
+  R.lines.forEach(l=>{ if(l[0]==="h"||l[0]==="b"||l[0]==="d") return; l[1].forEach(([v,t])=>{ if(v!==n) return; const poet=/^q/.test(l[0]); parts.push((parts.length?(poet||lastKind?"\n":" "):"")+t); lastKind=poet; }); });
+  return parts.join("").replace(/ \n/g,"\n").trim(); };
+function selGroups(){ const n=[...R.sel].sort((a,b)=>a-b), g=[]; n.forEach(x=>{ const r=g[g.length-1]; if(r&&x===r[r.length-1]+1) r.push(x); else g.push([x]); }); return g; }
+function selBar(){ const bar=$("rSel");
+  if(!R.sel.size){ bar.hidden=true; document.body.classList.remove("selecting"); return; }
+  const b=R.b, gs=selGroups(); $("rSelRef").textContent=`${nm(b)} ${R.c}:${gs.map(g=>g.length>1?`${g[0]}-${g[g.length-1]}`:g[0]).join(", ")}`;
+  const allFav=gs.every(g=>{ const ref=`${nm(b)} ${R.c}:${g[0]}${g.length>1?"-"+g[g.length-1]:""}`; const ex=S.list.find(x=>x.ref===ref); return ex&&ex.fav; });
+  $("rFav").textContent=allFav?"★ Favorited":"★ Favorite";
+  bar.hidden=false; document.body.classList.add("selecting"); }
+function clearSel(){ R.sel.clear(); rText.querySelectorAll(".vs.on").forEach(x=>x.classList.remove("on")); selBar(); }
+$("rClear").onclick=()=>{ clearSel(); haptic(); };
+/* favorite or save what's picked: neighbours become one passage, like the picker */
+function keepSel(fav){
+  const b=R.b, c=R.c, made=[], touched=[];
+  selGroups().forEach(g=>{ const v=g[0], v2=g.length>1?g[g.length-1]:null, ref=`${nm(b)} ${c}:${v}${v2?"-"+v2:""}`;
+    const ex=S.list.find(x=>x.ref===ref);
+    if(ex){ if(fav&&!ex.fav){ ex.fav=true; touched.push(ref); } return; }
+    const text=joinText(g.map(verseText).filter(Boolean)); if(!text) return;
+    made.push([{book:b.name,code:b.code,bi:b.i,c,v,v2,label:ref},text]); });
+  if(made.length){ const vs=addMany(made,true); vs.forEach(v=>{ if(fav) v.fav=true; v.tr=R.tr; if(R.tr==="BSB"&&S.read.tr==="NLT") v.up=1; }); save(); }
+  else if(touched.length){ save(); haptic(); }
+  const n=made.length+touched.length, first=(made[0]&&made[0][0].label)||touched[0];
+  if(!n){ toast(fav?"Already in your favorites":"Already saved"); clearSel(); return; }
+  toast(fav?(n>1?`★ ${n} added to favorites`:`★ ${first} added to favorites`):(n>1?`Saved ${n} verses`:`Saved ${first}`));
+  clearSel(); renderChapter(); renderTopics();
+}
+$("rFav").onclick=()=>keepSel(true);
+$("rSave").onclick=()=>keepSel(false);
+$("rShare").onclick=()=>{ const g=selGroups()[0]; if(!g) return; const b=R.b; openShare({ref:`${nm(b)} ${R.c}:${g[0]}${g.length>1?"-"+g[g.length-1]:""}`,text:joinText(g.map(verseText)),id:"tmp"}); };
+
+/* swipe sideways for the next or previous chapter */
+(()=>{ let x0=0,y0=0,t0=0,on=false;
+  rText.addEventListener("touchstart",e=>{ if(e.touches.length!==1) return; on=true; x0=e.touches[0].clientX; y0=e.touches[0].clientY; t0=Date.now(); },{passive:true});
+  rText.addEventListener("touchend",e=>{ if(!on) return; on=false; const t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+    if(Math.abs(dx)>80&&Math.abs(dy)<45&&Date.now()-t0<600){ (dx<0?$("rNext"):$("rPrev")).click(); } },{passive:true}); })();
+
+/* book, then chapter */
+function bookPicker(){
+  const o=$("over"), cur=bookAt(S.read.code);
+  const grid=list=>`<div class="bp-books">${list.map(b=>`<button type="button" data-bk="${b.code}" ${b.code===cur.code?'aria-current="true"':""} aria-label="${esc(b.name)}">${esc(b.name.replace("Thessalonians","Thess.").replace("Lamentations","Lament."))}</button>`).join("")}</div>`;
+  o.classList.add("full");
+  o.innerHTML=`<button class="x" type="button" data-o="close" aria-label="Close">${IC.close}</button><div class="bpick"><div class="bp-head">Books</div><div class="bp-scroll"><h4>Old Testament</h4>${grid(BOOKS.slice(0,39))}<h4>New Testament</h4>${grid(BOOKS.slice(39))}</div></div>`;
+  o.hidden=false; document.body.style.overflow="hidden";
+  requestAnimationFrame(()=>o.querySelector('[aria-current="true"]')?.scrollIntoView({block:"center"}));
+  o.onclick=e=>{ const t=e.target.closest("[data-o],[data-bk],[data-ch],[data-bpback]"); if(!t) return;
+    if(t.dataset.o==="close"){ closeOver(); return; }
+    if(t.dataset.bpback!=null){ bookPicker(); return; }
+    if(t.dataset.bk){ const b=bookAt(t.dataset.bk); haptic(); if(VC[b.i].length===1){ closeOver(); openChapter(b.code,1); return; }
+      o.querySelector(".bpick").outerHTML=`<div class="bpick"><div class="bp-head"><button type="button" data-bpback><svg viewBox="0 0 9 14" width="9" height="14" aria-hidden="true"><path d="M7.5 1.5 2 7l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Books</button><span style="margin-left:6px">${esc(b.name)}</span></div><div class="bp-scroll"><div class="bp-chs">${VC[b.i].map((_,i)=>`<button type="button" data-ch="${b.code},${i+1}" ${b.code===S.read.code&&i+1===S.read.c?'aria-current="true"':""}>${i+1}</button>`).join("")}</div></div></div>`; return; }
+    if(t.dataset.ch){ const [code,c]=t.dataset.ch.split(","); haptic(); closeOver(); openChapter(code,+c); }
+  };
+}
+$("rTitle").onclick=bookPicker;
+const closeOver0=closeOver; closeOver=function(){ $("over").classList.remove("full"); closeOver0(); };
+
+/* offline: the Bible (BSB) and the study notes, downloaded once in the background the first time the Bible view opens */
+const OFFLINE_FILES=()=>[...BOOKS.map(b=>`bible/${b.code}.json?v=${BV}`),...BOOKS.map(b=>`data/${b.code}.json?v=${DV}`),`data/dict.json?v=${DV}`,`data/themes.json?v=${DV}`];
+async function offlineStatus(){
+  const el=$("rOff"), want=OFFLINE_FILES();
+  if(!("caches" in window)||!navigator.serviceWorker||!navigator.serviceWorker.controller){ el.textContent=""; return; }
+  let have=new Set();
+  try{ const c=await caches.open("globetrotter-data-v1"); have=new Set((await c.keys()).map(k=>{ const u=new URL(k.url); return u.pathname.replace(/^.*\/verses\//,"")+u.search; })); }catch(e){}
+  const missing=want.filter(f=>!have.has(f));
+  if(!missing.length){ el.textContent="✓ The Bible (BSB) and study notes are saved for offline reading"; return; }
+  if(navigator.onLine===false){ el.textContent=`Saved for offline: ${want.length-missing.length} of ${want.length} files. The rest download when you're online.`; return; }
+  if(R.dl) return; R.dl=true;
+  let done=want.length-missing.length; const show=()=>{ el.textContent=`Saving the Bible and study notes for offline… ${Math.round(done/want.length*100)}%`; }; show();
+  for(let i=0;i<missing.length;i+=6){
+    await Promise.all(missing.slice(i,i+6).map(f=>fetch(f).then(r=>{ if(r.ok) done++; }).catch(()=>{}))); show();
+  }
+  R.dl=false; setTimeout(offlineStatus,300);
+}
+addEventListener("online",()=>{ if(S.view==="bible") offlineStatus(); upgradeOffline(); });
+
+/* verses favorited offline (BSB) switch to the NLT once you're connected */
+async function upgradeOffline(){
+  if(navigator.onLine===false) return;
+  const todo=S.list.filter(v=>v.up); if(!todo.length) return;
+  let changed=0;
+  for(const v of todo){ try{ const t=toText(await nltFetch(v.ref)); if(t){ v.text=t; v.tr="NLT"; delete v.up; delete v.kjv; changed++; } }catch(e){ break; } }
+  if(changed){ save(); if(S.view==="saved") render(); }
+}
+
+applySize();
+
 render();
+setView(S.view);
+upgradeOffline();
 if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")) navigator.serviceWorker.register("../sw.js").catch(()=>{});
 </script>
 </body>

@@ -1,8 +1,11 @@
 // Globetrotter offline support: keeps a copy of every tab (World, USA, Earth, Math, Games) on the device.
 // Pages open instantly from the saved copy, and a fresh copy is fetched in the background for next time.
 // The app checks version.json and offers "tap to update" when a newer version is online.
-const CACHE = "globetrotter-v17";
-const CORE = ["./", "./usa/", "./earth/", "./math/", "./games/", "./verses/", "./verses/data/dict.json", "./games/geo.json?v=2", "./games/flags.json?v=1", "./games/states.json?v=1", "./games/cities.json?v=1", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+const CACHE = "globetrotter-v18";
+// The offline Bible and the study notes live in their own cache, so app updates don't make you download them again.
+const DATA = "globetrotter-data-v1";
+const isData = url => /\/verses\/(bible|data)\//.test(url.pathname);
+const CORE = ["./", "./usa/", "./earth/", "./math/", "./games/", "./verses/", "./games/geo.json?v=2", "./games/flags.json?v=1", "./games/states.json?v=1", "./games/cities.json?v=1", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -10,7 +13,7 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil((async () => {
-    for (const k of await caches.keys()) if (k !== CACHE) await caches.delete(k);
+    for (const k of await caches.keys()) if (k !== CACHE && k !== DATA) await caches.delete(k);
     await self.clients.claim();
     for (const c of await self.clients.matchAll()) c.postMessage("cached");
   })());
@@ -34,6 +37,19 @@ self.addEventListener("fetch", e => {
       if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
       try { return await net; }
       catch (err) { return (await cache.match(new URL("./", self.registration.scope).href)) || Response.error(); }
+    })());
+    return;
+  }
+
+  // Bible text and study notes: from the device once saved (they don't change), the network only the first time.
+  if (url.origin === self.location.origin && isData(url)) {
+    e.respondWith((async () => {
+      const cache = await caches.open(DATA);
+      const hit = await cache.match(req);   // file names carry ?v=, so a rebuilt file is fetched fresh
+      if (hit) return hit;
+      const res = await fetch(req);
+      if (res.ok) await cache.put(req, res.clone());
+      return res;
     })());
     return;
   }
