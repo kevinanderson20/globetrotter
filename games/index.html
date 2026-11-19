@@ -696,7 +696,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .ring b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-display);font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1}
 .ring b small{font-size:11px;opacity:.65;font-weight:800;letter-spacing:.04em;margin-top:3px}
 @media (max-width:360px){.ring{width:74px;height:74px}.ring b{font-size:22px}.hero h2{font-size:24px}}
-/* ---------- Top Answers: a game-show board ---------- */
+/* ---------- Family Feud: a game-show board ---------- */
 .fd{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:100%;max-width:560px;margin:0 auto;box-sizing:border-box;--gold:#f2c14e;--fdf:"Oswald","Arial Narrow",var(--f-display)}
 .fdtot{font:700 20px var(--fdf);font-variant-numeric:tabular-nums;color:var(--ink)}
 .fdhud{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
@@ -1485,7 +1485,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.19-1238";
+const APP_VERSION="2026.11.19-1306";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -1520,7 +1520,7 @@ const GAMES={
  hilou:{cat:"unl", col:"--geo", ic:"📈", name:"Unlimited Higher or Lower", desc:"Random countries, as long a run as you can.", hi:true, fmt:v=>`${v} in a row`},
  queensu:{cat:"unl", col:"--log", ic:"👑", name:"Unlimited Queens", desc:"Any board from the bank.", hi:false, fmt:v=>fmtT(v)},
  timelineu:{cat:"unl", col:"--spd", ic:"📅", name:"Unlimited Timeline", desc:"A fresh deck of events.", hi:true, fmt:v=>`${v}/7`},
- feudu:{cat:"unl", col:"--nm", ic:"📋", name:"Unlimited Top Answers", desc:"Fresh surveys every game, from a bank of 300.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
+ feudu:{cat:"unl", col:"--nm", ic:"📋", name:"Unlimited Family Feud", desc:"Fresh surveys every game, from a bank of 300.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  msu:{cat:"unl", col:"--log", ic:"💣", name:"Unlimited Minesweeper", desc:"Easy, medium or hard. Never a forced guess.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
  maptapu:{cat:"unl", col:"--geo", ic:"📍", name:"Unlimited Map Tap", desc:"Five random cities to find.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  stateleu:{cat:"unl", col:"--geo", ic:"🇺🇸", name:"Unlimited Statele", desc:"A random state outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
@@ -1538,7 +1538,7 @@ const GAMES={
  hilo:{cat:"daily", col:"--geo", ic:"📈", name:"Higher or Lower", desc:"Which country has more people?", hi:true, fmt:v=>`${v} in a row`},
  queens:{cat:"daily", col:"--log", ic:"👑", name:"Queens", desc:"One queen per row, column and color.", hi:false, fmt:v=>fmtT(v)},
  timeline:{cat:"daily", col:"--spd", ic:"📅", name:"Timeline", desc:"Put the events in order.", hi:true, fmt:v=>`${v}/7`},
- feud:{cat:"daily", col:"--nm", ic:"📋", name:"Top Answers", desc:"We surveyed 100 people. Find the most popular answers, then beat the clock in Fast Money.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
+ feud:{cat:"daily", col:"--nm", ic:"📋", name:"Family Feud", desc:"We surveyed 100 people. Find the most popular answers, then beat the clock in Fast Money.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  mines:{cat:"daily", col:"--log", ic:"💣", name:"Minesweeper", desc:"The same no-guess board for everyone.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
  maptap:{cat:"daily", col:"--geo", ic:"📍", name:"Map Tap", desc:"Tap where five cities are.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  statele:{cat:"daily", col:"--geo", ic:"🇺🇸", name:"Statele", desc:"Guess the US state from its outline.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
@@ -1841,7 +1841,7 @@ const GLYPH_BASE={
   timeline:GICO("#ffbe7a","#ea5a0c",`<path d="M6 30h36" stroke="${GW7}" stroke-width="2.4" stroke-linecap="round"/>
     <rect x="7" y="13" width="10" height="12" rx="2.5" fill="${GW7}"/><rect x="19" y="9" width="10" height="16" rx="2.5" fill="${GW}"/><rect x="31" y="15" width="10" height="10" rx="2.5" fill="${GW7}"/>
     <circle cx="12" cy="30" r="3" fill="${GW}"/><circle cx="24" cy="30" r="3.4" fill="#fff3d6" stroke="${GW}" stroke-width="1.6"/><circle cx="36" cy="30" r="3" fill="${GW}"/><path d="M21.5 14h5M21.5 18h3.5" stroke="#ea5a0c" stroke-width="1.6" stroke-linecap="round"/>`),
-  /* Top Answers: a gold-framed survey board, one answer flipped over */
+  /* Family Feud: a gold-framed survey board, one answer flipped over */
   feud:GICO("#4f86ff","#0b2a8c",`<rect x="7" y="9" width="34" height="30" rx="5" fill="#081a5c" stroke="#f2c14e" stroke-width="2"/>
     <rect x="10.5" y="13" width="12.5" height="6.5" rx="1.6" fill="#f2c14e"/><rect x="25" y="13" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
     <rect x="10.5" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/><rect x="25" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
@@ -3748,7 +3748,7 @@ function startFeud(opt={}){
   else { const seen=new Set(S.fdSeen||[]); const p=fdPick(daily?seeded("globetrotter-feud-v1-"+key):Math.random,daily?new Set():seen);
     st={main:p.main,fm:p.fm,r:0,shown:[],strikes:0,bank:0,total:0,rs:[],phase:"main",fma:[],fmi:0,left:FD_FM_SECS*10};
     if(daily){ S.fd[key]=st; save(); } else { S.fdSeen=[...(S.fdSeen||[]),...p.main,...p.fm].slice(-200); save(); } }
-  begin(gid,daily?`Top Answers #${dayIndex()+1}`:"Unlimited Top Answers"); stage.className="gstage scroll fdstage";
+  begin(gid,daily?`Family Feud #${dayIndex()+1}`:"Unlimited Family Feud"); stage.className="gstage scroll fdstage";
   const persist=()=>{ if(daily) save(); };
   let busy=false;
   const q=()=>FQ[st.main[st.r]];
@@ -3834,7 +3834,7 @@ function startFeud(opt={}){
     later(()=>{ st.fmpts=sum; const win=sum>=FD_FM_GOAL; st.total=(st.rs||[]).reduce((a,b)=>a+(b||0),0)+sum+(win?100:0); st.win=win; st.over=1; persist(); info();
       if(win){ confetti(); fdDing(true); }
       $('fdafter').innerHTML=`<div class="fdend"><p>${win?`You beat ${FD_FM_GOAL}! <b>+100 bonus</b>`:`${sum} points. ${FD_FM_GOAL} wins.`}</p><button class="btn go wide" id="fddone">See your score</button></div>`;
-      $('fddone').onclick=()=>finish(gid,st.total,{sub:`Rounds ${st.rs.map(x=>x||0).join(" + ")} · Fast Money ${sum}${win?" + 100 bonus":""}`,share:fdShare(st,daily),html:fdCard(st),...(daily?{nextG:"feudu",nextLabel:"Play unlimited Top Answers"}:{})}); },500+5*1500+700);
+      $('fddone').onclick=()=>finish(gid,st.total,{sub:`Rounds ${st.rs.map(x=>x||0).join(" + ")} · Fast Money ${sum}${win?" + 100 bonus":""}`,share:fdShare(st,daily),html:fdCard(st),...(daily?{nextG:"feudu",nextLabel:"Play unlimited Family Feud"}:{})}); },500+5*1500+700);
   }
   if(st.over) return fdResults();
   if(st.phase==="reveal") return fmReveal();
@@ -3844,16 +3844,16 @@ function startFeud(opt={}){
 const FD_X='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M18 18 82 82M82 18 18 82" stroke="currentColor" stroke-width="20" stroke-linecap="round"/></svg>';
 function fdShare(st,daily){ const rounds=st.main.map((qi,r)=>{ const n=FQ[qi].a.length, got=st.rs[r]!=null?Math.round((st.rs[r]/FD_MULT[r])):0; return `R${r+1} ${st.rs[r]||0}`; }).join(" · ");
   const fm=st.fm.map((qi,k)=>{ const a=st.fma[k]||"", h=a?fdFind(a,FQ[qi],[]):null; return !h?"⬜":h[0]===0?"🟩":"🟨"; }).join("");
-  return `Top Answers${daily?` #${dayIndex()+1}`:""}\n${rounds}\nFast Money ${fm} ${st.fmpts||0}${st.win?" 🏆":""}\nTotal ${st.total}`; }
+  return `Family Feud${daily?` #${dayIndex()+1}`:""}\n${rounds}\nFast Money ${fm} ${st.fmpts||0}${st.win?" 🏆":""}\nTotal ${st.total}`; }
 function fdCard(st){ return `<section class="card"><h3>Your game</h3><dl class="fdsum">${st.main.map((qi,r)=>`<dt>Round ${r+1} · ×${FD_MULT[r]}</dt><dd><span>${esc(FQ[qi].q)}</span><b>${st.rs[r]||0}</b></dd>`).join("")}
   <dt>Fast Money</dt><dd><span>${st.win?"Won the bonus":"Needed "+FD_FM_GOAL}</span><b>${(st.fmpts||0)+(st.win?100:0)}</b></dd></dl></section>`; }
 function fdResults(){ const st=S.fd[today()];
-  show(`${bar("Top Answers")}
-  <section class="card center" style="--c:var(--nm)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Top Answers #${dayIndex()+1}</div>
+  show(`${bar("Family Feud")}
+  <section class="card center" style="--c:var(--nm)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Family Feud #${dayIndex()+1}</div>
     <div class="big">${st.total}</div><p class="muted">points</p><p class="cheer" style="color:var(--ink-2)">New surveys tomorrow</p></section>
   ${fdCard(st)}
   ${SHARE_ROW}
-  <button class="btn wide" data-act="play" data-g="feudu">Play unlimited Top Answers</button>
+  <button class="btn wide" data-act="play" data-g="feudu">Play unlimited Family Feud</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
   wireShare(fdShare(st,true)); }
 

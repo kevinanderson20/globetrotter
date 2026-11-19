@@ -50,7 +50,7 @@ const GLYPH_BASE={
   timeline:GICO("#ffbe7a","#ea5a0c",`<path d="M6 30h36" stroke="${GW7}" stroke-width="2.4" stroke-linecap="round"/>
     <rect x="7" y="13" width="10" height="12" rx="2.5" fill="${GW7}"/><rect x="19" y="9" width="10" height="16" rx="2.5" fill="${GW}"/><rect x="31" y="15" width="10" height="10" rx="2.5" fill="${GW7}"/>
     <circle cx="12" cy="30" r="3" fill="${GW}"/><circle cx="24" cy="30" r="3.4" fill="#fff3d6" stroke="${GW}" stroke-width="1.6"/><circle cx="36" cy="30" r="3" fill="${GW}"/><path d="M21.5 14h5M21.5 18h3.5" stroke="#ea5a0c" stroke-width="1.6" stroke-linecap="round"/>`),
-  /* Top Answers: a gold-framed survey board, one answer flipped over */
+  /* Family Feud: a gold-framed survey board, one answer flipped over */
   feud:GICO("#4f86ff","#0b2a8c",`<rect x="7" y="9" width="34" height="30" rx="5" fill="#081a5c" stroke="#f2c14e" stroke-width="2"/>
     <rect x="10.5" y="13" width="12.5" height="6.5" rx="1.6" fill="#f2c14e"/><rect x="25" y="13" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
     <rect x="10.5" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/><rect x="25" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>

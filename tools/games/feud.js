@@ -45,7 +45,7 @@ function startFeud(opt={}){
   else { const seen=new Set(S.fdSeen||[]); const p=fdPick(daily?seeded("globetrotter-feud-v1-"+key):Math.random,daily?new Set():seen);
     st={main:p.main,fm:p.fm,r:0,shown:[],strikes:0,bank:0,total:0,rs:[],phase:"main",fma:[],fmi:0,left:FD_FM_SECS*10};
     if(daily){ S.fd[key]=st; save(); } else { S.fdSeen=[...(S.fdSeen||[]),...p.main,...p.fm].slice(-200); save(); } }
-  begin(gid,daily?`Top Answers #${dayIndex()+1}`:"Unlimited Top Answers"); stage.className="gstage scroll fdstage";
+  begin(gid,daily?`Family Feud #${dayIndex()+1}`:"Unlimited Family Feud"); stage.className="gstage scroll fdstage";
   const persist=()=>{ if(daily) save(); };
   let busy=false;
   const q=()=>FQ[st.main[st.r]];
@@ -131,7 +131,7 @@ function startFeud(opt={}){
     later(()=>{ st.fmpts=sum; const win=sum>=FD_FM_GOAL; st.total=(st.rs||[]).reduce((a,b)=>a+(b||0),0)+sum+(win?100:0); st.win=win; st.over=1; persist(); info();
       if(win){ confetti(); fdDing(true); }
       $('fdafter').innerHTML=`<div class="fdend"><p>${win?`You beat ${FD_FM_GOAL}! <b>+100 bonus</b>`:`${sum} points. ${FD_FM_GOAL} wins.`}</p><button class="btn go wide" id="fddone">See your score</button></div>`;
-      $('fddone').onclick=()=>finish(gid,st.total,{sub:`Rounds ${st.rs.map(x=>x||0).join(" + ")} · Fast Money ${sum}${win?" + 100 bonus":""}`,share:fdShare(st,daily),html:fdCard(st),...(daily?{nextG:"feudu",nextLabel:"Play unlimited Top Answers"}:{})}); },500+5*1500+700);
+      $('fddone').onclick=()=>finish(gid,st.total,{sub:`Rounds ${st.rs.map(x=>x||0).join(" + ")} · Fast Money ${sum}${win?" + 100 bonus":""}`,share:fdShare(st,daily),html:fdCard(st),...(daily?{nextG:"feudu",nextLabel:"Play unlimited Family Feud"}:{})}); },500+5*1500+700);
   }
   if(st.over) return fdResults();
   if(st.phase==="reveal") return fmReveal();
@@ -141,15 +141,15 @@ function startFeud(opt={}){
 const FD_X='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M18 18 82 82M82 18 18 82" stroke="currentColor" stroke-width="20" stroke-linecap="round"/></svg>';
 function fdShare(st,daily){ const rounds=st.main.map((qi,r)=>{ const n=FQ[qi].a.length, got=st.rs[r]!=null?Math.round((st.rs[r]/FD_MULT[r])):0; return `R${r+1} ${st.rs[r]||0}`; }).join(" · ");
   const fm=st.fm.map((qi,k)=>{ const a=st.fma[k]||"", h=a?fdFind(a,FQ[qi],[]):null; return !h?"⬜":h[0]===0?"🟩":"🟨"; }).join("");
-  return `Top Answers${daily?` #${dayIndex()+1}`:""}\n${rounds}\nFast Money ${fm} ${st.fmpts||0}${st.win?" 🏆":""}\nTotal ${st.total}`; }
+  return `Family Feud${daily?` #${dayIndex()+1}`:""}\n${rounds}\nFast Money ${fm} ${st.fmpts||0}${st.win?" 🏆":""}\nTotal ${st.total}`; }
 function fdCard(st){ return `<section class="card"><h3>Your game</h3><dl class="fdsum">${st.main.map((qi,r)=>`<dt>Round ${r+1} · ×${FD_MULT[r]}</dt><dd><span>${esc(FQ[qi].q)}</span><b>${st.rs[r]||0}</b></dd>`).join("")}
   <dt>Fast Money</dt><dd><span>${st.win?"Won the bonus":"Needed "+FD_FM_GOAL}</span><b>${(st.fmpts||0)+(st.win?100:0)}</b></dd></dl></section>`; }
 function fdResults(){ const st=S.fd[today()];
-  show(`${bar("Top Answers")}
-  <section class="card center" style="--c:var(--nm)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Top Answers #${dayIndex()+1}</div>
+  show(`${bar("Family Feud")}
+  <section class="card center" style="--c:var(--nm)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Family Feud #${dayIndex()+1}</div>
     <div class="big">${st.total}</div><p class="muted">points</p><p class="cheer" style="color:var(--ink-2)">New surveys tomorrow</p></section>
   ${fdCard(st)}
   ${SHARE_ROW}
-  <button class="btn wide" data-act="play" data-g="feudu">Play unlimited Top Answers</button>
+  <button class="btn wide" data-act="play" data-g="feudu">Play unlimited Family Feud</button>
   <button class="btn ghost wide" data-act="home">Home</button>`);
   wireShare(fdShare(st,true)); }
