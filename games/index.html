@@ -13,7 +13,7 @@
 <title>Games · Globetrotter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap">
 <style>
 /* Games: quick games for memory, speed and logic. Home lists the games; each one plays full screen. */
 :root{
@@ -696,6 +696,81 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .ring b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-display);font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1}
 .ring b small{font-size:11px;opacity:.65;font-weight:800;letter-spacing:.04em;margin-top:3px}
 @media (max-width:360px){.ring{width:74px;height:74px}.ring b{font-size:22px}.hero h2{font-size:24px}}
+/* ---------- Top Answers: a game-show board ---------- */
+.fd{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:100%;max-width:560px;margin:0 auto;box-sizing:border-box;--gold:#f2c14e;--fdf:"Oswald","Arial Narrow",var(--f-display)}
+.fdtot{font:700 20px var(--fdf);font-variant-numeric:tabular-nums;color:var(--ink)}
+.fdhud{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
+.fdround{font:700 16px/1.15 var(--fdf);text-transform:uppercase;letter-spacing:.03em}
+.fdround small{display:block;font:600 12px var(--f-body);text-transform:none;letter-spacing:0;color:var(--ink-3)}
+.fdbank{min-width:112px;text-align:center;background:linear-gradient(#0d2468,#061238);border:3px solid var(--gold);border-radius:14px;padding:5px 14px 7px;color:#fff;box-shadow:0 0 0 3px #0a1a4a,0 0 20px rgba(242,193,78,.4)}
+.fdbank small{display:block;font:800 10px/1 var(--f-body);letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:3px}
+.fdbank b{font:700 36px/1 var(--fdf);font-variant-numeric:tabular-nums}
+.fdbank.pop{animation:fdpop 420ms cubic-bezier(.3,1.6,.5,1)}
+@keyframes fdpop{40%{transform:scale(1.14)}}
+.fdstrikes{justify-self:end;display:flex;gap:3px}
+.fdstrikes i{width:26px;height:26px;flex:none;color:color-mix(in srgb,#e11d2e 18%,transparent);transition:color 200ms,transform 300ms cubic-bezier(.3,1.6,.5,1)}
+.fdstrikes i.on{color:#e11d2e;transform:scale(1.08)}
+.fdboard{position:relative;border-radius:22px;padding:14px 12px 14px;background:radial-gradient(130% 90% at 50% 0%,#2457df 0%,#0e2d8c 48%,#071648 100%);box-shadow:inset 0 0 0 3px var(--gold),inset 0 0 0 8px #0a1a4a,inset 0 0 0 10px rgba(242,193,78,.5),0 16px 40px rgba(6,20,66,.35)}
+.fdboard::before{content:"";position:absolute;inset:3px;border-radius:20px;pointer-events:none;border:2px dotted #ffe9a8;opacity:.75;animation:fdbulbs 1.6s steps(2) infinite}
+@keyframes fdbulbs{50%{opacity:.35}}
+.fdq{position:relative;color:#fff;text-align:center;font:700 17px/1.3 var(--f-body);padding:8px 10px 14px;text-wrap:balance;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.fdgrid{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.fdt{position:relative;height:54px;perspective:700px}
+.fdf,.fdb{position:absolute;inset:0;border-radius:8px;display:flex;align-items:center;-webkit-backface-visibility:hidden;backface-visibility:hidden;transition:transform 560ms cubic-bezier(.3,1.25,.5,1)}
+.fdf{justify-content:center;background:linear-gradient(#2a5ce0,#123493);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 0 0 2px #0b1f63}
+.fdn{width:42px;height:30px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#6f9dff,#1c45bd 70%);border:2px solid var(--gold);color:#fff;font:700 18px var(--fdf);box-shadow:0 0 12px rgba(90,150,255,.55);text-shadow:0 1px 0 #0a2a80}
+.fdb{transform:rotateX(180deg);background:linear-gradient(#4a7cf5,#1d47c6);padding-left:10px;box-shadow:inset 0 0 0 2px var(--gold),inset 0 1px 0 rgba(255,255,255,.35)}
+.fdt.up .fdf{transform:rotateX(-180deg)}
+.fdt.up .fdb{transform:rotateX(0)}
+.fda{flex:1;min-width:0;color:#fff;font:600 14.5px/1.08 var(--fdf);text-transform:uppercase;letter-spacing:.02em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.fdp{width:42px;align-self:stretch;display:grid;place-items:center;background:#0e2b82;border-left:2px solid var(--gold);border-radius:0 7px 7px 0;color:#fff;font:700 19px var(--fdf);font-variant-numeric:tabular-nums}
+.fdt.miss .fdb{background:linear-gradient(#56658f,#2f3c66);box-shadow:inset 0 0 0 2px rgba(242,193,78,.45)}
+.fdt.miss .fdp{background:#28345a}
+.fdx{border-radius:8px;background:rgba(5,15,55,.45);box-shadow:inset 0 0 0 2px rgba(11,31,99,.9)}
+.fdboard.shake{animation:fdshake 420ms}
+@keyframes fdshake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.fdbig{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;gap:3vw;pointer-events:none;color:#ef1c2e;animation:fdbig 1s both}
+.fdbig svg{width:min(28vw,180px);height:min(28vw,180px);filter:drop-shadow(0 0 20px rgba(255,30,30,.7)) drop-shadow(0 6px 0 #6d0010)}
+@keyframes fdbig{0%{opacity:0;transform:scale(1.7)}14%{opacity:1;transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:scale(.96)}}
+.fdin{display:flex;gap:8px}
+.fdin input{flex:1;min-width:0;height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:0 14px;font:600 17px var(--f-body);outline:none}
+.fdin input:focus{border-color:#2457df;box-shadow:0 0 0 3px rgba(36,87,223,.2)}
+.fdin .btn{height:52px;padding:0 20px}
+.fdgive{justify-self:center}
+.fdend{display:grid;gap:10px}
+.fdend p{text-align:center;margin:0;font-size:16px}
+.fdlogo{position:relative;font:700 32px/1.1 var(--fdf);text-transform:uppercase;letter-spacing:.06em;color:#ffd965;text-align:center;text-shadow:0 2px 0 #8a5a00,0 0 20px rgba(255,200,60,.5);padding:6px 0 4px}
+.fdfmt{position:relative;color:#dbe6ff;text-align:center;margin:8px 0;font-size:16px}
+.fdfmt b{color:#ffd965}
+.fdqn{position:relative;display:block;text-align:center;color:var(--gold);font:800 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase;padding-top:6px}
+.fdfm .fdq{font-size:20px;padding:8px 6px 10px}
+.fdclock{display:flex;align-items:center;gap:12px}
+.fdclock b{font:700 46px/1 var(--fdf);font-variant-numeric:tabular-nums;min-width:62px;text-align:center;color:var(--ink)}
+.fdclock i{flex:1;height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.fdclock i span{display:block;height:100%;background:linear-gradient(90deg,#f2c14e,#ffd965);transform-origin:left;transition:transform 100ms linear}
+.fdclock.low b{color:#e11d2e;animation:fdpulse .5s ease-in-out infinite alternate}
+.fdclock.low i span{background:#e11d2e}
+@keyframes fdpulse{to{transform:scale(1.1)}}
+.fdrows{position:relative;display:grid;gap:7px;margin-top:6px}
+.fdrow{display:grid;grid-template-columns:1fr 48px;grid-template-areas:"q q" "a p" "t t";align-items:center;background:#0b2470;border-radius:9px;padding:8px 0 8px 12px;color:#fff;box-shadow:inset 0 0 0 2px rgba(242,193,78,.4);overflow:hidden}
+.fdrq{grid-area:q;font-size:12.5px;color:#a9bdf2;padding-right:10px;line-height:1.3}
+.fdra{grid-area:a;font:600 18px/1.2 var(--fdf);letter-spacing:.02em;opacity:0;transform:translateY(6px);transition:opacity 300ms,transform 300ms}
+.fdrp{grid-area:p;font:700 22px var(--fdf);text-align:center;opacity:0;transform:scale(.6);transition:opacity 250ms,transform 400ms cubic-bezier(.3,1.6,.5,1)}
+.fdrt{grid-area:t;font-size:12px;color:#a9bdf2;max-height:0;overflow:hidden;transition:max-height 300ms}
+.fdrow.up .fdra{opacity:1;transform:none}
+.fdrow.pts .fdrp{opacity:1;transform:none}
+.fdrow.pts .fdrt{max-height:20px;padding-top:3px}
+.fdrow.pts.zero .fdrp{color:#ff6b78}
+.fdfmtot{position:relative;display:flex;justify-content:flex-end;align-items:baseline;gap:10px;margin-top:10px;color:#fff;padding-right:4px}
+.fdfmtot small{font:800 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.fdfmtot b{font:700 38px/1 var(--fdf);font-variant-numeric:tabular-nums}
+.fdsum{margin:0;display:grid;gap:4px}
+.fdsum dt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:8px}
+.fdsum dd{margin:0;display:flex;gap:12px;align-items:baseline;justify-content:space-between}
+.fdsum dd span{color:var(--ink-2);font-size:15px}
+.fdsum dd b{font:700 20px var(--fdf);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){.fdf,.fdb,.fdra,.fdrp{transition:none}.fdboard::before,.fdclock.low b{animation:none}.fdbig{animation-duration:1ms}}
+@media (max-width:360px){.fdt{height:50px}.fda{font-size:13px}.fdp{width:36px;font-size:17px}.fdbank b{font-size:30px}}
 /* ==PREMIUM== */
 /* Globetrotter design system: native iOS, refined. Shared by every tab (built in by tools/build_editions.py).
    System font (SF Pro on iPhone), iOS system colors, grouped backgrounds, App Store-style rows with drawn icons,
@@ -1410,7 +1485,7 @@ const GT_BK=(()=>{
 /* ==/BACKUP== */
 /* ================= GAMES: quick games for memory, speed and logic ================= */
 /* (saved under the "brain" key: the tab was first called Brain, and the key keeps that progress) */
-const APP_VERSION="2026.11.17-1253";
+const APP_VERSION="2026.11.19-1238";
 const LS="globetrotter.brain.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), stage=$('gstage');
@@ -1445,6 +1520,7 @@ const GAMES={
  hilou:{cat:"unl", col:"--geo", ic:"📈", name:"Unlimited Higher or Lower", desc:"Random countries, as long a run as you can.", hi:true, fmt:v=>`${v} in a row`},
  queensu:{cat:"unl", col:"--log", ic:"👑", name:"Unlimited Queens", desc:"Any board from the bank.", hi:false, fmt:v=>fmtT(v)},
  timelineu:{cat:"unl", col:"--spd", ic:"📅", name:"Unlimited Timeline", desc:"A fresh deck of events.", hi:true, fmt:v=>`${v}/7`},
+ feudu:{cat:"unl", col:"--nm", ic:"📋", name:"Unlimited Top Answers", desc:"Fresh surveys every game, from a bank of 300.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  msu:{cat:"unl", col:"--log", ic:"💣", name:"Unlimited Minesweeper", desc:"Easy, medium or hard. Never a forced guess.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
  maptapu:{cat:"unl", col:"--geo", ic:"📍", name:"Unlimited Map Tap", desc:"Five random cities to find.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  stateleu:{cat:"unl", col:"--geo", ic:"🇺🇸", name:"Unlimited Statele", desc:"A random state outline every round.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
@@ -1462,6 +1538,7 @@ const GAMES={
  hilo:{cat:"daily", col:"--geo", ic:"📈", name:"Higher or Lower", desc:"Which country has more people?", hi:true, fmt:v=>`${v} in a row`},
  queens:{cat:"daily", col:"--log", ic:"👑", name:"Queens", desc:"One queen per row, column and color.", hi:false, fmt:v=>fmtT(v)},
  timeline:{cat:"daily", col:"--spd", ic:"📅", name:"Timeline", desc:"Put the events in order.", hi:true, fmt:v=>`${v}/7`},
+ feud:{cat:"daily", col:"--nm", ic:"📋", name:"Top Answers", desc:"We surveyed 100 people. Find the most popular answers, then beat the clock in Fast Money.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  mines:{cat:"daily", col:"--log", ic:"💣", name:"Minesweeper", desc:"The same no-guess board for everyone.", hi:false, fmt:v=>v>=99*60000?"💥":fmtT(v)},
  maptap:{cat:"daily", col:"--geo", ic:"📍", name:"Map Tap", desc:"Tap where five cities are.", hi:true, fmt:v=>`${v.toLocaleString()} pts`},
  statele:{cat:"daily", col:"--geo", ic:"🇺🇸", name:"Statele", desc:"Guess the US state from its outline.", hi:false, fmt:v=>v>=7?"X/6":`${v}/6`},
@@ -1764,6 +1841,13 @@ const GLYPH_BASE={
   timeline:GICO("#ffbe7a","#ea5a0c",`<path d="M6 30h36" stroke="${GW7}" stroke-width="2.4" stroke-linecap="round"/>
     <rect x="7" y="13" width="10" height="12" rx="2.5" fill="${GW7}"/><rect x="19" y="9" width="10" height="16" rx="2.5" fill="${GW}"/><rect x="31" y="15" width="10" height="10" rx="2.5" fill="${GW7}"/>
     <circle cx="12" cy="30" r="3" fill="${GW}"/><circle cx="24" cy="30" r="3.4" fill="#fff3d6" stroke="${GW}" stroke-width="1.6"/><circle cx="36" cy="30" r="3" fill="${GW}"/><path d="M21.5 14h5M21.5 18h3.5" stroke="#ea5a0c" stroke-width="1.6" stroke-linecap="round"/>`),
+  /* Top Answers: a gold-framed survey board, one answer flipped over */
+  feud:GICO("#4f86ff","#0b2a8c",`<rect x="7" y="9" width="34" height="30" rx="5" fill="#081a5c" stroke="#f2c14e" stroke-width="2"/>
+    <rect x="10.5" y="13" width="12.5" height="6.5" rx="1.6" fill="#f2c14e"/><rect x="25" y="13" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
+    <rect x="10.5" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/><rect x="25" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
+    <rect x="10.5" y="30" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/><rect x="25" y="30" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
+    <path d="M12.6 16.2h6.2" stroke="#081a5c" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.8" cy="16.2" r="1.3" fill="#081a5c"/>
+    <ellipse cx="31.2" cy="24.75" rx="2.6" ry="1.9" fill="#6f9dff" stroke="#f2c14e" stroke-width=".9"/><ellipse cx="16.7" cy="24.75" rx="2.6" ry="1.9" fill="#6f9dff" stroke="#f2c14e" stroke-width=".9"/>`),
   /* Minesweeper: a mine and a flag */
   mines:GICO("#9aa8bd","#3f4a5e",`<path d="M24 8v5M24 35v5M8 24h5M35 24h5M12.7 12.7l3.5 3.5M31.8 31.8l3.5 3.5M12.7 35.3l3.5-3.5M31.8 16.2l3.5-3.5" stroke="#141a26" stroke-width="3.4" stroke-linecap="round"/>
     <circle cx="24" cy="24" r="11" fill="#141a26"/><circle cx="20" cy="20" r="3.4" fill="${GW}" opacity=".9"/><circle cx="17.8" cy="25.5" r="1.2" fill="${GW}" opacity=".35"/>`),
@@ -1805,7 +1889,7 @@ const GLYPH_BASE={
     <path d="M24 10a8 8 0 0 0-4.8 14.4c.8.6 1.3 1.6 1.3 2.6V29h7v-2c0-1 .5-2 1.3-2.6A8 8 0 0 0 24 10z" fill="#ffe27a"/><path d="M20.5 32h7M21.5 35.5h5" stroke="#cdd6e8" stroke-width="2.2" stroke-linecap="round"/><path d="M21 15.5a4 4 0 0 1 3-1.8" stroke="${GW}" stroke-width="1.8" stroke-linecap="round" fill="none"/>`)
 };
 /* unlimited versions share their daily game's icon (the row adds an infinity badge) */
-const GLYPH=Object.assign({},GLYPH_BASE,{strandsu:GLYPH_BASE.strands,worldleu:GLYPH_BASE.worldle,travleu:GLYPH_BASE.travle,globleu:GLYPH_BASE.globle,nbrsu:GLYPH_BASE.nbrs,flagleu:GLYPH_BASE.flagle,hilou:GLYPH_BASE.hilo,queensu:GLYPH_BASE.queens,timelineu:GLYPH_BASE.timeline,msu:GLYPH_BASE.mines,maptapu:GLYPH_BASE.maptap,stateleu:GLYPH_BASE.statele,diveu:GLYPH_BASE.dive,climbu:GLYPH_BASE.climb});
+const GLYPH=Object.assign({},GLYPH_BASE,{strandsu:GLYPH_BASE.strands,worldleu:GLYPH_BASE.worldle,travleu:GLYPH_BASE.travle,globleu:GLYPH_BASE.globle,nbrsu:GLYPH_BASE.nbrs,flagleu:GLYPH_BASE.flagle,hilou:GLYPH_BASE.hilo,queensu:GLYPH_BASE.queens,timelineu:GLYPH_BASE.timeline,feudu:GLYPH_BASE.feud,msu:GLYPH_BASE.mines,maptapu:GLYPH_BASE.maptap,stateleu:GLYPH_BASE.statele,diveu:GLYPH_BASE.dive,climbu:GLYPH_BASE.climb});
 
 /* ================= ICONS =================
    One drawn icon set for the Games tab: 24×24, 2px round strokes, currentColor. Game tiles show them white on the game's color. */
@@ -3318,6 +3402,461 @@ function tlResults(){ const st=S.tl[today()];
   <button class="btn ghost wide" data-act="home">Home</button>`);
   wireShare(tlShare(st,true)); }
 
+/* ================= TOP ANSWERS: a survey game in the classic TV format =================
+   Three rounds (single, double, triple points), three strikes a round, then Fast Money: five questions in 25 seconds.
+   The questions are original surveys written for this app (tools/games/feud_data*.js). */
+const FEUD_RAW=`Name something people do right before going to bed|Brush teeth:36:brush,teeth,toothbrush,floss;Read:17:book,reading;Watch TV:13:tv,television,netflix,show;Check phone:11:phone,scroll,social media,instagram,tiktok;Pray:8:prayer,prayers;Shower:6:bath,wash,wash face;Set an alarm:5:alarm
+Name a reason you might be late for work|Traffic:41:car,jam,road;Overslept:24:slept in,alarm,sleep,woke up late;Car trouble:11:flat tire,car broke,breakdown,flat;Kids:8:children,school drop off;Weather:7:snow,rain,storm,ice;Couldn't find keys:5:keys,lost keys
+Name something you take to the beach|Towel:33:towels;Sunscreen:24:sunblock,lotion,suntan,sunscreen lotion;Umbrella:12:shade,parasol;Cooler:10:drinks,ice chest,beer,water;Chair:8:beach chair,chairs;Swimsuit:7:bathing suit,suit,bikini,trunks;Book:4:magazine,reading
+Name a food people eat with their hands|Pizza:34:slice;Burger:22:hamburger,cheeseburger;Fried chicken:13:chicken,wings,chicken wings,drumstick;Tacos:10:taco;Hot dog:9:hotdog,frank;Sandwich:7:sub,sandwiches;Fries:3:french fries,chips
+Name something you'd find in a junk drawer|Batteries:28:battery;Rubber bands:19:rubber band,hair ties;Pens:16:pen,pencil,pencils,markers;Tape:11:scotch tape,duct tape;Keys:10:key,old keys;Scissors:8:scissor;Takeout menus:4:menus,menu
+Name a place where people whisper|Library:52:libraries;Church:20:chapel,mass,service;Movie theater:10:movies,cinema,theater;Hospital:7:doctor,waiting room;Funeral:6:funeral home,wake;Classroom:3:school,class,test
+Name something people are afraid of|Spiders:31:spider,bugs,insects;Heights:23:high places,falling;Snakes:16:snake;The dark:10:dark,darkness;Death:8:dying;Clowns:6:clown;Flying:4:planes,airplane
+Name something you do at a red light|Check phone:30:phone,text,texting;Wait:22:stop,sit,brake;Change the radio:15:radio,music,song,station;Look in the mirror:11:mirror,makeup,hair;Sing:9:singing;Eat:6:snack;Pick nose:4:nose
+Name a reason a kid might stay home from school|Sick:62:illness,fever,flu,cold,ill,throwing up;Snow day:12:snow,weather,storm;Doctor appointment:9:doctor,dentist,appointment;Faking it:7:fake,pretending,lazy;Holiday:5:vacation,trip
+Name something people lose all the time|Keys:44:key,car keys;Phone:17:cell phone,cellphone;Glasses:12:sunglasses,eyeglasses;Socks:9:sock;Remote:8:tv remote,remote control;Wallet:6:purse,money
+Name a job where you wear a uniform|Police officer:30:police,cop,officer;Nurse:17:doctor,medical,scrubs;Firefighter:15:fireman,fire fighter;Soldier:13:military,army,marine,navy;Mail carrier:8:mailman,postal worker,mail;Pilot:6:flight attendant;Chef:5:cook
+Name something that has a lot of buttons|Remote control:38:remote,tv remote;Keyboard:21:computer,laptop;Phone:12:cell phone,telephone;Calculator:10:calculator;Shirt:8:coat,jacket,blouse;Elevator:6:elevators;Microwave:3:oven
+Name a pizza topping|Pepperoni:42:pepperonis;Sausage:16:italian sausage;Mushrooms:13:mushroom;Cheese:9:extra cheese,mozzarella;Onions:7:onion;Olives:6:black olives,olive;Peppers:5:green peppers,pepper,bell pepper
+Name something people do on their birthday|Eat cake:35:cake,birthday cake,cupcake;Open presents:21:presents,gifts,gift;Have a party:16:party,celebrate;Go out to eat:13:dinner,restaurant,eat out;Make a wish:7:wish,blow out candles,candles;Get drunk:4:drink,drinking,bar
+Name a fruit that's red|Strawberry:34:strawberries;Apple:30:apples;Cherry:17:cherries;Raspberry:7:raspberries;Watermelon:6:melon;Tomato:3:tomatoes;Pomegranate:3:pomegranates
+Name something you need to make a sandwich|Bread:58:roll,bun,toast,loaf;Meat:13:ham,turkey,bologna,salami,lunch meat;Cheese:9:slice of cheese;Mayonnaise:8:mayo;Peanut butter:6:pb,jelly;Knife:3:butter knife
+Name an animal you might see on a farm|Cow:39:cows,cattle,bull;Pig:21:pigs,hog;Horse:15:horses,pony;Chicken:13:chickens,hen,rooster;Sheep:6:lamb,goat;Duck:3:ducks,goose
+Name something people bring to a potluck|Casserole:22:dish;Salad:21:potato salad,pasta salad;Dessert:18:cake,pie,cookies,brownies;Chips and dip:13:chips,dip;Deviled eggs:9:eggs;Mac and cheese:9:macaroni,mac n cheese;Drinks:5:soda,punch
+Name a word that comes after "fire"|Truck:28:engine;Place:21:fireplace;Man:15:fighter,firefighter;Works:13:fireworks;Alarm:10:drill;Fly:7:flies,firefly;Wood:4:firewood
+Name something you'd see at a wedding|Bride:30:wife,wedding dress,dress;Cake:24:wedding cake;Flowers:15:bouquet,roses;Rings:12:ring;Groom:9:husband,tux;Priest:6:pastor,minister,officiant;Dancing:4:dance,dj
+Name something you might forget when you go on vacation|Toothbrush:31:toothpaste,brush;Phone charger:22:charger,cord;Underwear:13:socks,clothes;Swimsuit:10:bathing suit;Passport:9:id,license,tickets;Sunscreen:9:sunblock;Medication:6:pills,medicine
+Name a sport where you need a ball|Basketball:26:hoops;Football:24:soccer;Baseball:17:softball;Golf:11:golfing;Tennis:9:pickleball,ping pong;Volleyball:8:beach volleyball;Bowling:5:bowl
+Name something that gets harder as you get older|Sleeping:21:sleep,staying up;Seeing:19:eyes,eyesight,reading,vision;Getting up:17:standing,stairs,walking,moving;Remembering things:15:memory,remember,forgetting;Losing weight:13:weight,dieting;Hearing:9:ears;Bending over:6:bending,touching toes
+Name a place people go on a first date|Restaurant:44:dinner,eat,lunch;Movies:28:movie theater,film,cinema;Coffee shop:10:coffee,cafe,starbucks;Bar:9:drinks,club;Park:5:walk;Bowling:4:mini golf,arcade
+Name something you put on a hot dog|Mustard:37:yellow mustard;Ketchup:31:catsup;Relish:12:pickle relish;Onions:9:onion;Chili:6:chili sauce;Sauerkraut:5:kraut
+Name something people do when they're nervous|Bite nails:33:nails,fingernails;Sweat:18:sweating,sweaty;Pace:12:walk around,pacing;Shake:10:tremble,shaking,fidget;Eat:9:snack,overeat;Talk a lot:9:talk,ramble;Tap foot:5:tapping,tap fingers
+Name a reason someone might call 911|Fire:32:house fire;Heart attack:23:heart,chest pain,stroke;Car accident:18:accident,car wreck,crash,wreck;Robbery:13:break in,burglar,crime,theft,stolen;Injury:8:hurt,bleeding,broken bone;Someone choking:6:choking
+Name something people collect|Stamps:31:stamp;Coins:26:coin,money;Baseball cards:15:cards,trading cards;Shoes:9:sneakers;Dolls:7:barbies,action figures,toys;Rocks:6:shells,seashells;Comic books:6:comics
+Name something you see in the sky|Clouds:31:cloud;Sun:24:sunshine;Stars:15:star;Moon:12:the moon;Birds:9:bird;Airplane:6:plane,jet;Rainbow:3:rainbows
+Name something people do at the gym|Lift weights:41:weights,lift,weightlifting,bench press;Run on a treadmill:24:run,treadmill,running,cardio;Sweat:10:sweating;Swim:8:pool,swimming;Stretch:7:yoga,stretching;Take a shower:6:shower;Look in the mirror:4:mirror,flex
+Name a holiday that involves decorating|Christmas:59:xmas;Halloween:20:halloween;Easter:8:eggs;Thanksgiving:5:turkey day;Fourth of July:4:july 4th,independence day,4th of july;Valentine's Day:4:valentines
+Name something you associate with Halloween|Candy:40:sweets,chocolate,trick or treat;Costumes:24:costume,dress up,mask;Pumpkins:16:pumpkin,jack o lantern,carving;Ghosts:8:ghost,spirits;Witches:7:witch,broom;Black cats:5:cat,black cat
+Name something a teenager can't live without|Phone:62:cell phone,cellphone,iphone,smartphone;Friends:10:friend,best friend;Internet:9:wifi,social media,tiktok;Money:7:cash,allowance;Car:6:driving;Video games:6:games,xbox,playstation
+Name something people do at the airport|Wait:28:sit,waiting;Go through security:21:security,tsa,get searched;Eat:15:food,restaurant,drink;Check bags:12:luggage,check in,bags;Shop:9:duty free,shopping,buy magazines;Sleep:9:nap;Read:6:book
+Name something that comes in pairs|Shoes:34:shoe,sneakers;Socks:26:sock;Earrings:12:earring;Twins:9:twin;Gloves:8:mittens,glove;Eyes:6:ears,hands;Dice:5:die
+Name a famous ship|Titanic:68:the titanic;Mayflower:10:may flower;Noah's Ark:9:ark;Santa Maria:5:nina,pinta;Love Boat:4:the love boat;Black Pearl:4:pirate ship
+Name something kids do that drives parents crazy|Whine:28:complain,whining,cry,crying;Fight with siblings:21:fight,siblings,argue;Don't listen:16:ignore,talk back,disobey;Make a mess:15:messy room,mess,leave toys;Ask "why":10:why,questions;Play loud:6:noise,yell,scream;Won't go to bed:4:bedtime
+Name a type of shoe|Sneakers:33:tennis shoes,running shoes,nikes;Boots:22:boot,cowboy boots;Sandals:15:flip flops,sandal;High heels:14:heels,pumps,stilettos;Loafers:6:dress shoes,oxfords;Slippers:6:slipper;Clogs:4:crocs
+Name something associated with Christmas|Tree:31:christmas tree;Santa Claus:26:santa,saint nick;Presents:19:gifts,gift,present;Snow:9:snowman;Lights:7:christmas lights;Stockings:5:stocking;Reindeer:3:rudolph
+Name a reason people go to the hospital|Surgery:22:operation;Having a baby:20:baby,birth,pregnant,giving birth;Broken bone:16:broken leg,broken arm,injury,fracture;Heart attack:14:heart;Sick:13:illness,fever,flu;Car accident:9:accident,wreck;Visiting someone:6:visit
+Name something you do when you can't sleep|Count sheep:29:sheep,counting;Read:22:book,reading;Watch TV:18:tv,television,movie;Drink warm milk:9:milk,tea,drink;Toss and turn:8:roll around,toss;Look at phone:8:phone,scroll;Take a pill:6:sleeping pill,melatonin,medicine
+Name a famous cartoon dog|Scooby-Doo:38:scooby,scooby doo;Snoopy:28:charlie brown;Pluto:13:pluto;Goofy:9:goofy;Clifford:6:big red dog;Brian:3:family guy;Odie:3:garfield
+Name a color people paint their bedroom|Blue:30:light blue,navy;White:20:off white,cream,eggshell;Beige:15:tan,khaki;Green:12:sage,mint;Gray:11:grey;Pink:7:rose;Yellow:5:pale yellow
+Name a breakfast food|Eggs:34:egg,scrambled eggs,omelet;Pancakes:20:pancake,flapjacks;Bacon:15:sausage;Cereal:12:oatmeal,granola;Waffles:9:waffle;Toast:6:bagel,bread;French toast:4:french toast
+Name something people put in their coffee|Cream:38:creamer,half and half;Sugar:35:sweetener,splenda,honey;Milk:15:oat milk,almond milk;Whipped cream:5:whip;Liquor:4:whiskey,baileys,alcohol;Cinnamon:3:spices,vanilla
+Name a game people play at a party|Charades:26:act it out;Twister:15:twister;Spin the bottle:14:bottle;Beer pong:13:drinking game,flip cup;Pin the tail on the donkey:10:pin the tail,donkey;Musical chairs:9:chairs;Truth or dare:8:truth or dare
+Name something you'd hate to forget on a camping trip|Tent:33:shelter;Sleeping bag:20:blanket,pillow;Food:14:snacks,water;Matches:11:lighter,fire starter;Flashlight:10:lantern,light;Bug spray:7:insect repellent,bug repellent;Toilet paper:5:tp
+Name something you might find in a hotel room|Bed:30:beds,pillow;TV:22:television,remote;Bible:13:gideon bible;Towels:12:towel;Mini bar:9:minibar,fridge,snacks;Phone:7:telephone;Little soaps:5:soap,shampoo
+Name something people do to celebrate New Year's Eve|Drink champagne:34:champagne,drink,toast,drinking;Kiss at midnight:21:kiss,kissing;Watch the ball drop:16:ball drop,watch tv,countdown;Party:15:go to a party,party;Fireworks:9:firework;Make resolutions:5:resolution,resolutions
+Name a place you're not allowed to use your phone|Movie theater:31:movies,theater,cinema;Church:20:mass;School:14:class,classroom;Hospital:11:doctor;Airplane:9:plane,flight;While driving:9:car,driving;Library:6:library
+Name a reason you might wake up in the middle of the night|Bathroom:40:pee,restroom,toilet,go to the bathroom;Noise:16:loud noise,sound;Bad dream:15:nightmare,dream;Baby crying:10:baby,kids,child;Thirsty:8:water,drink;Snoring:7:spouse snoring,partner;Too hot:4:hot,cold
+Name something that has wheels|Car:46:cars,automobile;Bike:18:bicycle;Truck:10:pickup;Skateboard:8:roller skates,skates;Wagon:7:wheelbarrow;Shopping cart:6:cart;Bus:5:train
+Name a vegetable kids hate|Broccoli:38:brocoli;Brussels sprouts:24:brussel sprouts,sprouts;Spinach:13:greens;Peas:9:pea;Cauliflower:6:cauliflower;Asparagus:5:asparagus;Carrots:5:carrot
+Name something people do on a long drive|Listen to music:37:music,radio,sing,songs;Eat snacks:17:eat,snack,food;Sleep:13:nap;Talk:12:conversation,chat;Play games:9:i spy,car games;Stop for gas:7:gas,stop;Listen to a podcast:5:podcast,audiobook
+Name something you might do with a cardboard box|Store things:30:storage,store,pack;Move:22:moving,pack for a move;Recycle:15:throw away,trash;Make a fort:12:fort,play,build;Ship something:10:mail,send;Give it to the cat:6:cat,pet bed;Make a costume:5:costume,robot
+Name a sound you might hear at a baseball game|Crack of the bat:30:bat,hit;Cheering:24:crowd,fans,yelling;Umpire:14:strike,you're out,ump;Organ music:12:organ,music,charge;Vendors:10:peanuts,hot dogs,popcorn;Take me out to the ball game:6:take me out,seventh inning stretch;Boos:4:booing
+Name something you see at a carnival|Ferris wheel:31:ferris wheel;Rides:22:roller coaster,ride;Cotton candy:16:candy,funnel cake,food;Games:13:ring toss,booth;Clowns:9:clown;Prizes:5:stuffed animal,prize;Bumper cars:4:bumper cars
+Name a food that's sticky|Honey:30:honey;Peanut butter:20:pb;Syrup:16:maple syrup;Cotton candy:10:candy;Caramel:9:toffee,taffy;Rice:8:sticky rice;Gum:7:chewing gum,bubble gum
+Name something people forget to do before leaving the house|Lock the door:32:lock,locks,door;Turn off lights:20:lights,lights off;Turn off the stove:13:stove,oven,iron;Grab their keys:12:keys;Grab their phone:10:phone;Brush teeth:7:teeth;Feed the pet:6:feed dog,pet,cat
+Name a fast food chain|McDonald's:48:mcdonalds,mcdonald;Burger King:16:bk;Wendy's:11:wendys;Taco Bell:9:taco bell;Chick-fil-A:8:chick fil a,chickfila;Subway:5:subway;KFC:3:kentucky fried chicken
+Name something people do at a funeral|Cry:52:crying,weep,mourn;Pray:14:prayer;Hug:10:hugs,comfort;Give a eulogy:9:speech,eulogy,speak;Sing:7:hymns;Eat:5:food,lunch;Wear black:3:black
+Name something that makes a dog bark|Mailman:30:mail carrier,postman,mail;Doorbell:24:door,knock,knocking;Strangers:16:stranger,people,visitors;Other dogs:12:dog,another dog;Cats:9:cat,squirrel;Noise:6:sound,thunder;Hunger:3:food,hungry
+Name something that's hard to do with your eyes closed|Drive:31:driving;Walk:24:walking;Read:17:reading;Eat:9:cook;Put on makeup:8:makeup;Write:6:text;Find something:5:search
+Name something people do in the shower|Sing:43:singing;Wash hair:19:shampoo,hair;Shave:13:shaving;Think:9:daydream,plan;Wash body:9:soap,scrub,wash;Cry:4:pee,brush teeth
+Name a way to cook an egg|Scrambled:34:scramble;Fried:23:fry,over easy,sunny side up;Boiled:18:hard boiled,soft boiled,boil;Poached:13:poach;Omelet:8:omelette;Deviled:4:baked
+Name a country people dream of visiting|Italy:24:rome,venice;France:22:paris;Japan:13:tokyo;Australia:11:sydney;Ireland:9:england,uk,britain;Greece:8:athens;Mexico:6:cancun
+Name something associated with Valentine's Day|Roses:28:flowers,rose;Chocolate:26:candy,chocolates;Cards:14:card,valentine;Hearts:12:heart;Cupid:9:arrow;Dinner date:7:date,dinner;Jewelry:4:diamond,ring
+Name a profession that requires a lot of schooling|Doctor:57:surgeon,physician,md;Lawyer:21:attorney;Teacher:7:professor;Engineer:6:architect;Dentist:5:orthodontist;Pharmacist:4:scientist,veterinarian,vet
+Name something people do to relax|Take a bath:23:bath,bubble bath;Read:20:book;Watch TV:17:tv,movies,netflix;Sleep:13:nap;Listen to music:11:music;Go for a walk:9:walk,hike;Meditate:7:yoga,breathe
+Name something you buy by the dozen|Eggs:62:egg;Donuts:22:doughnuts,donut;Roses:8:flowers;Bagels:4:bagel,rolls,cookies;Cupcakes:4:muffins
+Name a reason someone might get a tattoo|Remember someone:27:memorial,in memory,loved one;Love:19:boyfriend,girlfriend,spouse,partner;Express themselves:16:art,self expression,look cool;Drunk:13:dare,bet,impulse;Rebellion:11:rebel,parents;Religion:8:faith,god;Military:6:army,navy
+Name something people do on a plane|Sleep:38:nap;Read:18:book,magazine;Watch a movie:16:movie,tv,screen;Eat:11:snacks,drink;Talk:7:chat;Go to the bathroom:6:bathroom;Look out the window:4:window
+Name something that's yellow|Banana:28:bananas;Sun:24:sunshine;Lemon:15:lemons;School bus:12:bus;Taxi:9:cab;Corn:7:butter;Rubber duck:5:duck,big bird
+Name something you'd find in a doctor's office|Stethoscope:24:stethoscope;Magazines:21:magazine;Exam table:15:table,bed;Thermometer:12:temperature;Needles:11:shots,syringe;Tongue depressor:9:popsicle stick,lollipop;Nurse:8:receptionist
+Name a famous Santa's reindeer|Rudolph:56:rudolph;Dasher:12:dasher;Blitzen:9:blitzen;Donner:7:donder;Comet:6:comet;Prancer:5:dancer;Vixen:5:cupid
+Name something people do when they're stuck in traffic|Listen to music:31:music,radio;Honk:21:honking,horn;Curse:16:yell,swear,cuss,scream;Check phone:13:phone,text;Eat:7:snack;Sing:7:singing;Daydream:5:think
+Name something that might be "broken"|Heart:35:hearts;Bone:22:leg,arm,bones;Window:14:glass,mirror;Promise:10:record,rules;Phone:9:screen,tv;Car:6:engine,brakes;Dish:4:plate
+Name a pet people keep in a cage|Bird:34:parrot,parakeet,canary,birds;Hamster:30:hamsters;Rabbit:12:bunny;Guinea pig:10:guinea pig;Mouse:6:mice,rat;Gerbil:5:gerbils;Snake:3:lizard,reptile
+Name something people do while waiting in line|Check phone:43:phone,text,scroll;Talk:15:chat,gossip;Complain:12:sigh,whine;Read:9:magazine;People watch:9:look around,stare;Tap foot:7:fidget,pace;Shop:5:impulse buy,candy
+Name a reason a person might move|New job:37:job,work,career;Cheaper rent:15:money,rent,cost,afford;Marriage:12:married,wedding,partner;Family:12:closer to family,kids;Divorce:9:breakup;Weather:9:climate,warmer;School:6:college
+Name a kind of cake|Chocolate:38:chocolate cake;Vanilla:15:white cake,yellow cake;Carrot:14:carrot cake;Cheesecake:12:cheese cake;Red velvet:9:red velvet;Birthday:7:birthday cake;Pound cake:5:angel food,lemon
+Name something you see in a classroom|Desks:29:desk,chairs;Chalkboard:24:board,whiteboard,blackboard,chalk;Teacher:16:teacher;Students:13:kids,children;Books:9:book,textbook;Clock:5:flag;Pencils:4:pencil,pens
+Name something that gets wet|Towel:22:towels;Hair:16:body;Dishes:15:dish,sponge;Grass:13:lawn,ground,car;Clothes:12:laundry,clothes;Umbrella:11:raincoat;Swimsuit:11:bathing suit
+Name a superhero|Superman:36:superman;Batman:29:batman;Spider-Man:15:spiderman,spider man;Wonder Woman:8:wonder woman;Iron Man:5:ironman;Captain America:4:captain america;Hulk:3:the hulk
+Name something you'd find in a garage|Car:36:cars,truck;Tools:22:tool,hammer,wrench,toolbox;Lawn mower:13:mower;Bikes:11:bike,bicycle;Boxes:8:junk,storage;Paint:5:paint cans;Freezer:5:fridge,refrigerator
+Name something people give up for New Year's|Junk food:25:sweets,sugar,candy,eating,fast food,dessert;Smoking:24:cigarettes,smoke;Drinking:19:alcohol,beer,wine;Soda:12:coke,pop;Social media:9:phone,facebook,instagram;Cursing:6:swearing,cussing;Coffee:5:caffeine
+Name something you'd see at a zoo|Lions:26:lion;Elephants:22:elephant;Monkeys:16:monkey,apes,gorilla;Giraffes:14:giraffe;Bears:9:bear,polar bear,panda;Zebras:8:zebra;Penguins:5:penguin
+Name a word that rhymes with "cat"|Hat:31:hat;Bat:22:bat;Rat:16:rat;Mat:12:mat;Sat:8:sat;Fat:7:fat;Pat:4:pat,chat,flat
+Name a reason people go to the mall|Shopping:47:shop,buy clothes,clothes;Food court:15:eat,food,lunch;Walk:11:exercise,mall walking;Hang out:10:meet friends,socialize;Movies:9:movie theater;Buy a gift:5:gift,present;Air conditioning:3:cool off
+Name something kids ask Santa for|Toys:30:toy;Video games:22:games,playstation,xbox,nintendo;Bike:16:bicycle;Doll:12:barbie,dolls;Phone:9:iphone,tablet,ipad;Puppy:7:dog,pet,kitten;Lego:4:legos
+Name something that's cold|Ice:39:ice cube,ice cubes;Snow:22:snowman;Ice cream:15:popsicle;Freezer:9:refrigerator,fridge;Winter:7:weather;Water:5:drink,soda;Antarctica:3:north pole,alaska
+Name something you'd do if you won the lottery|Buy a house:33:house,home,mansion;Quit my job:20:quit,retire,stop working;Travel:16:vacation,trip;Pay off debt:12:bills,debt,pay off bills;Buy a car:9:car,new car;Give to charity:6:charity,donate,church;Help family:4:family,give to family
+Name a food that comes in a can|Soup:34:chicken noodle,tomato soup;Tuna:20:fish,salmon,sardines;Beans:15:baked beans,chili;Vegetables:11:corn,peas,green beans;Fruit:9:peaches,pineapple,fruit cocktail;Spam:7:spam;Soda:4:pop,beer
+Name something people do at the dentist|Get teeth cleaned:38:cleaning,clean teeth;Open their mouth:15:open wide,mouth;Get a filling:14:filling,cavity,drill;Get x-rays:11:x-ray,xray;Floss:10:floss;Rinse:7:spit,rinse;Get a lollipop:5:toothbrush,prize
+Name a reason people get up early|Work:57:job;School:14:class;Exercise:11:gym,run,workout;Kids:8:baby,children;Catch a flight:6:flight,plane,travel;Watch the sunrise:4:sunrise
+Name a game played with cards|Poker:32:texas holdem,holdem;Go Fish:20:go fish;Solitaire:17:solitaire;Blackjack:11:21,twenty one;Uno:9:uno;Crazy Eights:6:war,old maid;Rummy:5:gin rummy,gin
+Name something associated with a pirate|Ship:24:boat;Eye patch:22:patch;Parrot:17:bird;Treasure:14:gold,chest,treasure chest;Peg leg:10:wooden leg,leg;Hook:8:hook hand;Sword:5:cutlass,swords
+Name something on a farmer's to-do list|Feed the animals:31:feed,feed animals,feed cows;Milk the cows:23:milk,cows;Plant crops:18:plant,seeds,sow;Harvest:12:pick,crops;Fix the fence:8:fence,repair;Collect eggs:5:eggs;Drive the tractor:3:tractor
+Name a kind of bread|White:28:white bread;Wheat:24:whole wheat;Rye:14:rye bread;Sourdough:12:sourdough;French:10:baguette,french bread;Pumpernickel:7:pumpernickel;Banana:5:banana bread,cornbread
+Name something you'd see at a hockey game|Fights:28:fighting,fight;Puck:21:pucks;Ice:16:rink,zamboni;Players:11:goalie,skates;Sticks:10:stick,hockey stick;Fans:9:crowd,cheering;Penalty box:5:penalty
+Name something that might be "cracked"|Egg:34:eggs;Phone screen:19:screen,phone,iphone;Window:15:glass,windshield;Knuckles:10:knuckle,back,neck;Code:9:safe,password;Nut:7:walnut,peanut;Mirror:6:mirror
+Name something that's associated with spring|Flowers:39:flower,blooming;Rain:18:showers;Easter:12:easter eggs,bunny;Baseball:9:opening day;Allergies:9:pollen,sneezing;Cleaning:7:spring cleaning;Birds:6:birds chirping
+Name something you might get at the movies|Popcorn:58:pop corn;Soda:18:drink,coke,pop;Candy:15:sour patch,m&ms,snacks;Nachos:5:nacho,hot dog;Ticket:4:tickets
+Name something people do on a Sunday|Go to church:36:church,mass,worship;Sleep in:18:sleep,nap,rest;Watch football:15:football,sports,game;Family dinner:11:dinner,brunch,cook;Relax:9:nothing,lounge;Read the paper:6:newspaper,read;Do laundry:5:laundry,chores
+Name something people put on their face|Makeup:32:foundation,mascara,lipstick,blush;Lotion:22:moisturizer,cream;Sunscreen:14:sunblock;Mask:10:face mask;Glasses:9:sunglasses;Soap:8:face wash,cleanser;Shaving cream:5:beard oil
+Name a reason you'd honk your car horn|Someone cut you off:31:cut off,bad driver;Light turned green:22:green light,not moving,slow driver;Say hello:16:hello,wave,friend;Warn someone:13:warning,danger,avoid accident;Road rage:10:angry,mad;Locked the car:8:lock car
+Name something you'd find on a desk|Computer:34:laptop,monitor;Pens:22:pen,pencils,pencil;Paper:14:papers,notepad;Lamp:10:light;Stapler:9:staples;Phone:7:telephone;Coffee mug:4:mug,cup
+Name a TV game show|Wheel of Fortune:33:wheel of fortune,wheel;Jeopardy:30:jeopardy;The Price Is Right:22:price is right;Who Wants to Be a Millionaire:7:millionaire;Deal or No Deal:5:deal or no deal;Let's Make a Deal:3:lets make a deal
+Name something you might be allergic to|Peanuts:30:nuts,peanut;Cats:20:cat,pets,dogs;Pollen:16:grass,flowers,hay fever;Bees:11:bee stings,bee;Dust:9:dust mites;Shellfish:8:shrimp,seafood;Penicillin:6:medicine,antibiotics
+Name something people wear in the winter|Coat:34:jacket,parka;Gloves:20:mittens,glove;Hat:16:beanie,cap;Scarf:14:scarves;Boots:10:snow boots;Sweater:6:hoodie
+Name something you see at a bowling alley|Pins:30:pin;Balls:27:bowling ball,ball;Shoes:18:bowling shoes;Lanes:11:alley,gutter;Pizza:7:food,beer;Scoreboard:7:score
+Name something people buy at a gas station|Gas:42:fuel,gasoline;Snacks:19:chips,candy,food;Drinks:15:soda,coffee,water,energy drink;Lottery tickets:10:lottery,scratchers;Cigarettes:9:smokes,tobacco;Ice:5:bag of ice
+Name a famous mouse|Mickey Mouse:66:mickey;Minnie Mouse:13:minnie;Mighty Mouse:7:mighty mouse;Jerry:6:tom and jerry;Stuart Little:5:stuart little;Speedy Gonzales:3:speedy gonzales
+Name something that's often stolen|Car:30:cars;Wallet:22:purse,money,cash;Phone:18:cell phone,iphone;Bike:11:bicycle;Jewelry:9:diamonds,ring,necklace;Identity:6:credit card,identity;Packages:4:package,amazon box
+Name a reason people go to the library|Borrow books:58:books,check out books,read,book;Study:16:homework,research;Use the computer:12:computer,internet,wifi;Quiet:7:peace and quiet;Story time:4:kids;Movies:3:dvds
+Name something you'd hate to find in your food|Hair:45:a hair;Bug:25:fly,cockroach,insect,worm;Fingernail:10:nail;Band-Aid:8:bandaid;Mold:6:mould;Glass:6:metal,plastic
+Name something associated with the Fourth of July|Fireworks:55:firework;Flag:13:american flag,flags;Barbecue:12:bbq,cookout,grill,hot dogs;Parade:8:parades;Red white and blue:6:red,colors;Picnic:6:beach
+Name a job that involves a lot of talking|Teacher:28:professor;Salesperson:24:sales,telemarketer,car salesman;Lawyer:17:attorney;Politician:12:president;Talk show host:9:radio host,newscaster,host;Customer service:6:receptionist,call center;Therapist:4:counselor
+Name something people do at a rock concert|Dance:28:dancing,jump;Sing along:24:sing,singing;Scream:19:yell,cheer,screaming;Drink:12:beer,drinking;Mosh:8:mosh pit,crowd surf;Wave lighters:5:lighter,phone flashlight;Take pictures:4:video,record
+Name something that has a shell|Turtle:38:turtles,tortoise;Egg:20:eggs;Snail:13:snails;Crab:11:lobster,shrimp;Nut:9:peanut,walnut;Clam:6:oyster,mussels;Taco:3:taco
+Name something you might do in a hammock|Sleep:45:nap,rest;Relax:22:lounge,chill;Read:16:book;Swing:9:rock;Fall out:5:fall;Cuddle:3:kiss
+Name a word that follows "birthday"|Cake:41:cakes;Party:28:parties;Present:13:gift,presents;Card:9:cards;Suit:5:candles;Girl:4:boy,wish
+Name something you'd see at a hospital|Doctors:33:doctor,surgeon;Nurses:24:nurse;Beds:13:bed,stretcher,gurney;Patients:11:sick people,patient;Wheelchairs:9:wheelchair;Needles:6:iv;Ambulance:4:ambulances
+Name something you might do on a snow day|Build a snowman:36:snowman;Sledding:22:sled,sledge;Snowball fight:16:snowball,snowballs;Drink hot chocolate:11:hot cocoa,cocoa,hot chocolate;Sleep in:7:sleep;Shovel snow:5:shovel;Watch movies:3:tv
+Name something people do when they get home from work|Change clothes:24:get comfortable,pajamas,change;Eat dinner:21:eat,dinner,cook;Relax:17:sit down,couch;Watch TV:15:tv;Take a shower:11:shower,bath;Kiss their spouse:7:hug,kiss;Have a drink:5:beer,wine
+Name something associated with Thanksgiving|Turkey:62:the turkey;Stuffing:10:dressing;Football:9:parade,macy's parade;Pumpkin pie:8:pie;Family:6:relatives;Mashed potatoes:5:potatoes,gravy
+Name something that might have stripes|Zebra:40:zebras;Tiger:21:tigers;Flag:13:american flag;Shirt:10:sweater,pajamas;Candy cane:7:candy;Skunk:5:bee;Referee:4:ref
+Name something you put in a salad|Lettuce:30:greens,spinach;Tomatoes:23:tomato;Cucumbers:15:cucumber;Dressing:11:ranch,vinaigrette;Croutons:8:crouton;Cheese:7:feta;Carrots:6:carrot
+Name a reason someone might cry at a movie|Sad ending:31:sad,ending,tragedy;Someone dies:27:death,dying;A dog dies:13:dog,animal dies;Love story:12:romance,romantic;Happy ending:9:happy,reunion;Scary:5:frightened;Bad movie:3:boring
+Name something you might find in a purse|Wallet:30:money,cash;Lipstick:20:makeup,lip balm,chapstick;Keys:15:key;Phone:12:cell phone;Gum:9:mints,candy;Tissues:8:kleenex;Hairbrush:6:brush,comb
+Name a reason people get a pet|Companionship:41:company,friend,lonely,loneliness;Kids want one:19:kids,children;Love animals:13:love,cuddles;Protection:12:security,guard dog;Teach responsibility:8:responsibility;Exercise:7:walks
+Name something people do at a sleepover|Watch movies:31:movie,movies,tv;Stay up late:20:stay up,no sleep;Tell scary stories:14:ghost stories,stories;Eat junk food:12:eat,snacks,pizza;Pillow fight:10:pillows;Talk:8:gossip,talk about boys;Truth or dare:5:games
+Name something you'd find at a picnic|Basket:24:picnic basket;Blanket:20:tablecloth;Ants:19:bugs,flies;Sandwiches:15:food,sandwich;Lemonade:8:drinks,soda;Watermelon:8:fruit;Potato salad:6:chips
+Name a reason people go to Las Vegas|Gamble:59:gambling,casino,casinos,slots;Shows:11:concert,show;Get married:10:wedding,marriage;Party:9:bachelor party,club,drink;Vacation:6:fun;Buffets:5:food,eat
+Name something you'd see on a golf course|Golf balls:24:balls,ball;Clubs:20:club,golf clubs;Golf carts:17:cart;Holes:11:hole,flag,pin;Sand traps:10:sand,bunker;Grass:10:green,fairway;Water:8:pond,lake
+Name something you might do while on hold on the phone|Listen to music:31:hold music,music;Get annoyed:22:complain,frustrated,mad;Hang up:14:hang up;Clean:10:dishes,chores;Check email:10:computer,browse;Walk around:8:pace;Talk to someone else:5:talk
+Name a reason you'd go to the post office|Mail a package:42:package,ship,send package;Buy stamps:25:stamps,stamp;Mail a letter:15:letter,mail;Pick up mail:10:pick up package,po box;Passport:5:passport;Money order:3:pay bills
+Name a fruit that grows on trees|Apple:42:apples;Orange:20:oranges;Peach:11:peaches;Pear:9:pears;Cherry:8:cherries;Banana:6:bananas;Lemon:4:lemons,coconut
+Name a famous duck|Donald Duck:62:donald;Daffy Duck:22:daffy;Daisy Duck:6:daisy;Scrooge McDuck:5:scrooge;Howard the Duck:3:howard;Ugly Duckling:2:ugly duckling
+Name something people do with their hair|Brush it:28:brush,comb;Wash it:22:wash,shampoo;Cut it:17:cut,trim,haircut;Dye it:14:color,dye,highlights;Braid it:9:braid,ponytail;Style it:6:curl,straighten,blow dry;Twirl it:4:play with it
+Name something you'd see in a barbershop|Barber chair:27:chair,chairs;Clippers:23:razor,scissors;Mirrors:15:mirror;Hair on the floor:13:hair;Barber pole:10:pole;Magazines:8:magazine;TV:4:sports
+Name something people do at a baby shower|Open gifts:36:presents,gifts,open presents;Play games:23:games;Eat cake:15:cake,eat,food;Guess the baby's sex:9:gender reveal,guess;Rub the belly:8:belly,touch belly;Give advice:5:advice;Cry:4:emotional
+Name something that's hard to find|A good man:22:husband,boyfriend,love,soulmate,good woman;Parking spot:20:parking;Keys:16:car keys;Remote:13:tv remote;Good job:12:job,work;Time:9:free time;Socks:8:matching socks
+Name a kind of candy bar|Snickers:38:snickers;Hershey's:20:hershey,chocolate bar;Kit Kat:14:kitkat;Milky Way:9:milky way;Butterfinger:7:butterfinger;3 Musketeers:6:three musketeers;Twix:6:twix
+Name something you can never have too much of|Money:52:cash;Love:20:affection;Friends:9:family;Time:8:free time;Shoes:6:clothes;Happiness:5:joy,sleep
+Name a place that's usually crowded|Mall:26:shopping mall;Concert:18:stadium,game;Airport:15:train station;Beach:12:pool;Amusement park:11:disney,theme park;Grocery store:10:walmart,costco;Times Square:8:new york,city
+Name something you take on a road trip|Snacks:32:food,chips;Music:20:playlist,cds,radio;Map:15:gps,directions;Water:12:drinks;Pillow:8:blanket;Phone charger:7:charger;Games:6:cards
+Name something people do when they're bored|Watch TV:28:tv,netflix,movies;Eat:22:snack;Play on their phone:18:phone,scroll,social media;Sleep:12:nap;Read:9:book;Doodle:6:draw;Clean:5:organize
+Name something associated with a vampire|Blood:31:drink blood;Fangs:24:teeth,fang;Dracula:14:count dracula;Bats:11:bat;Coffin:9:casket;Garlic:6:stake;Cape:5:cloak
+Name something people bring to the office|Lunch:32:food,lunchbox;Coffee:24:mug,thermos;Laptop:15:computer;Phone:10:cell phone;Briefcase:8:bag,backpack;Water bottle:6:water;Pictures of family:5:photos
+Name something you'd see at a parade|Floats:36:float;Marching bands:25:band,music;Clowns:12:clown;Candy:9:candy thrown;Balloons:8:balloon;Horses:6:horse;Flags:4:flag
+Name something people do to stay warm|Wear a coat:30:coat,jacket,layers;Drink something hot:20:hot chocolate,coffee,tea,soup;Use a blanket:18:blanket,blankets;Sit by a fire:13:fire,fireplace;Turn up the heat:10:heater,thermostat;Cuddle:5:hug;Exercise:4:move around
+Name something that's sold in bars|Soap:30:bar of soap;Candy:28:chocolate,candy bar;Gold:15:gold bars;Granola:12:granola bars,protein bar;Ice cream:8:ice cream bar;Butter:7:sticks
+Name something people buy for their car|Gas:28:fuel;Tires:22:tire;Air freshener:15:freshener;Oil:12:oil change;Floor mats:10:mats,seat covers;Car wash:7:wash,wax;Stereo:6:speakers,radio
+Name a place where you might see a lot of dogs|Dog park:44:park;Vet:18:veterinarian,animal hospital;Pet store:15:petsmart,petco;Shelter:12:pound,animal shelter;Dog show:8:show;Groomer:3:kennel
+Name something people often do in the car|Listen to music:33:music,radio,sing;Talk on the phone:20:phone,call,talk;Eat:15:food,drink;Put on makeup:11:makeup;Argue:9:fight;Sleep:7:nap;Text:5:texting
+Name a type of tree|Oak:34:oak tree;Pine:22:pine tree;Maple:16:maple tree;Palm:12:palm tree;Apple:7:fruit tree;Willow:5:weeping willow;Christmas tree:4:fir,spruce
+Name a reason a woman might buy a new dress|Wedding:31:going to a wedding;Party:22:a party;Date:15:going out,night out;Job interview:10:interview,work;Prom:9:dance,formal;Feel good:8:treat herself,happy;Funeral:5:special occasion
+Name something you'd do on a rainy day|Watch movies:31:movie,tv,netflix;Read:21:book;Sleep:15:nap;Play board games:10:games,cards,puzzles;Bake:9:cook;Clean:8:chores;Jump in puddles:6:play in the rain
+Name something people do at a barbecue|Grill:30:cook,barbecue,grilling;Eat:27:burgers,hot dogs,food;Drink beer:16:drink,beer;Play games:10:cornhole,horseshoes,volleyball;Swim:9:pool;Talk:8:socialize
+Name something you'd see on a pirate ship|Flag:26:jolly roger,skull and crossbones;Treasure:20:gold,chest;Cannons:17:cannon;Parrot:12:bird;Plank:11:walk the plank;Sails:8:mast;Captain:6:hook,captain hook
+Name a reason people visit New York City|Statue of Liberty:24:statue;Broadway:22:shows,musicals,plays;Shopping:17:shop,fifth avenue;Times Square:15:times square;Food:9:pizza,restaurants;Empire State Building:8:empire state;Central Park:5:central park
+Name something people do at a beach|Swim:31:swimming;Tan:24:sunbathe,lay out,sun;Build sand castles:15:sand castle,sandcastle;Surf:11:surfing,boogie board;Read:9:book;Collect shells:6:shells,seashells;Volleyball:4:play volleyball
+Name a reason a dog might be in the doghouse|Chewed something:32:chewed shoes,chewed,ate shoes;Peed on the rug:23:peed,accident,potty;Bit someone:14:bite,bit;Dug up the yard:11:dug,digging;Barked too much:10:barking;Ate food off the table:6:stole food;Ran away:4:ran off
+Name something people do on a cruise|Eat:38:buffet,food;Drink:16:cocktails,alcohol;Swim:15:pool;Visit islands:11:excursion,port;Gamble:8:casino;Dance:6:shows;Get seasick:6:seasick,throw up
+Name something people do in a hot tub|Relax:38:soak,sit;Drink:20:wine,beer,champagne;Kiss:14:romance,make out;Talk:13:chat;Sleep:6:nap;Get massage:5:jets,massage;Read:4:read
+Name an animal that hops|Kangaroo:46:kangaroos,wallaby;Rabbit:28:bunny,rabbits,hare;Frog:20:frogs,toad;Grasshopper:4:cricket;Flea:2:fleas
+Name a food you'd eat at a ballpark|Hot dog:52:hot dogs,frank;Peanuts:18:peanut;Nachos:10:nacho;Popcorn:7:cracker jacks;Pretzel:6:soft pretzel;Burger:4:hamburger;Cotton candy:3:candy
+Name something you might do at a family reunion|Eat:34:food,potluck,dinner;Catch up:21:talk,visit;Take a group picture:16:photos,pictures,photo;Play games:12:sports,softball;Hug:9:hugs;Drink:5:beer;Argue:3:fight
+Name something you'd find in a nursery|Crib:42:bed,cradle;Baby:22:infant;Diapers:13:diaper;Toys:9:stuffed animals,teddy bear;Changing table:7:changing table;Rocking chair:4:rocker;Mobile:3:night light
+Name something people do on a lunch break|Eat:62:lunch,eat lunch;Take a walk:11:walk;Run errands:9:errands,shopping;Check phone:8:phone;Nap:6:sleep;Smoke:4:cigarette
+Name something with a lot of seeds|Watermelon:42:watermelon;Pomegranate:16:pomegranates;Strawberry:12:strawberries;Pumpkin:11:pumpkins;Sunflower:8:sunflowers;Tomato:6:cucumber;Kiwi:5:kiwi
+Name something people take on a picnic|Sandwiches:30:sandwich,food;Blanket:24:picnic blanket;Basket:15:picnic basket;Drinks:13:lemonade,soda,water;Chips:8:snacks;Fruit:6:watermelon,grapes;Napkins:4:plates
+Name something you might ride|Bike:35:bicycle;Horse:24:pony;Car:12:bus,taxi;Roller coaster:11:rides,coaster;Motorcycle:9:scooter;Skateboard:5:surfboard;Train:4:subway
+Name a reason someone might stay up all night|Studying:28:exam,test,homework,study;Party:22:partying,club;Baby crying:16:baby,newborn;Worried:12:stress,anxiety,insomnia;Work:10:deadline,job;Watch a movie:7:tv,binge watch;Video games:5:gaming
+Name a reason people leave a party early|Tired:30:sleepy,exhausted;Bored:22:boring party;Work tomorrow:16:work,early morning;Sick:11:not feeling well,ill;Babysitter:10:kids,children;Drunk:7:too much to drink;Fight:4:argument
+Name a famous cartoon cat|Garfield:41:garfield;Tom:21:tom and jerry;Sylvester:15:sylvester;Felix:11:felix the cat;Cheshire Cat:5:cheshire;Hello Kitty:4:hello kitty;Top Cat:3:top cat
+Name something people do while watching a scary movie|Scream:30:yell,screaming;Cover their eyes:26:close eyes,hide eyes;Hide under a blanket:14:blanket,hide;Grab someone:12:hold hands,cuddle,hug;Eat popcorn:9:popcorn;Jump:6:jump;Turn on the lights:3:lights
+Name something you see at a train station|Trains:30:train,subway;Tracks:20:railroad tracks;Tickets:14:ticket booth;People waiting:13:passengers,commuters;Benches:10:bench,seats;Clock:7:schedule,board;Conductor:6:conductors
+Name a reason people get married|Love:62:in love;Kids:11:start a family,family,baby;Money:9:financial;Pregnant:7:pregnancy;Companionship:6:lonely;Taxes:5:benefits,green card
+Name something people do with chewing gum|Chew it:38:chew;Blow bubbles:28:bubbles,bubble;Stick it under a table:13:under desk,stick it;Spit it out:9:spit;Swallow it:7:swallow;Freshen breath:5:breath
+Name something associated with Easter|Eggs:35:easter eggs,egg hunt;Easter bunny:26:bunny,rabbit;Candy:14:chocolate,jelly beans,peeps;Church:10:jesus,resurrection;Baskets:9:basket;Ham:6:dinner
+Name a reason you might call in sick to work|Flu:32:sick,fever,cold,illness;Hangover:20:drunk,hungover;Need a day off:18:mental health,tired,lazy;Kids are sick:12:kids,children;Doctor appointment:10:appointment;Bad weather:5:snow;Family emergency:3:emergency
+Name something people check before leaving for a trip|Locks:24:doors,lock the door;Weather:20:forecast;Tickets:16:passport,id,boarding pass;Luggage:13:bags,suitcase;Stove:11:oven,iron;Gas in the car:9:gas,tires;Phone:7:charger
+Name a place where you can't wear shoes|Beach:20:sand;Pool:18:swimming pool;Bed:16:bedroom;Someone's house:15:home,friend's house;Mosque:11:temple;Bounce house:10:trampoline;Airport security:10:tsa
+Name a reason people go back to school|Better job:40:job,career;More money:22:money,raise;Degree:14:finish degree,diploma;Learn something new:12:learn,knowledge;Change careers:8:new career;Kids grew up:4:empty nest
+Name something kids collect|Trading cards:30:pokemon cards,baseball cards,cards;Toys:20:action figures,dolls;Rocks:16:rocks;Stickers:14:sticker;Shells:9:seashells;Coins:7:coin;Bugs:4:insects
+Name a reason you'd go to the bank|Deposit money:42:deposit,cash a check,check;Withdraw money:24:withdraw,cash,money;Get a loan:14:loan,mortgage;Open an account:10:account;Safe deposit box:6:safety deposit;Talk to someone:4:help
+Name something associated with the circus|Clowns:44:clown;Elephants:16:elephant;Tightrope:12:trapeze,acrobats;Lions:10:lion tamer,tigers;Tent:7:big top;Ringmaster:6:ringleader;Cotton candy:5:popcorn,peanuts
+Name a reason you might return a gift|Wrong size:38:size,doesn't fit,too small,too big;Didn't like it:25:ugly,hate it;Already have one:15:have it,duplicate;Broken:9:damaged,defective;Need the money:8:money,cash;Wrong color:5:color
+Name something people do at a wedding reception|Dance:38:dancing;Eat:22:dinner,food;Drink:15:champagne,cocktails;Cut the cake:10:cake;Throw the bouquet:8:bouquet,garter;Give speeches:7:speech,toast
+We asked 100 married men: name something your wife always complains about|Leaving the toilet seat up:28:toilet seat,seat up;Not helping around the house:22:chores,housework,cleaning,dishes;Snoring:16:snore;Watching too much sports:12:sports,tv,football;Dirty clothes on the floor:10:clothes,laundry,mess;Not listening:8:listen;Working too much:4:work
+We asked 100 married women: name something your husband does that drives you crazy|Snores:26:snoring;Leaves clothes on the floor:21:clothes,mess,dirty clothes;Hogs the remote:16:remote,channel surfing,tv;Doesn't listen:15:ignores me,listen;Leaves the toilet seat up:12:toilet seat;Plays video games:6:games;Burps:4:farts
+Name something that's hard to do while wearing gloves|Text:31:texting,phone,type;Pick up coins:16:pick up,coins,small things;Write:15:writing;Tie shoes:12:shoelaces;Button a shirt:10:buttons;Eat:9:open a package;Play piano:7:piano,guitar
+Name something people do in the morning|Brush teeth:28:teeth;Drink coffee:24:coffee;Shower:19:bath;Eat breakfast:13:breakfast,eat;Get dressed:8:dress;Check phone:5:phone,email;Exercise:3:run,jog
+Name something you'd find in a kitchen drawer|Silverware:34:forks,spoons,knives,utensils;Can opener:16:opener;Spatula:13:spatulas;Dish towels:11:towels;Measuring spoons:9:measuring cups;Rubber bands:9:twist ties;Scissors:8:scissor
+Name something you might find under your bed|Dust bunnies:28:dust,dirt;Shoes:22:shoe,slippers;Socks:15:sock;Monsters:12:monster,boogeyman;Boxes:9:storage,suitcase;Toys:8:toy;Magazines:6:books
+Name a famous bear|Winnie the Pooh:38:pooh,winnie;Yogi Bear:24:yogi;Smokey Bear:13:smokey;Teddy Bear:9:teddy;Paddington:7:paddington;Baloo:5:baloo;Fozzie:4:fozzie,care bears
+Name a reason you might get pulled over|Speeding:58:speed,going too fast;Running a red light:15:red light,ran a light;Broken taillight:10:taillight,headlight;Drunk driving:7:drunk,dui;Expired tags:6:registration,tags;Texting:4:phone
+Name something people do on the weekend|Sleep in:28:sleep,rest;Clean the house:20:clean,chores,laundry;Go out:17:party,bar,club;Watch TV:12:movies,tv;Shop:10:shopping,groceries;Visit family:8:family;Yard work:5:mow the lawn
+Name something associated with a cowboy|Hat:34:cowboy hat;Horse:30:horses;Boots:16:cowboy boots;Lasso:9:rope;Guns:5:gun,pistol;Spurs:4:saddle
+Name a food that's often fried|Chicken:38:fried chicken,wings;French fries:28:fries,potatoes;Fish:12:fish and chips;Eggs:8:egg;Onion rings:7:onions;Donuts:4:doughnuts;Shrimp:3:shrimp
+Name something you'd see at a music festival|Bands:28:band,music,stage;Crowds:22:people,crowd;Food trucks:13:food;Tents:12:camping;Port-a-potties:10:porta potty,bathrooms;Mud:9:dirt;Flower crowns:6:costumes,face paint
+Name something that runs|Water:22:faucet;Nose:19:runny nose;People:15:runner,person;Car:12:engine;Clock:10:time;Refrigerator:9:fridge;Stockings:8:tights,pantyhose
+Name a reason people go to the doctor|Checkup:36:physical,annual,check up;Sick:30:illness,flu,cold,fever;Shots:12:vaccine,flu shot,vaccination;Injury:10:hurt,broken bone,pain;Prescription:7:medicine,refill;Pregnancy:5:pregnant
+Name something people do before a job interview|Practice answers:24:practice,rehearse,prepare;Research the company:21:research;Pick out clothes:18:dress up,iron clothes,clothes;Get a haircut:12:haircut,shave;Pray:9:prayer;Get nervous:9:nervous,sweat;Print their resume:7:resume
+Name something you might have to wait for|Bus:22:train,ride;Doctor:18:appointment;Food:15:table,restaurant;Mail:14:package,delivery;Bathroom:12:restroom;Paycheck:10:payday,money;Pizza:9:pizza delivery
+Name a type of bird|Robin:22:robins;Eagle:20:bald eagle,eagles;Blue jay:15:jay;Cardinal:13:cardinals;Parrot:12:parakeet;Crow:10:raven;Pigeon:8:dove,pigeons
+Name something you'd buy at a hardware store|Hammer:28:hammers;Nails:23:nail,screws;Paint:16:paintbrush;Tools:12:wrench,screwdriver,tool;Light bulbs:9:bulbs;Lumber:7:wood;Tape:5:duct tape
+Name a famous Jack|Jack Nicholson:22:nicholson;Jack Sparrow:20:sparrow;Jack and Jill:16:jack and jill;Jack Black:14:black;Jack in the Box:11:jack in the box;Jack Frost:10:frost;Jack Kennedy:7:jfk,kennedy
+Name something people do to get ready for a party|Shower:25:bathe,bath;Get dressed:22:pick an outfit,clothes,dress up;Do their hair:18:hair;Put on makeup:15:makeup;Clean the house:10:clean;Buy drinks:6:alcohol;Shave:4:shave
+Name something you find in a toolbox|Hammer:38:hammers;Screwdriver:30:screwdrivers;Wrench:13:wrenches;Pliers:9:plier;Tape measure:5:measuring tape,ruler;Nails:5:screws
+Name a reason you might stay in your car after parking|Finish a song:30:song,music,radio;Phone call:26:on the phone,call,talking;Raining:14:rain,weather;Eating:10:finish eating,food;Waiting for someone:9:waiting;Napping:6:sleep;Crying:5:cry
+Name something that might be "sharp"|Knife:48:knives,blade;Pencil:17:pencils;Scissors:12:scissor;Needle:9:pin;Mind:7:wit,brain;Teeth:4:claws;Cheddar:3:cheese
+Name something people put on their Christmas tree|Lights:32:light;Ornaments:30:ornament,balls;Star:16:angel,topper;Tinsel:9:garland;Candy canes:7:candy cane;Popcorn:6:popcorn strings
+Name a reason someone might get fired|Being late:34:late,tardy;Stealing:24:theft,stole;Not showing up:13:absent,no show,skipping;Bad attitude:10:rude,attitude;Drinking on the job:9:drunk,drugs;Fighting:6:fight;Lazy:4:lazy
+Name a part of the body that people pierce|Ears:48:ear;Nose:20:nostril;Belly button:13:navel,belly;Tongue:9:mouth;Eyebrow:6:brow;Lip:4:lips
+Name something people do at a sports game|Cheer:34:yell,scream,clap;Eat:20:hot dogs,food;Drink beer:15:drink,beer;Do the wave:11:wave;Boo:9:booing;Paint their face:6:face paint;Catch a foul ball:5:ball
+Name something you'd find in a medicine cabinet|Aspirin:28:pain reliever,tylenol,advil,ibuprofen;Band-Aids:23:bandaids,bandages;Toothpaste:14:toothbrush;Vitamins:12:pills;Cough syrup:9:cold medicine;Razor:8:shaving cream;Cotton balls:6:q-tips,qtips
+Name something that comes with a lid|Jar:24:jars;Pot:20:pan,pots;Box:14:container,tupperware;Coffee cup:12:cup,mug;Toilet:12:toilet seat;Trash can:10:garbage can;Piano:8:piano
+Name a reason you might be up at 3 AM|Can't sleep:32:insomnia;Bathroom:22:pee,restroom;Baby:16:feeding,newborn;Work:11:night shift,job;Party:9:out late,club;Bad dream:6:nightmare;Sick:4:ill
+Name something people do to show they're happy|Smile:52:grin;Laugh:18:laughing;Dance:11:dancing;Jump up and down:8:jump;Hug:6:hug someone;Sing:5:whistle
+Name a word that comes before "cake"|Birthday:30:birthday;Cheese:22:cheesecake;Pan:15:pancake;Cup:13:cupcake;Wedding:10:wedding;Carrot:6:carrot;Chocolate:4:chocolate
+Name something people do when they're sick|Sleep:39:rest,nap;Take medicine:22:medicine,pills;Drink soup:14:soup,chicken soup;Stay home:10:call in,stay in bed;Watch TV:9:tv;Go to the doctor:6:doctor
+Name a reason you might go to a hotel|Vacation:38:trip,travel,holiday;Business trip:22:work,conference;Wedding:11:event;Romance:10:honeymoon,anniversary,date night;Visiting family:9:family;Fight at home:6:argument,kicked out;Pool:4:pool
+Name something people do at a playground|Swing:35:swings;Slide:28:go down the slide,slides;Climb:13:monkey bars,jungle gym;Seesaw:10:teeter totter;Play tag:8:tag,run;Sandbox:6:sand
+Name something you'd find at a car wash|Soap:30:suds,bubbles;Water:22:hose,sprayer;Brushes:16:brush;Towels:11:rags;Vacuum:10:vacuums;Wax:7:air freshener;Dirty cars:4:cars
+Name a famous wizard|Harry Potter:38:harry;Gandalf:20:gandalf;Merlin:18:merlin;Dumbledore:12:dumbledore;Wizard of Oz:8:oz;Mickey Mouse:4:sorcerer's apprentice
+Name something people do on Halloween|Trick or treat:44:trick or treating,candy;Wear a costume:24:dress up,costume;Carve pumpkins:11:pumpkin,jack o lantern;Go to a party:9:party;Watch scary movies:7:scary movie,horror movie;Haunted house:5:haunted house
+Name something you associate with Hawaii|Beaches:22:beach,ocean,sand;Hula:20:hula dancers,dancing;Leis:15:lei,flowers;Surfing:13:surf;Volcanoes:11:volcano;Pineapple:10:pineapples;Luau:9:luau
+Name something people forget at the grocery store|Milk:30:milk;Bread:20:bread;Eggs:16:egg;Shopping list:11:list;Reusable bags:9:bags;Coupons:8:coupon;Wallet:6:money
+Name a reason someone might wear a hat|Sun:32:shade,sunny;Bad hair day:25:hair,cover hair,bald;Cold:18:keep warm,winter;Fashion:12:style,look good;Sports team:7:baseball,team;Rain:6:weather
+Name something you might do at a museum|Look at art:44:art,paintings,look;Learn:16:read,history;Take pictures:13:photos;Buy souvenirs:10:gift shop;Take a tour:9:tour,guide;See dinosaurs:5:dinosaur;Whisper:3:quiet
+Name a reason people go camping|Nature:30:outdoors,fresh air,scenery;Get away:20:escape,relax,peace and quiet;Fishing:15:fish;Family time:13:family,kids;Cheap vacation:9:cheap,money;Hiking:8:hike;Campfire:5:s'mores
+Name something people do in a library besides read|Study:36:homework,research;Use the computer:23:computer,internet,wifi;Sleep:14:nap;Whisper:10:talk;Meet friends:8:socialize;Print things:6:copy,printer;Check out movies:3:dvds
+Name a place where you might see a lot of candles|Church:38:chapel;Birthday cake:24:cake,birthday;Restaurant:12:romantic dinner;Bathroom:9:bath;Home:7:living room,dining table;Wedding:6:vigil;Candle store:4:yankee candle
+Name something associated with a king|Crown:48:crowns;Throne:20:chair;Castle:11:palace;Queen:10:wife;Scepter:6:jewels;Robe:5:cape
+Name something people do at a laundromat|Wash clothes:40:laundry,wash;Wait:20:sit;Read:12:magazines;Fold clothes:12:fold;Play on their phone:9:phone;Use the vending machine:4:snacks;Talk:3:chat
+Name something that might be "spilled"|Milk:34:drink;Coffee:24:tea;Beans:13:secret,secrets,spill the beans;Juice:10:soda;Wine:9:beer;Water:6:glass of water;Paint:4:ink
+Name a reason someone might go to the emergency room|Broken bone:30:broken arm,broken leg,fracture;Heart attack:22:chest pain,heart;Car accident:15:accident,wreck;Cut:12:bleeding,stitches;Can't breathe:9:asthma,breathing;Food poisoning:7:poisoning;Baby coming:5:labor
+Name something people do at a drive-in movie|Watch the movie:30:movie,watch;Make out:28:kiss,romance;Eat popcorn:16:popcorn,snacks,eat;Sit in the car:10:sit in car;Listen to the radio:8:radio;Fall asleep:5:sleep
+Name something that makes a baby cry|Hunger:40:hungry,food,bottle;Wet diaper:22:diaper,dirty diaper;Tired:13:sleepy,nap;Teething:10:teeth;Loud noise:7:noise;Strangers:5:stranger;Gas:3:tummy ache
+Name something you'd see at the Olympics|Athletes:26:athlete,competitors;Gold medals:24:medals,medal,gold;Torch:15:flame,olympic torch;Flags:12:flag;Rings:9:olympic rings;Swimming:8:track,gymnastics;Crowd:6:fans
+Name something associated with France|Eiffel Tower:44:eiffel;Wine:15:champagne;Paris:14:paris;Bread:9:baguette,croissant;Berets:7:beret;Cheese:6:cheese;Kissing:5:french kiss
+Name something people do when they're angry|Yell:38:scream,shout;Slam doors:16:slam,door;Curse:13:swear,cuss;Cry:10:tears;Hit something:9:punch,throw;Go for a walk:8:walk away;Count to ten:6:breathe
+Name something you'd find in a classroom desk|Pencils:30:pencil,pens;Books:22:textbooks,book;Paper:14:notebooks,notebook;Gum:12:chewing gum;Erasers:9:eraser;Crayons:8:markers;Notes:5:love notes
+Name a reason people use their phone|Call:28:phone call,talk;Text:24:texting,message;Social media:17:facebook,instagram,tiktok;Check email:10:email;Games:9:play games;Directions:7:gps,maps;Pictures:5:camera,photos
+Name something people might be "addicted" to|Coffee:24:caffeine;Phone:20:social media,internet;Chocolate:15:sugar,candy,sweets;Cigarettes:14:smoking,nicotine;Alcohol:11:drinking,beer;Shopping:9:spending;Gambling:7:video games
+Name something associated with Ireland|Leprechauns:30:leprechaun;Four-leaf clover:20:clover,shamrock;St. Patrick's Day:15:st patrick,saint patrick;Green:12:color green;Beer:11:guinness;Pot of gold:8:gold,rainbow;Potatoes:4:potato
+Name something you'd do if you were stranded on a desert island|Build a shelter:28:shelter,hut;Find water:19:water,drink;Make a fire:16:fire;Fish:14:hunt,find food,food;Make an SOS sign:12:sos,signal,help sign;Swim:6:swim away;Cry:5:panic
+Name something people buy on vacation|Souvenirs:33:souvenir,trinkets;T-shirts:22:shirt,shirts;Postcards:13:postcard;Food:10:snacks;Sunscreen:9:sunblock;Magnets:8:magnet;Jewelry:5:keychain
+Name something people do in the bathroom besides use the toilet|Brush teeth:30:teeth;Shower:22:bath;Read:16:book,magazine;Put on makeup:12:makeup;Look at their phone:9:phone;Shave:7:shaving;Cry:4:hide
+Name a famous Mike|Michael Jordan:30:jordan;Michael Jackson:28:jackson;Mike Tyson:16:tyson;Mike Myers:9:myers;Michael Phelps:7:phelps;Mike Wazowski:6:monsters inc;Michael Scott:4:the office
+Name something people do at the end of the day|Go to bed:34:sleep,bed;Watch TV:20:tv;Take a shower:13:shower,bath;Eat dinner:12:dinner;Relax:9:unwind;Read:7:book;Pray:5:prayer
+Name something people do at a car dealership|Test drive:36:drive,test drive;Haggle:24:negotiate,bargain;Buy a car:15:buy;Look at cars:12:browse;Wait:8:sit;Sign papers:5:paperwork
+Name something that's associated with winter|Snow:46:snowflakes;Cold:16:freezing;Christmas:12:holidays;Ice:9:icicles;Hot chocolate:7:cocoa;Skiing:6:sledding;Fireplace:4:fire
+Name something you might see on a farm in the morning|Rooster:32:rooster crowing,crowing;Cows:22:cow,milking;Tractor:14:farmer;Sunrise:12:sun;Chickens:9:hens,eggs;Dew:6:fog;Horses:5:horse
+Name something people do after a big meal|Nap:34:sleep;Unbutton their pants:22:loosen belt,belt,unbutton;Watch TV:14:tv,football;Burp:10:belch;Wash dishes:9:dishes,clean up;Walk:7:take a walk;Eat dessert:4:dessert
+Name something a cat does|Sleep:30:nap;Meow:22:meows;Purr:17:purring;Scratch:13:scratches,scratch furniture;Eat:8:food;Lick itself:6:groom,clean;Chase mice:4:hunt
+Name a reason you might be awake early on a Saturday|Kids:30:children,cartoons;Work:20:job;Exercise:15:gym,run;Yard work:12:mow the lawn,chores;Garage sales:9:yard sales;Sports:8:soccer game,kids sports;Can't sleep:6:habit
+Name something you find at a birthday party|Cake:38:birthday cake,cupcakes;Presents:22:gifts;Balloons:16:balloon;Candles:9:candle;Games:7:pinata;Party hats:5:hats;Ice cream:3:ice cream
+Name something people do when it's really hot outside|Swim:30:pool,swimming;Turn on the AC:24:air conditioning,ac,fan;Drink water:16:drink,lemonade;Stay inside:10:stay indoors;Eat ice cream:9:ice cream,popsicles;Wear shorts:6:shorts,less clothes;Sweat:5:sweat
+Name something associated with Mexico|Tacos:30:food,burritos;Sombrero:18:hat;Tequila:16:margaritas,margarita;Beaches:11:cancun;Mariachi:9:music;Spanish:8:language;Piñata:8:pinata
+Name something you need a ticket for|Movie:28:movies;Concert:25:show;Airplane:18:flight,plane;Sporting event:12:game,football game;Train:8:bus;Raffle:5:lottery;Amusement park:4:theme park
+Name something people do at a pool party|Swim:44:swimming;Cannonball:14:jump in,dive;Barbecue:12:grill,eat;Tan:10:sunbathe;Drink:10:beer,cocktails;Play games:6:volleyball,marco polo;Get pushed in:4:push
+Name a reason a person might blush|Embarrassed:44:embarrassment;Compliment:22:complimented;Crush:16:flirt,someone cute;Caught in a lie:7:lie;Hot:5:warm;Makeup:3:blush;Shy:3:nervous
+Name something that's associated with Texas|Cowboys:28:cowboy;Big:19:everything is bigger;Barbecue:14:bbq;Oil:12:oil wells;Heat:10:hot;Alamo:9:the alamo;Longhorns:8:cattle
+Name a type of dance|Salsa:24:salsa;Tango:20:tango;Ballet:17:ballet;Waltz:13:waltz;Hip hop:11:hip-hop;Square dance:8:line dance;Tap:7:tap dancing
+Name something people do in their car while waiting|Listen to music:32:music,radio;Check phone:28:phone,text;Eat:12:snack;Nap:9:sleep;Put on makeup:8:makeup;Read:6:book;People watch:5:look around
+Name something you'd hate to run out of|Toilet paper:44:tp,toilet tissue;Gas:20:fuel;Money:13:cash;Coffee:10:caffeine;Food:7:milk;Phone battery:6:battery
+Name a word that comes after "snow"|Man:34:snowman;Ball:24:snowball;Flake:16:snowflake;Storm:11:blizzard;Board:8:snowboard;Plow:4:shovel;Cone:3:snow cone
+Name something associated with the beach|Sand:31:sandy;Water:22:ocean,waves,sea;Sun:18:sunshine;Seashells:12:shells;Towels:8:towel;Lifeguard:5:lifeguards;Seagulls:4:birds
+Name something people do on their phone in bed|Scroll social media:36:social media,scroll,instagram,tiktok,facebook;Text:22:message;Watch videos:15:youtube,netflix,movies;Play games:10:games;Read:8:news,books;Set an alarm:6:alarm;Online shopping:3:shop
+Name something you'd find in a sewing kit|Needle:36:needles;Thread:33:string;Pins:11:pin,pin cushion;Buttons:9:button;Scissors:6:scissor;Thimble:5:thimbles
+Name a reason people visit Florida|Disney World:42:disney,disneyland,theme parks;Beaches:24:beach,ocean;Weather:15:warm,sun;Retirement:8:retire;Visit family:6:family,grandparents;Spring break:5:party
+Name a kind of soup|Chicken noodle:40:chicken,chicken soup;Tomato:20:tomato soup;Vegetable:12:veggie;Clam chowder:10:chowder;Split pea:7:pea;Minestrone:6:minestrone;French onion:5:onion
+Name something people do to prepare for a hurricane|Board up windows:28:board,windows,plywood;Buy water:22:water;Stock up on food:16:food,groceries,canned food;Evacuate:13:leave,evacuation;Get batteries:9:batteries,flashlight;Buy a generator:7:generator;Fill up gas:5:gas
+Name something you associate with a superhero|Cape:38:capes;Mask:20:masks;Super powers:15:powers,flying;Costume:11:suit,spandex;Saving people:9:hero,save the day;Secret identity:7:alter ego
+Name something people do at a coffee shop|Drink coffee:34:coffee,latte;Work on a laptop:22:laptop,work,computer;Read:12:book,newspaper;Meet a friend:11:chat,talk,meet;Study:9:homework;Use the wifi:7:wifi,internet;Eat a pastry:5:muffin,scone,croissant
+Name something that's associated with a graduation|Cap and gown:34:cap,gown,hat;Diploma:24:degree;Party:14:celebration;Speeches:11:speech,valedictorian;Throwing hats:9:toss caps;Gifts:5:money,cards;Pictures:3:photos
+Name something you might find in a teenager's bedroom|Dirty clothes:34:clothes,laundry;Posters:18:poster;Phone charger:12:phone;Video games:11:xbox,playstation,games;Dirty dishes:10:dishes,cups;Makeup:9:makeup;Trash:6:mess,junk
+Name a reason people go to the beach in winter|Walk:30:stroll,exercise;Watch the waves:20:ocean,waves;Peace and quiet:17:quiet,no crowds;Collect shells:11:shells;Take pictures:9:photos;Walk the dog:8:dog;Surf:5:surf
+Name a famous Jennifer|Jennifer Aniston:38:aniston;Jennifer Lopez:30:lopez,j lo,jlo;Jennifer Lawrence:16:lawrence;Jennifer Garner:7:garner;Jennifer Hudson:5:hudson;Jennifer Love Hewitt:4:hewitt
+Name something people bring to work every day|Lunch:31:food;Phone:22:cell phone;Coffee:16:mug;Keys:11:car keys;Bag:9:purse,backpack;ID badge:7:badge,id;Water bottle:4:water
+Name something that has a remote control|TV:58:television;Garage door:13:garage;Car:9:car alarm,keys;Toy car:8:drone,toys;Air conditioner:5:fan,ac;Stereo:4:sound system;Fireplace:3:lights
+Name something people do when they first wake up|Stretch:22:yawn;Go to the bathroom:21:pee,bathroom;Check phone:18:phone;Make coffee:15:coffee;Brush teeth:10:teeth;Turn off the alarm:8:alarm,snooze;Pray:6:prayer
+Name a reason people go to Disney World|Rides:30:roller coasters,attractions;Kids:24:children,family;Meet characters:15:mickey,characters,princesses;Fun:12:vacation;Fireworks:8:shows,parades;Honeymoon:6:anniversary;Food:5:churros
+Name something associated with a library card|Books:56:book,check out;Fines:12:late fees,fine;Library:12:library;Movies:8:dvds;Computers:6:internet;ID:6:barcode
+Name something that might be "fake"|Nails:22:fingernails;Eyelashes:18:lashes;Money:17:cash,bills;Tan:12:spray tan;Smile:11:laugh;News:11:news;ID:9:id card
+Name a reason someone might go to bed early|Tired:48:exhausted,sleepy;Early start:20:work,early morning;Sick:15:ill,not feeling well;Bored:8:nothing to do;Avoid someone:5:fight;Old age:4:old
+Name something people do at a bonfire|Roast marshmallows:38:marshmallows,s'mores,smores;Tell stories:18:ghost stories,stories;Sing songs:13:sing,guitar;Drink:11:beer;Stay warm:10:warm up,warm hands;Cook hot dogs:6:hot dogs;Stare at the fire:4:watch the fire
+Name something associated with Italy|Pizza:28:pizza;Pasta:26:spaghetti,noodles;Rome:12:colosseum,venice;Wine:10:vino;Leaning Tower of Pisa:9:pisa,leaning tower;Pope:7:vatican;Gelato:5:ice cream
+Name a reason people use a calendar|Appointments:36:doctor appointments,appointment;Birthdays:22:birthday;Holidays:12:dates;Work schedule:10:work,meetings;Paying bills:8:bills;Kids' activities:7:school events,practice;Countdown to vacation:5:vacation
+Name something you'd find in a backpack|Books:34:textbooks,book;Notebook:18:paper,binder;Pencils:15:pens,pencil case;Lunch:11:snacks,food;Water bottle:9:water;Laptop:8:computer,tablet;Calculator:5:calculator
+Name something people do to save money|Use coupons:30:coupons,coupon;Cook at home:20:cook,eat at home,stop eating out;Shop sales:14:sales,discount,thrift;Budget:12:budgeting;Cancel subscriptions:9:subscriptions,cable;Carpool:8:bike,walk;Buy generic:7:store brand
+Name something associated with dinosaurs|T. rex:30:t rex,tyrannosaurus;Fossils:22:bones,fossil;Extinct:15:extinction,asteroid;Jurassic Park:14:jurassic park,movie;Museum:9:museum;Big:6:huge;Eggs:4:eggs
+Name something people do at a high school reunion|Catch up:30:talk,reminisce,visit;Drink:20:alcohol,beer;Dance:15:dancing;Show off:12:brag,compare;Look at old pictures:10:yearbook,photos;Gossip:8:gossip;Reconnect with an old flame:5:crush,ex
+Name something that's hard to wake up from|Nap:30:afternoon nap;Deep sleep:22:sleep;Dream:18:good dream;Hangover:12:drinking;Anesthesia:10:surgery;Coma:8:coma
+Name something people keep in their car|Sunglasses:24:glasses;Phone charger:20:charger,cord;Napkins:16:tissues;Spare change:13:coins,money;Water:11:water bottle;Umbrella:9:jacket;Snacks:7:gum,mints
+Name a famous Smith|Will Smith:58:will;Anna Nicole Smith:10:anna nicole;Sam Smith:9:sam;John Smith:8:pocahontas;Jaden Smith:8:jaden;Emmitt Smith:7:emmitt`;
+const FQ=FEUD_RAW.trim().split("\n").map(ln=>{ const [q,rest]=ln.split("|");
+  return {q, a:rest.split(";").map(x=>{ const [d,p,al]=x.split(":"); return {d, p:+p, al:[d,...(al?al.split(","):[])]}; })}; });
+const FD_MULT=[1,2,3], FD_FM_SECS=25, FD_FM_GOAL=100;
+
+/* matching typed answers: plurals, small typos and partial phrases all count */
+const FD_STOP=new Set("a an the my your his her their our some to of for at in on with and or is be it its i you they them".split(" "));
+const fdStem=w=>w.length>4?w.replace(/ies$/,"y").replace(/(ing|ed|es|s)$/,""):w.length>3?w.replace(/s$/,""):w;
+const fdTok=s=>String(s).toLowerCase().replace(/[’'.]/g,"").replace(/&/g," and ").replace(/[^a-z0-9 ]+/g," ").split(/\s+/).filter(w=>w&&!FD_STOP.has(w)).map(fdStem);
+function fdLev(a,b){ if(a===b) return 0; const m=a.length, n=b.length; if(!m||!n) return m||n; let p=Array.from({length:n+1},(_,i)=>i);
+  for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; } return p[n]; }
+function fdScore(guess,ans){ const g=fdTok(guess); if(!g.length) return 0; const gs=g.join(" "); let best=0;
+  for(const al of ans.al){ const t=fdTok(al); if(!t.length) continue; const ts=t.join(" ");
+    if(gs===ts) return 100;
+    if(t.every(w=>g.includes(w))) best=Math.max(best,80+t.length);
+    else if(g.length<=2&&g.every(w=>w.length>=4&&t.includes(w))) best=Math.max(best,60);
+    else { const tol=ts.length>=8?2:ts.length>=5?1:0; if(tol&&Math.abs(gs.length-ts.length)<=2&&fdLev(gs,ts)<=tol) best=Math.max(best,70);
+      else if(g.length===1&&g[0].length>=5) for(const w of t) if(w.length>=5&&fdLev(g[0],w)<=1){ best=Math.max(best,55); break; } } }
+  return best; }
+/* the best matching answer on this board: [index, already shown?] or null */
+function fdFind(guess,q,shown){ let bi=-1, bs=0; q.a.forEach((a,i)=>{ const s=fdScore(guess,a); if(s>bs||(s===bs&&s&&!shown[i]&&shown[bi])){ bs=s; bi=i; } });
+  return bi<0||!bs?null:[bi,!!shown[bi]]; }
+
+/* sounds: the ding is the app's own; the buzzer is a harsh two-tone square wave */
+function fdBuzz(){ if(!S.sound) return; try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); const t=actx.currentTime, out=actx.createGain(); out.gain.setValueAtTime(.0001,t); out.gain.exponentialRampToValueAtTime(.09,t+.02); out.gain.setValueAtTime(.09,t+.5); out.gain.exponentialRampToValueAtTime(.0001,t+.62); out.connect(actx.destination);
+  [110,117].forEach(f=>{ const o=actx.createOscillator(); o.type="square"; o.frequency.value=f; o.connect(out); o.start(t); o.stop(t+.65); }); }catch(e){} }
+function fdDing(big){ if(!S.sound) return; snd("ok"); if(big) setTimeout(()=>snd("ok"),110); }
+const fdVib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
+
+function fdPick(rng,avoid=new Set()){ const pool=FQ.map((_,i)=>i).filter(i=>!avoid.has(i));
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const main=pool.filter(i=>FQ[i].a.length>=6).slice(0,3), fm=pool.filter(i=>!main.includes(i)).slice(0,5); return {main,fm}; }
+function fdStatus(){ S.fd=S.fd||{}; const d=S.fd[today()]; if(!d) return "";
+  return d.over?`Today's done · ${d.total} pts`:d.phase==="fm"?`Today's #${dayIndex()+1} · round 4`:`Today's #${dayIndex()+1} · round ${d.r+1}`; }
+
+function startFeud(opt={}){
+  const daily=!opt.unlimited, gid=daily?"feud":"feudu", key=today();
+  S.fd=S.fd||{};
+  if(daily&&S.fd[key]&&S.fd[key].over) return fdResults();
+  let st;
+  if(daily&&S.fd[key]) st=S.fd[key];
+  else { const seen=new Set(S.fdSeen||[]); const p=fdPick(daily?seeded("globetrotter-feud-v1-"+key):Math.random,daily?new Set():seen);
+    st={main:p.main,fm:p.fm,r:0,shown:[],strikes:0,bank:0,total:0,rs:[],phase:"main",fma:[],fmi:0,left:FD_FM_SECS*10};
+    if(daily){ S.fd[key]=st; save(); } else { S.fdSeen=[...(S.fdSeen||[]),...p.main,...p.fm].slice(-200); save(); } }
+  begin(gid,daily?`Top Answers #${dayIndex()+1}`:"Unlimited Top Answers"); stage.className="gstage scroll fdstage";
+  const persist=()=>{ if(daily) save(); };
+  let busy=false;
+  const q=()=>FQ[st.main[st.r]];
+  function info(){ $('ginfo').innerHTML=`<span class="fdtot" aria-label="Score ${st.total}">${st.total.toLocaleString()}</span>`; }
+
+  /* ---------- the main rounds ---------- */
+  function board(){ const Q=q(), n=Q.a.length, rows=Math.ceil(n/2), mult=FD_MULT[st.r];
+    const tile=i=>{ if(i>=n) return `<div class="fdt fdx" aria-hidden="true"></div>`; const a=Q.a[i], s=st.shown[i];
+      return `<div class="fdt${s?" up":""}${s==="m"?" miss":""}" data-i="${i}" aria-label="${s?`${esc(a.d)}, ${a.p} points`:`Answer ${i+1}, hidden`}">
+        <div class="fdf"><span class="fdn">${i+1}</span></div><div class="fdb"><span class="fda">${esc(a.d)}</span><span class="fdp">${a.p}</span></div></div>`; };
+    const order=[]; for(let r=0;r<rows;r++){ order.push(r, r+rows); }
+    info();
+    stage.innerHTML=`<div class="fd">
+      <div class="fdhud"><span class="fdround">Round ${st.r+1}<small>${mult===1?"Single":mult===2?"Double":"Triple"} points</small></span>
+        <div class="fdbank" aria-live="polite"><small>Bank</small><b>${st.bank}</b></div>
+        <span class="fdstrikes" aria-label="${st.strikes} of 3 strikes">${[0,1,2].map(k=>`<i class="${k<st.strikes?"on":""}">${FD_X}</i>`).join("")}</span></div>
+      <div class="fdboard"><div class="fdq">${esc(Q.q)}</div><div class="fdgrid" style="--rows:${rows}">${order.map(tile).join("")}</div></div>
+      ${roundOver()?`<div class="fdend"><p>${st.strikes>=3?"Three strikes.":"You found them all!"} Round score <b>${st.bank} × ${mult} = ${st.bank*mult}</b></p>
+        <button class="btn go wide" id="fdnext">${st.r<2?`Round ${st.r+2}`:"Fast Money"}</button></div>`
+      :`<form class="fdin" id="fdform" autocomplete="off"><input id="fdg" type="text" enterkeyhint="go" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn go" type="submit">Guess</button></form>
+        <button class="btn ghost small fdgive" id="fdgive" type="button">Reveal the board</button>`}
+    </div>`;
+    const f=$('fdform');
+    if(f){ f.onsubmit=e=>{ e.preventDefault(); const g=$('fdg').value.trim(); if(!g||busy) return; guess(g); };
+      $('fdgive').onclick=()=>{ if(busy) return; st.strikes=3; endRound(); };
+      setTimeout(()=>{ const i=$('fdg'); if(i&&!matchMedia("(hover: none)").matches) i.focus(); },60); }
+    const nx=$('fdnext'); if(nx) nx.onclick=next;
+  }
+  const roundOver=()=>st.strikes>=3||q().a.every((_,i)=>st.shown[i]);
+  function flip(i,miss){ const el=stage.querySelector(`.fdt[data-i="${i}"]`); if(!el) return; el.classList.add("up"); if(miss) el.classList.add("miss"); el.setAttribute("aria-label",`${q().a[i].d}, ${q().a[i].p} points`); }
+  function guess(g){
+    const Q=q(), hit=fdFind(g,Q,st.shown); const inp=$('fdg');
+    if(hit&&hit[1]){ toast("Already on the board"); inp.value=""; inp.focus(); return; }
+    if(hit){ const i=hit[0]; st.shown[i]=1; st.bank+=Q.a[i].p; persist(); busy=true; inp.value="";
+      flip(i); fdDing(i===0); fdVib(12); flash();
+      const bk=stage.querySelector(".fdbank b"); if(bk){ bk.textContent=st.bank; bk.parentNode.classList.remove("pop"); void bk.offsetWidth; bk.parentNode.classList.add("pop"); }
+      later(()=>{ busy=false; if(roundOver()) endRound(); else inp.focus(); },i===0?700:450); return; }
+    st.strikes++; persist(); inp.value=""; strike(st.strikes);
+    if(st.strikes>=3) later(endRound,1200); else inp.focus();
+  }
+  function strike(n){ fdBuzz(); fdVib([40,60,40]); busy=true;
+    const o=document.createElement("div"); o.className="fdbig"; o.setAttribute("aria-hidden","true"); o.innerHTML=Array.from({length:n},()=>FD_X).join(""); stage.appendChild(o);
+    stage.querySelectorAll(".fdstrikes i").forEach((x,k)=>x.classList.toggle("on",k<n)); stage.querySelector(".fdboard")?.classList.add("shake");
+    later(()=>{ o.remove(); stage.querySelector(".fdboard")?.classList.remove("shake"); busy=false; },1050); }
+  function endRound(){ const Q=q(); busy=true; const hidden=Q.a.map((_,i)=>i).filter(i=>!st.shown[i]);
+    hidden.forEach((i,k)=>later(()=>{ st.shown[i]="m"; flip(i,true); if(S.sound) snd("tick"); },350+k*420));
+    later(()=>{ busy=false; const pts=st.bank*FD_MULT[st.r]; if(st.rs[st.r]==null){ st.rs[st.r]=pts; st.total+=pts; } persist(); board(); },400+hidden.length*420); }
+  function next(){ if(st.r<2){ st.r++; st.shown=[]; st.strikes=0; st.bank=0; persist(); board(); scrollTo(0,0); } else { st.phase="fm"; persist(); fmIntro(); } }
+
+  /* ---------- Fast Money ---------- */
+  function fmIntro(){ info();
+    stage.innerHTML=`<div class="fd"><div class="fdboard fdfm"><div class="fdlogo">Fast Money</div>
+      <p class="fdfmt">Five questions. ${FD_FM_SECS} seconds. Give the answer most people would.</p>
+      <p class="fdfmt">Score <b>${FD_FM_GOAL}</b> points or more to win.</p></div>
+      <button class="btn go wide" id="fdgo">Start the clock</button></div>`;
+    $('fdgo').onclick=fmPlay; }
+  function fmPlay(){ let t0=performance.now(), left0=st.left;
+    const ask=()=>{ if(st.fmi>=5||st.left<=0) return fmReveal(); const Q=FQ[st.fm[st.fmi]];
+      stage.innerHTML=`<div class="fd"><div class="fdclock" aria-live="off"><b id="fdsec">${Math.ceil(st.left/10)}</b><i><span id="fdbar"></span></i></div>
+        <div class="fdboard fdfm"><span class="fdqn">Question ${st.fmi+1} of 5</span><div class="fdq">${esc(Q.q)}</div></div>
+        <form class="fdin" id="fdform" autocomplete="off"><input id="fdg" type="text" enterkeyhint="next" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn go" type="submit">Next</button></form>
+        <button class="btn ghost small fdgive" id="fdpass" type="button">Pass</button></div>`;
+      $('fdform').onsubmit=e=>{ e.preventDefault(); answer($('fdg').value.trim()); };
+      $('fdpass').onclick=()=>answer("");
+      const i=$('fdg'); i.focus(); setTimeout(()=>i.focus(),50); };
+    const answer=a=>{ st.fma[st.fmi]=a; st.fmi++; persist(); if(S.sound) snd("tick"); ask(); };
+    const tick=()=>{ const el=$('fdsec'); st.left=Math.max(0,left0-Math.floor((performance.now()-t0)/100));
+      if(el){ el.textContent=Math.ceil(st.left/10); const b=$('fdbar'); if(b) b.style.transform=`scaleX(${st.left/(FD_FM_SECS*10)})`; el.parentNode.classList.toggle("low",st.left<=50); }
+      if(st.left%10===0&&st.left<=50&&st.left>0&&S.sound&&tick.last!==st.left){ tick.last=st.left; snd("tick"); }
+      if(st.left<=0){ while(st.fmi<5){ st.fma[st.fmi]=st.fma[st.fmi]||""; st.fmi++; } persist(); fdBuzz(); return fmReveal(); }
+      if(st.fmi<5) later(tick,100); };
+    ask(); later(tick,100);
+  }
+  function fmReveal(){ st.phase="reveal"; persist(); info();
+    const rows=st.fm.map((qi,k)=>{ const Q=FQ[qi], a=st.fma[k]||"", hit=a?fdFind(a,Q,[]):null; return {Q,a,pts:hit?Q.a[hit[0]].p:0,top:Q.a[0]}; });
+    stage.innerHTML=`<div class="fd"><div class="fdboard fdfm"><div class="fdlogo">Fast Money</div>
+      <div class="fdrows">${rows.map((r,k)=>`<div class="fdrow" data-k="${k}"><span class="fdrq">${esc(r.Q.q)}</span><span class="fdra">${esc(r.a?r.a.toUpperCase():"(PASS)")}</span><span class="fdrp">${r.pts}</span><span class="fdrt">Top answer: ${esc(r.top.d)} (${r.top.p})</span></div>`).join("")}</div>
+      <div class="fdfmtot"><small>Total</small><b id="fdft">0</b></div></div>
+      <div id="fdafter"></div></div>`;
+    let sum=0;
+    rows.forEach((r,k)=>later(()=>{ const el=stage.querySelector(`.fdrow[data-k="${k}"]`); el.classList.add("up"); if(!r.pts) el.classList.add("zero");
+      later(()=>{ el.classList.add("pts"); sum+=r.pts; $('fdft').textContent=sum; if(r.pts){ fdDing(r.pts>=25); fdVib(10); } else fdBuzz(); },650); },500+k*1500));
+    later(()=>{ st.fmpts=sum; const win=sum>=FD_FM_GOAL; st.total=(st.rs||[]).reduce((a,b)=>a+(b||0),0)+sum+(win?100:0); st.win=win; st.over=1; persist(); info();
+      if(win){ confetti(); fdDing(true); }
+      $('fdafter').innerHTML=`<div class="fdend"><p>${win?`You beat ${FD_FM_GOAL}! <b>+100 bonus</b>`:`${sum} points. ${FD_FM_GOAL} wins.`}</p><button class="btn go wide" id="fddone">See your score</button></div>`;
+      $('fddone').onclick=()=>finish(gid,st.total,{sub:`Rounds ${st.rs.map(x=>x||0).join(" + ")} · Fast Money ${sum}${win?" + 100 bonus":""}`,share:fdShare(st,daily),html:fdCard(st),...(daily?{nextG:"feudu",nextLabel:"Play unlimited Top Answers"}:{})}); },500+5*1500+700);
+  }
+  if(st.over) return fdResults();
+  if(st.phase==="reveal") return fmReveal();
+  if(st.phase==="fm") return st.fmi>0||st.left<FD_FM_SECS*10?fmPlay():fmIntro();
+  board();
+}
+const FD_X='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M18 18 82 82M82 18 18 82" stroke="currentColor" stroke-width="20" stroke-linecap="round"/></svg>';
+function fdShare(st,daily){ const rounds=st.main.map((qi,r)=>{ const n=FQ[qi].a.length, got=st.rs[r]!=null?Math.round((st.rs[r]/FD_MULT[r])):0; return `R${r+1} ${st.rs[r]||0}`; }).join(" · ");
+  const fm=st.fm.map((qi,k)=>{ const a=st.fma[k]||"", h=a?fdFind(a,FQ[qi],[]):null; return !h?"⬜":h[0]===0?"🟩":"🟨"; }).join("");
+  return `Top Answers${daily?` #${dayIndex()+1}`:""}\n${rounds}\nFast Money ${fm} ${st.fmpts||0}${st.win?" 🏆":""}\nTotal ${st.total}`; }
+function fdCard(st){ return `<section class="card"><h3>Your game</h3><dl class="fdsum">${st.main.map((qi,r)=>`<dt>Round ${r+1} · ×${FD_MULT[r]}</dt><dd><span>${esc(FQ[qi].q)}</span><b>${st.rs[r]||0}</b></dd>`).join("")}
+  <dt>Fast Money</dt><dd><span>${st.win?"Won the bonus":"Needed "+FD_FM_GOAL}</span><b>${(st.fmpts||0)+(st.win?100:0)}</b></dd></dl></section>`; }
+function fdResults(){ const st=S.fd[today()];
+  show(`${bar("Top Answers")}
+  <section class="card center" style="--c:var(--nm)"><div class="eyebrow" style="font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">Top Answers #${dayIndex()+1}</div>
+    <div class="big">${st.total}</div><p class="muted">points</p><p class="cheer" style="color:var(--ink-2)">New surveys tomorrow</p></section>
+  ${fdCard(st)}
+  ${SHARE_ROW}
+  <button class="btn wide" data-act="play" data-g="feudu">Play unlimited Top Answers</button>
+  <button class="btn ghost wide" data-act="home">Home</button>`);
+  wireShare(fdShare(st,true)); }
+
 /* ================= MINESWEEPER · MAP TAP · STATELE ================= */
 
 /* ---------------- MINESWEEPER ---------------- */
@@ -3688,11 +4227,11 @@ function bestOf(game){ if(game==="sudoku"){ const k=S.best["sudoku:daily"]!=null
   if(game==="msu"){ const k="msu:"+(S.msLvl||"easy"); return {v:S.best[k],h:S.hist[k]}; }
   if(game==="lights"){ const k=`lights:${S.lit}`; return {v:S.best[k],h:S.hist[k]}; } return {v:S.best[game],h:S.hist[game]}; }
 /* ---------- home rows: icon, name, a short tagline, and one clear status on the right ---------- */
-const TAG={mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",mines:"No-guess, same board for all",maptap:"Find 5 cities on a map",statele:"Name the state outline",msu:"Easy, medium or hard",maptapu:"Random cities",stateleu:"Random states",nbrs:"Name every border",dsudoku:"An easy 6×6",
+const TAG={feud:"Name the top survey answers",feudu:"Fresh surveys every game",mini:"5×5 crossword",groups:"Four groups of four",dive:"Rarest answers win",climb:"Common answers win",strands:"Find the theme words",worldle:"Name the outline",travle:"Link two countries",globle:"Hot or cold",flagle:"Name the flag",hilo:"Who has more people?",queens:"One per row, column, color",timeline:"Put events in order",flagleu:"Random flags",hilou:"Random countries",queensu:"Any board",timelineu:"Fresh decks",mines:"No-guess, same board for all",maptap:"Find 5 cities on a map",statele:"Name the state outline",msu:"Easy, medium or hard",maptapu:"Random cities",stateleu:"Random states",nbrs:"Name every border",dsudoku:"An easy 6×6",
   seq:"Repeat the pattern",num:"Remember the digits",match:"Find all 8 pairs",react:"Tap on green",stroop:"The ink, not the word",schulte:"Tap 1 to 25 in order",count:"Hit the target number",sudoku:"6×6, easy to hard",lights:"Turn every light off",
   strandsu:"Any board you like",worldleu:"Random outlines",travleu:"Random routes",globleu:"Random mystery countries",nbrsu:"Random countries",diveu:"Fresh prompts",climbu:"Fresh prompts"};
 function dailyStat(k){ try{ return dailyStat0(k); }catch(e){ console.error(e); return {st:"new"}; } }
-function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():k==="flagle"?flStatus():k==="hilo"?hlStatus():k==="queens"?qnStatus():k==="timeline"?tlStatus():k==="mines"?msStatus():k==="maptap"?mtStatus():k==="statele"?sbStatus():nmStatus(k);
+function dailyStat0(k){ const raw=k==="mini"||k==="groups"?wordStatus(k):k==="dsudoku"?dsStatus():k==="strands"?stStatus():k==="worldle"?wlStatus():k==="travle"?tvStatus():k==="globle"?gbStatus():k==="nbrs"?nbStatus():k==="flagle"?flStatus():k==="hilo"?hlStatus():k==="queens"?qnStatus():k==="timeline"?tlStatus():k==="feud"?fdStatus():k==="mines"?msStatus():k==="maptap"?mtStatus():k==="statele"?sbStatus():nmStatus(k);
   if(/^Today's done/.test(raw)){ let r=(raw.split(" · ")[1]||"done").replace(/ \/ 700$/,"").replace(/ named$/,"").replace(/ guess(es)?$/,"").replace(/^gave up$|^missed it$|^didn't make it$/,"✗");
     if(/^\d+$/.test(r)&&k==="globle") r=r+(r==="1"?" guess":" guesses");
     return {st:"done", r:r.charAt(0).toUpperCase()+r.slice(1)}; }
@@ -3733,7 +4272,7 @@ function home(){
   GT_BK.ui($('bk'),{beforeBackup:save});
   if(backTo!=null){ window.scrollTo(0,backTo); requestAnimationFrame(()=>window.scrollTo(0,backTo)); app.style.transformOrigin=`50% ${Math.round(backTo+innerHeight/2)}px`; app.classList.remove("back"); void app.offsetWidth; app.classList.add("back"); clearTimeout(home.bt); home.bt=setTimeout(()=>app.classList.remove("back"),420); }
 }
-const STARTERS={strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),flagle:()=>startFlagle(),flagleu:()=>startFlagle({unlimited:true}),hilo:()=>startHiLo(),hilou:()=>startHiLo({unlimited:true}),queens:()=>startQueens(),queensu:()=>startQueens({unlimited:true}),timeline:()=>startTimeline(),mines:()=>startMines(),msu:()=>startMines({unlimited:true}),maptap:()=>startMapTap(),maptapu:()=>startMapTap({unlimited:true}),statele:()=>startStatele(),stateleu:()=>startStatele({unlimited:true}),timelineu:()=>startTimeline({unlimited:true}),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
+const STARTERS={feud:()=>startFeud(),feudu:()=>startFeud({unlimited:true}),strands:()=>startStrands(),strandsu:()=>startStrands({unlimited:true}),worldle:()=>startWorldle(),worldleu:()=>startWorldle({unlimited:true}),travle:()=>startTravle(),travleu:()=>startTravle({unlimited:true}),globle:()=>startGloble(),flagle:()=>startFlagle(),flagleu:()=>startFlagle({unlimited:true}),hilo:()=>startHiLo(),hilou:()=>startHiLo({unlimited:true}),queens:()=>startQueens(),queensu:()=>startQueens({unlimited:true}),timeline:()=>startTimeline(),mines:()=>startMines(),msu:()=>startMines({unlimited:true}),maptap:()=>startMapTap(),maptapu:()=>startMapTap({unlimited:true}),statele:()=>startStatele(),stateleu:()=>startStatele({unlimited:true}),timelineu:()=>startTimeline({unlimited:true}),globleu:()=>startGloble({unlimited:true}),nbrs:()=>startNeighbors(),nbrsu:()=>startNeighbors({unlimited:true}),diveu:()=>startNm("dive",{practice:true}),climbu:()=>startNm("climb",{practice:true}),dsudoku:startDSudoku,dive:o=>startNm("dive",o),climb:o=>startNm("climb",o),mini:startMini,groups:startGroups,seq:startSeq,num:startNum,match:startMatch,react:startReact,stroop:startStroop,schulte:startSchulte,count:startCount,sudoku:startSudoku,lights:startLights};
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const a=b.dataset.act;
   if(a==="home") return home();
   if(a==="arch") return archive();

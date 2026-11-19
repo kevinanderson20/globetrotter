@@ -166,6 +166,8 @@ code = rep(code, '/*LISTS*/', open('tools/games/lists.js', encoding='utf-8').rea
 code = rep(code, '/*GEOGAMES*/', open('tools/games/geogames.js', encoding='utf-8').read(), 1)  # Worldle and Travle
 code = rep(code, '/*GAMES3*/', open('tools/games/games3.js', encoding='utf-8').read(), 1)  # Minesweeper, Map Tap, Statele
 code = rep(code, '/*NEWGAMES*/', open('tools/games/newgames.js', encoding='utf-8').read().replace('/*QUEENS_DATA*/', open('tools/games/queens.js', encoding='utf-8').read()).replace('/*TIMELINE_DATA*/', open('tools/games/timeline.js', encoding='utf-8').read()), 1)  # Flagle, Higher or Lower, Queens, Timeline
+_fd = '\n'.join(open(f'tools/games/feud_data{i}.js', encoding='utf-8').read().strip() for i in (1, 2, 3))
+code = rep(code, '/*FEUD*/', open('tools/games/feud.js', encoding='utf-8').read().replace('/*FEUD_DATA*/', _fd), 1)  # Top Answers and its 300 surveys
 code = rep(code, '/*STRANDSGAME*/', open('tools/games/strandsgame.js', encoding='utf-8').read().replace('/*STRANDS_DATA*/', open('tools/games/strands.js', encoding='utf-8').read()), 1)  # Strands
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
 os.makedirs('games', exist_ok=True)

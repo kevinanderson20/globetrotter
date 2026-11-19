@@ -50,6 +50,13 @@ const GLYPH_BASE={
   timeline:GICO("#ffbe7a","#ea5a0c",`<path d="M6 30h36" stroke="${GW7}" stroke-width="2.4" stroke-linecap="round"/>
     <rect x="7" y="13" width="10" height="12" rx="2.5" fill="${GW7}"/><rect x="19" y="9" width="10" height="16" rx="2.5" fill="${GW}"/><rect x="31" y="15" width="10" height="10" rx="2.5" fill="${GW7}"/>
     <circle cx="12" cy="30" r="3" fill="${GW}"/><circle cx="24" cy="30" r="3.4" fill="#fff3d6" stroke="${GW}" stroke-width="1.6"/><circle cx="36" cy="30" r="3" fill="${GW}"/><path d="M21.5 14h5M21.5 18h3.5" stroke="#ea5a0c" stroke-width="1.6" stroke-linecap="round"/>`),
+  /* Top Answers: a gold-framed survey board, one answer flipped over */
+  feud:GICO("#4f86ff","#0b2a8c",`<rect x="7" y="9" width="34" height="30" rx="5" fill="#081a5c" stroke="#f2c14e" stroke-width="2"/>
+    <rect x="10.5" y="13" width="12.5" height="6.5" rx="1.6" fill="#f2c14e"/><rect x="25" y="13" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
+    <rect x="10.5" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/><rect x="25" y="21.5" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
+    <rect x="10.5" y="30" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/><rect x="25" y="30" width="12.5" height="6.5" rx="1.6" fill="#2a5ce0"/>
+    <path d="M12.6 16.2h6.2" stroke="#081a5c" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.8" cy="16.2" r="1.3" fill="#081a5c"/>
+    <ellipse cx="31.2" cy="24.75" rx="2.6" ry="1.9" fill="#6f9dff" stroke="#f2c14e" stroke-width=".9"/><ellipse cx="16.7" cy="24.75" rx="2.6" ry="1.9" fill="#6f9dff" stroke="#f2c14e" stroke-width=".9"/>`),
   /* Minesweeper: a mine and a flag */
   mines:GICO("#9aa8bd","#3f4a5e",`<path d="M24 8v5M24 35v5M8 24h5M35 24h5M12.7 12.7l3.5 3.5M31.8 31.8l3.5 3.5M12.7 35.3l3.5-3.5M31.8 16.2l3.5-3.5" stroke="#141a26" stroke-width="3.4" stroke-linecap="round"/>
     <circle cx="24" cy="24" r="11" fill="#141a26"/><circle cx="20" cy="20" r="3.4" fill="${GW}" opacity=".9"/><circle cx="17.8" cy="25.5" r="1.2" fill="${GW}" opacity=".35"/>`),
@@ -91,4 +98,4 @@ const GLYPH_BASE={
     <path d="M24 10a8 8 0 0 0-4.8 14.4c.8.6 1.3 1.6 1.3 2.6V29h7v-2c0-1 .5-2 1.3-2.6A8 8 0 0 0 24 10z" fill="#ffe27a"/><path d="M20.5 32h7M21.5 35.5h5" stroke="#cdd6e8" stroke-width="2.2" stroke-linecap="round"/><path d="M21 15.5a4 4 0 0 1 3-1.8" stroke="${GW}" stroke-width="1.8" stroke-linecap="round" fill="none"/>`)
 };
 /* unlimited versions share their daily game's icon (the row adds an infinity badge) */
-const GLYPH=Object.assign({},GLYPH_BASE,{strandsu:GLYPH_BASE.strands,worldleu:GLYPH_BASE.worldle,travleu:GLYPH_BASE.travle,globleu:GLYPH_BASE.globle,nbrsu:GLYPH_BASE.nbrs,flagleu:GLYPH_BASE.flagle,hilou:GLYPH_BASE.hilo,queensu:GLYPH_BASE.queens,timelineu:GLYPH_BASE.timeline,msu:GLYPH_BASE.mines,maptapu:GLYPH_BASE.maptap,stateleu:GLYPH_BASE.statele,diveu:GLYPH_BASE.dive,climbu:GLYPH_BASE.climb});
+const GLYPH=Object.assign({},GLYPH_BASE,{strandsu:GLYPH_BASE.strands,worldleu:GLYPH_BASE.worldle,travleu:GLYPH_BASE.travle,globleu:GLYPH_BASE.globle,nbrsu:GLYPH_BASE.nbrs,flagleu:GLYPH_BASE.flagle,hilou:GLYPH_BASE.hilo,queensu:GLYPH_BASE.queens,timelineu:GLYPH_BASE.timeline,feudu:GLYPH_BASE.feud,msu:GLYPH_BASE.mines,maptapu:GLYPH_BASE.maptap,stateleu:GLYPH_BASE.statele,diveu:GLYPH_BASE.dive,climbu:GLYPH_BASE.climb});
