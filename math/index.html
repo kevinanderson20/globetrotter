@@ -931,7 +931,7 @@ const GT_BK=(()=>{
 })();
 /* ==/BACKUP== */
 /* ================= MATH: rapid-fire mental arithmetic ================= */
-const APP_VERSION="2026.11.19-1306";
+const APP_VERSION="2026.11.19-1315";
 const LS="globetrotter.math.v1";
 const $=id=>document.getElementById(id);
 const app=$('app');
@@ -1567,14 +1567,16 @@ home();
   const hl=D.createElement("label"), hi=D.createElement("input"); hi.type="checkbox"; hi.setAttribute("switch",""); hi.tabIndex=-1;
   hl.setAttribute("aria-hidden","true"); hl.style.cssText="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9px;top:0";
   hl.appendChild(hi); B.appendChild(hl); hl.addEventListener("click",e=>e.stopPropagation());
-  const haptic=()=>{ try{ if(navigator.vibrate&&!/iP(hone|ad|od)/.test(navigator.userAgent)) navigator.vibrate(8); else hl.click(); }catch(e){} };
+  // the iPhone trick taps a hidden switch, which would pull focus (and the keyboard) away from a text box, so skip it while typing
+  const typing=()=>{ const a=D.activeElement; return !!a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!/^(checkbox|radio|button|submit|range)$/.test(a.type)); };
+  const haptic=()=>{ try{ if(navigator.vibrate&&!/iP(hone|ad|od)/.test(navigator.userAgent)) navigator.vibrate(8); else if(!typing()) hl.click(); }catch(e){} };
   window.GT_HAPTIC=haptic;
   let lastTap=null, lastAt=0;
   D.addEventListener("pointerdown",e=>{ lastTap=e.target.closest("button,[role=button],a,.mc,.qc,.cell,.tile"); lastAt=performance.now(); },{capture:true,passive:true});
   /* answer feedback: the thing you tapped springs on a right answer and shakes on a wrong one */
   function react(kind){ if(RM.matches||!lastTap||!lastTap.isConnected||performance.now()-lastAt>700) return; if(lastTap.closest(".tabbar,.pad,.kb,.dspad,.ckeys,.msboard,.qboard")) return;
     const el=lastTap, c=kind==="no"?"fb-no":"fb-ok"; el.classList.remove("fb-ok","fb-no"); void el.offsetWidth; el.classList.add(c); setTimeout(()=>el.classList.remove(c),520); }
-  if(typeof window.snd==="function"){ const o=window.snd; window.snd=function(k){ haptic(); if(k==="ok"||k==="no") react(k); return o.apply(this,arguments); }; }
+  if(typeof window.snd==="function"){ const o=window.snd; window.snd=function(k){ if(k!=="tick") haptic(); if(k==="ok"||k==="no") react(k); return o.apply(this,arguments); }; }
 
   /* tab bar: a tick on tap, and the tab you land on gives a small bounce */
   const tb=D.querySelector(".tabbar");

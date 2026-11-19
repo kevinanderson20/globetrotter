@@ -978,7 +978,7 @@ let tt; function toast(text,undo){ const el=$("toast"); $("toastT").textContent=
 
 /* a small tick on iPhone (iOS 18+) and Android */
 const hl=(()=>{ try{ const l=document.createElement("label"); l.setAttribute("aria-hidden","true"); l.style.cssText="position:fixed;left:-99px;top:0;opacity:0;pointer-events:none"; l.innerHTML='<input type="checkbox" switch tabindex="-1">'; document.body.appendChild(l); return l; }catch(e){ return null; } })();
-function haptic(){ try{ if(navigator.vibrate) navigator.vibrate(8); else hl&&hl.click(); }catch(e){} }
+function haptic(){ try{ const a=document.activeElement, typing=a&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT"&&!/^(checkbox|radio|button|submit)$/.test(a.type)); if(navigator.vibrate) navigator.vibrate(8); else if(!typing) hl&&hl.click(); }catch(e){} }
 
 /* compact title once the large one scrolls away */
 const nav=$("nav"); new IntersectionObserver(([en])=>nav.classList.toggle("stuck",!en.isIntersecting),{rootMargin:"-56px 0px 0px 0px"}).observe($("ttl"));

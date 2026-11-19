@@ -65,11 +65,12 @@ function startFeud(opt={}){
       <div class="fdboard"><div class="fdq">${esc(Q.q)}</div><div class="fdgrid" style="--rows:${rows}">${order.map(tile).join("")}</div></div>
       ${roundOver()?`<div class="fdend"><p>${st.strikes>=3?"Three strikes.":"You found them all!"} Round score <b>${st.bank} × ${mult} = ${st.bank*mult}</b></p>
         <button class="btn go wide" id="fdnext">${st.r<2?`Round ${st.r+2}`:"Fast Money"}</button></div>`
-      :`<form class="fdin" id="fdform" autocomplete="off"><input id="fdg" type="text" enterkeyhint="go" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn go" type="submit">Guess</button></form>
+      :`<form class="fdin" id="fdform" autocomplete="off"><input id="fdg" type="text" enterkeyhint="send" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn go" type="submit">Guess</button></form>
         <button class="btn ghost small fdgive" id="fdgive" type="button">Reveal the board</button>`}
     </div>`;
     const f=$('fdform');
     if(f){ f.onsubmit=e=>{ e.preventDefault(); const g=$('fdg').value.trim(); if(!g||busy) return; guess(g); };
+      f.querySelector("button").addEventListener("pointerdown",e=>e.preventDefault());   // tapping Guess doesn't close the keyboard
       $('fdgive').onclick=()=>{ if(busy) return; st.strikes=3; endRound(); };
       setTimeout(()=>{ const i=$('fdg'); if(i&&!matchMedia("(hover: none)").matches) i.focus(); },60); }
     const nx=$('fdnext'); if(nx) nx.onclick=next;
@@ -103,15 +104,18 @@ function startFeud(opt={}){
       <button class="btn go wide" id="fdgo">Start the clock</button></div>`;
     $('fdgo').onclick=fmPlay; }
   function fmPlay(){ let t0=performance.now(), left0=st.left;
+    // the page is drawn once; each question only swaps the text, so the same answer box (and the keyboard) stays put
+    stage.innerHTML=`<div class="fd"><div class="fdclock" aria-live="off"><b id="fdsec">${Math.ceil(st.left/10)}</b><i><span id="fdbar"></span></i></div>
+      <div class="fdboard fdfm"><span class="fdqn" id="fdqn"></span><div class="fdq" id="fdqt"></div></div>
+      <form class="fdin" id="fdform" autocomplete="off"><input id="fdg" type="text" enterkeyhint="send" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn go" type="submit">Next</button></form>
+      <button class="btn ghost small fdgive" id="fdpass" type="button">Pass</button></div>`;
+    const inp=$('fdg');
     const ask=()=>{ if(st.fmi>=5||st.left<=0) return fmReveal(); const Q=FQ[st.fm[st.fmi]];
-      stage.innerHTML=`<div class="fd"><div class="fdclock" aria-live="off"><b id="fdsec">${Math.ceil(st.left/10)}</b><i><span id="fdbar"></span></i></div>
-        <div class="fdboard fdfm"><span class="fdqn">Question ${st.fmi+1} of 5</span><div class="fdq">${esc(Q.q)}</div></div>
-        <form class="fdin" id="fdform" autocomplete="off"><input id="fdg" type="text" enterkeyhint="next" autocapitalize="off" spellcheck="false" placeholder="Your answer" aria-label="Your answer"><button class="btn go" type="submit">Next</button></form>
-        <button class="btn ghost small fdgive" id="fdpass" type="button">Pass</button></div>`;
-      $('fdform').onsubmit=e=>{ e.preventDefault(); answer($('fdg').value.trim()); };
-      $('fdpass').onclick=()=>answer("");
-      const i=$('fdg'); i.focus(); setTimeout(()=>i.focus(),50); };
-    const answer=a=>{ st.fma[st.fmi]=a; st.fmi++; persist(); if(S.sound) snd("tick"); ask(); };
+      $('fdqn').textContent=`Question ${st.fmi+1} of 5`; $('fdqt').textContent=Q.q; inp.value=""; inp.focus(); };
+    $('fdform').onsubmit=e=>{ e.preventDefault(); answer(inp.value.trim()); };
+    $('fdpass').addEventListener("pointerdown",e=>e.preventDefault());   // tapping Pass doesn't close the keyboard
+    $('fdpass').onclick=()=>answer("");
+    const answer=a=>{ if(st.fmi>=5) return; st.fma[st.fmi]=a; st.fmi++; persist(); if(S.sound) snd("tick"); ask(); };
     const tick=()=>{ const el=$('fdsec'); st.left=Math.max(0,left0-Math.floor((performance.now()-t0)/100));
       if(el){ el.textContent=Math.ceil(st.left/10); const b=$('fdbar'); if(b) b.style.transform=`scaleX(${st.left/(FD_FM_SECS*10)})`; el.parentNode.classList.toggle("low",st.left<=50); }
       if(st.left%10===0&&st.left<=50&&st.left>0&&S.sound&&tick.last!==st.left){ tick.last=st.left; snd("tick"); }
@@ -138,6 +142,7 @@ function startFeud(opt={}){
   if(st.phase==="fm") return st.fmi>0||st.left<FD_FM_SECS*10?fmPlay():fmIntro();
   board();
 }
+document.addEventListener("keydown",e=>{ if(e.key!=="Enter"||e.isComposing) return; const t=e.target; if(!(t&&t.id==="fdg")) return; e.preventDefault(); const f=t.form; if(f) (f.requestSubmit?f.requestSubmit():f.dispatchEvent(new Event("submit",{cancelable:true}))); });
 const FD_X='<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M18 18 82 82M82 18 18 82" stroke="currentColor" stroke-width="20" stroke-linecap="round"/></svg>';
 function fdShare(st,daily){ const rounds=st.main.map((qi,r)=>{ const n=FQ[qi].a.length, got=st.rs[r]!=null?Math.round((st.rs[r]/FD_MULT[r])):0; return `R${r+1} ${st.rs[r]||0}`; }).join(" · ");
   const fm=st.fm.map((qi,k)=>{ const a=st.fma[k]||"", h=a?fdFind(a,FQ[qi],[]):null; return !h?"⬜":h[0]===0?"🟩":"🟨"; }).join("");

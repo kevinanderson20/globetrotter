@@ -1,7 +1,7 @@
 // Globetrotter offline support: keeps a copy of every tab (World, USA, Earth, Math, Games) on the device.
 // Pages open instantly from the saved copy, and a fresh copy is fetched in the background for next time.
 // The app checks version.json and offers "tap to update" when a newer version is online.
-const CACHE = "globetrotter-v18";
+const CACHE = "globetrotter-v19";
 // The offline Bible and the study notes live in their own cache, so app updates don't make you download them again.
 const DATA = "globetrotter-data-v1";
 const isData = url => /\/verses\/(bible|data)\//.test(url.pathname);
