@@ -115,6 +115,11 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .el b{font-size:2.85cqw;font-weight:800;line-height:1;letter-spacing:-.02em}
 .el small{position:absolute;left:1px;top:0;font-size:1.45cqw;font-weight:700;opacity:.65;line-height:1.1;display:none}
 @container (min-width:560px){.el small{display:block}.el b{font-size:2.5cqw;margin-top:.6cqw}}
+.el .w{display:none;font-style:normal;font-family:var(--f-body);font-weight:600;font-size:.95cqw;opacity:.75;line-height:1;margin-top:.2cqw;font-variant-numeric:tabular-nums}
+@container (min-width:900px){.el{align-content:center;gap:0}.el .w{display:block}.el b{font-size:2.2cqw;margin-top:.9cqw}.el small{font-size:1cqw;left:3px;top:2px}}
+.el.blank .w{visibility:hidden}
+.extab.big{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.extab.big .pt{width:920px}
 .ph{grid-column:3;display:grid;place-items:center;border-radius:3px;background:var(--fc);opacity:.45;font:700 1.3cqw var(--f-body);color:var(--el-ink);aspect-ratio:1/1.14;overflow:hidden;white-space:nowrap}
 .gap{grid-column:1/-1}
 .el.dim{opacity:.18}

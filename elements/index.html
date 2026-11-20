@@ -115,6 +115,11 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:
 .el b{font-size:2.85cqw;font-weight:800;line-height:1;letter-spacing:-.02em}
 .el small{position:absolute;left:1px;top:0;font-size:1.45cqw;font-weight:700;opacity:.65;line-height:1.1;display:none}
 @container (min-width:560px){.el small{display:block}.el b{font-size:2.5cqw;margin-top:.6cqw}}
+.el .w{display:none;font-style:normal;font-family:var(--f-body);font-weight:600;font-size:.95cqw;opacity:.75;line-height:1;margin-top:.2cqw;font-variant-numeric:tabular-nums}
+@container (min-width:900px){.el{align-content:center;gap:0}.el .w{display:block}.el b{font-size:2.2cqw;margin-top:.9cqw}.el small{font-size:1cqw;left:3px;top:2px}}
+.el.blank .w{visibility:hidden}
+.extab.big{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.extab.big .pt{width:920px}
 .ph{grid-column:3;display:grid;place-items:center;border-radius:3px;background:var(--fc);opacity:.45;font:700 1.3cqw var(--f-body);color:var(--el-ink);aspect-ratio:1/1.14;overflow:hidden;white-space:nowrap}
 .gap{grid-column:1/-1}
 .el.dim{opacity:.18}
@@ -942,7 +947,7 @@ const GT_BK=(()=>{
    silly sentence for the symbols, then quizzes: tap it on the table, name the glowing cell, pick the symbol.
    Every answer feeds a spaced-repetition schedule; Review brings back what's due. Name them all and In order
    are the full-recall drills, and the Daily 10 is the same ten questions for everyone each day. */
-const APP_VERSION="2026.11.20-0914";
+const APP_VERSION="2026.11.20-1007";
 const LS="globetrotter.elements.v1";
 const $=id=>document.getElementById(id);
 const app=$('app'), play=$('play'), ptab=$('ptable'), panel=$('panel');
@@ -1155,10 +1160,12 @@ const Z=range(1,118), SYM=z=>ELS[z-1][0], NAME=z=>ELS[z-1][1];
 const lessonTitle=l=>`${NAME(l.z[0])} to ${NAME(l.z[l.z.length-1])}`;
 
 /* ---------- saved progress ---------- */
-const FRESH=()=>({el:{}, done:{}, daily:{}, best:{}, days:[], sound:true, color:"fam", tips:false});
+const FRESH=()=>({el:{}, done:{}, daily:{}, best:{}, days:[], sound:true, color:"fam", tips:false, wq:true, big:false});
 let S=FRESH();
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
+if(S.wq==null) S.wq=true;
+const WT=z=>ELS[z-1][2];
 if(!S.v2){ S.v2=1; for(const l of LESSONS) if(!S.done[l.id]&&l.z.every(z=>S.el[z]&&S.el[z].n>0)) S.done[l.id]=2; save(); }
 const dstr=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const today=()=>dstr(new Date());
@@ -1188,7 +1195,7 @@ function snd(k){ if(!S.sound||!ac()) return;
 /* ================= the table ================= */
 // one cell per element on an 18-column grid; rows 9 and 10 hold the lanthanides and actinides
 function tableHTML(o={}){ let h=`<div class="pt ${o.cls||""}" style="${o.style||""}">`;
-  for(const z of Z){ const [c,r]=cellOf(z); h+=`<button class="el f-${famOf(z)}" data-z="${z}" style="grid-column:${c};grid-row:${r}" tabindex="-1" aria-label="${esc(NAME(z))}"><small>${z}</small><b>${SYM(z)}</b></button>`; }
+  for(const z of Z){ const [c,r]=cellOf(z); h+=`<button class="el f-${famOf(z)}" data-z="${z}" style="grid-column:${c};grid-row:${r}" tabindex="-1" aria-label="${esc(NAME(z))}"><small>${z}</small><b>${SYM(z)}</b><i class="w">${WT(z)}</i></button>`; }
   h+=`<span class="ph f-lan" style="grid-column:3;grid-row:6">57–71</span><span class="ph f-act" style="grid-column:3;grid-row:7">89–103</span><span class="gap" style="grid-row:8"></span>`;
   return h+`</div>`; }
 const cellEl=(root,z)=>root.querySelector(`.el[data-z="${z}"]`);
@@ -1237,7 +1244,7 @@ function step(){ const s=SES; progress(); if(s.i>=s.steps.length) return finish(
   if(q.t==="teach"){ paint(ptab,{scope,hl:q.z}); flash(ptab,q.z,"pop",700);
     const k=s.taught=(s.taught||0)+1, tot=s.steps.filter(x=>x.t==="teach").length;
     panel.innerHTML=`<div class="teach"><p class="eyebrow">New element ${k} of ${tot}</p>${tile(q.z,true)}
-      <div class="facts"><span>${esc(FAM[famOf(q.z)])}</span><span>${where(q.z)}</span></div>
+      <div class="facts"><span>${esc(FAM[famOf(q.z)])}</span><span>${where(q.z)}</span><span>Atomic weight ${esc(WT(q.z))}</span></div>
       <p class="hook">${esc(ELS[q.z-1][3])}</p><button class="btn go wide" id="nx">${k===tot?"See them together":"Next"}</button></div>`;
     $('nx').onclick=()=>{ const e=E(q.z); e.n++; if(!e.due) e.due=dayNo(); next(); }; return; }
   if(q.t==="mnem"){ const l=s.lesson; paint(ptab,{scope,hlSet:new Set(l.z)});
@@ -1247,7 +1254,7 @@ function step(){ const s=SES; progress(); if(s.i>=s.steps.length) return finish(
       <div class="about"><b>${esc(UNITS[l.u].name)}</b> ${esc(UNITS[l.u].about)}</div>
       <button class="btn go wide" id="nx">Quiz me</button></div>`; $('nx').onclick=next; return; }
   s.asked++;
-  const opts=q.t==="find"||q.t==="type"?null:q.t==="znum"?numOpts(q.z):distract(q.z,s.pool,q.t==="sym"?"sym":"name");
+  const opts=q.t==="find"||q.t==="type"?null:q.t==="znum"||q.t==="wt"?numOpts(q.z):distract(q.z,s.pool,q.t==="sym"?"sym":"name");
   let prompt="", sub="";
   if(q.t==="find"){ paint(ptab,{scope,blank:q.blankAll?true:null}); prompt=`Tap <b>${esc(NAME(q.z))}</b>`; sub=q.blankAll?"The symbols are hidden. Go by position.":"Find it on the table."; }
   else if(q.t==="name"){ paint(ptab,{scope,hl:q.z,blank:new Set([q.z])}); prompt="Which element is glowing?"; }
@@ -1255,9 +1262,10 @@ function step(){ const s=SES; progress(); if(s.i>=s.steps.length) return finish(
   else if(q.t==="who"){ paint(ptab,{scope,blank:new Set([q.z])}); prompt=`Which element is <b class="sy">${SYM(q.z)}</b>?`; }
   else if(q.t==="num"){ paint(ptab,{scope,blank:new Set([q.z])}); prompt=`Which element is number <b>${q.z}</b>?`; }
   else if(q.t==="type"){ paint(ptab,{scope,hl:q.z,blank:new Set([q.z])}); prompt="Type the name of the glowing element"; }
+  else if(q.t==="wt"){ paint(ptab,{scope,hl:q.z}); prompt=`What's the atomic weight of <b>${esc(NAME(q.z))}</b>?`; sub="Hint: it's usually a bit more than twice the atomic number for anything past calcium."; }
   else if(q.t==="znum"){ paint(ptab,{scope,hl:q.z}); prompt=`What's the atomic number of <b>${esc(NAME(q.z))}</b>?`; sub="Count across the rows. It's also the number of protons."; }
   panel.innerHTML=`<div class="ask"><p class="prompt">${prompt}</p>${sub?`<p class="muted center">${sub}</p>`:""}
-    ${opts?`<div class="opts">${opts.map(z=>`<button class="opt" data-a="${z}">${q.t==="sym"?`<b class="sy">${SYM(z)}</b>`:q.t==="znum"?`<b class="sy">${z}</b>`:esc(NAME(z))}</button>`).join("")}</div>`:""}
+    ${opts?`<div class="opts">${opts.map(z=>`<button class="opt" data-a="${z}">${q.t==="sym"?`<b class="sy">${SYM(z)}</b>`:q.t==="znum"?`<b class="sy">${z}</b>`:q.t==="wt"?`<b class="sy">${esc(WT(z))}</b>`:esc(NAME(z))}</button>`).join("")}</div>`:""}
     ${q.t==="type"?`<form class="tin" id="tform" autocomplete="off"><input id="tin" type="text" enterkeyhint="send" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Element name" aria-label="Element name"><button class="btn go" type="submit">Check</button></form><button class="btn ghost small" id="idk" type="button">I don't know</button>`:""}
     <div class="fb" id="fb"></div></div>`;
   panel.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.a,b));
@@ -1273,11 +1281,11 @@ function answer(a,btn,typed){ const s=SES, q=s.q; if(s.locked) return; s.locked=
   if(q.t==="find"&&!ok&&a>0) flash(ptab,a,"pick",0);
   panel.querySelectorAll(".opt").forEach(b=>{ const z=+b.dataset.a; b.disabled=true; if(z===q.z) b.classList.add("right"); else if(b===btn) b.classList.add("wrong"); });
   const fb=$('fb');
-  if(ok){ fb.innerHTML=`<p class="yes">${["Nice!","Right!","Yes!","Got it!"][Math.floor(Math.random()*4)]} <span>${SYM(q.z)} is ${esc(NAME(q.z))}, number ${q.z}</span></p>`; setTimeout(next,q.t==="type"?900:750); }
+  if(ok){ fb.innerHTML=`<p class="yes">${["Nice!","Right!","Yes!","Got it!"][Math.floor(Math.random()*4)]} <span>${SYM(q.z)} is ${esc(NAME(q.z))}, number ${q.z}${q.t==="wt"?`, weight ${esc(WT(q.z))}`:""}</span></p>`; setTimeout(next,q.t==="type"?900:750); }
   else { if(s.requeue!==false) s.steps.splice(Math.min(s.steps.length,s.i+3),0,{t:q.t==="find"&&q.blankAll?"find":q.t==="type"?"name":q.t,z:q.z,again:true});
-    fb.innerHTML=`<div class="no">${tile(q.z)}<div><p><b>${q.t==="find"&&a>0?`That's ${esc(NAME(a))}. `:typed?`Not "${esc(typed)}". `:""}It's ${esc(NAME(q.z))}${q.t==="znum"?`, number ${q.z}`:""}.</b></p><p>${esc(ELS[q.z-1][3])}</p></div></div><button class="btn wide" id="nx">Continue</button>`;
+    fb.innerHTML=`<div class="no">${tile(q.z)}<div><p><b>${q.t==="find"&&a>0?`That's ${esc(NAME(a))}. `:typed?`Not "${esc(typed)}". `:""}It's ${esc(NAME(q.z))}${q.t==="znum"?`, number ${q.z}`:q.t==="wt"?`, atomic weight ${esc(WT(q.z))}`:""}.</b></p><p>${esc(ELS[q.z-1][3])}</p></div></div><button class="btn wide" id="nx">Continue</button>`;
     $('nx').onclick=next; } }
-function next(){ SES.i++; step(); }
+function next(){ if(!SES||SES.kind==="fill") return; SES.i++; step(); }
 function finish(){ const s=SES; practiced(); const acc=s.asked?Math.round(s.right/(s.right+s.wrong)*100):100, secs=Math.round((Date.now()-s.t0)/1000);
   let head="", extra="";
   if(s.kind==="lesson"){ const st=acc>=95?3:acc>=80?2:1, l=s.lesson; S.done[l.id]=Math.max(S.done[l.id]||0,st);
@@ -1300,7 +1308,7 @@ const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
 
 // a lesson: teach each new element, the memory sentence, then three kinds of questions on each plus a few old ones
 function startLesson(l){ const steps=l.z.map(z=>({t:"teach",z})); steps.push({t:"mnem"});
-  const qs=[]; l.z.forEach((z,i)=>qs.push({t:"find",z},{t:"sym",z},{t:["name","znum","num"][i%3],z}));
+  const rot=S.wq?["name","znum","wt","num"]:["name","znum","num"], qs=[]; l.z.forEach((z,i)=>qs.push({t:"find",z},{t:"sym",z},{t:rot[i%rot.length],z}));
   const old=shuffle(Z.filter(z=>learned(z)&&!l.z.includes(z))).sort((a,b)=>E(a).s-E(b).s).slice(0,3); old.forEach(z=>qs.push({t:Math.random()<.5?"find":"who",z}));
   startSession({kind:"lesson",lesson:l,pool:l.z,steps:steps.concat(spread(qs))}); }
 function spread(qs){ // shuffle, then nudge so the same element never comes twice in a row
@@ -1309,7 +1317,7 @@ function nextLesson(){ return LESSONS.find(l=>!S.done[l.id])||null; }
 // review: what's due first, then the weakest; harder question types as an element gets stronger
 function startReview(){ const due=dueList().sort((a,b)=>E(a).s-E(b).s||E(a).due-E(b).due), more=Z.filter(z=>learned(z)&&!due.includes(z)).sort((a,b)=>E(a).s-E(b).s);
   const pick=due.concat(more).slice(0,12); if(!pick.length) return;
-  const qs=pick.map(z=>{ const s=E(z).s, kinds=s<=1?["find","name","sym"]:s===2?["sym","who","znum"]:s===3?["type","num","znum"]:["type","find+","num"]; let t=kinds[Math.floor(Math.random()*kinds.length)];
+  const qs=pick.map(z=>{ const s=E(z).s, kinds=s<=1?["find","name","sym"]:s===2?["sym","who","znum"]:s===3?["type","num","znum"]:["type","find+","num"]; if(S.wq&&s>=2) kinds.push("wt"); let t=kinds[Math.floor(Math.random()*kinds.length)];
     return t==="find+"?{t:"find",z,blankAll:true}:{t,z}; });
   startSession({kind:"review",pool:pick,steps:spread(qs)}); }
 // the daily 10: the same questions for everyone on a given day
@@ -1364,7 +1372,8 @@ function fillDone(gave){ const s=SES; clearInterval(s.timer); practiced(); const
 let EX={z:1};
 function explore(){ app.innerHTML=`<div class="bar"><button class="x" data-act="home" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M14 4 7 11l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">The periodic table</div></div>
   <div class="seg2" role="group" aria-label="Color by"><button data-act="col" data-c="fam" aria-pressed="${S.color!=="mastery"}">Families</button><button data-act="col" data-c="mastery" aria-pressed="${S.color==="mastery"}">What I know</button></div>
-  <div class="extab" id="extab">${tableHTML()}</div>
+  <div class="seg2" role="group" aria-label="Table size"><button data-act="big" data-b="0" aria-pressed="${!S.big}">Whole table</button><button data-act="big" data-b="1" aria-pressed="${!!S.big}">Big, with weights</button></div>
+  <div class="extab ${S.big?"big":""}" id="extab">${tableHTML()}</div>
   ${S.color==="mastery"?`<div class="legend"><span data-m="0">Not learned</span><span data-m="1">Learning</span><span data-m="2">Getting there</span><span data-m="3">Mastered</span></div>`
     :`<div class="legend fam">${Object.entries(FAM).map(([k,v])=>`<span class="f-${k}">${v}</span>`).join("")}</div>`}
   <section class="card" id="exd"></section>`;
@@ -1405,10 +1414,11 @@ function home(){ const nl=nextLesson(), due=dueList().length, d=S.daily[today()]
     </section>`; }).join("")}
   <section class="card"><h3>How it works</h3><div class="how">
     <p><b>Lessons</b> go family by family: the columns at the edges first, then the transition metals in the middle, then the two rows underneath. Each one teaches three to six elements with a hook to remember them by and a silly sentence for the symbols.</p>
+    <p><b>Atomic weights</b> are on every card and in the big table in Explore. Lessons and review ask about them too; switch that off at the bottom if you only want names, symbols, positions and numbers.</p>
     <p><b>Review</b> brings each element back just before you'd forget it: a day later, then two, four, eight and sixteen.</p>
     <p><b>Name them all</b> and <b>In order</b> are the real test. When you can fill the whole table, you know it.</p></div></section>
   <div class="foot"><div id="bk" style="width:100%"></div>
-    <div class="row" style="justify-content:center"><button class="btn ghost small" data-act="sound">Sounds ${S.sound?"on":"off"}</button><button class="btn ghost small" data-act="reset">Reset progress</button></div>
+    <div class="row" style="justify-content:center"><button class="btn ghost small" data-act="sound">Sounds ${S.sound?"on":"off"}</button><button class="btn ghost small" data-act="wq">Weight questions ${S.wq?"on":"off"}</button><button class="btn ghost small" data-act="reset">Reset progress</button></div>
     <div>Version ${esc(APP_VERSION)}</div></div>`;
   paint($('mini'),{color:"mastery"});
   if(window.GT_BK) GT_BK.ui($('bk'),{beforeBackup:save}); }
@@ -1425,6 +1435,8 @@ app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b|
   if(a==="explore") return explore();
   if(a==="home"){ home(); return scrollTo(0,0); }
   if(a==="col"){ S.color=b.dataset.c; save(); return explore(); }
+  if(a==="big"){ S.big=b.dataset.b==="1"; save(); explore(); if(S.big){ const t=$('extab'), c=cellEl(t,EX.z); t.scrollLeft=Math.max(0,c.offsetLeft-t.clientWidth/2); } return; }
+  if(a==="wq"){ S.wq=!S.wq; save(); return home(); }
   if(a==="exprev"&&EX.z>1) return exShow(EX.z-1);
   if(a==="exnext"&&EX.z<118) return exShow(EX.z+1);
   if(a==="sound"){ S.sound=!S.sound; save(); return home(); }
