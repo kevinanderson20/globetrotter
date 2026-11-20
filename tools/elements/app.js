@@ -18,6 +18,7 @@ const FRESH=()=>({el:{}, done:{}, daily:{}, best:{}, days:[], sound:true, color:
 let S=FRESH();
 try{ const raw=localStorage.getItem(LS); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
 function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
+if(!S.v2){ S.v2=1; for(const l of LESSONS) if(!S.done[l.id]&&l.z.every(z=>S.el[z]&&S.el[z].n>0)) S.done[l.id]=2; save(); }
 const dstr=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const today=()=>dstr(new Date());
 const dayNo=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
@@ -82,6 +83,9 @@ function distract(z,pool,kind){ const [c,r]=cellOf(z), out=new Set();
   const cand=kind==="sym"?shuffle(look).concat(shuffle(near)):shuffle(near).concat(shuffle(pool||[]));
   for(const y of cand.concat(shuffle(Z))){ if(y!==z) out.add(y); if(out.size>=3) break; }
   return shuffle([z,...out]); }
+// wrong numbers that are easy to confuse: one off, and the element directly above or below
+function numOpts(z){ const c=[z-1,z+1,z-8,z+8,z-18,z+18,z-32,z+32,z+2,z-2].filter(n=>n>=1&&n<=118&&n!==z), out=new Set();
+  for(const n of shuffle(c.slice(0,4)).concat(shuffle(c.slice(4)))){ out.add(n); if(out.size>=3) break; } return shuffle([z,...out]); }
 function startSession(o){ SES=Object.assign({i:0,right:0,wrong:0,asked:0,missed:new Set(),t0:Date.now()},o);
   document.body.classList.add("playing"); play.hidden=false; ptab.innerHTML=tableHTML({cls:"play-pt"}); scrollTo(0,0); step(); }
 function endSession(){ play.hidden=true; document.body.classList.remove("playing"); SES=null; home(); }
@@ -98,10 +102,11 @@ function step(){ const s=SES; progress(); if(s.i>=s.steps.length) return finish(
   if(q.t==="mnem"){ const l=s.lesson; paint(ptab,{scope,hlSet:new Set(l.z)});
     panel.innerHTML=`<div class="teach"><p class="eyebrow">Remember them in order</p><p class="mnem">${mnemHTML(l)}</p>
       <div class="syms">${l.z.map(z=>`<span class="f-${famOf(z)}"><small>${z}</small>${SYM(z)}</span>`).join("")}</div>
-      <p class="muted">Say the sentence out loud a couple of times. The capital letters are the symbols, left to right across the table.</p>
+      <p class="muted">Say the sentence out loud a couple of times. The capital letters are the symbols, ${UNITS[l.u].dir==="down"?"top to bottom down the column":"left to right across the row"}.</p>
+      <div class="about"><b>${esc(UNITS[l.u].name)}</b> ${esc(UNITS[l.u].about)}</div>
       <button class="btn go wide" id="nx">Quiz me</button></div>`; $('nx').onclick=next; return; }
   s.asked++;
-  const opts=q.t==="find"||q.t==="type"?null:distract(q.z,s.pool,q.t==="sym"?"sym":"name");
+  const opts=q.t==="find"||q.t==="type"?null:q.t==="znum"?numOpts(q.z):distract(q.z,s.pool,q.t==="sym"?"sym":"name");
   let prompt="", sub="";
   if(q.t==="find"){ paint(ptab,{scope,blank:q.blankAll?true:null}); prompt=`Tap <b>${esc(NAME(q.z))}</b>`; sub=q.blankAll?"The symbols are hidden. Go by position.":"Find it on the table."; }
   else if(q.t==="name"){ paint(ptab,{scope,hl:q.z,blank:new Set([q.z])}); prompt="Which element is glowing?"; }
@@ -109,8 +114,9 @@ function step(){ const s=SES; progress(); if(s.i>=s.steps.length) return finish(
   else if(q.t==="who"){ paint(ptab,{scope,blank:new Set([q.z])}); prompt=`Which element is <b class="sy">${SYM(q.z)}</b>?`; }
   else if(q.t==="num"){ paint(ptab,{scope,blank:new Set([q.z])}); prompt=`Which element is number <b>${q.z}</b>?`; }
   else if(q.t==="type"){ paint(ptab,{scope,hl:q.z,blank:new Set([q.z])}); prompt="Type the name of the glowing element"; }
+  else if(q.t==="znum"){ paint(ptab,{scope,hl:q.z}); prompt=`What's the atomic number of <b>${esc(NAME(q.z))}</b>?`; sub="Count across the rows. It's also the number of protons."; }
   panel.innerHTML=`<div class="ask"><p class="prompt">${prompt}</p>${sub?`<p class="muted center">${sub}</p>`:""}
-    ${opts?`<div class="opts">${opts.map(z=>`<button class="opt" data-a="${z}">${q.t==="sym"?`<b class="sy">${SYM(z)}</b>`:esc(NAME(z))}</button>`).join("")}</div>`:""}
+    ${opts?`<div class="opts">${opts.map(z=>`<button class="opt" data-a="${z}">${q.t==="sym"?`<b class="sy">${SYM(z)}</b>`:q.t==="znum"?`<b class="sy">${z}</b>`:esc(NAME(z))}</button>`).join("")}</div>`:""}
     ${q.t==="type"?`<form class="tin" id="tform" autocomplete="off"><input id="tin" type="text" enterkeyhint="send" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Element name" aria-label="Element name"><button class="btn go" type="submit">Check</button></form><button class="btn ghost small" id="idk" type="button">I don't know</button>`:""}
     <div class="fb" id="fb"></div></div>`;
   panel.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.a,b));
@@ -126,9 +132,9 @@ function answer(a,btn,typed){ const s=SES, q=s.q; if(s.locked) return; s.locked=
   if(q.t==="find"&&!ok&&a>0) flash(ptab,a,"pick",0);
   panel.querySelectorAll(".opt").forEach(b=>{ const z=+b.dataset.a; b.disabled=true; if(z===q.z) b.classList.add("right"); else if(b===btn) b.classList.add("wrong"); });
   const fb=$('fb');
-  if(ok){ fb.innerHTML=`<p class="yes">${["Nice!","Right!","Yes!","Got it!"][Math.floor(Math.random()*4)]} <span>${SYM(q.z)} is ${esc(NAME(q.z))}</span></p>`; setTimeout(next,q.t==="type"?900:750); }
+  if(ok){ fb.innerHTML=`<p class="yes">${["Nice!","Right!","Yes!","Got it!"][Math.floor(Math.random()*4)]} <span>${SYM(q.z)} is ${esc(NAME(q.z))}, number ${q.z}</span></p>`; setTimeout(next,q.t==="type"?900:750); }
   else { if(s.requeue!==false) s.steps.splice(Math.min(s.steps.length,s.i+3),0,{t:q.t==="find"&&q.blankAll?"find":q.t==="type"?"name":q.t,z:q.z,again:true});
-    fb.innerHTML=`<div class="no">${tile(q.z)}<div><p><b>${q.t==="find"&&a>0?`That's ${esc(NAME(a))}. `:typed?`Not "${esc(typed)}". `:""}It's ${esc(NAME(q.z))}.</b></p><p>${esc(ELS[q.z-1][3])}</p></div></div><button class="btn wide" id="nx">Continue</button>`;
+    fb.innerHTML=`<div class="no">${tile(q.z)}<div><p><b>${q.t==="find"&&a>0?`That's ${esc(NAME(a))}. `:typed?`Not "${esc(typed)}". `:""}It's ${esc(NAME(q.z))}${q.t==="znum"?`, number ${q.z}`:""}.</b></p><p>${esc(ELS[q.z-1][3])}</p></div></div><button class="btn wide" id="nx">Continue</button>`;
     $('nx').onclick=next; } }
 function next(){ SES.i++; step(); }
 function finish(){ const s=SES; practiced(); const acc=s.asked?Math.round(s.right/(s.right+s.wrong)*100):100, secs=Math.round((Date.now()-s.t0)/1000);
@@ -153,7 +159,7 @@ const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
 
 // a lesson: teach each new element, the memory sentence, then three kinds of questions on each plus a few old ones
 function startLesson(l){ const steps=l.z.map(z=>({t:"teach",z})); steps.push({t:"mnem"});
-  const qs=[]; for(const z of l.z){ qs.push({t:"find",z},{t:"name",z},{t:"sym",z}); }
+  const qs=[]; l.z.forEach((z,i)=>qs.push({t:"find",z},{t:"sym",z},{t:["name","znum","num"][i%3],z}));
   const old=shuffle(Z.filter(z=>learned(z)&&!l.z.includes(z))).sort((a,b)=>E(a).s-E(b).s).slice(0,3); old.forEach(z=>qs.push({t:Math.random()<.5?"find":"who",z}));
   startSession({kind:"lesson",lesson:l,pool:l.z,steps:steps.concat(spread(qs))}); }
 function spread(qs){ // shuffle, then nudge so the same element never comes twice in a row
@@ -162,13 +168,13 @@ function nextLesson(){ return LESSONS.find(l=>!S.done[l.id])||null; }
 // review: what's due first, then the weakest; harder question types as an element gets stronger
 function startReview(){ const due=dueList().sort((a,b)=>E(a).s-E(b).s||E(a).due-E(b).due), more=Z.filter(z=>learned(z)&&!due.includes(z)).sort((a,b)=>E(a).s-E(b).s);
   const pick=due.concat(more).slice(0,12); if(!pick.length) return;
-  const qs=pick.map(z=>{ const s=E(z).s, kinds=s<=1?["find","name"]:s===2?["sym","who","find"]:s===3?["type","num","who"]:["type","find+","num"]; let t=kinds[Math.floor(Math.random()*kinds.length)];
+  const qs=pick.map(z=>{ const s=E(z).s, kinds=s<=1?["find","name","sym"]:s===2?["sym","who","znum"]:s===3?["type","num","znum"]:["type","find+","num"]; let t=kinds[Math.floor(Math.random()*kinds.length)];
     return t==="find+"?{t:"find",z,blankAll:true}:{t,z}; });
   startSession({kind:"review",pool:pick,steps:spread(qs)}); }
 // the daily 10: the same questions for everyone on a given day
 function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; } return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); h^=h>>>16; return (h>>>0)/4294967296; }; }
 function startDaily(){ const r=seeded("elements-"+today()), zs=[]; while(zs.length<10){ const z=1+Math.floor(r()*118); if(!zs.includes(z)) zs.push(z); }
-  const kinds=["find","name","sym","who","num"];
+  const kinds=["find","name","sym","who","znum"];
   startSession({kind:"daily",steps:zs.map((z,i)=>({t:kinds[i%5],z})),requeue:false}); }
 
 /* ================= full recall: Name them all, In order ================= */
@@ -252,11 +258,12 @@ function home(){ const nl=nextLesson(), due=dueList().length, d=S.daily[today()]
     <div class="legend"><span data-m="0">Not learned</span><span data-m="1">Learning</span><span data-m="2">Getting there</span><span data-m="3">Mastered</span></div></section>
   ${UNITS.map((u,ui)=>{ const nd=u.lessons.filter(l=>S.done[l.id]).length; return `<section class="card unit" style="--cc:${u.c}">
     <div class="uhead"><div><h3>${esc(u.name)}</h3><p class="muted">${esc(u.sub)}</p></div><span class="ucount">${nd}/${u.lessons.length}</span></div>
+    <p class="about">${esc(u.about)}</p>
     ${u.lessons.map(l=>{ const st=S.done[l.id]||0, isNext=nl&&nl.id===l.id; return `<button class="lrow ${st?"done":""} ${isNext?"nx":""}" data-act="lesson" data-id="${l.id}">
       <span class="lnum">${st?"✓":l.i+1}</span><span class="lt"><b>${esc(lessonTitle(l))}</b><span>${l.z.map(SYM).join(" · ")}</span></span>${st?`<span class="lst">${"★".repeat(st)}<i>${"★".repeat(3-st)}</i></span>`:""}</button>`; }).join("")}
     </section>`; }).join("")}
   <section class="card"><h3>How it works</h3><div class="how">
-    <p><b>Lessons</b> introduce four to six elements at a time, row by row, each with a hook to remember it by and a silly sentence for the symbols.</p>
+    <p><b>Lessons</b> go family by family: the columns at the edges first, then the transition metals in the middle, then the two rows underneath. Each one teaches three to six elements with a hook to remember them by and a silly sentence for the symbols.</p>
     <p><b>Review</b> brings each element back just before you'd forget it: a day later, then two, four, eight and sixteen.</p>
     <p><b>Name them all</b> and <b>In order</b> are the real test. When you can fill the whole table, you know it.</p></div></section>
   <div class="foot"><div id="bk" style="width:100%"></div>
@@ -265,7 +272,7 @@ function home(){ const nl=nextLesson(), due=dueList().length, d=S.daily[today()]
   paint($('mini'),{color:"mastery"});
   if(window.GT_BK) GT_BK.ui($('bk'),{beforeBackup:save}); }
 function fillPick(kind){ app.innerHTML=`<div class="bar"><button class="x" data-act="home" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M14 4 7 11l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">${kind==="names"?"Name them all":"In order"}</div></div>
-  <p class="muted">${kind==="names"?"Type element names in any order. Each one drops into its cell. Start with a row you've learned, then go for all 118.":"Type each symbol in order of atomic number. The cell to fill glows."}</p>
+  <p class="muted">${kind==="names"?"Type element names in any order. Each one drops into its cell. Start with a family you've learned, then go for all 118.":"Type each symbol in order of atomic number. The cell to fill glows."}</p>
   <div class="scopes">${["all",...UNITS.map(u=>u.key)].map(k=>{ const b=S.best[kind+":"+k], u=UNITS.find(u=>u.key===k); return `<button class="tile scope" data-act="fill" data-k="${kind}" data-s="${k}" style="--cc:${u?u.c:"var(--ink)"}"><b>${esc(scopeName(k))}</b><span>${scopeZ(k).length} elements${b?` · best ${fmt(b)}`:""}</span></button>`; }).join("")}</div>`;
   scrollTo(0,0); }
 app.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b||b.disabled) return; const a=b.dataset.act; ac();

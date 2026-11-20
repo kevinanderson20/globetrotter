@@ -144,38 +144,59 @@ function famOf(z){ const L=(...a)=>a.includes(z);
 const periodOf=z=>z<=2?1:z<=10?2:z<=18?3:z<=36?4:z<=54?5:z<=86?6:7;
 const groupOf=z=>(z>=57&&z<=71)||(z>=89&&z<=103)?null:cellOf(z)[0];
 
-/* ---------- the lesson trail: 7 units, 22 lessons of 4 to 6 elements, each with a silly sentence
-   whose words start with the symbols in order ---------- */
+/* ---------- the lesson trail: families first (each column shares a personality), then the transition metals
+   row by row, then the two rows under the table. 11 units, 26 lessons. Each lesson has a silly sentence whose
+   capital letters spell its symbols in order; "dir" says whether that order runs down a column or across a row.
+   "about" is the family's shared trait, shown as extra info and never quizzed. ---------- */
 const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
 const UNITS=[
- {key:"p13", name:"Rows 1–3", sub:"The first 18, the ones everyone learns first", c:"#2a9d6a", lessons:[
-   {z:range(1,5),  m:"Happy HEns LIke BEans, Baked"},
-   {z:range(6,10), m:"Cats Never Order Fancy NEcklaces"},
-   {z:range(11,14),m:"NAncy's MaGic ALligator SIngs"},
-   {z:range(15,18),m:"Purple Seals CLap ARound"}]},
- {key:"p4", name:"Row 4", sub:"Potassium to krypton, the first transition metals", c:"#3f67d8", lessons:[
-   {z:range(19,24),m:"Kind CAts SCare TIny Vicious CRabs"},
-   {z:range(25,30),m:"MaNy FErrets COpy NIne CUte ZaNies"},
-   {z:range(31,36),m:"GAllant GEese ASk SEven BRave KRakens"}]},
- {key:"p5", name:"Row 5", sub:"Rubidium to xenon", c:"#8b54d0", lessons:[
-   {z:range(37,42),m:"RuBber SiRens Yell; ZoRro NiBbles MOzzarella"},
-   {z:range(43,48),m:"TeCh RUlers RHyme, PanDas AGree, CuDdle"},
-   {z:range(49,54),m:"INky SNails SoB, TElling Insects XEnon jokes"}]},
- {key:"p6", name:"Row 6", sub:"Cesium to radon, with gold, mercury and lead", c:"#ec7f19", lessons:[
-   {z:[55,56,72,73,74,75],m:"CoSy BAts HalF TAlk, Wildly REhearsing"},
-   {z:range(76,80),m:"OStriches IRritate PreTty AUnts HuGely"},
-   {z:range(81,86),m:"TaLl PlumBers BIke POorly AT RaiN"}]},
- {key:"lan", name:"Lanthanides", sub:"The first row under the table", c:"#0f9ea0", lessons:[
-   {z:range(57,61),m:"LAzy CEllos PRactice NoDding PoeMs"},
-   {z:range(62,66),m:"SMall EUropeans GuarD TaBby DYnamos"},
-   {z:range(67,71),m:"HOt ERrands TeMpt Yogi Bear's LUnch"}]},
- {key:"p7", name:"Row 7", sub:"Francium to oganesson, mostly made in labs", c:"#de3f58", lessons:[
-   {z:[87,88,104,105,106,107],m:"FRiendly RAbbits ReFuse DumB SuGary BHajis"},
-   {z:range(108,112),m:"HorSes MusT DaSh, RacinG CaNyons"},
-   {z:range(113,118),m:"NigHt FLamingos MarCh, LoVing TaSty OGres"}]},
- {key:"act", name:"Actinides", sub:"The second row under the table", c:"#7a5c3e", lessons:[
-   {z:range(89,93),m:"ACtive THieves PAss Under NePtune"},
-   {z:range(94,98),m:"PUppies AMaze CalM BaKers' CaFés"},
-   {z:range(99,103),m:"ElveS FarM MuDdy NOodle LizaRds"}]}
+ {key:"g1", name:"Column 1", sub:"Hydrogen and the alkali metals", c:"#e4573f", dir:"down",
+  about:"Hydrogen sits on top, but the rest are the alkali metals: soft, shiny and so reactive they fizz or explode in water.", lessons:[
+   {z:[1,3,11,19], m:"Hungry LIons NAp Kindly"},
+   {z:[37,55,87], m:"RuBy CaStles FRighten"}]},
+ {key:"g2", name:"Column 2", sub:"The alkaline earth metals", c:"#e8912c", dir:"down",
+  about:"A little calmer than column 1. Calcium and magnesium build bones and plants; strontium and barium color fireworks red and green.", lessons:[
+   {z:[4,12,20], m:"BEars MaGically CAmp"},
+   {z:[38,56,88], m:"SuRfers BArely RAce"}]},
+ {key:"g18", name:"Noble gases", sub:"Column 18, the far right edge", c:"#9b4fc4", dir:"down",
+  about:"They almost never react with anything, which is why they can glow safely in signs and fill balloons.", lessons:[
+   {z:[2,10,18,36], m:"HEavy NEighbors ARe KRazy"},
+   {z:[54,86,118], m:"XEna RuNs to OGres"}]},
+ {key:"g17", name:"Halogens", sub:"Column 17, next to the noble gases", c:"#5b55d6", dir:"down",
+  about:"Halogen means salt-maker. They snatch an electron from metals to make salts, like the chlorine in table salt.", lessons:[
+   {z:[9,17,35], m:"Funny CLowns BRag"},
+   {z:[53,85,117], m:"I ATe TacoS"}]},
+ {key:"g1314", name:"Boron and carbon families", sub:"Columns 13 and 14", c:"#3f8f4f", dir:"down",
+  about:"Column 13 holds aluminum; column 14 holds carbon, the basis of life, and silicon, the basis of computer chips.", lessons:[
+   {z:[5,13,31,49,81,113], m:"Big ALpacas GAllop INto TaLl NigHts"},
+   {z:[6,14,32,50,82,114], m:"Cool SIsters GEt SNacks: PB and FLapjacks"}]},
+ {key:"g1516", name:"Nitrogen and oxygen families", sub:"Columns 15 and 16", c:"#1f8ea8", dir:"down",
+  about:"Column 15 starts with nitrogen, most of the air. Column 16 starts with oxygen; its old name, chalcogens, means ore-makers.", lessons:[
+   {z:[7,15,33,51,83,115], m:"Nine Pirates ASk SoBer BIkers' MusiC"},
+   {z:[8,16,34,52,84,116], m:"Old Sailors SEe TEn POlar LoVebirds"}]},
+ {key:"t4", name:"Transition metals: row 4", sub:"Scandium to zinc, the everyday metals", c:"#b88a1c", dir:"across",
+  about:"Iron, copper, nickel and zinc. Transition metals are hard, shiny and great at carrying electricity.", lessons:[
+   {z:range(21,25), m:"SCary TIgers Visit CRazy MaNsions"},
+   {z:range(26,30), m:"FErrets COpy NIne CUte ZaNies"}]},
+ {key:"t5", name:"Transition metals: row 5", sub:"Yttrium to cadmium", c:"#a8761a", dir:"across",
+  about:"Home to silver and three of the precious platinum-group metals: ruthenium, rhodium and palladium.", lessons:[
+   {z:range(39,43), m:"Young ZebRas NiBble MOldy TaCos"},
+   {z:range(44,48), m:"RUde RHinos PaDdle AGainst ColD waves"}]},
+ {key:"t67", name:"Transition metals: rows 6 and 7", sub:"Hafnium to mercury, then the lab-made giants", c:"#8c6417", dir:"across",
+  about:"Gold, platinum, mercury and tungsten, then super-heavy elements made in labs that fall apart almost instantly.", lessons:[
+   {z:range(72,75), m:"HalF TAll Wizards REst"},
+   {z:range(76,80), m:"OStriches IRritate PreTty AUnts HuGely"},
+   {z:range(104,107), m:"ReFined DeBaters SinG BHangra"},
+   {z:range(108,112), m:"HorSes MusT DaSh, RacinG CaNyons"}]},
+ {key:"lan", name:"Lanthanides", sub:"The first row under the table", c:"#c2477a", dir:"across",
+  about:"The rare earth metals, inside strong magnets, screens and lasers. They fit in the gap at row 6, column 3.", lessons:[
+   {z:range(57,61), m:"LAzy CEllos PRactice NoDding PoeMs"},
+   {z:range(62,66), m:"SMall EUropeans GuarD TaBby DYnamos"},
+   {z:range(67,71), m:"HOt ERrands TeMpt Yogi Bear's LUnch"}]},
+ {key:"act", name:"Actinides", sub:"The second row under the table", c:"#a63d4c", dir:"across",
+  about:"All radioactive. Uranium and plutonium fuel nuclear power; they fit in the gap at row 7, column 3.", lessons:[
+   {z:range(89,93), m:"ACtive THieves PAss Under NePtune"},
+   {z:range(94,98), m:"PUppies AMaze CalM BaKers' CaFés"},
+   {z:range(99,103), m:"ElveS FarM MuDdy NOodle LizaRds"}]}
 ];
 const LESSONS=[]; UNITS.forEach((u,ui)=>u.lessons.forEach((l,li)=>LESSONS.push(Object.assign(l,{u:ui,i:li,id:u.key+"-"+(li+1)}))));
