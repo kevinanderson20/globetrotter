@@ -1,5 +1,5 @@
 /* ==BACKUP== */
-/* One backup for the whole app: every tab (World, USA, Earth, Math, Games, Hockey) keeps its progress in this
+/* One backup for the whole app: every tab (World, USA, Earth, Math, Games, Elements) keeps its progress in this
    phone's storage under a "globetrotter." key, so one code carries all of it to a new phone.
    Codes start with GTZ1: (compressed) or GT1: (plain). Copy the code, or save it as a file. */
 const GT_BK=(()=>{
@@ -23,7 +23,7 @@ const GT_BK=(()=>{
   function apply(o){ Object.entries(o.d).forEach(([k,v])=>{ if(k.startsWith(PFX)&&typeof v==="string") localStorage.setItem(k,v); });
     // until the page reloads, stop this tab from saving its old in-memory progress over what was just restored
     const set=Storage.prototype.setItem; Storage.prototype.setItem=function(k,v){ if(String(k).startsWith(PFX)) return; return set.call(this,k,v); }; }
-  const TABS=[["globetrotter.v1","World"],["globetrotter.usa.v1","USA"],["globetrotter.earth.v1","Earth"],["globetrotter.math.v1","Math"],["globetrotter.brain.v1","Games"],["globetrotter.hockey.v1","Hockey"]];
+  const TABS=[["globetrotter.v1","World"],["globetrotter.usa.v1","USA"],["globetrotter.earth.v1","Earth"],["globetrotter.math.v1","Math"],["globetrotter.brain.v1","Games"],["globetrotter.elements.v1","Elements"]];
   const tabsIn=d=>TABS.filter(([k])=>d[k]).map(([,n])=>n);
   const CSS=`.gtbk{display:grid;gap:10px}.gtbk .gtrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .gtbk .gtpane{display:grid;gap:10px;background:var(--surface-2);border-radius:14px;padding:12px;font-size:14px;color:var(--ink-2)}

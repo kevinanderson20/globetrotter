@@ -2,7 +2,7 @@
 /* The bottom tab bar shared by every tab (tools/tabbar.js, copied in by tools/build_editions.py).
    Outline icons for the other tabs, a filled icon in the tint color for the one you're on. */
 (function(){
-  const m=location.pathname.match(/\/(usa|earth|math|games|hockey)\/(?:index\.html)?$/), cur=m?m[1]:"", root=m?"../":"./";
+  const m=location.pathname.match(/\/(usa|earth|math|games|elements)\/(?:index\.html)?$/), cur=m?m[1]:"", root=m?"../":"./";
   const I=(o,f)=>`<svg viewBox="0 0 28 28" aria-hidden="true"><g class="o" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${o}</g><g class="f">${f}</g></svg>`;
   const T=[
     ["",'World',I('<circle cx="14" cy="14" r="10"/><path d="M4 14h20M14 4c3 3 4.5 6.5 4.5 10S17 21 14 24c-3-3-4.5-6.5-4.5-10S11 7 14 4z"/>',
@@ -15,8 +15,8 @@
       '<rect x="3.5" y="3.5" width="21" height="21" rx="5.5" fill="currentColor"/><path d="M9 10h5M11.5 7.5v5M9 18.5h5M16.5 9.5l3 3M19.5 9.5l-3 3M16.5 17h3M16.5 20h3" fill="none" stroke="var(--glass-solid,#fff)" stroke-width="1.8" stroke-linecap="round"/>')],
     ["games","Games",I('<path d="M8.5 8h11a5.5 5.5 0 0 1 5.3 7l-1.3 4.6a3 3 0 0 1-5 1.3L16 18.5h-4L9.5 21a3 3 0 0 1-5-1.3L3.2 15a5.5 5.5 0 0 1 5.3-7z"/><path d="M9.5 11.5v4M7.5 13.5h4"/><circle cx="18.5" cy="12.5" r=".9" fill="currentColor"/><circle cx="20.5" cy="14.8" r=".9" fill="currentColor"/>',
       '<path d="M8.5 7.5h11a6 6 0 0 1 5.8 7.6L24 19.8a3.2 3.2 0 0 1-5.4 1.4l-2.4-2.6h-4.4l-2.4 2.6A3.2 3.2 0 0 1 4 19.8l-1.3-4.7a6 6 0 0 1 5.8-7.6z" fill="currentColor"/><path d="M9.5 11.5v4M7.5 13.5h4" stroke="var(--glass-solid,#fff)" stroke-width="1.8" stroke-linecap="round"/><circle cx="18.5" cy="12.3" r="1.1" fill="var(--glass-solid,#fff)"/><circle cx="20.6" cy="14.7" r="1.1" fill="var(--glass-solid,#fff)"/>')],
-    ["hockey","Hockey",I('<path d="M9 3.5l6.2 15.2c.4 1 1.4 1.6 2.4 1.6H24"/><ellipse cx="7.5" cy="21.5" rx="3.6" ry="1.8"/><path d="M3.9 21.5v1.4c0 1 1.6 1.8 3.6 1.8s3.6-.8 3.6-1.8v-1.4"/>',
-      '<path d="M9 3.5l6.2 15.2c.4 1 1.4 1.6 2.4 1.6H24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 21.3c0-1.1 1.8-2 4-2s4 .9 4 2v1.6c0 1.1-1.8 2-4 2s-4-.9-4-2z" fill="currentColor"/>')]
+    ["elements","Elements",I('<path d="M3.5 5.5h4v13h-4zM20.5 5.5h4v13h-4zM9.5 10.5h9v8h-9zM7.5 22.5h13"/>',
+      '<path d="M3 5h5v14H3zM20 5h5v14h-5zM9.5 10h9v9h-9z" fill="currentColor"/><path d="M7.5 22.5h13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>')]
   ];
   const nav=document.createElement("nav"); nav.className="tabbar"; nav.setAttribute("aria-label","Tabs");
   nav.innerHTML=T.map(([k,n,ic])=>`<a href="${root}${k?k+"/":""}"${k===cur?' aria-current="page"':""}>${ic}<span>${n}</span></a>`).join("");

@@ -157,15 +157,15 @@ os.makedirs('math', exist_ok=True)
 open('math/index.html', 'w', encoding='utf-8').write(page)
 print('math/index.html', len(page), VERSION)
 
-# ---------------- Hockey (5-on-5 arcade hockey, not a map edition) ----------------
-page = with_premium(open('tools/hockey/page.html', encoding='utf-8').read())
-code = rep(open('tools/hockey/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
-code = rep(code, '/*ROSTERS*/', open('tools/hockey/rosters.js', encoding='utf-8').read(), 1)   # real lines and ratings
-code = rep(code, '/*SEASON*/', open('tools/hockey/season.js', encoding='utf-8').read(), 1)     # season and playoffs
+# ---------------- Elements (learn the periodic table, not a map edition) ----------------
+# Assembled from tools/elements/: page.html is the shell and styles, data.js the 118 elements and lessons, app.js the app.
+page = with_premium(open('tools/elements/page.html', encoding='utf-8').read())
+code = rep(open('tools/elements/app.js', encoding='utf-8').read(), 'const APP_VERSION="dev";', f'const APP_VERSION="{VERSION}";', 1)
+code = rep(code, '/*DATA*/', open('tools/elements/data.js', encoding='utf-8').read(), 1)
 page = rep(page, '/*APP*/', _bk + '\n' + code, 1)
-os.makedirs('hockey', exist_ok=True)
-open('hockey/index.html', 'w', encoding='utf-8').write(page)
-print('hockey/index.html', len(page), VERSION)
+os.makedirs('elements', exist_ok=True)
+open('elements/index.html', 'w', encoding='utf-8').write(page)
+print('elements/index.html', len(page), VERSION)
 
 # ---------------- Games (memory, speed and logic games; first called Brain) ----------------
 page = with_premium(open('tools/games/page.html', encoding='utf-8').read())

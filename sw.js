@@ -1,11 +1,11 @@
 // Globetrotter offline support: keeps a copy of every tab (World, USA, Earth, Math, Games) on the device.
 // Pages open instantly from the saved copy, and a fresh copy is fetched in the background for next time.
 // The app checks version.json and offers "tap to update" when a newer version is online.
-const CACHE = "globetrotter-v23";
+const CACHE = "globetrotter-v24";
 // The offline Bible and the study notes live in their own cache, so app updates don't make you download them again.
 const DATA = "globetrotter-data-v1";
 const isData = url => /\/verses\/(bible|data)\//.test(url.pathname);
-const CORE = ["./", "./usa/", "./earth/", "./math/", "./games/", "./hockey/", "./verses/", "./games/geo.json?v=2", "./games/flags.json?v=1", "./games/states.json?v=1", "./games/cities.json?v=1", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
+const CORE = ["./", "./usa/", "./earth/", "./math/", "./games/", "./elements/", "./verses/", "./games/geo.json?v=2", "./games/flags.json?v=1", "./games/states.json?v=1", "./games/cities.json?v=1", "./earth/earth-day.jpg", "./map-hi.json", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
